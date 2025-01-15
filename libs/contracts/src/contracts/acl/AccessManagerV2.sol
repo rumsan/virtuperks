@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0
-pragma solidity 0.8.20;
+pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts/utils/Multicall.sol';
 import '../interfaces/IAccessManagerV2.sol';
