@@ -1,0 +1,90 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: AccessManager
+    network: mainnet
+    source:
+      address: '0x50D75C1BC6a1cE35002C9f92D0AF4B3684aa6B74'
+      abi: AccessManager
+      startBlock: 38
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AppCreated
+        - OwnershipTransferred
+        - RoleGranted
+        - RoleRevoked
+      abis:
+        - name: AccessManager
+          file: ./abis/AccessManager.json
+      eventHandlers:
+        - event: AppCreated(indexed bytes32,indexed address)
+          handler: handleAppCreated
+        - event: OwnershipTransferred(indexed bytes32,indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: RoleGranted(bytes32,indexed bytes32,indexed address)
+          handler: handleRoleGranted
+        - event: RoleRevoked(bytes32,indexed bytes32,indexed address)
+          handler: handleRoleRevoked
+      file: ./src/access-manager.ts
+  - kind: ethereum
+    name: RewardToken
+    network: mainnet
+    source:
+      address: '0xD2E8d9173584D4DaA5C8354a79eF75ceC2dfa228'
+      abi: RewardToken
+      startBlock: 42
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - Transfer
+      abis:
+        - name: RewardToken
+          file: ./abis/RewardToken.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/reward-token.ts
+  - kind: ethereum
+    name: TaskManagement
+    network: mainnet
+    source:
+      address: '0xB5AE3e2883934457cb593793f034b401867e1372'
+      abi: TaskManagement
+      startBlock: 45
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ParticiantApplied
+        - TaskAccepted
+        - TaskApproved
+        - TaskCompleted
+        - TaskCreated
+      abis:
+        - name: TaskManagement
+          file: ./abis/TaskManagement.json
+      eventHandlers:
+        - event: ParticiantApplied(indexed string,indexed address)
+          handler: handleParticiantApplied
+        - event: TaskAccepted(indexed string)
+          handler: handleTaskAccepted
+        - event: TaskApproved(indexed string,indexed address)
+          handler: handleTaskApproved
+        - event: TaskCompleted(indexed string,indexed address)
+          handler: handleTaskCompleted
+        - event: TaskCreated(indexed string,indexed address)
+          handler: handleTaskCreated
+      file: ./src/task-management.ts
