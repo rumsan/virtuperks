@@ -1,0 +1,14 @@
+{
+  "mainnet": {
+    "AccessManager": {
+      "address": "0x50D75C1BC6a1cE35002C9f92D0AF4B3684aa6B74",
+      "startBlock": 371
+    },
+    "RewardToken": {
+      "address": "0xD2E8d9173584D4DaA5C8354a79eF75ceC2dfa228"
+    },
+    "TaskManagement": {
+      "address": "0xB5AE3e2883934457cb593793f034b401867e1372"
+    }
+  }
+}

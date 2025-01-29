@@ -1,0 +1,22 @@
+{
+  "name": "@workspace/subgraph",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p .",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "graphql": "^16.0.0",
+    "@urql/core": "^5.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@workspace/typescript-config": "workspace:*"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  }
+}

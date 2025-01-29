@@ -8,12 +8,20 @@
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' + && find . -name 'dist' -exec rm -rf '{}' + && find . -name '.next' -exec rm -rf '{}' + && find . -name '.turbo' -exec rm -rf '{}' +",
-    "publish-packages": "turbo run build lint && changeset version && changeset publish"
+    "publish-packages": "turbo run build lint && changeset version && changeset publish",
+    "bootstrap": "cd tools/local-setup && bash bootstrap.sh",
+    "reset": "cd tools/local-setup && bash reset.sh",
+    "deployContract": "npx ts-node tools/deploy/deployment.ts",
+    "graph:codegen": "cd ./apps/subgraph && graph codegen",
+    "graph:build": "cd ./apps/subgraph && graph build",
+    "graph:create-local": "cd ./apps/subgraph && graph create --node http://localhost:8020/ virtuperks",
+    "graph:deploy-local": "cd ./apps/subgraph && graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 virtuperks"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "prettier": "^3.2.5",
+    "ts-node": "^10.9.2",
     "turbo": "^2.3.0",
     "typescript": "5.5.4"
   },
@@ -22,6 +30,8 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@changesets/cli": "^2.27.11"
+    "@changesets/cli": "^2.27.11",
+    "dotenv": "^16.4.7",
+    "ethers": "^6.13.5"
   }
 }
