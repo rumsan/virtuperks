@@ -21,8 +21,6 @@ export function ListTable<T, TData>({
   columns,
   handleRowClick,
 }: ListTableProps<T, TData>) {
-  console.log(table, "table");
-
   if (!table.getHeaderGroups) {
     console.error("Invalid table object passed:", table);
     return <div>Error: Invalid table object.</div>;

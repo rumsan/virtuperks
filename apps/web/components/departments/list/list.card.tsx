@@ -79,6 +79,13 @@ export const Departments = [
     dName: "Rumsan",
     eName: "Nishu Bade Shrestha",
   },
+  {
+    id: 11,
+    cuid: "c29ufh4849ccvmfk",
+    name: "Rumsan Consulting",
+    dName: "Rumsan",
+    eName: "Nishu Bade Shrestha",
+  },
 ];
 
 const DepartmentListCard = ({ router }: any) => {
@@ -86,17 +93,11 @@ const DepartmentListCard = ({ router }: any) => {
     <div className="flex items-center w-full">
       <div className="grid grid-cols-4 gap-4 w-full">
         <Card
-          style={{
-            border: "1px dashed #3B82F6",
-            outline: "none",
-          }}
-          className="w-full flex items-center justify-center text-blue-500 bg-blue-50 cursor-pointer hover:shadow-lg hover:text-blue-400"
+          className="w-full flex items-center justify-center text-blue-500 bg-blue-50 border-sm border-primary border-dashed cursor-pointer hover:shadow-lg hover:text-blue-400"
           onClick={() => router.push(PATHS.DEPARTMENT.ADD)}
         >
-          {/* <div className="flex items-center text-blue-500 gap-2"> */}
           <span className="text-center text-base">Add Department</span>
           <Plus size={24} />
-          {/* </div> */}
         </Card>
         {Departments &&
           Departments.map((department) => {

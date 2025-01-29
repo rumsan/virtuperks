@@ -38,6 +38,10 @@ export default function DepartmentDetails({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
   const columns = useColumns();
   const table = useReactTable({
@@ -77,7 +81,12 @@ export default function DepartmentDetails({
 
       <DepartmentDetailsCard cuid={cuid} />
 
-      <DepartmentDetailsTable table={table} columns={columns} />
+      <DepartmentDetailsTable
+        table={table}
+        columns={columns}
+        setPagination={setPagination}
+        pagination={pagination}
+      />
     </main>
   );
 }
