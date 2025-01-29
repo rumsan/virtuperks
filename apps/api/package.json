@@ -29,7 +29,7 @@
     "@nestjs/platform-fastify": "^11.0.5",
     "@nestjs/swagger": "^11.0.3",
     "@prisma/client": "^6.2.1",
-    "@rumsan/extensions": "^0.1.148",
+    "@rumsan/extensions": "^0.1.103",
     "nest-winston": "^1.10.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
