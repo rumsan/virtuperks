@@ -1,7 +1,7 @@
-import { Geist, Geist_Mono } from "next/font/google";
-
+import { Providers } from "@/provider/providers";
+import { Wagmi } from "@/provider/wagmi-provider";
 import "@workspace/ui/globals.css";
-import { Providers } from "@/components/providers";
+import { Geist, Geist_Mono } from "next/font/google";
 
 const fontSans = Geist({
   subsets: ["latin"],
@@ -23,7 +23,9 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
       >
-        <Providers>{children}</Providers>
+        <Wagmi>
+          <Providers>{children}</Providers>
+        </Wagmi>
       </body>
     </html>
   );
