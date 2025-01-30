@@ -1,4 +1,7 @@
+'use client'
+
 import { Button } from "@workspace/ui/components/button";
+import { ConnectKitButton } from "connectkit";
 
 export default function Page() {
   return (
@@ -7,6 +10,7 @@ export default function Page() {
         <h1 className="text-2xl font-bold">Hello World</h1>
 
         <Button size="sm">Button</Button>
+        <ConnectKitButton />
       </div>
     </div>
   );
