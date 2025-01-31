@@ -8,12 +8,11 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "graphql": "^16.0.0",
-    "@urql/core": "^5.1.0"
+    "graphql": "^16.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "@workspace/typescript-config": "workspace:*"
+    "@workspace/typescript-config": "workspace:*",
+    "typescript": "^5.0.0"
   },
   "exports": {
     ".": "./src/index.ts",

@@ -1,11 +1,11 @@
-import { DepartmentList } from "./list";
+// import DepartmentList from "./list";
 
-function Department() {
-  return (
-    <main className="w-full">
-      <DepartmentList />
-    </main>
-  );
-}
+// function Department() {
+//   return (
+//     <main className="w-full">
+//       <DepartmentList />
+//     </main>
+//   );
+// }
 
-export default Department;
+// export default Department;
