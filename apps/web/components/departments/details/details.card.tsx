@@ -18,7 +18,7 @@ export default function DepartmentDetailsCard({
 }: DepartmentDetailsCardProps) {
   const data = Departments.find((department) => department.cuid === cuid.id);
   return (
-    <div className="grid grid-cols-3 mt-4 gap-4">
+    <div className="grid grid-cols-3 mt-4 gap-4 w-full">
       <Card className="font-normal text-base h-40 flex flex-col">
         <CardHeader className="flex-grow">
           <CardTitle className="flex p-0 mb-4">
@@ -58,6 +58,54 @@ export default function DepartmentDetailsCard({
 
         <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
           23,000
+        </CardFooter>
+      </Card>
+
+      <Card className="font-normal text-base h-40 flex flex-col">
+        <CardHeader className="flex-grow">
+          <CardTitle className="flex p-0 mb-4">
+            <span>Current tokens</span>
+            <Coins size={24} strokeWidth={2} className="ml-auto" />
+          </CardTitle>
+          <CardDescription className="flex items-center text-sm">
+            <div className="h-4"></div>
+          </CardDescription>
+        </CardHeader>
+
+        <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
+          5,000
+        </CardFooter>
+      </Card>
+
+      <Card className="font-normal text-base h-40 flex flex-col">
+        <CardHeader className="flex-grow">
+          <CardTitle className="flex p-0 mb-4">
+            <span>Allocated Tokens</span>
+            <Coins size={24} strokeWidth={2} className="ml-auto" />
+          </CardTitle>
+          <CardDescription className="flex items-center text-sm">
+            <div className="h-4"></div>
+          </CardDescription>
+        </CardHeader>
+
+        <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
+          10,000
+        </CardFooter>
+      </Card>
+
+      <Card className="font-normal text-base h-40 flex flex-col">
+        <CardHeader className="flex-grow">
+          <CardTitle className="flex p-0 mb-4">
+            <span>Redeemed Tokens</span>
+            <Coins size={24} strokeWidth={2} className="ml-auto" />
+          </CardTitle>
+          <CardDescription className="flex items-center text-sm">
+            <div className="h-4"></div>
+          </CardDescription>
+        </CardHeader>
+
+        <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
+          5,000
         </CardFooter>
       </Card>
 

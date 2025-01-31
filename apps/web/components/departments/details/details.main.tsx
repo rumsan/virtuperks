@@ -11,6 +11,12 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@workspace/ui/components/tabs";
 import { ArrowLeft } from "lucide-react";
 import React from "react";
 import { Departments } from "../list/list.card";
@@ -64,7 +70,7 @@ export default function DepartmentDetails({
   });
 
   return (
-    <main className="gap-2 p-4 sm:px-8 md:gap-8 w-full">
+    <main className="gap-2 p-4 sm:px-8 md:gap-8">
       <div
         onClick={() => router.push(PATHS.DEPARTMENT.HOME)}
         className="flex items-center gap-2 cursor-pointer hover:text-gray-400"
@@ -79,14 +85,32 @@ export default function DepartmentDetails({
         </h3>
       </div>
 
-      <DepartmentDetailsCard cuid={cuid} />
+      <Tabs defaultValue="departmentOverview" className="">
+        <div className="w-[400px]">
+          <TabsList className="flex bg-blue-50 h-10">
+            <TabsTrigger value="departmentOverview" className="w-full h-8">
+              Department Overview
+            </TabsTrigger>
+            <TabsTrigger value="allocationHistory" className="w-full h-8">
+              Allocation History
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-      <DepartmentDetailsTable
-        table={table}
-        columns={columns}
-        setPagination={setPagination}
-        pagination={pagination}
-      />
+        <div className="w-full">
+          <TabsContent className="w-full" value="departmentOverview">
+            <DepartmentDetailsCard cuid={cuid} />
+          </TabsContent>
+          <TabsContent className="w-full" value="allocationHistory">
+            <DepartmentDetailsTable
+              table={table}
+              columns={columns}
+              setPagination={setPagination}
+              pagination={pagination}
+            />
+          </TabsContent>
+        </div>
+      </Tabs>
     </main>
   );
 }

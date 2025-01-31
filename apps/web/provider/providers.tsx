@@ -18,14 +18,14 @@
 //   )
 // }
 
-"use client"
+"use client";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { ConnectKitProvider } from "connectkit"
-import * as React from "react"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ConnectKitProvider } from "connectkit";
+import * as React from "react";
 
 interface QueryProviderProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export function Providers({ children }: QueryProviderProps) {
@@ -33,14 +33,16 @@ export function Providers({ children }: QueryProviderProps) {
     defaultOptions: {
       queries: {
         refetchOnWindowFocus: false,
-        retry: false
+        retry: false,
       },
       mutations: {
-        retry: false
-      }
-    }
-  })
+        retry: false,
+      },
+    },
+  });
   return (
-    <QueryClientProvider client={queryClient}><ConnectKitProvider theme="soft">{children}</ConnectKitProvider></QueryClientProvider>
-  )
+    <QueryClientProvider client={queryClient}>
+      <ConnectKitProvider theme="soft">{children}</ConnectKitProvider>
+    </QueryClientProvider>
+  );
 }
