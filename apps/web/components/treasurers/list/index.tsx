@@ -19,7 +19,7 @@ export function TreasurerList({ router }: TreasurerListProps) {
         </div>
         <ListToolBar />
       </div>
-      <TreasurerListCard />
+      <TreasurerListCard router={router} />
     </main>
   );
 }
