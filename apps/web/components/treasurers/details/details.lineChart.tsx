@@ -32,26 +32,24 @@ const chartConfig = {
 
 export function TreasurerLineChart() {
   return (
-    <div className="w-full h-full">
-      <div>
-        <ChartContainer config={chartConfig}>
-          <BarChart accessibilityLayer data={chartData}>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Bar dataKey="desktop" fill="blue-400" radius={8} />
-          </BarChart>
-        </ChartContainer>
-      </div>
+    <div className="w-full h-[200px] mt-2">
+      <ChartContainer config={chartConfig} className="w-full h-full">
+        <BarChart accessibilityLayer data={chartData}>
+          <CartesianGrid vertical={false} />
+          <XAxis
+            dataKey="month"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+            tickFormatter={(value) => value.slice(0, 3)}
+          />
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent hideLabel />}
+          />
+          <Bar dataKey="desktop" fill="blue" radius={8} />
+        </BarChart>
+      </ChartContainer>
     </div>
   );
 }

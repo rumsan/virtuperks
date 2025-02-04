@@ -24,6 +24,7 @@ type ParticipantListProps = {
 
 export const Participants = [
   {
+    cuid: "cui3cn39nakoqxin3",
     name: "Hello A",
     email: "hello@gmail.com",
     walletAddress: "0x03hdh7gd83h9d3nd",
@@ -32,6 +33,7 @@ export const Participants = [
     userRole: "owner",
   },
   {
+    cuid: "cui3cn39nakoqxin3",
     name: "Hello A",
     email: "hello@gmail.com",
     walletAddress: "0x03hdh7gd83h9d3nd",
@@ -40,6 +42,7 @@ export const Participants = [
     userRole: "owner",
   },
   {
+    cuid: "cui3cn39nakoqxin3",
     name: "Hello A",
     email: "hello@gmail.com",
     walletAddress: "0x03hdh7gd83h9d3nd",
@@ -48,6 +51,7 @@ export const Participants = [
     userRole: "owner",
   },
   {
+    cuid: "cui3cn39nakoqxin3",
     name: "Hello A",
     email: "hello@gmail.com",
     walletAddress: "0x03hdh7gd83h9d3nd",
@@ -56,6 +60,7 @@ export const Participants = [
     userRole: "owner",
   },
   {
+    cuid: "cui3cn39nakoqxin3",
     name: "Hello A",
     email: "hello@gmail.com",
     walletAddress: "0x03hdh7gd83h9d3nd",
@@ -100,6 +105,11 @@ const ParticipantList = ({ router }: ParticipantListProps) => {
     },
   });
 
+  const handleRowClick = (row: any) => {
+    console.log("hello");
+    router.push(PATHS.PARTICIPANT.DETAILS(row.original.cuid));
+  };
+
   return (
     <main className="gap-2 p-4 sm:px-8 sm:py-10 md:gap-8 w-full">
       <div className="flex space-y-4">
@@ -118,7 +128,11 @@ const ParticipantList = ({ router }: ParticipantListProps) => {
 
       <Card className="p-4">
         <ListToolBar />
-        <ListTable table={table} columns={columns} />
+        <ListTable
+          table={table}
+          columns={columns}
+          handleRowClick={handleRowClick}
+        />
         <DataTablePagination
           table={table}
           setPagination={setPagination}
