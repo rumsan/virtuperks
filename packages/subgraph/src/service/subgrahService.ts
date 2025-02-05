@@ -1,4 +1,6 @@
-import {Client} from '@urql/core';
+// import { cacheExchange, Client, fetchExchange } from '@urql/core'
+//import {cacheExchange, Client, fetchExchange} from '@urql/core';
+import {Client} from 'urql';
 import {
   ApprovalList,
   CreatedAppList,
@@ -11,13 +13,23 @@ import {
 export class SubgraphService {
   private subgraphQuery: Client;
 
-  constructor(client: Client) {
-    this.subgraphQuery = client;
+  constructor(graphurl: Client) {
+    console.log(graphurl, 'client from queries');
+    this.subgraphQuery = graphurl;
   }
 
   async getAppCreatedlist() {
-    const {data, error} = await this.subgraphQuery.query(CreatedAppList, {});
-    return {data, error};
+    try {
+      console.log('do i reach here');
+      console.log(this.subgraphQuery, 'subgraphClient');
+      console.log(CreatedAppList, 'CreatedAppList');
+      const data = await this.subgraphQuery.query(CreatedAppList, {id: 1});
+
+      console.log(data, 'data form service file');
+      return {data};
+    } catch (error) {
+      console.log(error, 'error');
+    }
   }
 
   async getRoleGrantedList() {

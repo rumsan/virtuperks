@@ -1,3 +1,4 @@
+import { useEntity } from "@/hooks/subgraph/querycall";
 import { PATHS } from "@/routes/paths";
 import {
   Card,
@@ -89,6 +90,8 @@ export const Departments = [
 ];
 
 const DepartmentListCard = ({ router }: any) => {
+  const listOftheDepartments = useEntity();
+  console.log(listOftheDepartments.data, "listofthedepartment");
   return (
     <div className="flex items-center w-full">
       <div className="grid grid-cols-4 gap-4 w-full">

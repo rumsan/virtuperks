@@ -1,17 +1,13 @@
-export const CreatedAppList = `
-  query CreatedAppList {
-    appCreateds(first: 10, orderBy: appId) {
-      id
-      appId
-      account
-      blockNumber
-      blockTimestamp
-      transactionHash
-    }
+export const CreatedAppList = `query 
+  appCreateds
+  {
+    appCreateds(first:10){
+    appId
+    blockNumber
+    blockTimestamp
+    account
   }
-
-
-`;
+  }`;
 
 export const RoleGrantedList = `
   query RoleGranted {

@@ -84,7 +84,7 @@ export default function DepartmentBaseForm({
                   </FormItem>
                 )}
               />
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="owner"
                 render={({ field }) => (
@@ -112,7 +112,7 @@ export default function DepartmentBaseForm({
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
               <FormField
                 control={form.control}
                 name="walletAddress"
