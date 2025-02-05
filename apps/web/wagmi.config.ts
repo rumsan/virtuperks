@@ -1,15 +1,36 @@
-'use client';
+"use client";
 
-import { getDefaultConfig } from 'connectkit';
-import { createConfig, http } from 'wagmi';
-import { mainnet, polygonAmoy, sepolia } from 'wagmi/chains';
-import { safe } from 'wagmi/connectors';
+import { getDefaultConfig } from "connectkit";
+import { defineChain } from "viem";
+import { createConfig, http } from "wagmi";
+import { mainnet, polygonAmoy, sepolia } from "wagmi/chains";
 
-declare module 'wagmi' {
+import { safe } from "wagmi/connectors";
+
+declare module "wagmi" {
   interface Register {
     config: typeof config;
   }
 }
+const ganache = {
+  id: 8545, 
+  name: "Ganache",
+  network: "ganache",
+  nativeCurrency: {
+    decimals: 18,
+    name: "Ether",
+    symbol: "ETH",
+  },
+  rpcUrls: {
+    default: {
+      http: ["http://localhost:8545"], // Ganache RPC URL
+    },
+    public: {
+      http: ["http://localhost:8545"], // Ganache RPC URL
+    },
+  },
+};
+const localChain = defineChain(ganache);
 
 export const config = createConfig(
   getDefaultConfig({
@@ -18,7 +39,7 @@ export const config = createConfig(
       // sepolia,
       // arbitrumGoerli,
       // polygon,
-      polygonAmoy,
+      localChain,
       // arbitrumSepolia,
       // rahatChain,
     ],
@@ -36,16 +57,17 @@ export const config = createConfig(
       [sepolia.id]: http(),
       // [arbitrumSepolia.id]: http(),
       [polygonAmoy.id]: http(),
+      [localChain.id]: http(),
     },
-    walletConnectProjectId: '',
+    walletConnectProjectId: "",
     // Required App Info
-    appName: 'Perks',
+    appName: "Perks",
 
     // Optional App Info
     appDescription:
-      'An open-source blockchain-based financial access platform to support vulnerable communities.',
-    appUrl: 'https://family.co', // your app's url
-    appIcon: 'https://family.co/logo.png', // your app's icon, no bigger than 1024x1024px (max. 1MB)
+      "An open-source blockchain-based financial access platform to support vulnerable communities.",
+    appUrl: "https://family.co", // your app's url
+    appIcon: "https://family.co/logo.png", // your app's icon, no bigger than 1024x1024px (max. 1MB)
   }),
 );
 
