@@ -1,5 +1,6 @@
 "use client";
 
+import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import {
   Tabs,
@@ -112,6 +113,7 @@ export default function TaskDetails({ router }: TaskDetailsProps) {
               className="min-w-[10rem] fw-[600] h-10"
               variant="default"
               type="submit"
+              onClick={() => router.push(PATHS.TASKS.ADD)}
             >
               <Plus size={22} strokeWidth={2.75} />
               <span>Create Task</span>
@@ -119,7 +121,7 @@ export default function TaskDetails({ router }: TaskDetailsProps) {
           </div>
         </div>
 
-        <Tabs defaultValue="departmentOverview" className="">
+        <Tabs defaultValue="active" className="">
           <div className="w-[400px]">
             <TabsList className="flex bg-blue-50 h-10">
               <TabsTrigger value="active" className="w-full h-8">
@@ -135,10 +137,7 @@ export default function TaskDetails({ router }: TaskDetailsProps) {
             <TabsContent className="w-full" value="active">
               <ListCardDetails taskList={TaskList} />
             </TabsContent>
-            <TabsContent
-              className="w-full"
-              value="allocationHistory"
-            ></TabsContent>
+            <TabsContent className="w-full" value="completed"></TabsContent>
           </div>
         </Tabs>
       </div>

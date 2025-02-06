@@ -1,16 +1,6 @@
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Coins, Dot, ExternalLink } from "lucide-react";
-
-type Task = {
-  cuid: string;
-  title: string;
-  url: string;
-  status: string;
-  owner: string;
-  date: string;
-  participants: number;
-  tokens: number;
-};
+import { Task } from "../form/schema";
 
 type ListCardDetailsProps = {
   taskList: Task[];
@@ -30,10 +20,8 @@ const ListCardDetails = ({ taskList }: ListCardDetailsProps) => {
             </div>
 
             <div className="flex flex-col gap-1 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="text-blue-500 cursor-pointer hover:text-blue-400">
-                  {task.url}
-                </span>
+              <div className="flex items-center gap-2 cursor-pointer hover:text-blue-400">
+                <span className="text-blue-500">{task.url}</span>
                 <ExternalLink size={16} color="#297ad6" strokeWidth={2.75} />
               </div>
               <div className="flex items-center text-gray-400">
