@@ -1,7 +1,6 @@
 import MainLayout from "@/components/layout/main.layout";
-import { PropsWithChildren } from "react";
 
-const layout = ({ children }: PropsWithChildren) => {
+const HeaderLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div>
       <MainLayout>{children}</MainLayout>
@@ -9,4 +8,4 @@ const layout = ({ children }: PropsWithChildren) => {
   );
 };
 
-export default layout;
+export default HeaderLayout;
