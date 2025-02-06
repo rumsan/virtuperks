@@ -31,9 +31,7 @@
   },
   "dependencies": {
     "@changesets/cli": "^2.27.11",
-    "@urql/core": "4.3.0",
     "dotenv": "^16.4.7",
-    "ethers": "^6.13.5",
-    "urql": "4.1.0"
+    "ethers": "^6.13.5"
   }
 }
