@@ -18,7 +18,7 @@ const ParticipantDetails = ({ cuid, router }: ParticipantDetailsProps) => {
   return (
     <main className="gap-2 p-4 sm:px-8 md:gap-8">
       <div
-        onClick={() => router.push(PATHS.DEPARTMENT.HOME)}
+        onClick={() => router.push(PATHS.PARTICIPANT.HOME)}
         className="flex items-center gap-2 cursor-pointer hover:text-gray-400"
       >
         <ArrowLeft size={24} strokeWidth={2} />
