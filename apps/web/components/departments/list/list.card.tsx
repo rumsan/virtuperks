@@ -1,5 +1,3 @@
-import { useEntity } from "@/hooks/subgraph/querycall";
-
 import { PATHS } from "@/routes/paths";
 import {
   Card,
@@ -91,18 +89,9 @@ export const Departments = [
 ];
 
 const DepartmentListCard = ({ router }: any) => {
-  const listOftheDepartments = useEntity();
-  console.log(
-    listOftheDepartments?.data?.data?.data?.appCreateds,
-    "listofthedepartment",
-  );
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const result = await subgraphService.getAppCreatedlist();
-  //     console.log(result, "result");
-  //   };
-  //   fetchData();
-  // }, []);
+  // const listOftheDepartments = useEntity();
+  console.log(process.env.DEPLOYER_PRIVATE_KEY,'DEPLOYER_PRIVATE_KEY');
+
   return (
     <div className="flex items-center w-full">
       <div className="grid grid-cols-4 gap-4 w-full">
