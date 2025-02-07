@@ -1,9 +1,7 @@
 "use client";
 
-// import { cacheExchange, Client, fetchExchange } from "@urql/core";
-import { SubgraphService } from "@workspace/subgraph";
+import { SubgraphService } from "@workspace/subgraph/service";
 import { createContext, useContext } from "react";
-import { cacheExchange, Client, fetchExchange } from "urql";
 
 export type GraphContextType = {
   queryService: SubgraphService | null;
@@ -17,24 +15,12 @@ interface QueryProviderProps {
 }
 
 export function GraphQueryProvider({ children }: QueryProviderProps) {
-  // const urqlClient = new Client({
-  //   url: "http://localhost:8000/subgraphs/name/virtuperks/graphql",
-  //   exchanges: [cacheExchange, fetchExchange],
-  // });
-  // console.log(urqlClient, "urqlClient");
-  // const subgraphService = new SubgraphService( // No need to create urqlClient here
-  //   "http://localhost:8000/subgraphs/name/virtuperks/graphql",
-  // );
-  const url = "http://localhost:8000/subgraphs/name/virtuperks/graphql";
-  const subgraphService = new Client({
-    url,
-    exchanges: [cacheExchange, fetchExchange],
-  });
+  const graphql = "http://localhost:8000/subgraphs/name/virtuperks";
 
   return (
     <GraphContext.Provider
       value={{
-        queryService: new SubgraphService(subgraphService),
+        queryService: new SubgraphService(graphql),
       }}
     >
       {children}

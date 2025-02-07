@@ -4,12 +4,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
 
-import { AccessManager } from "@/abis/AccessManager";
 import { PATHS } from "@/routes/paths";
+import { deployEntityTaskManager } from "@/utils/ethers";
+import { useEthersSigner } from "@/utils/etherSigner";
 import { ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { keccak256, toBytes } from "viem";
-import { useWriteContract } from "wagmi";
 import DepartmentBaseForm from "./department.form";
 import { departmentSchema } from "./schema";
 
@@ -22,7 +21,7 @@ const defaultValues: any = {
 type DepartmentAddProps = {
   router: any;
 };
-const AccessManagerAddress = "0x50D75C1BC6a1cE35002C9f92D0AF4B3684aa6B74";
+const accessManagerContract = "0x50D75C1BC6a1cE35002C9f92D0AF4B3684aa6B74";
 
 export default function DepartmentAdd({ router }: DepartmentAddProps) {
   const form = useForm({
@@ -30,19 +29,35 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
     defaultValues: defaultValues,
   });
 
-  const { data: hash, writeContract } = useWriteContract();
+  const signer = useEthersSigner({ chainId: 8545 });
 
-  const handleDepartmentSubmit = async (data: any) => {
-    const appId = keccak256(toBytes(data.name));
+  //const { data: hash, writeContract } = useWriteContract();
+  //way to call the function of the deployed contract
+  // const handleDepartmentSubmit = async (data: any) => {
+  //   const appId = keccak256(toBytes(data.name));
 
-    const adminAddress = "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1";
+  //   const adminAddress = "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1";
 
-    writeContract({
-      address: AccessManagerAddress,
-      abi: AccessManager,
-      functionName: "createApp",
-      args: [appId, adminAddress],
-    });
+  //   writeContract({
+  //     address: AccessManagerAddress,
+  //     abi: AccessManager,
+  //     functionName: "createApp",
+  //     args: [appId, adminAddress],
+  //   });
+  // };
+  const createEntityButton = async () => {
+    if (!signer) {
+      alert("Signer is not available");
+      return;
+    }
+    const appId =
+      "0x87c3aefca89371d66a3eb9d8a8b7866fad1000286f175d57d502b71d34b7e7bd";
+    const deployContract = await deployEntityTaskManager(
+      signer,
+      accessManagerContract,
+      appId,
+    );
+  console.log(deployContract, "deployContractfrom component");
   };
 
   return (
@@ -71,7 +86,8 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
                   mode="add"
                   form={form}
                   defaultValues={defaultValues}
-                  saveForm={handleDepartmentSubmit}
+                  // saveForm={handleDepartmentSubmit}
+                  saveForm={createEntityButton}
                 >
                   <div className="flex justify-end gap-4">
                     <Button
