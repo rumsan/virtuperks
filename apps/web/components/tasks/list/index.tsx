@@ -12,7 +12,7 @@ import { Plus } from "lucide-react";
 import ListCardDetails from "./list.card";
 import TaskListStatus from "./list.status";
 
-interface TaskDetailsProps {
+interface TaskListMainProps {
   router: any;
 }
 
@@ -88,7 +88,7 @@ export const TaskList = [
   },
 ];
 
-export default function TaskDetails({ router }: TaskDetailsProps) {
+export default function TaskListMain({ router }: TaskListMainProps) {
   return (
     <main className="gap-2 p-4 sm:px-8 sm:py-10 md:gap-8 w-full">
       <div className="space-y-4">
@@ -135,7 +135,7 @@ export default function TaskDetails({ router }: TaskDetailsProps) {
 
           <div className="w-full mt-5 mb-5">
             <TabsContent className="w-full" value="active">
-              <ListCardDetails taskList={TaskList} />
+              <ListCardDetails taskList={TaskList} router={router} />
             </TabsContent>
             <TabsContent className="w-full" value="completed"></TabsContent>
           </div>

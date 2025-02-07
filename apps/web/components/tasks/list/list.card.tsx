@@ -1,16 +1,24 @@
+import { PATHS } from "@/routes/paths";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Coins, Dot, ExternalLink } from "lucide-react";
 import { Task } from "../form/schema";
 
 type ListCardDetailsProps = {
   taskList: Task[];
+  router: any;
 };
 
-const ListCardDetails = ({ taskList }: ListCardDetailsProps) => {
+const ListCardDetails = ({ taskList, router }: ListCardDetailsProps) => {
   return (
     <div className="grid grid-cols-2 gap-4">
       {taskList.map((task) => (
-        <Card key={task.cuid} className="">
+        <Card
+          key={task.cuid}
+          className="cursor-pointer"
+          onClick={() =>
+            task.cuid && router.push(PATHS.TASKS.DETAILS(task.cuid))
+          }
+        >
           <CardTitle className="flex flex-col p-4 gap-2">
             <div className="flex items-center gap-2">
               <span>{task.title}</span>

@@ -1,11 +1,11 @@
-import TaskDetails from "./list";
+import TaskListMain from "./list";
 
 interface TaskProps {
   router: any;
 }
 
 function Task({ router }: TaskProps) {
-  return <TaskDetails router={router} />;
+  return <TaskListMain router={router} />;
 }
 
 export default Task;
