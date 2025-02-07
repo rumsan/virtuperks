@@ -1,5 +1,11 @@
 start_docker() {
-    docker compose up -d
+    if command -v podman &> /dev/null; then
+        CONTAINER_CMD="podman"
+    else
+        CONTAINER_CMD="docker"
+    fi
+
+    $CONTAINER_CMD compose up -d
     
     while ! curl -s http://localhost:8000/health > /dev/null; do
         echo "Waiting for Graph Node to be ready..."
@@ -37,11 +43,7 @@ update_subgraph() {
 
     # Update the address and startBlock for accessManagerV2
     # sed -i "s/address: .*/address: \"$NEW_ACCESS_MANAGER_ADDRESS\"/g" $YAML_FILE
-  
- 
-    
 
-  
 }
 
 deploy_subgraph() {
