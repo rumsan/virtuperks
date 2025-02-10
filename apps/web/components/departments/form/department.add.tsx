@@ -4,11 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
 
+import { EntityTaskManager } from "@/abis/TaskManagement";
+import { EntityTaskBytesCode } from "@/bytecodes/entityTaskManager";
 import { PATHS } from "@/routes/paths";
-import { deployEntityTaskManager } from "@/utils/ethers";
 import { useEthersSigner } from "@/utils/etherSigner";
 import { ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { useDeployContract } from "wagmi";
 import DepartmentBaseForm from "./department.form";
 import { departmentSchema } from "./schema";
 
@@ -29,7 +31,8 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
     defaultValues: defaultValues,
   });
 
-  const signer = useEthersSigner({ chainId: 8545 });
+  // const signer = useEthersSigner({ chainId: 8545 });
+  const {deployContractAsync}= useDeployContract()
 
   //const { data: hash, writeContract } = useWriteContract();
   //way to call the function of the deployed contract
@@ -46,18 +49,25 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
   //   });
   // };
   const createEntityButton = async () => {
-    if (!signer) {
-      alert("Signer is not available");
-      return;
-    }
+    // if (!signer) {
+    //   alert("Signer is not available");
+    //   return;
+    // }
     const appId =
       "0x87c3aefca89371d66a3eb9d8a8b7866fad1000286f175d57d502b71d34b7e7bd";
-    const deployContract = await deployEntityTaskManager(
-      signer,
-      accessManagerContract,
-      appId,
-    );
-  console.log(deployContract, "deployContractfrom component");
+    // const deployContract = await deployEntityTaskManager(
+    //   signer,
+    //   accessManagerContract,
+    //   appId,
+    // );
+  const deployedContract =   await deployContractAsync({
+      abi: EntityTaskManager,
+    args: [accessManagerContract, appId],
+    chainId: 8545,
+    
+      bytecode: EntityTaskBytesCode,
+    })
+  console.log(deployedContract, "deployContractfrom component");
   };
 
   return (

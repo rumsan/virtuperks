@@ -90,7 +90,9 @@ export const Departments = [
 
 const DepartmentListCard = ({ router }: any) => {
   // const listOftheDepartments = useEntity();
-  console.log(process.env.DEPLOYER_PRIVATE_KEY,'DEPLOYER_PRIVATE_KEY');
+  console.log(process.env.DEPLOYER_PRIVATE_KEY, 'DEPLOYER_PRIVATE_KEY');
+  
+  
 
   return (
     <div className="flex items-center w-full">

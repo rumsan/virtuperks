@@ -2,6 +2,8 @@ import { EntityTaskManager } from "@/abis/TaskManagement";
 import { EntityTaskBytesCode } from "@/bytecodes/entityTaskManager";
 import { ethers } from "ethers";
 
+import {useDeployContract} from "wagmi"
+
 export const deployEntityTaskManager = async (
   signer: ethers.Signer,
   accessManagerContract: string,
