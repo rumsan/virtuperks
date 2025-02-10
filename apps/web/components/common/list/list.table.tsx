@@ -27,7 +27,7 @@ export function ListTable<T, TData>({
   }
 
   return (
-    <TableDom className="w-full mt-4">
+    <TableDom className="w-full mt-2">
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
           <TableRow key={headerGroup.id}>

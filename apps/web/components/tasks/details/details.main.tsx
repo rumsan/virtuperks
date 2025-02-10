@@ -29,17 +29,22 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
             </h3>
           </div>
           <div className="flex items-center ml-auto gap-4">
-            <Button variant="outline" className="border border-#297ad6">
-              Edit <PencilLine color="#297ad6" />
+            <Button variant="outline" className="border border-primary">
+              <span className="text-primary">Edit</span>{" "}
+              <PencilLine color="#297ad6" strokeWidth={2.5} size={20} />
             </Button>
-            <Button variant="outline">
-              Close <CircleX color="#e44134" />
+            <Button variant="outline" className="border border-red-600">
+              <span className="text-red-600">Close</span>{" "}
+              <CircleX color="#e44134" strokeWidth={2.5} size={20} />
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <TaskDetails cuid={cuid} />
+        <div className="flex w-full gap-4">
+          <TaskDetails cuid={cuid} router={router} />
+        </div>
+
+        <div className="flex w-full gap-4">
           <TaskParticipant router={router} />
         </div>
       </div>
