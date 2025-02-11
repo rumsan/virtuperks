@@ -6,12 +6,31 @@ import { Task } from "../form/schema";
 type ListCardDetailsProps = {
   taskList: Task[];
   router: any;
+  tabStatus: string;
 };
 
-const ListCardDetails = ({ taskList, router }: ListCardDetailsProps) => {
+const ListCardDetails = ({
+  taskList,
+  router,
+  tabStatus,
+}: ListCardDetailsProps) => {
+  const filteredTaskList = () => {
+    if (tabStatus === "active") {
+      return taskList.filter((task) => task.status.toLowerCase() === "open");
+    } else if (tabStatus === "completed") {
+      return taskList.filter(
+        (task) =>
+          task.status.toLowerCase() === "approved" ||
+          task.status.toLowerCase() === "closed" ||
+          task.status.toLowerCase() === "completed",
+      );
+    }
+    return taskList;
+  };
+
   return (
     <div className="grid grid-cols-2 gap-4">
-      {taskList.map((task) => (
+      {filteredTaskList().map((task) => (
         <Card
           key={task.cuid}
           className="cursor-pointer"
@@ -22,7 +41,9 @@ const ListCardDetails = ({ taskList, router }: ListCardDetailsProps) => {
           <CardTitle className="flex flex-col p-4 gap-2">
             <div className="flex items-center gap-2">
               <span>{task.title}</span>
-              <span className="w-20 h-6 flex items-center justify-center bg-green-50 rounded-full text-green-700 p-1 text-sm">
+              <span
+                className={`w-20 h-5 flex items-center justify-center font-normal rounded-full p-3 text-sm ${task.status.toLowerCase() === "closed" ? "bg-red-50 text-red-700" : "bg-green-50 text-green-700"}`}
+              >
                 {task.status}
               </span>
             </div>
@@ -41,7 +62,6 @@ const ListCardDetails = ({ taskList, router }: ListCardDetailsProps) => {
               </div>
             </div>
           </CardTitle>
-
           <div className="flex items-center gap-2 pl-4 pb-4">
             <Coins color="#297ad6" />
             <span className="text-xl text-blue-600 font-bold">

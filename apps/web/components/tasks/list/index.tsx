@@ -9,6 +9,7 @@ import {
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
 import { Plus } from "lucide-react";
+import { useState } from "react";
 import ListCardDetails from "./list.card";
 import { DatePickerWithRange } from "./list.date";
 import TaskListStatus from "./list.status";
@@ -32,7 +33,7 @@ export const TaskList = [
     cuid: "cu38nd93j930j0jf48j2",
     title: "Organize a blood donation campaign",
     url: "https://github.com/user/random-repo",
-    status: "Open",
+    status: "Closed",
     owner: "Ram Thapa Magar",
     date: "26th July, 2025",
     participants: 20,
@@ -52,7 +53,7 @@ export const TaskList = [
     cuid: "cu38nd93j930j0jf48j1",
     title: "Organize a blood donation campaign",
     url: "https://github.com/user/random-repo",
-    status: "Open",
+    status: "Approved",
     owner: "Ram Thapa Magar",
     date: "26th July, 2025",
     tokens: 100,
@@ -61,7 +62,7 @@ export const TaskList = [
     cuid: "cu38nd93j930j0jf48j4",
     title: "Organize a blood donation campaign",
     url: "https://github.com/user/random-repo",
-    status: "Open",
+    status: "Completed",
     owner: "Ram Thapa Magar",
     date: "26th July, 2025",
     participants: 20,
@@ -81,7 +82,7 @@ export const TaskList = [
     cuid: "cu38nd93j930j0jf48j6",
     title: "Organize a blood donation campaign",
     url: "https://github.com/user/random-repo",
-    status: "Open",
+    status: "Approved",
     owner: "Ram Thapa Magar",
     date: "26th July, 2025",
     participants: 20,
@@ -90,6 +91,8 @@ export const TaskList = [
 ];
 
 export default function TaskListMain({ router }: TaskListMainProps) {
+  const [tabStatus, setTabStatus] = useState("active");
+
   return (
     <main className="gap-2 p-4 sm:px-8 sm:py-10 md:gap-8 w-full">
       <div className="space-y-4">
@@ -126,10 +129,18 @@ export default function TaskListMain({ router }: TaskListMainProps) {
           <div className="flex items-center">
             <div className="w-[400px]">
               <TabsList className="flex bg-blue-50 h-10 ">
-                <TabsTrigger value="active" className="w-full h-8">
+                <TabsTrigger
+                  value="active"
+                  className="w-full h-8"
+                  onClick={() => setTabStatus("active")}
+                >
                   Active
                 </TabsTrigger>
-                <TabsTrigger value="completed" className="w-full h-8">
+                <TabsTrigger
+                  value="completed"
+                  className="w-full h-8"
+                  onClick={() => setTabStatus("completed")}
+                >
                   Completed
                 </TabsTrigger>
               </TabsList>
@@ -142,9 +153,20 @@ export default function TaskListMain({ router }: TaskListMainProps) {
 
           <div className="w-full mt-5 mb-5">
             <TabsContent className="w-full" value="active">
-              <ListCardDetails taskList={TaskList} router={router} />
+              <ListCardDetails
+                taskList={TaskList}
+                router={router}
+                tabStatus={tabStatus}
+              />
             </TabsContent>
-            <TabsContent className="w-full" value="completed"></TabsContent>
+            <TabsContent className="w-full" value="completed">
+              <ListCardDetails
+                taskList={TaskList}
+                router={router}
+                value="completed"
+                tabStatus={tabStatus}
+              />
+            </TabsContent>
           </div>
         </Tabs>
       </div>
