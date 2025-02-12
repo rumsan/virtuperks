@@ -13,7 +13,7 @@ import {
 interface ListTableProps<T, TData> {
   columns: ColumnDef<T>[];
   table: Table<TData>;
-  handleRowClick?: (row: any) => void;
+  handleRowClick?: (row: TData) => void;
 }
 
 export function ListTable<T, TData>({
@@ -27,7 +27,7 @@ export function ListTable<T, TData>({
   }
 
   return (
-    <TableDom className="w-full mt-4">
+    <TableDom className="w-full mt-2">
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
           <TableRow key={headerGroup.id}>
@@ -53,7 +53,7 @@ export function ListTable<T, TData>({
               className="text-sm text-black-900 cursor-pointer h-5"
               key={row.id}
               data-state={row.getIsSelected() && "selected"}
-              onClick={() => handleRowClick && handleRowClick(row)}
+              onClick={() => handleRowClick && handleRowClick(row.original)}
             >
               {row.getVisibleCells().map((cell) => (
                 <TableCell key={cell.id}>

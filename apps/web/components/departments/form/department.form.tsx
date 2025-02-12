@@ -9,17 +9,10 @@ import {
   FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select";
+import { Wallet } from "lucide-react";
+import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Department } from "./schema";
-import React from "react";
-import { Wallet } from "lucide-react";
 
 interface DepartmentFormProps {
   mode: "add" | "edit";
@@ -30,25 +23,8 @@ interface DepartmentFormProps {
   children: React.ReactNode;
 }
 
-export const departmentOwnerList = [
-  {
-    id: 1,
-    name: "A",
-  },
-  {
-    id: 2,
-    name: "B",
-  },
-  {
-    id: 3,
-    name: "C",
-  },
-];
-
 export default function DepartmentBaseForm({
-  mode,
   saveForm,
-  defaultValues,
   form,
   children,
 }: DepartmentFormProps) {
@@ -58,7 +34,7 @@ export default function DepartmentBaseForm({
     },
     (errors) => {
       console.log("Validation errors:", errors);
-    }
+    },
   );
   return (
     <>

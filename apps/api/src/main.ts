@@ -3,15 +3,15 @@
  * This is only a minimal backend to get started.
  */
 
-import { Logger, ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { NestFastifyApplication } from '@nestjs/platform-fastify';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { RsExceptionFilter } from '@rumsan/extensions/exceptions';
-import { ResponseTransformInterceptor } from '@rumsan/extensions/interceptors';
-import { WinstonModule } from 'nest-winston';
-import { AppModule } from './app/app.module';
-import { loggerInstance } from './helpers/logger/winston.logger';
+import {Logger, ValidationPipe} from '@nestjs/common';
+import {NestFactory} from '@nestjs/core';
+import {NestFastifyApplication} from '@nestjs/platform-fastify';
+import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
+import {RsExceptionFilter} from '@rumsan/extensions/exceptions';
+import {ResponseTransformInterceptor} from '@rumsan/extensions/interceptors';
+import {WinstonModule} from 'nest-winston';
+import {AppModule} from './app/app.module';
+import {loggerInstance} from './helpers/logger/winston.logger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, {
@@ -27,7 +27,7 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true,
       transform: true,
-      transformOptions: { enableImplicitConversion: true },
+      transformOptions: {enableImplicitConversion: true},
     }),
   );
   app.useGlobalFilters(new RsExceptionFilter());
@@ -40,10 +40,7 @@ async function bootstrap() {
     .setTitle('Rumsan App')
     .setDescription('API service for Rumsan Apps')
     .setVersion('1.0')
-    .addBearerAuth(
-      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
-      'JWT',
-    )
+    .addBearerAuth({type: 'http', scheme: 'bearer', bearerFormat: 'JWT'}, 'JWT')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
