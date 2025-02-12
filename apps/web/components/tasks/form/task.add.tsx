@@ -5,6 +5,7 @@ import { Card, CardContent } from "@workspace/ui/components/card";
 
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
+import { Calendar } from "@workspace/ui/components/calendar";
 import {
   Form,
   FormControl,
@@ -27,7 +28,8 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select";
 import { Textarea } from "@workspace/ui/components/textarea";
-import { ArrowLeft, Calendar, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { ArrowLeft, CalendarIcon, Copy } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Task, taskSchema } from "./schema";
@@ -36,10 +38,11 @@ const defaultValues: Task = {
   title: "",
   url: "",
   status: "",
+  description: "",
   owner: "",
   date: "",
-  participants: 0,
-  tokens: 0,
+  participants: "",
+  tokens: "",
 };
 
 type TaskAddProps = {
@@ -106,11 +109,21 @@ export default function TaskAdd({ router }: TaskAddProps) {
                             <FormItem>
                               <FormLabel>Task URL</FormLabel>
                               <FormControl>
-                                <Input
-                                  placeholder="Write title for the task"
-                                  {...field}
-                                  value={field.value ?? ""}
-                                />
+                                <div className="relative flex items-center bg-gray-200 rounded-md">
+                                  <Input
+                                    placeholder="Write title for the task"
+                                    {...field}
+                                    value={field.value ?? ""}
+                                  />
+
+                                  <div className="absolute right-2 flex items-center">
+                                    <Copy
+                                      size={20}
+                                      strokeWidth={2.5}
+                                      color="#334155"
+                                    />
+                                  </div>
+                                </div>
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -160,21 +173,11 @@ export default function TaskAdd({ router }: TaskAddProps) {
                             <FormItem>
                               <FormLabel>Token</FormLabel>
                               <FormControl>
-                                {/* <Select
-                                  {...field}
-                                  value={String(field.value ?? 0)}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select token type"></SelectValue>
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="ERC20">ERC20</SelectItem>
-                                  </SelectContent>
-                                </Select> */}
                                 <Input
-                                  placeholder="Write token amount"
+                                  type="number"
+                                  placeholder="0"
                                   {...field}
-                                  value={field.value ?? 0}
+                                  value={field.value ?? ""}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -213,20 +216,31 @@ export default function TaskAdd({ router }: TaskAddProps) {
                                 >
                                   <PopoverTrigger asChild>
                                     <FormControl>
-                                      <Button
-                                        variant="outline"
-                                        className={`w-full pl-3 text-left font-normal ${
-                                          !field.value &&
-                                          "text-muted-foreground"
-                                        }`}
-                                      >
-                                        {field.value ? (
-                                          format(field.value, "PPP")
-                                        ) : (
-                                          <span>Pick a date</span>
-                                        )}
-                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                      </Button>
+                                      <div className="relative flex items-center">
+                                        <div className="w-[35px] h-full absolute flex items-center p-2">
+                                          <CalendarIcon
+                                            color="#64748B"
+                                            strokeWidth={2.5}
+                                            // size={24}
+                                            className="w-8 h-8 ml-auto"
+                                          />
+                                        </div>
+                                        <Button
+                                          variant="outline"
+                                          className={`w-full font-normal ${
+                                            !field.value &&
+                                            "text-muted-foreground"
+                                          }`}
+                                        >
+                                          {field.value ? (
+                                            format(field.value, "date")
+                                          ) : (
+                                            <span className="flex justify-start mr-auto ml-5">
+                                              Select deadline date
+                                            </span>
+                                          )}
+                                        </Button>
+                                      </div>
                                     </FormControl>
                                   </PopoverTrigger>
                                   <PopoverContent
@@ -302,7 +316,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
                               >
                                 <FormControl>
                                   <SelectTrigger>
-                                    <SelectValue placeholder="Select task owner" />
+                                    <SelectValue placeholder="Select assignees for the task" />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
