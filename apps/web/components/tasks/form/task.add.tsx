@@ -226,6 +226,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
                                           />
                                         </div>
                                         <Button
+                                          type="button"
                                           variant="outline"
                                           className={`w-full font-normal ${
                                             !field.value &&
@@ -233,7 +234,10 @@ export default function TaskAdd({ router }: TaskAddProps) {
                                           }`}
                                         >
                                           {field.value ? (
-                                            format(field.value, "date")
+                                            format(
+                                              new Date(field.value),
+                                              "MM/dd/yyyy",
+                                            )
                                           ) : (
                                             <span className="flex justify-start mr-auto ml-5">
                                               Select deadline date
