@@ -39,9 +39,9 @@ export class commonLib {
     const signer = this.getDeployerWallet();
 
     const {abi, bytecode} = await this.getContractArtifacts(contractName);
-    console.log(abi, bytecode, 'abi,bytecode');
+    
     const factory = new ethers.ContractFactory(abi, bytecode, signer);
-    console.log(factory, 'factory');
+    
     const contract = await factory.deploy(...args);
     const address = await contract.getAddress();
     await contract.waitForDeployment();

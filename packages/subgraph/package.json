@@ -1,21 +1,27 @@
 {
   "name": "@workspace/subgraph",
   "version": "0.0.0",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "exports": {
+    "./service": {
+      "import": "./dist/service/index.js",
+      "types": "./dist/service/index.d.ts"
+    },
+    "./queries": {
+      "import": "./dist/queries/index.js",
+      "types": "./dist/queries/index.d.ts"
+    }
+  },
   "scripts": {
-    "build": "tsc -p .",
-    "start": "node dist/index.js"
+    "build": "tsc",
+    "dev": "tsc --watch --preserveWatchOutput"
   },
   "dependencies": {
-    "graphql": "^16.0.0"
+    "@urql/core": "^5.1.0",
+    "graphql": "^16.0.0",
+    "urql": "^4.2.1"
   },
   "devDependencies": {
     "@workspace/typescript-config": "workspace:*",
     "typescript": "^5.0.0"
-  },
-  "exports": {
-    ".": "./src/index.ts",
-    "./*": "./src/*.ts"
   }
 }

@@ -1,1 +1,0 @@
-export {SubgraphService }from './service'
