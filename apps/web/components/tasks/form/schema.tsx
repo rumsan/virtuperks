@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export type Task = {
+type TaskBase = {
   cuid?: string;
   title: string;
   url: string;
@@ -10,6 +10,11 @@ export type Task = {
   date: string;
   participants: number;
   tokens: number;
+};
+
+export type Task = Omit<TaskBase, "participants" | "tokens"> & {
+  participants?: string | null;
+  tokens?: string | null;
 };
 
 export const taskSchema = () => {

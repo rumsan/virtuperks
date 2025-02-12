@@ -72,7 +72,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: Task) => {
     console.log(data, "data");
   };
 

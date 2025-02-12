@@ -27,7 +27,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
         <div className="text-left text-gray-600 font-bold">Action</div>
       ),
       enableHiding: false,
-      cell: ({ row }) => {
+      cell: () => {
         return (
           <span className="flex items-center gap-1">
             <CircleCheck color="#03AB65" strokeWidth={1.5} size={28} />
