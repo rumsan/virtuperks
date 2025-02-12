@@ -1,6 +1,7 @@
 "use client";
 
 import { PATHS } from "@/routes/paths";
+import { TaskList } from "@/sampleData";
 import { Button } from "@workspace/ui/components/button";
 import {
   Tabs,
@@ -17,86 +18,6 @@ import TaskListStatus from "./list.status";
 interface TaskListMainProps {
   router: any;
 }
-
-export const TaskList = [
-  {
-    cuid: "cu38nd93j930j0jf48j3",
-    title: "Organize a blood donation campaign",
-    url: "https://github.com/user/random-repo",
-    description: "Description",
-    status: "Open",
-    owner: "Ram Thapa Magar",
-    date: "26th July, 2025",
-    participants: "20",
-    tokens: "100",
-  },
-  {
-    cuid: "cu38nd93j930j0jf48j2",
-    title: "Organize a blood donation campaign",
-    url: "https://github.com/user/random-repo",
-    description: "Description",
-    status: "Closed",
-    owner: "Ram Thapa Magar",
-    date: "26th July, 2025",
-    participants: "20",
-    tokens: "120",
-  },
-  {
-    cuid: "cu38nd93j930j0jf48j0",
-    title: "Organize a blood donation campaign",
-    url: "https://github.com/user/random-repo",
-    description: "Description",
-    status: "Open",
-    owner: "Ram Thapa Magar",
-    date: "26th July, 2025",
-    participants: "20",
-    tokens: "100",
-  },
-  {
-    cuid: "cu38nd93j930j0jf48j1",
-    title: "Organize a blood donation campaign",
-    url: "https://github.com/user/random-repo",
-    description: "Description",
-    status: "Approved",
-    owner: "Ram Thapa Magar",
-    date: "26th July, 2025",
-    participants: "20",
-    tokens: "100",
-  },
-  {
-    cuid: "cu38nd93j930j0jf48j4",
-    title: "Organize a blood donation campaign",
-    url: "https://github.com/user/random-repo",
-    description: "Description",
-    status: "Completed",
-    owner: "Ram Thapa Magar",
-    date: "26th July, 2025",
-    participants: "20",
-    tokens: "150",
-  },
-  {
-    cuid: "cu38nd93j930j0jf48j5",
-    title: "Organize a blood donation campaign",
-    url: "https://github.com/user/random-repo",
-    description: "Description",
-    status: "Open",
-    owner: "Ram Thapa Magar",
-    date: "26th July, 2025",
-    participants: "20",
-    tokens: "130",
-  },
-  {
-    cuid: "cu38nd93j930j0jf48j6",
-    title: "Organize a blood donation campaign",
-    url: "https://github.com/user/random-repo",
-    description: "Description",
-    status: "Approved",
-    owner: "Ram Thapa Magar",
-    date: "26th July, 2025",
-    participants: "20",
-    tokens: "120",
-  },
-];
 
 export default function TaskListMain({ router }: TaskListMainProps) {
   const [tabStatus, setTabStatus] = useState("active");

@@ -1,34 +1,12 @@
+import { Treasurers } from "@/sampleData";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import { ArrowRight, Copy, Plus, User, Wallet } from "lucide-react";
-import React from "react";
-
-const Treasurers = [
-  {
-    id: 1,
-    eName: "Nishu Bade Shrestha",
-    walletAddress: "0xhf094bfnj38ddbj484n48",
-    amount: 23000,
-  },
-  {
-    id: 2,
-    eName: "Nishu Bade Shrestha",
-    walletAddress: "0xhf094bfnj38ddbj484n48",
-    amount: 23000,
-  },
-  {
-    id: 3,
-    eName: "Nishu Bade Shrestha",
-    walletAddress: "0xhf094bfnj38ddbj484n48",
-    amount: 23000,
-  },
-];
+import { ArrowRight, Copy, Plus, Wallet } from "lucide-react";
 
 const TreasurerListCard = () => {
   return (

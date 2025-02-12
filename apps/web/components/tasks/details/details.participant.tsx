@@ -1,5 +1,6 @@
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import { ListTable } from "@/components/common/list/list.table";
+import { participantList } from "@/sampleData";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -15,45 +16,6 @@ import { Input } from "@workspace/ui/components/input";
 import { Search, User } from "lucide-react";
 import React from "react";
 import { useColumns } from "./details.column";
-
-const participantList = [
-  {
-    walletAddress: "xx778x9873398738x1",
-    name: "Ram Thapa Magar",
-  },
-  {
-    walletAddress: "xx778x9873398738x2",
-    name: "Ram Thapa Magar",
-  },
-  {
-    walletAddress: "xx778x9873398738x3",
-    name: "Ram Thapa Magar",
-  },
-  {
-    walletAddress: "xx778x9873398738x4",
-    name: "Ram Thapa Magar",
-  },
-  {
-    walletAddress: "xx778x9873398738x5",
-    name: "Ram Thapa Magar",
-  },
-  {
-    walletAddress: "xx778x9873398738x6",
-    name: "Ram Thapa Magar",
-  },
-  {
-    walletAddress: "xx778x9873398738x7",
-    name: "Ram Thapa Magar",
-  },
-  {
-    walletAddress: "xx778x9873398738x8",
-    name: "Ram Thapa Magar",
-  },
-  {
-    walletAddress: "xx778x9873398738x9",
-    name: "Ram Thapa Magar",
-  },
-];
 
 const TaskParticipant = ({ router }: any) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);

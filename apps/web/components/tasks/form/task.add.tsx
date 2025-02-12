@@ -33,6 +33,7 @@ import { ArrowLeft, CalendarIcon, Copy } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Task, taskSchema } from "./schema";
+import { ownerList } from "@/sampleData";
 
 const defaultValues: Task = {
   title: "",
@@ -48,21 +49,6 @@ const defaultValues: Task = {
 type TaskAddProps = {
   router: any;
 };
-
-const ownerList = [
-  {
-    cuid: "cuie8738hfj409f",
-    name: "A",
-  },
-  {
-    cuid: "cuie8738hfj409w",
-    name: "B",
-  },
-  {
-    cuid: "cuie8738hfj409x",
-    name: "C",
-  },
-];
 
 export default function TaskAdd({ router }: TaskAddProps) {
   const form = useForm({
