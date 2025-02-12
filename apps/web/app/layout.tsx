@@ -26,7 +26,6 @@ export default function RootLayout({
       >
         <Wagmi>
           <GraphQueryProvider>
-            {/* {children} */}
             <Providers>{children}</Providers>
           </GraphQueryProvider>
         </Wagmi>

@@ -10,7 +10,6 @@ import {
 import { ArrowRight, Plus, User } from "lucide-react";
 
 const DepartmentListCard = ({ router }: any) => {
-  // const listOftheDepartments = useEntity();
   console.log(process.env.DEPLOYER_PRIVATE_KEY, "DEPLOYER_PRIVATE_KEY");
 
   return (

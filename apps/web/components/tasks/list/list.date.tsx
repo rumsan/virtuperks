@@ -36,18 +36,6 @@ export function DatePickerWithRange({
                   !date && "text-muted-foreground",
                 )}
               >
-                {/* {date?.from ? (
-      date.to ? (
-        <>
-          {format(date.from, "LLL dd, y")} -{" "}
-          {format(date.to, "LLL dd, y")}
-        </>
-      ) : (
-        format(date.from, "LLL dd, y")
-      )
-    ) : (
-      <span>Pick a date</span>
-    )} */}
                 <span className="text-gray-500">Select Date Range</span>
                 <div className="ml-auto">
                   <CalendarIcon size={32} strokeWidth={2.5} color="#667085" />
