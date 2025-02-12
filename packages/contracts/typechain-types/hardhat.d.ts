@@ -118,6 +118,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.EntityTaskManager__factory>;
     getContractFactory(
+      name: "EntityTaskManagerFactory",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.EntityTaskManagerFactory__factory>;
+    getContractFactory(
       name: "IAccessManagerV1",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IAccessManagerV1__factory>;
@@ -137,6 +141,10 @@ declare module "hardhat/types/runtime" {
       name: "AbstractTokenActions",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.AbstractTokenActions__factory>;
+    getContractFactory(
+      name: "Proxy",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Proxy__factory>;
     getContractFactory(
       name: "RewardClaimer",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -277,6 +285,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.EntityTaskManager>;
     getContractAt(
+      name: "EntityTaskManagerFactory",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.EntityTaskManagerFactory>;
+    getContractAt(
       name: "IAccessManagerV1",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -301,6 +314,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.AbstractTokenActions>;
+    getContractAt(
+      name: "Proxy",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Proxy>;
     getContractAt(
       name: "RewardClaimer",
       address: string | ethers.Addressable,
@@ -417,6 +435,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.EntityTaskManager>;
     deployContract(
+      name: "EntityTaskManagerFactory",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.EntityTaskManagerFactory>;
+    deployContract(
       name: "IAccessManagerV1",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IAccessManagerV1>;
@@ -436,6 +458,10 @@ declare module "hardhat/types/runtime" {
       name: "AbstractTokenActions",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.AbstractTokenActions>;
+    deployContract(
+      name: "Proxy",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Proxy>;
     deployContract(
       name: "RewardClaimer",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -576,6 +602,11 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.EntityTaskManager>;
     deployContract(
+      name: "EntityTaskManagerFactory",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.EntityTaskManagerFactory>;
+    deployContract(
       name: "IAccessManagerV1",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -600,6 +631,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.AbstractTokenActions>;
+    deployContract(
+      name: "Proxy",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Proxy>;
     deployContract(
       name: "RewardClaimer",
       args: any[],

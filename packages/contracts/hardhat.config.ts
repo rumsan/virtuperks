@@ -1,6 +1,10 @@
 /** @type import('hardhat/config').HardhatUserConfig */
 import '@nomicfoundation/hardhat-toolbox';
+import * as dotenv from 'dotenv';
 import { HardhatUserConfig } from 'hardhat/config';
+dotenv.config();
+
+
 
 
 const config: HardhatUserConfig = {
@@ -27,6 +31,14 @@ const config: HardhatUserConfig = {
     outDir: 'typechain-types',
     target: 'ethers-v6',
   },
+   
+  networks: {
+    ganache: {
+      url: "http://0.0.0.0:8545/",
+      chainId: 8545,
+      accounts: [`${process.env.DEPLOYER_PRIVATE_KEY}`]
+  }
+ }
 }
 
 export default config;
