@@ -9,14 +9,14 @@
   },
   "rewardToken": {
     "address": "0xD2E8d9173584D4DaA5C8354a79eF75ceC2dfa228",
-    "startBlock": 42
+    "startBlock": 41
   },
   "entity": {
     "address": "0xB5AE3e2883934457cb593793f034b401867e1372",
-    "startBlock": 44
+    "startBlock": 43
   },
   "entityFactory": {
-    "address": "0x6320ca8209d9a1F127D740ce01A5b728384255f8",
-    "startBlock": 19369
+    "address": "0x56F7DC1Cc938d6d6575B68d70d381F9C28C8C7b7",
+    "startBlock": 45
   }
 }

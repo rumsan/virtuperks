@@ -5,10 +5,9 @@ import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
 
 import { PATHS } from "@/routes/paths";
-import { AccessManagerABI } from '@workspace/contracts/abis';
+import { EntityFactoryABI } from '@workspace/contracts/abis';
 import { ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { keccak256, toBytes } from "viem";
 import { useDeployContract, useWriteContract } from "wagmi";
 import DepartmentBaseForm from "./department.form";
 import { departmentSchema } from "./schema";
@@ -34,40 +33,33 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
   const {deployContractAsync}= useDeployContract()
 
   const { data: hash, writeContract } = useWriteContract();
-  //way to call the function of the deployed contract
-  const handleDepartmentSubmit = async (data: any) => {
-    const appId = keccak256(toBytes(data.name));
+  //functin that call the createApp function in the accessManager contract
+  // const handleDepartmentSubmit = async (data: any) => {
+  //  console.log(data,'data from form')
+  //   const appId = keccak256(toBytes(data.name));
  
 
-    writeContract({
-      address: process.env.NEXT_PUBLIC_ACCESSMANAGER as `0x${string}` || '0x0000000000000000000000000000000000000000',
-      abi: AccessManagerABI,
-      functionName: "createApp",
-      args: [appId, process.env.NEXT_PUBLIC_ADMIN],
-        //chainId of the network
-    });
-  };
-  // const createEntityButton = async () => {
-  //   // if (!signer) {
-  //   //   alert("Signer is not available");
-  //   //   return;
-  //   // }
-  //   const appId =
-  //     "0x87c3aefca89371d66a3eb9d8a8b7866fad1000286f175d57d502b71d34b7e7bd";
-  //   // const deployContract = await deployEntityTaskManager(
-  //   //   signer,
-  //   //   accessManagerContract,
-  //   //   appId,
-  //   // );
-  // const deployedContract =   await deployContractAsync({
-  //     abi: EntityTaskManager,
-  //   args: [accessManagerContract, appId],
-  //   chainId: 8545,
-    
-  //     bytecode: EntityTaskBytesCode,
-  //   })
-  // console.log(deployedContract, "deployContractfrom component");
+  //   writeContract({
+  //     address: process.env.NEXT_PUBLIC_ACCESSMANAGER as `0x${string}` || '0x0000000000000000000000000000000000000000',
+  //     abi: AccessManagerABI,
+  //     functionName: "createApp",
+  //     args: [appId, process.env.NEXT_PUBLIC_ADMIN],
+  //       //chainId of the network
+  //   });
   // };
+  const createEntityButton = async () => {
+  
+    const appId =
+      "0x5bf5ae4a633cdd72f66abc7b09e647e8df970f94fad392525ba8c6e42dc83737";
+  
+    writeContract({
+      address: process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}` || '0x ',
+      abi: EntityFactoryABI,
+      functionName: "createEntityTaskManager",
+      args: [process.env.NEXT_PUBLIC_ACCESSMANAGER , appId],
+   })
+
+  };
 
   return (
     <>
@@ -96,7 +88,7 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
                   form={form}
                   defaultValues={defaultValues}
                   // saveForm={handleDepartmentSubmit}
-                  saveForm={handleDepartmentSubmit}
+                  saveForm={createEntityButton}
                 >
                   <div className="flex justify-end gap-4">
                     <Button

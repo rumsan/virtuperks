@@ -93,14 +93,15 @@ class SeedProject extends commonLib {
 async function main() {
   const seedProject = new SeedProject();
   const RUMSAN_APP_ID = ethers.id('RUMSAN_APP');
- // const {accessManagerV2} =
-   // await seedProject.deployCommonContracts(RUMSAN_APP_ID);
-  //console.log('Common contracts deployed');
-  // await seedProject.deployEntityContract(
-  //   accessManagerV2.contract.target,
-  //   ethers.id('RUMSAN_ENTITY'),
-  // );
+ const {accessManagerV2} =
+   await seedProject.deployCommonContracts(RUMSAN_APP_ID);
+  console.log('Common contracts deployed');
+  await seedProject.deployEntityContract(
+    accessManagerV2.contract.target,
+    ethers.id('RUMSAN_ENTITY'),
+  );
   await seedProject.deployEntityContractFactory();
+console.log('deploy factory contract')
   await seedProject.writeToDeploymentFile('contracts', seedProject.contracts);
 }
 

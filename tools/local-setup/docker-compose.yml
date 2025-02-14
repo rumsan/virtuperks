@@ -18,7 +18,7 @@ services:
       postgres_pass: ${PASSWORD}
       postgres_db: graph-node
       ipfs: 'ipfs:5001'
-      ethereum: 'mainnet:http://${INTERNAL_HOST:-host.docker.internal}:8545'
+      ethereum: 'mainnet:http://host.docker.internal:8545'
       GRAPH_LOG: info
   ipfs:
     image: ipfs/kubo:v0.17.0
