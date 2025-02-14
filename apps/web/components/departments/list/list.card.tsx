@@ -1,4 +1,5 @@
 import { PATHS } from "@/routes/paths";
+import { Departments } from "@/sampleData";
 import {
   Card,
   CardDescription,
@@ -7,86 +8,6 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { ArrowRight, Plus, User } from "lucide-react";
-
-export const Departments = [
-  {
-    id: 1,
-    cuid: "c29ufh4849ccvmfk",
-    name: "Rumsan Consulting",
-    dName: "Rumsan",
-    eName: "Nishu Bade Shrestha",
-  },
-  {
-    id: 2,
-    cuid: "c29ufh4849ccvmfk",
-    name: "Rumsan Consulting",
-    dName: "Rumsan",
-    eName: "Nishu Bade Shrestha",
-  },
-  {
-    id: 3,
-    cuid: "c29ufh4849ccvmfk",
-    name: "Rumsan Consulting",
-    dName: "Rumsan",
-    eName: "Nishu Bade Shrestha",
-  },
-  {
-    id: 4,
-    cuid: "c29ufh4849ccvmfk",
-    name: "Rumsan Consulting",
-    dName: "Rumsan",
-    eName: "Nishu Bade Shrestha",
-  },
-  {
-    id: 5,
-    cuid: "c29ufh4849ccvmfk",
-    name: "Rumsan Consulting",
-    dName: "Rumsan",
-    eName: "Nishu Bade Shrestha",
-  },
-  {
-    id: 6,
-    cuid: "c29ufh4849ccvmfk",
-    name: "Rumsan Consulting",
-    dName: "Rumsan",
-    eName: "Nishu Bade Shrestha",
-  },
-  {
-    id: 7,
-    cuid: "c29ufh4849ccvmfk",
-    name: "Rumsan Consulting",
-    dName: "Rumsan",
-    eName: "Nishu Bade Shrestha",
-  },
-  {
-    id: 8,
-    cuid: "c29ufh4849ccvmfk",
-    name: "Rumsan Consulting",
-    dName: "Rumsan",
-    eName: "Nishu Bade Shrestha",
-  },
-  {
-    id: 9,
-    cuid: "c29ufh4849ccvmfk",
-    name: "Rumsan Consulting",
-    dName: "Rumsan",
-    eName: "Nishu Bade Shrestha",
-  },
-  {
-    id: 10,
-    cuid: "c29ufh4849ccvmfk",
-    name: "Rumsan Consulting",
-    dName: "Rumsan",
-    eName: "Nishu Bade Shrestha",
-  },
-  {
-    id: 11,
-    cuid: "c29ufh4849ccvmfk",
-    name: "Rumsan Consulting",
-    dName: "Rumsan",
-    eName: "Nishu Bade Shrestha",
-  },
-];
 
 const DepartmentListCard = ({ router }: any) => {
   // const listOftheDepartments = useEntity();

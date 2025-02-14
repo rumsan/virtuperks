@@ -5,10 +5,6 @@ import { Input } from "@workspace/ui/components/input";
 import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-// interface ListToolBarProps<TData> {
-//   table: Table<TData>;
-// }
-
 export default function ListToolBar() {
   const router = useRouter();
   return (
@@ -28,16 +24,6 @@ export default function ListToolBar() {
 
       <div className="flex gap-2 ml-auto w-[15%] justify-end">
         <ListFilter />
-        {/* <Button
-          color="primary"
-          className="min-w-[12rem] fw-[600] h-10 bg-primary"
-          variant="default"
-          type="submit"
-          onClick={() => router.push(PATHS.DEPARTMENT.ADD)}
-        >
-          <Plus size={22} strokeWidth={2.75} />
-          <span>Add Department</span>
-        </Button> */}
       </div>
     </div>
   );
