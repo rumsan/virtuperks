@@ -22,7 +22,7 @@ const defaultValues: any = {
 type DepartmentAddProps = {
   router: any;
 };
-const accessManagerContract = "0x50D75C1BC6a1cE35002C9f92D0AF4B3684aa6B74";
+
 
 export default function DepartmentAdd({ router }: DepartmentAddProps) {
   const form = useForm({
@@ -37,17 +37,14 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
   //way to call the function of the deployed contract
   const handleDepartmentSubmit = async (data: any) => {
     const appId = keccak256(toBytes(data.name));
-    const AccessManagerAddress = '0x50D75C1BC6a1cE35002C9f92D0AF4B3684aa6B74'
-
-    const adminAddress = "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1";
- console.log(AccessManagerABI,'AccessManagerABI')
+ 
 
     writeContract({
-      address: AccessManagerAddress,
+      address: process.env.NEXT_PUBLIC_ACCESSMANAGER as `0x${string}` || '0x0000000000000000000000000000000000000000',
       abi: AccessManagerABI,
       functionName: "createApp",
-      args: [appId, adminAddress],
-      chainId: 8545,  //chainId of the network
+      args: [appId, process.env.NEXT_PUBLIC_ADMIN],
+        //chainId of the network
     });
   };
   // const createEntityButton = async () => {
