@@ -70,8 +70,6 @@ export type { IRewardToken } from "./src/contracts/interfaces/IRewardToken";
 export { IRewardToken__factory } from "./factories/src/contracts/interfaces/IRewardToken__factory";
 export type { AbstractTokenActions } from "./src/contracts/libraries/AbstractTokenActions";
 export { AbstractTokenActions__factory } from "./factories/src/contracts/libraries/AbstractTokenActions__factory";
-export type { Proxy } from "./src/contracts/ProxyContract.sol/Proxy";
-export { Proxy__factory } from "./factories/src/contracts/ProxyContract.sol/Proxy__factory";
 export type { RewardClaimer } from "./src/contracts/RewardClaimer";
 export { RewardClaimer__factory } from "./factories/src/contracts/RewardClaimer__factory";
 export type { RewardToken } from "./src/contracts/RewardToken";

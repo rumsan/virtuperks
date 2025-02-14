@@ -13,6 +13,7 @@
     "contracts:test": "cd ./packages/contracts && npx hardhat test",
     "bootstrap": "cd tools/local-setup && bash bootstrap.sh",
     "reset": "cd tools/local-setup && bash reset.sh",
+    "deploy":"cd ./packages/contracts && npx hardhat run scripts/deploy-factory.ts --network ganache ",
     "deployContract": "npx ts-node tools/deploy/deployment.ts",
     "graph:codegen": "cd ./apps/subgraph && graph codegen",
     

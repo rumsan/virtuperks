@@ -1,7 +1,7 @@
-import {randomBytes} from 'crypto';
+import { randomBytes } from 'crypto';
 import * as dotenv from 'dotenv';
-import {Addressable, ethers, uuidV4} from 'ethers';
-import {commonLib} from './_common';
+import { Addressable, ethers, uuidV4 } from 'ethers';
+import { commonLib } from './_common';
 dotenv.config();
 
 interface DeployedContract {
@@ -34,13 +34,13 @@ class SeedProject extends commonLib {
       address: rumsanForwarder.contract.target as string,
       startBlock: rumsanForwarder.blockNumber,
     };
-    console.log('Forwarder deployed', rumsanForwarder.contract.target);
+ 
     const accessManagerV2 = await this.deployContract('AccessManagerV2', []);
     this.contracts['accessManagerV2'] = {
       address: accessManagerV2.contract.target as string,
       startBlock: accessManagerV2.blockNumber,
     };
-    console.log('Access Manager deployed', accessManagerV2.contract.target);
+  
 
     const rewardToken = await this.deployContract('RewardToken', [
       appId,
@@ -54,7 +54,7 @@ class SeedProject extends commonLib {
       address: rewardToken.contract.target as string,
       startBlock: rewardToken.blockNumber,
     };
-    console.log('Reward Token deployed', rewardToken.contract.target);
+ 
 
     return {rumsanForwarder, accessManagerV2, rewardToken};
   }
@@ -74,18 +74,33 @@ class SeedProject extends commonLib {
     console.log('Entity Contract deployed', entity.contract.target);
     return {entity};
   }
+
+   public async deployEntityContractFactory(
+    
+  ) {
+    const entityFactory = await this.deployContract('EntityTaskManagerFactory', [
+   
+    ]);
+    this.contracts['entityFactory'] = {
+      address: entityFactory.contract.target as string,
+      startBlock: entityFactory.blockNumber,
+    };
+    console.log('EntityFactroy Contract deployed', entityFactory.contract.target);
+    return {entityFactory};
+  }
 }
 
 async function main() {
   const seedProject = new SeedProject();
   const RUMSAN_APP_ID = ethers.id('RUMSAN_APP');
-  const {accessManagerV2} =
-    await seedProject.deployCommonContracts(RUMSAN_APP_ID);
-  console.log('Common contracts deployed');
-  await seedProject.deployEntityContract(
-    accessManagerV2.contract.target,
-    ethers.id('RUMSAN_ENTITY'),
-  );
+ // const {accessManagerV2} =
+   // await seedProject.deployCommonContracts(RUMSAN_APP_ID);
+  //console.log('Common contracts deployed');
+  // await seedProject.deployEntityContract(
+  //   accessManagerV2.contract.target,
+  //   ethers.id('RUMSAN_ENTITY'),
+  // );
+  await seedProject.deployEntityContractFactory();
   await seedProject.writeToDeploymentFile('contracts', seedProject.contracts);
 }
 

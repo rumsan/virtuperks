@@ -2,7 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export * as factorySol from "./Factory.sol";
-export * as proxyContractSol from "./ProxyContract.sol";
 export * as acl from "./acl";
 export * as interfaces from "./interfaces";
 export * as libraries from "./libraries";

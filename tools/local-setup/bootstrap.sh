@@ -10,7 +10,7 @@ deploy_contract
 
 # update_subgraph
 
-deploy_subgraph
+# deploy_subgraph
 
 node banners/success.js
 

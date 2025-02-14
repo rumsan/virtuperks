@@ -8,6 +8,7 @@ import type {
   FunctionFragment,
   Result,
   Interface,
+  EventFragment,
   AddressLike,
   ContractRunner,
   ContractMethod,
@@ -17,6 +18,7 @@ import type {
   TypedContractEvent,
   TypedDeferredTopicFilter,
   TypedEventLog,
+  TypedLogDescription,
   TypedListener,
   TypedContractMethod,
 } from "../../../common";
@@ -28,6 +30,8 @@ export interface EntityTaskManagerFactoryInterface extends Interface {
       | "deployedContracts"
       | "getDeployedContracts"
   ): FunctionFragment;
+
+  getEvent(nameOrSignatureOrTopic: "EntityTaskManagerCreated"): EventFragment;
 
   encodeFunctionData(
     functionFragment: "createEntityTaskManager",
@@ -54,6 +58,28 @@ export interface EntityTaskManagerFactoryInterface extends Interface {
     functionFragment: "getDeployedContracts",
     data: BytesLike
   ): Result;
+}
+
+export namespace EntityTaskManagerCreatedEvent {
+  export type InputTuple = [
+    entityTaskManager: AddressLike,
+    aclAddress: AddressLike,
+    _appId: BytesLike
+  ];
+  export type OutputTuple = [
+    entityTaskManager: string,
+    aclAddress: string,
+    _appId: string
+  ];
+  export interface OutputObject {
+    entityTaskManager: string;
+    aclAddress: string;
+    _appId: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
 
 export interface EntityTaskManagerFactory extends BaseContract {
@@ -131,5 +157,24 @@ export interface EntityTaskManagerFactory extends BaseContract {
     nameOrSignature: "getDeployedContracts"
   ): TypedContractMethod<[], [string[]], "view">;
 
-  filters: {};
+  getEvent(
+    key: "EntityTaskManagerCreated"
+  ): TypedContractEvent<
+    EntityTaskManagerCreatedEvent.InputTuple,
+    EntityTaskManagerCreatedEvent.OutputTuple,
+    EntityTaskManagerCreatedEvent.OutputObject
+  >;
+
+  filters: {
+    "EntityTaskManagerCreated(address,address,bytes32)": TypedContractEvent<
+      EntityTaskManagerCreatedEvent.InputTuple,
+      EntityTaskManagerCreatedEvent.OutputTuple,
+      EntityTaskManagerCreatedEvent.OutputObject
+    >;
+    EntityTaskManagerCreated: TypedContractEvent<
+      EntityTaskManagerCreatedEvent.InputTuple,
+      EntityTaskManagerCreatedEvent.OutputTuple,
+      EntityTaskManagerCreatedEvent.OutputObject
+    >;
+  };
 }

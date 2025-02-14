@@ -98,3 +98,12 @@ type TaskCreated @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+type EntityTaskManagerCreated @entity(immutable: true) {
+  id: Bytes!
+  entityTaskManager: Bytes! # address
+  aclAddress: Bytes! # address
+  _appId: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}

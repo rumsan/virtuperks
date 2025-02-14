@@ -3,8 +3,6 @@
 /* eslint-disable */
 import type * as factorySol from "./Factory.sol";
 export type { factorySol };
-import type * as proxyContractSol from "./ProxyContract.sol";
-export type { proxyContractSol };
 import type * as acl from "./acl";
 export type { acl };
 import type * as interfaces from "./interfaces";

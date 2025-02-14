@@ -142,10 +142,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.AbstractTokenActions__factory>;
     getContractFactory(
-      name: "Proxy",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Proxy__factory>;
-    getContractFactory(
       name: "RewardClaimer",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.RewardClaimer__factory>;
@@ -315,11 +311,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.AbstractTokenActions>;
     getContractAt(
-      name: "Proxy",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Proxy>;
-    getContractAt(
       name: "RewardClaimer",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -458,10 +449,6 @@ declare module "hardhat/types/runtime" {
       name: "AbstractTokenActions",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.AbstractTokenActions>;
-    deployContract(
-      name: "Proxy",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.Proxy>;
     deployContract(
       name: "RewardClaimer",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -631,11 +618,6 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.AbstractTokenActions>;
-    deployContract(
-      name: "Proxy",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.Proxy>;
     deployContract(
       name: "RewardClaimer",
       args: any[],
