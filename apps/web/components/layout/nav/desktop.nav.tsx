@@ -18,12 +18,12 @@ export default function DesktopNav() {
   return (
     <header className="border-b bg-white">
       <div className="flex h-14 items-center px-4 gap-8">
-        <nav className="flex items-center justify-center w-[24px] h-[24px]">
+        <nav className="flex items-center justify-center w-[50px] h-full">
           <Link href="/" className="flex items-center gap-2">
             <Image
-              src="/bg/finance-loader.png"
-              width={24}
-              height={24}
+              src="/bg/rumsan-logo.png"
+              width={50}
+              height={50}
               alt="Logo"
             />
           </Link>
@@ -71,7 +71,7 @@ export default function DesktopNav() {
             />
             My Tasks
           </Link>
-          <div className="flex items-center h-10 p-2 bg-gray-100 rounded-md">
+          <div className="flex items-center h-10 p-2 bg-[#F1F5F9] rounded-md">
             <span className="flex items-center gap-2 font-normal text-[#1E293B] text-sm">
               <Wallet size={18} strokeWidth={2.65} color="#334155" />{" "}
               67wdbb...383hd

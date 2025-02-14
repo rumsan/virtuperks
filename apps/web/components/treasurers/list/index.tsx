@@ -9,7 +9,7 @@ type TreasurerListProps = {
 
 export function TreasurerList({ router }: TreasurerListProps) {
   return (
-    <main className="gap-2 p-4 sm:px-8 sm:py-10 md:gap-8 w-full">
+    <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
       <div className="flex items-center space-y-4">
         <div className="flex flex-col gap-1 my-3">
           <h1 className="font-bold text-4xl">Treasurers</h1>
