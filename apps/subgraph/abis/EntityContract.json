@@ -2,7 +2,8 @@
   {
     "inputs": [
       { "internalType": "address", "name": "aclAddress", "type": "address" },
-      { "internalType": "bytes32", "name": "_appId", "type": "bytes32" }
+      { "internalType": "bytes32", "name": "_appId", "type": "bytes32" },
+      { "internalType": "string", "name": "_name", "type": "string" }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
@@ -193,6 +194,13 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "name",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       { "internalType": "string", "name": "taskId", "type": "string" }
     ],
@@ -202,13 +210,15 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "inputs": [
+      { "internalType": "string", "name": "", "type": "string" },
+      { "internalType": "address", "name": "", "type": "address" }
+    ],
     "name": "taskAssignments",
     "outputs": [
-      { "internalType": "address", "name": "participant", "type": "address" },
       {
         "internalType": "enum IEntityTaskManager.STATUS",
-        "name": "status",
+        "name": "",
         "type": "uint8"
       }
     ],

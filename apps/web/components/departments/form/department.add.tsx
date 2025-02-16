@@ -5,9 +5,10 @@ import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
 
 import { PATHS } from "@/routes/paths";
-// import { EntityFactoryABI } from '@workspace/contracts/abis';
+import { AccessManagerABI } from "@workspace/contracts/abis";
 import { ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { keccak256, toBytes } from "viem";
 import { useDeployContract, useWriteContract } from "wagmi";
 import DepartmentBaseForm from "./department.form";
 import { departmentSchema } from "./schema";
@@ -34,19 +35,19 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
 
   const { data: hash, writeContract } = useWriteContract();
   //functin that call the createApp function in the accessManager contract
-  // const handleDepartmentSubmit = async (data: any) => {
+   const handleDepartmentSubmit = async (data: any) => {
   //  console.log(data,'data from form')
-  //   const appId = keccak256(toBytes(data.name));
+   const appId = keccak256(toBytes(data.name));
  
 
-  //   writeContract({
-  //     address: process.env.NEXT_PUBLIC_ACCESSMANAGER as `0x${string}` || '0x0000000000000000000000000000000000000000',
-  //     abi: AccessManagerABI,
-  //     functionName: "createApp",
-  //     args: [appId, process.env.NEXT_PUBLIC_ADMIN],
-  //       //chainId of the network
-  //   });
-  // };
+    writeContract({
+      address: process.env.NEXT_PUBLIC_ACCESSMANAGER as `0x${string}` || '0x0000000000000000000000000000000000000000',
+      abi: AccessManagerABI,
+      functionName: "createApp",
+      args: [appId, process.env.NEXT_PUBLIC_ADMIN],
+        //chainId of the network
+    });
+  };
   const createEntityButton = async () => {
   
     const appId =
@@ -88,7 +89,7 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
                   form={form}
                   defaultValues={defaultValues}
                   // saveForm={handleDepartmentSubmit}
-                  saveForm={createEntityButton}
+                  saveForm={handleDepartmentSubmit}
                 >
                   <div className="flex justify-end gap-4">
                     <Button

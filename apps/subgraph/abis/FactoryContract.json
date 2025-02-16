@@ -19,6 +19,12 @@
         "internalType": "bytes32",
         "name": "_appId",
         "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
       }
     ],
     "name": "EntityTaskManagerCreated",
@@ -27,7 +33,8 @@
   {
     "inputs": [
       { "internalType": "address", "name": "aclAddress", "type": "address" },
-      { "internalType": "bytes32", "name": "_appId", "type": "bytes32" }
+      { "internalType": "bytes32", "name": "_appId", "type": "bytes32" },
+      { "internalType": "string", "name": "_name", "type": "string" }
     ],
     "name": "createEntityTaskManager",
     "outputs": [],
