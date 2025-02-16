@@ -34,12 +34,14 @@ class SeedProject extends commonLib {
       address: rumsanForwarder.contract.target as string,
       startBlock: rumsanForwarder.blockNumber,
     };
+     console.log('rumsan forwarder deployed', rumsanForwarder.contract.target);
  
     const accessManagerV2 = await this.deployContract('AccessManagerV2', []);
     this.contracts['accessManagerV2'] = {
       address: accessManagerV2.contract.target as string,
       startBlock: accessManagerV2.blockNumber,
     };
+    console.log('acessManager deployed', accessManagerV2.contract.target);
   
 
     const rewardToken = await this.deployContract('RewardToken', [
@@ -54,6 +56,7 @@ class SeedProject extends commonLib {
       address: rewardToken.contract.target as string,
       startBlock: rewardToken.blockNumber,
     };
+    console.log('rewardToken deployed', rewardToken.contract.target);
  
 
     return {rumsanForwarder, accessManagerV2, rewardToken};
@@ -62,10 +65,12 @@ class SeedProject extends commonLib {
   public async deployEntityContract(
     accessManagerContract: Addressable | string,
     appId: string,
+    name:string
   ) {
     const entity = await this.deployContract('EntityTaskManager', [
       accessManagerContract,
       appId,
+      name,
     ]);
     this.contracts['entity'] = {
       address: entity.contract.target as string,
@@ -93,12 +98,14 @@ class SeedProject extends commonLib {
 async function main() {
   const seedProject = new SeedProject();
   const RUMSAN_APP_ID = ethers.id('RUMSAN_APP');
+  const name = 'rumsan'
  const {accessManagerV2} =
    await seedProject.deployCommonContracts(RUMSAN_APP_ID);
   console.log('Common contracts deployed');
   await seedProject.deployEntityContract(
     accessManagerV2.contract.target,
     ethers.id('RUMSAN_ENTITY'),
+    name
   );
   await seedProject.deployEntityContractFactory();
 console.log('deploy factory contract')

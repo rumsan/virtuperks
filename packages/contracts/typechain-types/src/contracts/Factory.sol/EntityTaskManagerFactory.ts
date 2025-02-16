@@ -35,7 +35,7 @@ export interface EntityTaskManagerFactoryInterface extends Interface {
 
   encodeFunctionData(
     functionFragment: "createEntityTaskManager",
-    values: [AddressLike, BytesLike]
+    values: [AddressLike, BytesLike, string]
   ): string;
   encodeFunctionData(
     functionFragment: "deployedContracts",
@@ -64,17 +64,20 @@ export namespace EntityTaskManagerCreatedEvent {
   export type InputTuple = [
     entityTaskManager: AddressLike,
     aclAddress: AddressLike,
-    _appId: BytesLike
+    _appId: BytesLike,
+    _name: string
   ];
   export type OutputTuple = [
     entityTaskManager: string,
     aclAddress: string,
-    _appId: string
+    _appId: string,
+    _name: string
   ];
   export interface OutputObject {
     entityTaskManager: string;
     aclAddress: string;
     _appId: string;
+    _name: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -126,7 +129,7 @@ export interface EntityTaskManagerFactory extends BaseContract {
   ): Promise<this>;
 
   createEntityTaskManager: TypedContractMethod<
-    [aclAddress: AddressLike, _appId: BytesLike],
+    [aclAddress: AddressLike, _appId: BytesLike, _name: string],
     [void],
     "nonpayable"
   >;
@@ -146,7 +149,7 @@ export interface EntityTaskManagerFactory extends BaseContract {
   getFunction(
     nameOrSignature: "createEntityTaskManager"
   ): TypedContractMethod<
-    [aclAddress: AddressLike, _appId: BytesLike],
+    [aclAddress: AddressLike, _appId: BytesLike, _name: string],
     [void],
     "nonpayable"
   >;
@@ -166,7 +169,7 @@ export interface EntityTaskManagerFactory extends BaseContract {
   >;
 
   filters: {
-    "EntityTaskManagerCreated(address,address,bytes32)": TypedContractEvent<
+    "EntityTaskManagerCreated(address,address,bytes32,string)": TypedContractEvent<
       EntityTaskManagerCreatedEvent.InputTuple,
       EntityTaskManagerCreatedEvent.OutputTuple,
       EntityTaskManagerCreatedEvent.OutputObject

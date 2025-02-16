@@ -55,4 +55,6 @@ interface IEntityTaskManager {
         string memory taskId,
         address participant
     ) external view returns (STATUS status);
+
+    function name() external view returns (string memory);
 }

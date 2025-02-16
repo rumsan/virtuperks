@@ -6,7 +6,8 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { Coins, Copy, User, Wallet } from "lucide-react";
-import { Departments } from "../list/list.card";
+
+import { Departments } from "@/sampleData";
 import { Cuid } from "./details.main";
 
 type DepartmentDetailsCardProps = {

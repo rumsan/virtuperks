@@ -8,6 +8,7 @@ import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 //TODO: Don not allow token to withdraw from this contract if it is already allocated as rewards
 contract EntityTaskManager is IEntityTaskManager {
     IAccessManagerV2 public acl;
+    string public name;
 
     bytes32 public constant ENTITY_OWNER = keccak256('ENTITY_OWNER');
     bytes32 public constant PARTICIPANT = keccak256('PARTICIPANT');
@@ -18,9 +19,10 @@ contract EntityTaskManager is IEntityTaskManager {
 
     bytes32 public appId;
 
-    constructor(address aclAddress, bytes32 _appId) {
+    constructor(address aclAddress, bytes32 _appId, string memory _name) {
         acl = IAccessManagerV2(aclAddress);
         appId = _appId;
+        name = _name;
     }
 
     modifier onlyRole(bytes32 role) {

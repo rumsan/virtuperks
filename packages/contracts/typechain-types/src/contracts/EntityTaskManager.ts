@@ -66,6 +66,7 @@ export interface EntityTaskManagerInterface extends Interface {
       | "appId"
       | "completeTask"
       | "createTask"
+      | "name"
       | "participate"
       | "taskAssignments"
       | "tasks"
@@ -103,6 +104,7 @@ export interface EntityTaskManagerInterface extends Interface {
     functionFragment: "createTask",
     values: [IEntityTaskManager.TaskStruct]
   ): string;
+  encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "participate", values: [string]): string;
   encodeFunctionData(
     functionFragment: "taskAssignments",
@@ -133,6 +135,7 @@ export interface EntityTaskManagerInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "createTask", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "participate",
     data: BytesLike
@@ -277,6 +280,8 @@ export interface EntityTaskManager extends BaseContract {
     "nonpayable"
   >;
 
+  name: TypedContractMethod<[], [string], "view">;
+
   participate: TypedContractMethod<[taskId: string], [void], "nonpayable">;
 
   taskAssignments: TypedContractMethod<
@@ -336,6 +341,9 @@ export interface EntityTaskManager extends BaseContract {
     [void],
     "nonpayable"
   >;
+  getFunction(
+    nameOrSignature: "name"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "participate"
   ): TypedContractMethod<[taskId: string], [void], "nonpayable">;

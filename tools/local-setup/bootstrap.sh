@@ -8,9 +8,9 @@ start_docker
 
 deploy_contract
 
-update_subgraph
+# update_subgraph
 
-deploy_subgraph
+# deploy_subgraph
 
 node banners/success.js
 

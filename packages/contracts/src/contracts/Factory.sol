@@ -10,17 +10,20 @@ contract EntityTaskManagerFactory {
     event EntityTaskManagerCreated(
         address entityTaskManager,
         address aclAddress,
-        bytes32 _appId
+        bytes32 _appId,
+        string _name
     );
 
     function createEntityTaskManager(
         address aclAddress,
-        bytes32 _appId
+        bytes32 _appId,
+        string memory _name
     ) public {
         // Deploy a new instance of EntityTaskManager
         EntityTaskManager newEntityTaskManager = new EntityTaskManager(
             aclAddress,
-            _appId
+            _appId,
+            _name
         );
 
         // Track the deployed contract
@@ -30,7 +33,8 @@ contract EntityTaskManagerFactory {
         emit EntityTaskManagerCreated(
             address(newEntityTaskManager),
             aclAddress,
-            _appId
+            _appId,
+            _name
         );
     }
     function getDeployedContracts() public view returns (address[] memory) {

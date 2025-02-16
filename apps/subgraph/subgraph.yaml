@@ -8,7 +8,7 @@ dataSources:
     name: AccessManager
     network: mainnet
     source:
-      address: "0x50D75C1BC6a1cE35002C9f92D0AF4B3684aa6B74"
+      address: "0x69E40e93f68c336B97B6C0583C33162DB3416618"
       abi: AccessManager
       startBlock: 0
     mapping:
@@ -37,7 +37,7 @@ dataSources:
     name: RewardToken
     network: mainnet
     source:
-      address: "0xD2E8d9173584D4DaA5C8354a79eF75ceC2dfa228"
+      address: "0x6320ca8209d9a1F127D740ce01A5b728384255f8"
       abi: RewardToken
       startBlock: 0
     mapping:
@@ -60,7 +60,7 @@ dataSources:
     name: TaskManagement
     network: mainnet
     source:
-      address: "0xB5AE3e2883934457cb593793f034b401867e1372"
+      address: "0xa0590E2F8878Fc9190C7E967e5aC0958f0B08069"
       abi: TaskManagement
       startBlock: 0
     mapping:
@@ -92,7 +92,7 @@ dataSources:
     name: EntityFactoryContract
     network: mainnet
     source:
-      address: "0x56F7DC1Cc938d6d6575B68d70d381F9C28C8C7b7"
+      address: "0x0843A79F4Ac84Bf406D74B8bCa7A5bcbaF6F43C0"
       abi: EntityFactoryContract
       startBlock: 0
     mapping:

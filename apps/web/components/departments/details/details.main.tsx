@@ -13,7 +13,8 @@ import {
 } from "@tanstack/react-table";
 import { ArrowLeft } from "lucide-react";
 import React from "react";
-import { Departments } from "../list/list.card";
+
+import { Departments } from "@/sampleData";
 import DepartmentDetailsCard from "./details.card";
 import { useColumns } from "./details.column";
 import DepartmentDetailsTable from "./details.table";

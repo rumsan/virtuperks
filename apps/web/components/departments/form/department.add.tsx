@@ -5,7 +5,7 @@ import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
 
 import { PATHS } from "@/routes/paths";
-import { EntityFactoryABI } from '@workspace/contracts/abis';
+// import { EntityFactoryABI } from '@workspace/contracts/abis';
 import { ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useDeployContract, useWriteContract } from "wagmi";
@@ -52,12 +52,12 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
     const appId =
       "0x5bf5ae4a633cdd72f66abc7b09e647e8df970f94fad392525ba8c6e42dc83737";
   
-    writeContract({
-      address: process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}` || '0x ',
-      abi: EntityFactoryABI,
-      functionName: "createEntityTaskManager",
-      args: [process.env.NEXT_PUBLIC_ACCESSMANAGER , appId],
-   })
+  //   writeContract({
+  //     address: process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}` || '0x ',
+  //     abi: EntityFactoryABI,
+  //     functionName: "createEntityTaskManager",
+  //     args: [process.env.NEXT_PUBLIC_ACCESSMANAGER , appId],
+  //  })
 
   };
 
