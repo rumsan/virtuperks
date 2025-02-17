@@ -5,18 +5,17 @@ import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
 
 import { PATHS } from "@/routes/paths";
-import { AccessManagerABI } from "@workspace/contracts/abis";
+import { EntityFactoryABI } from "@workspace/contracts/abis";
 import { ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { keccak256, toBytes } from "viem";
 import { useDeployContract, useWriteContract } from "wagmi";
 import DepartmentBaseForm from "./department.form";
 import { departmentSchema } from "./schema";
 
 const defaultValues: any = {
   name: "",
-  //owner: "",
-  walletAddress: "",
+ 
+  appId: "",
 };
 
 type DepartmentAddProps = {
@@ -35,30 +34,31 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
 
   const { data: hash, writeContract } = useWriteContract();
   //functin that call the createApp function in the accessManager contract
-   const handleDepartmentSubmit = async (data: any) => {
-  //  console.log(data,'data from form')
-   const appId = keccak256(toBytes(data.name));
+  //  const handleAppSubmit = async (data: any) => {
+  // //  console.log(data,'data from form')
+  //  const appId = keccak256(toBytes(data.name));
  
 
-    writeContract({
-      address: process.env.NEXT_PUBLIC_ACCESSMANAGER as `0x${string}` || '0x0000000000000000000000000000000000000000',
-      abi: AccessManagerABI,
-      functionName: "createApp",
-      args: [appId, process.env.NEXT_PUBLIC_ADMIN],
-        //chainId of the network
-    });
-  };
-  const createEntityButton = async () => {
-  
-    const appId =
-      "0x5bf5ae4a633cdd72f66abc7b09e647e8df970f94fad392525ba8c6e42dc83737";
-  
   //   writeContract({
-  //     address: process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}` || '0x ',
-  //     abi: EntityFactoryABI,
-  //     functionName: "createEntityTaskManager",
-  //     args: [process.env.NEXT_PUBLIC_ACCESSMANAGER , appId],
-  //  })
+  //     address: process.env.NEXT_PUBLIC_ACCESSMANAGER as `0x${string}` || '0x0000000000000000000000000000000000000000',
+  //     abi: AccessManagerABI,
+  //     functionName: "createApp",
+  //     args: [appId, process.env.NEXT_PUBLIC_ADMIN],
+  //       //chainId of the network
+  //   });
+  // };
+  const createEntityButton = async (data: any) => {
+    console.log(data.appId,'appId')
+ 
+    const appId =
+      "0x2b56db881889710dae7660e2ab8f4d36e231cec73c9923c95f531a52fe704183";
+  
+    writeContract({
+      address: process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}` || '0x ',
+      abi: EntityFactoryABI,
+      functionName: "createEntityTaskManager",
+      args: [process.env.NEXT_PUBLIC_ACCESSMANAGER , data.appId, data.name],
+   })
 
   };
 
@@ -89,7 +89,7 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
                   form={form}
                   defaultValues={defaultValues}
                   // saveForm={handleDepartmentSubmit}
-                  saveForm={handleDepartmentSubmit}
+                  saveForm={createEntityButton}
                 >
                   <div className="flex justify-end gap-4">
                     <Button

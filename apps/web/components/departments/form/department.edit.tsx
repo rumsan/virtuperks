@@ -16,8 +16,8 @@ type ExpenseEditProps = {
 export default function DepartmentEdit({ router }: ExpenseEditProps) {
   const defaultValues: Department = {
     name: "Hello Hello",
-    owner: "A",
-    walletAddress: "0x0ehfrhf94840t05059n",
+  
+    appId: "0x0ehfrhf94840t05059n",
   };
 
   const form = useForm<Department>({
