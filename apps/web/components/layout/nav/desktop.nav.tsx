@@ -5,6 +5,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@workspace/ui/components/avatar";
+import { ConnectKitButton } from "connectkit";
 import {
   Briefcase,
   Coins,
@@ -16,9 +17,14 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useAccount } from "wagmi";
 
 export default function DesktopNav() {
   const [activeNavBar, setActiveNavBar] = useState("dashboard");
+
+  const { isConnected, address } = useAccount();
+  console.log(isConnected, "isConnected");
+  console.log(address, "address");
 
   const handleNavClick = (nav: string) => {
     setActiveNavBar(nav);
@@ -107,9 +113,9 @@ export default function DesktopNav() {
             My Tasks
           </Link>
           <div className="flex items-center h-10 p-2 bg-[#F1F5F9] rounded-md p-2">
-            <span className="flex items-center gap-2 font-normal text-[#1E293B] text-sm">
-              <Wallet size={18} strokeWidth={2.65} color="#334155" />{" "}
-              67wdbb...383hd
+            <span className="flex items-center gap-2 font-normal text-[#1E293B] text-sm middle-ellipsis">
+              <Wallet size={18} strokeWidth={2.65} color="#334155" />
+              <ConnectKitButton showAvatar={false} theme="auto" />
             </span>
           </div>
           <Avatar className="bg-red-400 h-7 w-7">
