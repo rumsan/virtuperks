@@ -21,7 +21,7 @@ export const useEntityList = () => {
   return useQuery({
     queryKey: ["entity"],
     queryFn: async () => {
-      const getAllData = await queryService?.getAppCreatedlist();
+      const getAllData = await queryService?.getEntityManagerCreatedList()
 
       return getAllData;
     },

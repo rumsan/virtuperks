@@ -1,5 +1,5 @@
+import { useEntityList } from "@/hooks/subgraph/querycall";
 import { PATHS } from "@/routes/paths";
-import { Departments } from "@/sampleData";
 import {
   Card,
   CardDescription,
@@ -11,7 +11,9 @@ import { ArrowRight, Plus, User } from "lucide-react";
 
 const DepartmentListCard = ({ router }: any) => {
   // const listOftheDepartments = useEntity();
-  console.log(process.env.DEPLOYER_PRIVATE_KEY, 'DEPLOYER_PRIVATE_KEY');
+  const getAllEntity = useEntityList()
+  const entityList = getAllEntity?.data?.data?.entityTaskManagerCreateds
+  
   
   
 
@@ -25,8 +27,8 @@ const DepartmentListCard = ({ router }: any) => {
           <span className="text-center text-base">Add Department</span>
           <Plus size={24} />
         </Card>
-        {Departments &&
-          Departments.map((department) => {
+        {entityList &&
+          entityList.map((department:any) => {
             return (
               <Card
                 key={department.id}
@@ -37,14 +39,14 @@ const DepartmentListCard = ({ router }: any) => {
               >
                 <CardHeader>
                   <CardTitle className="text-base flex ">
-                    {department.name}
+                    {department._name}
                     <span className="ml-auto w-[90px] flex items-center justify-center bg-gray-100 rounded-xl font-normal text-sm">
-                      {department.dName}
+                      {/* {department._app} */}
                     </span>
                   </CardTitle>
                   <CardDescription className="flex gap-2 text-sm">
                     <User size={20} strokeWidth={2.75} />
-                    <span>{department.eName}</span>
+                    <span>{department._name}</span>
                   </CardDescription>
                 </CardHeader>
                 <CardFooter className="flex items-center justify-end gap-2 text-blue-500 font-normal">
