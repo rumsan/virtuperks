@@ -19,20 +19,24 @@ export type Task = Omit<TaskBase, "participants" | "tokens"> & {
 
 export const taskSchema = () => {
   const _schema = {
-    title: z.string().min(1, "Task title is required"),
-    url: z.string().min(1, "Task url name is required"),
-    status: z.string().min(1, "Task status is required"),
-    description: z.string().min(1, "Task description is required"),
+    //title: z.string().min(1, "Task title is required"),
+    detailsUrl: z.string().min(1, "Task url name is required"),
+    //status: z.string().min(1, "Task status is required"),
+   // description: z.string().min(1, "Task description is required"),
     owner: z.string().min(1, "Task owner is required"),
-    date: z.date({ required_error: "Date is required" }),
-    participants: z.number().min(1, "Task participants is required"),
-    tokens: z.coerce
+    rewardToken: z.string().min(1, "Task reward token is required"),
+    expiryDate: z.date({ required_error: "Date is required" }),
+    allowedWallets: z.string(),
+    maxParticipants: z.number(),
+    rewardAmount: z.coerce
       .number({
         required_error: "Token is required",
         invalid_type_error: "Token must be a number",
       })
       .positive()
       .min(1, { message: "Token should be at least 1" }),
+    isActive: z.boolean(),
   };
+
   return z.object(_schema);
 };

@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent } from "@workspace/ui/components/card";
 
 import { PATHS } from "@/routes/paths";
+import { EntityTaskManagementABI } from "@workspace/contracts/abis";
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
 import {
@@ -27,23 +28,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select";
-import { Textarea } from "@workspace/ui/components/textarea";
 import { format } from "date-fns";
 import { ArrowLeft, CalendarIcon, Copy } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Task, taskSchema } from "./schema";
-import { ownerList } from "@/sampleData";
 
-const defaultValues: Task = {
-  title: "",
-  url: "",
-  status: "",
-  description: "",
+import { useWriteContract } from "wagmi";
+import { taskSchema } from "./schema";
+
+const defaultValues:any = {
+
+  detailsUrl: "",
   owner: "",
-  date: "",
-  participants: "",
-  tokens: "",
+  rewardToken: "",
+  expiryDate: "",
+  allowedWallets: "",
+  maxParticipants: 0 ,
+  rewardAmount:0,
+  isActive: false
 };
 
 type TaskAddProps = {
@@ -57,9 +59,25 @@ export default function TaskAdd({ router }: TaskAddProps) {
   });
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const { data: hash, writeContract } = useWriteContract()
+  const entityAddress = "0xfd6d1bd3586e2af2b37099aed2995a4906932763"
+ 
 
-  const handleSubmit = async (data: Task) => {
-    console.log(data, "data");
+  const handleSubmit = async (data: any) => {
+    console.log(data, "data of taks");
+    const { detailsUrl, rewardToken, rewardAmount, maxParticipants, owner, isActive } = data
+    const expiryDate = new Date(data.expiryDate).getTime()
+    const allowedWallets = [data.allowedWallets]
+    console.log(expiryDate, "expiryDate")
+    console.log(detailsUrl, rewardToken, rewardAmount, allowedWallets, maxParticipants, expiryDate, owner, isActive, "data")
+    writeContract({
+      address:`${entityAddress}`,
+      abi: EntityTaskManagementABI,
+      functionName: "createTask",
+      args:[detailsUrl, rewardToken, rewardAmount, allowedWallets,maxParticipants,expiryDate,owner,isActive]
+
+ })
+
   };
 
   return (
@@ -85,12 +103,12 @@ export default function TaskAdd({ router }: TaskAddProps) {
             <Card className="rounded-lg w-full">
               <CardContent className="p-0">
                 <Form {...form}>
-                  <form onSubmit={handleSubmit}>
+                  <form onSubmit={form.handleSubmit(handleSubmit)}>
                     <div className="p-6">
                       <div className="flex flex-col w-full gap-4 mb-5">
                         <FormField
                           control={form.control}
-                          name="url"
+                          name="detailsUrl"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Task URL</FormLabel>
@@ -118,13 +136,13 @@ export default function TaskAdd({ router }: TaskAddProps) {
 
                         <FormField
                           control={form.control}
-                          name="title"
+                          name="rewardToken"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Title</FormLabel>
+                              <FormLabel>Token Address</FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder="Write title for the task"
+                                  placeholder="Write token address"
                                   {...field}
                                   value={field.value ?? ""}
                                 />
@@ -136,15 +154,18 @@ export default function TaskAdd({ router }: TaskAddProps) {
 
                         <FormField
                           control={form.control}
-                          name="description"
+                          name="maxParticipants"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Description</FormLabel>
-                              <Textarea
-                                placeholder="Write task description"
-                                {...field}
+                              <FormLabel>Max Number of Participants</FormLabel>
+                               <Input
+                                   type="number"
+        placeholder="0"
+                                
+                                  {...field}
                                 value={field.value ?? ""}
-                              />
+                                onChange={(e) => field.onChange(parseInt(e.target.value))}
+                                />
                               <FormMessage />
                             </FormItem>
                           )}
@@ -154,16 +175,17 @@ export default function TaskAdd({ router }: TaskAddProps) {
                       <div className="grid grid-cols-2 gap-4 mb-5">
                         <FormField
                           control={form.control}
-                          name="tokens"
+                          name="rewardAmount"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Token</FormLabel>
+                              <FormLabel>Reward Amount</FormLabel>
                               <FormControl>
                                 <Input
                                   type="number"
                                   placeholder="0"
                                   {...field}
                                   value={field.value ?? ""}
+                                  onChange={(e) => field.onChange(parseInt(e.target.value))}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -173,16 +195,24 @@ export default function TaskAdd({ router }: TaskAddProps) {
 
                         <FormField
                           control={form.control}
-                          name="participants"
+                          name="isActive"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Max number of applicants</FormLabel>
+                              <FormLabel>Event status </FormLabel>
                               <FormControl>
-                                <Input
-                                  placeholder="0"
-                                  {...field}
-                                  value={field.value ?? ""}
-                                />
+                                <Select
+                                  onValueChange={(value) => field.onChange(value === "true")}
+                                  value={field.value ? "true" : "false"} 
+                                
+                                >
+          <SelectTrigger>
+            <SelectValue placeholder="Select event status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="true">True</SelectItem>
+            <SelectItem value="false">False</SelectItem>
+          </SelectContent>
+        </Select>
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -191,11 +221,11 @@ export default function TaskAdd({ router }: TaskAddProps) {
 
                         <FormField
                           control={form.control}
-                          name="date"
+                          name="expiryDate"
                           render={({ field }) => {
                             return (
                               <FormItem>
-                                <FormLabel>Date</FormLabel>
+                                <FormLabel>Expiry Date</FormLabel>
                                 <Popover
                                   open={isPopoverOpen}
                                   onOpenChange={setIsPopoverOpen}
@@ -265,7 +295,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
                             <FormItem>
                               <FormLabel>Set Task Owner</FormLabel>
 
-                              <Select
+                              {/* <Select
                                 onValueChange={field.onChange}
                                 value={field.value ?? ""}
                               >
@@ -284,7 +314,13 @@ export default function TaskAdd({ router }: TaskAddProps) {
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
-                              </Select>
+                              </Select> */}
+                               <Input
+                                  type="string"
+                                  placeholder="Add owner Address"
+                                  {...field}
+                                  value={field.value ?? ""}
+                                />
 
                               <FormMessage />
                             </FormItem>
@@ -295,12 +331,12 @@ export default function TaskAdd({ router }: TaskAddProps) {
                       <div className="w-full mb-5">
                         <FormField
                           control={form.control}
-                          name="owner"
+                          name="allowedWallets"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Add assignes</FormLabel>
 
-                              <Select
+                              {/* <Select
                                 onValueChange={field.onChange}
                                 value={field.value ?? ""}
                               >
@@ -319,7 +355,13 @@ export default function TaskAdd({ router }: TaskAddProps) {
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
-                              </Select>
+                              </Select> */}
+                                <Input
+                                  type="string"
+                                  placeholder="Add Participants wallet Address"
+                                  {...field}
+                                  value={field.value ?? ""}
+                                />
 
                               <FormMessage />
                             </FormItem>
