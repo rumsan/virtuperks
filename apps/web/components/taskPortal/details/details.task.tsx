@@ -3,12 +3,12 @@ import { TaskList } from "@/sampleData";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { ExternalLink, Timer, Trophy, UserRoundCog, Users } from "lucide-react";
 
-type TaskDetailsProps = {
+type TaskPortalDetailsProps = {
   cuid: Cuid;
   router: any;
 };
 
-const TaskDetails = ({ cuid, router }: TaskDetailsProps) => {
+const TaskPortalDetails = ({ cuid, router }: TaskPortalDetailsProps) => {
   const taskData = TaskList.find((task) => task.cuid === cuid.id);
 
   return (
@@ -69,4 +69,4 @@ const TaskDetails = ({ cuid, router }: TaskDetailsProps) => {
   );
 };
 
-export default TaskDetails;
+export default TaskPortalDetails;

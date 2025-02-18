@@ -2,6 +2,7 @@ const ROOTS = {
   DEPARTMENT: "/departments",
   TREASURER: "/treasurer",
   TASKS: "/tasks",
+  TASKPORTAL: "/task_portal",
 };
 
 export const PATHS = {
@@ -23,5 +24,11 @@ export const PATHS = {
     HOME: `${ROOTS.TASKS}`,
     ADD: `${ROOTS.TASKS}/add`,
     DETAILS: (cuid: string) => `${ROOTS.TASKS}/${cuid}`,
+  },
+
+  TASKPORTAL: {
+    HOME: `${ROOTS.TASKPORTAL}`,
+    ADD: `${ROOTS.TASKPORTAL}/add`,
+    DETAILS: (cuid: string) => `${ROOTS.TASKPORTAL}/${cuid}`,
   },
 };

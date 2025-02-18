@@ -17,14 +17,28 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { useAccount } from "wagmi";
+// import { useAccount } from "wagmi";
 
 export default function DesktopNav() {
   const [activeNavBar, setActiveNavBar] = useState("dashboard");
 
-  const { isConnected, address } = useAccount();
-  console.log(isConnected, "isConnected");
-  console.log(address, "address");
+  // const { isConnected, address } = useAccount();
+  // console.log(isConnected, "isConnected");
+
+  const userDetails = [
+    {
+      address: "0x1234567890123456789012345678901234567890",
+      role: "participant",
+    },
+    {
+      address: "0x1234567890123456789012345678901234567890",
+      role: "departmentOwner",
+    },
+    {
+      address: "0x1234567890123456789012345678901234567890",
+      role: "superAdmin",
+    },
+  ];
 
   const handleNavClick = (nav: string) => {
     setActiveNavBar(nav);
