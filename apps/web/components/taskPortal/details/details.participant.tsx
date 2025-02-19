@@ -3,12 +3,10 @@ import { Card, CardTitle } from "@workspace/ui/components/card";
 import { User } from "lucide-react";
 import { useState } from "react";
 
-const TaskPortalParticipant = ({ router }: any) => {
+const TaskPortalParticipant = () => {
   const [hoveredWallet, setHoveredWallet] = useState<string | null>(null);
   return (
     <>
-      {/* <Card className="w-[80%] h-full p-4"></Card> */}
-
       <Card className="w-[20%] ml-auto p-4">
         <CardTitle className="flex flex-col gap-2 w-full">
           <span>Participants</span>

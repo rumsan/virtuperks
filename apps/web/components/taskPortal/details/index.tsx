@@ -37,11 +37,11 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
         </div>
 
         <div className="flex w-full gap-4">
-          <TaskPortalDetails cuid={cuid} router={router} />
+          <TaskPortalDetails cuid={cuid} />
         </div>
 
         <div className="flex w-full gap-4">
-          <TaskPortalParticipant router={router} />
+          <TaskPortalParticipant />
         </div>
       </div>
     </main>

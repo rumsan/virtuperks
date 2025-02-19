@@ -5,10 +5,9 @@ import { ExternalLink, Timer, Trophy, UserRoundCog, Users } from "lucide-react";
 
 type TaskPortalDetailsProps = {
   cuid: Cuid;
-  router: any;
 };
 
-const TaskPortalDetails = ({ cuid, router }: TaskPortalDetailsProps) => {
+const TaskPortalDetails = ({ cuid }: TaskPortalDetailsProps) => {
   const taskData = TaskList.find((task) => task.cuid === cuid.id);
 
   return (

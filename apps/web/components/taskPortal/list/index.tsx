@@ -1,7 +1,6 @@
 "use client";
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
-// import { useColumns } from "@/components/departments/details/details.column";
 import { TaskList } from "@/sampleData";
 import {
   ColumnFiltersState,
