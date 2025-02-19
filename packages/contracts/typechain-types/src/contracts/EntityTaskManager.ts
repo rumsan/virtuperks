@@ -203,11 +203,41 @@ export namespace TaskCompletedEvent {
 }
 
 export namespace TaskCreatedEvent {
-  export type InputTuple = [id: string, createdBy: AddressLike];
-  export type OutputTuple = [id: string, createdBy: string];
+  export type InputTuple = [
+    id: string,
+    createdBy: AddressLike,
+    detailsUrl: string,
+    rewardToken: AddressLike,
+    rewardAmount: BigNumberish,
+    allowedWallets: AddressLike[],
+    maxParticipants: BigNumberish,
+    expiryDate: BigNumberish,
+    owner: AddressLike,
+    isActive: boolean
+  ];
+  export type OutputTuple = [
+    id: string,
+    createdBy: string,
+    detailsUrl: string,
+    rewardToken: string,
+    rewardAmount: bigint,
+    allowedWallets: string[],
+    maxParticipants: bigint,
+    expiryDate: bigint,
+    owner: string,
+    isActive: boolean
+  ];
   export interface OutputObject {
     id: string;
     createdBy: string;
+    detailsUrl: string;
+    rewardToken: string;
+    rewardAmount: bigint;
+    allowedWallets: string[];
+    maxParticipants: bigint;
+    expiryDate: bigint;
+    owner: string;
+    isActive: boolean;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -452,7 +482,7 @@ export interface EntityTaskManager extends BaseContract {
       TaskCompletedEvent.OutputObject
     >;
 
-    "TaskCreated(string,address)": TypedContractEvent<
+    "TaskCreated(string,address,string,address,uint256,address[],uint256,uint256,address,bool)": TypedContractEvent<
       TaskCreatedEvent.InputTuple,
       TaskCreatedEvent.OutputTuple,
       TaskCreatedEvent.OutputObject

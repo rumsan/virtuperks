@@ -1,5 +1,5 @@
 import { newMockEvent } from "matchstick-as"
-import { ethereum, Address } from "@graphprotocol/graph-ts"
+import { ethereum, Address, BigInt } from "@graphprotocol/graph-ts"
 import {
   ParticiantApplied,
   TaskAccepted,
@@ -82,7 +82,15 @@ export function createTaskCompletedEvent(
 
 export function createTaskCreatedEvent(
   id: string,
-  createdBy: Address
+  createdBy: Address,
+  detailsUrl: string,
+  rewardToken: Address,
+  rewardAmount: BigInt,
+  allowedWallets: Array<Address>,
+  maxParticipants: BigInt,
+  expiryDate: BigInt,
+  owner: Address,
+  isActive: boolean
 ): TaskCreated {
   let taskCreatedEvent = changetype<TaskCreated>(newMockEvent())
 
@@ -93,6 +101,45 @@ export function createTaskCreatedEvent(
   )
   taskCreatedEvent.parameters.push(
     new ethereum.EventParam("createdBy", ethereum.Value.fromAddress(createdBy))
+  )
+  taskCreatedEvent.parameters.push(
+    new ethereum.EventParam("detailsUrl", ethereum.Value.fromString(detailsUrl))
+  )
+  taskCreatedEvent.parameters.push(
+    new ethereum.EventParam(
+      "rewardToken",
+      ethereum.Value.fromAddress(rewardToken)
+    )
+  )
+  taskCreatedEvent.parameters.push(
+    new ethereum.EventParam(
+      "rewardAmount",
+      ethereum.Value.fromUnsignedBigInt(rewardAmount)
+    )
+  )
+  taskCreatedEvent.parameters.push(
+    new ethereum.EventParam(
+      "allowedWallets",
+      ethereum.Value.fromAddressArray(allowedWallets)
+    )
+  )
+  taskCreatedEvent.parameters.push(
+    new ethereum.EventParam(
+      "maxParticipants",
+      ethereum.Value.fromUnsignedBigInt(maxParticipants)
+    )
+  )
+  taskCreatedEvent.parameters.push(
+    new ethereum.EventParam(
+      "expiryDate",
+      ethereum.Value.fromUnsignedBigInt(expiryDate)
+    )
+  )
+  taskCreatedEvent.parameters.push(
+    new ethereum.EventParam("owner", ethereum.Value.fromAddress(owner))
+  )
+  taskCreatedEvent.parameters.push(
+    new ethereum.EventParam("isActive", ethereum.Value.fromBoolean(isActive))
   )
 
   return taskCreatedEvent

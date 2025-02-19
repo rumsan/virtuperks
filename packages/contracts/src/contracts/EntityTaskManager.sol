@@ -32,6 +32,7 @@ contract EntityTaskManager is IEntityTaskManager {
 
     /// @notice This function creates a new Task
     /// @param task The task object
+
     function createTask(Task memory task) public onlyRole(ENTITY_OWNER) {
         require(
             task.maxParticipants > 0,
@@ -42,12 +43,25 @@ contract EntityTaskManager is IEntityTaskManager {
         }
 
         tasks[task.detailsUrl] = task;
+        // Emit the new event with all task details
 
-        emit TaskCreated(task.detailsUrl, task.owner);
+        emit TaskCreated(
+            task.detailsUrl,
+            msg.sender, // createdBy should be msg.sender
+            task.detailsUrl,
+            task.rewardToken,
+            task.rewardAmount,
+            task.allowedWallets,
+            task.maxParticipants,
+            task.expiryDate,
+            task.owner, // Correctly adding the owner here
+            task.isActive
+        );
     }
 
     /// @notice This function will provide access for participant to apply for the task
     /// @param taskId The id of the task
+
     function participate(string memory taskId) public onlyRole(PARTICIPANT) {
         require(tasks[taskId].isActive, 'Task is not active');
         require(tasks[taskId].expiryDate > block.timestamp, 'Task is expired');

@@ -55,9 +55,20 @@ type Transfer @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+type EntityTaskManagerCreated @entity(immutable: true) {
+  id: Bytes!
+  entityTaskManager: Bytes! # address
+  aclAddress: Bytes! # address
+  _appId: Bytes! # bytes32
+  _name: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
 type ParticiantApplied @entity(immutable: true) {
   id: Bytes!
-  internal_id: Bytes! # address
+  internal_id: Bytes! # bytes32
   participant: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
@@ -66,7 +77,7 @@ type ParticiantApplied @entity(immutable: true) {
 
 type TaskAccepted @entity(immutable: true) {
   id: Bytes!
-  internal_id: Bytes! # address
+  internal_id: Bytes! # bytes32
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
@@ -74,7 +85,7 @@ type TaskAccepted @entity(immutable: true) {
 
 type TaskApproved @entity(immutable: true) {
   id: Bytes!
-  internal_id: Bytes! # address
+  internal_id: Bytes! # bytes32
   approver: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
@@ -83,7 +94,7 @@ type TaskApproved @entity(immutable: true) {
 
 type TaskCompleted @entity(immutable: true) {
   id: Bytes!
-  internal_id: Bytes! # address
+  internal_id: Bytes! # bytes32
   participant: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
@@ -92,26 +103,16 @@ type TaskCompleted @entity(immutable: true) {
 
 type TaskCreated @entity(immutable: true) {
   id: Bytes!
-  internal_id: Bytes! # address
-  createdBy: Bytes! # address,
-  details: String! # string,
-  rewardToken: Bytes! # address,
-  allowedWallets: Bytes! # address,
-  maxParticipants: BigInt! # uint256,
-  expiryDate: BigInt! # uint256,
-  owner: Bytes! # address,
-  isActive: Boolean! # bool,
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type EntityTaskManagerCreated @entity(immutable: true) {
-  id: Bytes!
-  entityTaskManager: Bytes! # address
-  aclAddress: Bytes! # address
-  _appId: Bytes! # bytes32
-  _name: String! # string
+  internal_id:Bytes! # bytes32
+  createdBy: Bytes! # address
+  detailsUrl: String! # string
+  rewardToken: Bytes! # address
+  rewardAmount: BigInt! # uint256
+  allowedWallets: [Bytes!]! # address[]
+  maxParticipants: BigInt! # uint256
+  expiryDate: BigInt! # uint256
+  owner: Bytes! # address
+  isActive: Boolean! # bool
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

@@ -63,7 +63,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
   });
    const getAllEntity = useEntityList()
   const entityList = getAllEntity?.data?.data?.entityTaskManagerCreateds
-  console.log(entityList, 'entityList')
+
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { data: hash, writeContract } = useWriteContract()

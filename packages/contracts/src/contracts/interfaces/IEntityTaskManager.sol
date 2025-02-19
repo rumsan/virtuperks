@@ -30,7 +30,7 @@ interface IEntityTaskManager {
         STATUS status;
     }
 
-    event TaskCreated(string indexed id, address indexed createdBy);
+    event TaskCreated(string indexed id, address indexed createdBy, string detailsUrl, address rewardToken, uint256 rewardAmount, address[] allowedWallets, uint256 maxParticipants, uint256 expiryDate, address owner, bool isActive);
     event TaskAccepted(string indexed id);
     event ParticiantApplied(string indexed id, address indexed participant);
     event TaskCompleted(string indexed id, address indexed participant);

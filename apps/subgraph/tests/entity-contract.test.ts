@@ -6,7 +6,7 @@ import {
   beforeAll,
   afterAll
 } from "matchstick-as/assembly/index"
-import { Address } from "@graphprotocol/graph-ts"
+import { Address, BigInt } from "@graphprotocol/graph-ts"
 import { ParticiantApplied } from "../generated/schema"
 import { ParticiantApplied as ParticiantAppliedEvent } from "../generated/EntityContract/EntityContract"
 import { handleParticiantApplied } from "../src/entity-contract"
