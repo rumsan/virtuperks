@@ -60,21 +60,20 @@ export default function TaskAdd({ router }: TaskAddProps) {
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { data: hash, writeContract } = useWriteContract()
-  const entityAddress = "0xfd6d1bd3586e2af2b37099aed2995a4906932763"
+  const entityAddress = "0xcb8ecb06074dc3d881594d71cadb21b3dee09232"
  
 
   const handleSubmit = async (data: any) => {
-    console.log(data, "data of taks");
+   
     const { detailsUrl, rewardToken, rewardAmount, maxParticipants, owner, isActive } = data
     const expiryDate = new Date(data.expiryDate).getTime()
     const allowedWallets = [data.allowedWallets]
-    console.log(expiryDate, "expiryDate")
-    console.log(detailsUrl, rewardToken, rewardAmount, allowedWallets, maxParticipants, expiryDate, owner, isActive, "data")
+    
     writeContract({
       address:`${entityAddress}`,
       abi: EntityTaskManagementABI,
       functionName: "createTask",
-      args:[detailsUrl, rewardToken, rewardAmount, allowedWallets,maxParticipants,expiryDate,owner,isActive]
+      args: [{ detailsUrl, rewardToken, rewardAmount, allowedWallets, maxParticipants, expiryDate, owner, isActive }]
 
  })
 

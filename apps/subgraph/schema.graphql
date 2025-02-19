@@ -93,7 +93,14 @@ type TaskCompleted @entity(immutable: true) {
 type TaskCreated @entity(immutable: true) {
   id: Bytes!
   internal_id: Bytes! # address
-  createdBy: Bytes! # address
+  createdBy: Bytes! # address,
+  details: String! # string,
+  rewardToken: Bytes! # address,
+  allowedWallets: Bytes! # address,
+  maxParticipants: BigInt! # uint256,
+  expiryDate: BigInt! # uint256,
+  owner: Bytes! # address,
+  isActive: Boolean! # bool,
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

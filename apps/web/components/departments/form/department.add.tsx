@@ -5,9 +5,10 @@ import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
 
 import { PATHS } from "@/routes/paths";
-import { EntityFactoryABI } from "@workspace/contracts/abis";
+import { AccessManagerABI, EntityFactoryABI } from "@workspace/contracts/abis";
 import { ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { keccak256 } from "viem";
 import { useDeployContract, useWriteContract } from "wagmi";
 import DepartmentBaseForm from "./department.form";
 import { departmentSchema } from "./schema";
@@ -36,11 +37,14 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
   //functin that call the createApp function in the accessManager contract
   //  const handleAppSubmit = async (data: any) => {
   // //  console.log(data,'data from form')
-  //  const appId = keccak256(toBytes(data.name));
+  //    const appId = keccak256(data.name);
+  //    console.log(appId, 'appid')
+  //    console.log(process.env.NEXT_PUBLIC_ACCESSMANAGER, 'accessmanager')
+  //    console.log(AccessManagerABI, 'abi')
  
 
   //   writeContract({
-  //     address: process.env.NEXT_PUBLIC_ACCESSMANAGER as `0x${string}` || '0x0000000000000000000000000000000000000000',
+  //     address: process.env.NEXT_PUBLIC_ACCESSMANAGER as `0x${string}` || '0x0000000000000000,',
   //     abi: AccessManagerABI,
   //     functionName: "createApp",
   //     args: [appId, process.env.NEXT_PUBLIC_ADMIN],
