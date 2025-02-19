@@ -28,6 +28,7 @@ export const taskSchema = () => {
     expiryDate: z.date({ required_error: "Date is required" }),
     allowedWallets: z.string(),
     maxParticipants: z.number(),
+    entityAddress: z.string({ required_error: "Entity address is required" }),
     rewardAmount: z.coerce
       .number({
         required_error: "Token is required",

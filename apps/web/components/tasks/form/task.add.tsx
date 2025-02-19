@@ -33,8 +33,11 @@ import { ArrowLeft, CalendarIcon, Copy } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
+import { useEntityList } from "@/hooks/subgraph/querycall";
 import { useWriteContract } from "wagmi";
 import { taskSchema } from "./schema";
+
+import { participantList, tokenList } from "@/sampleData";
 
 const defaultValues:any = {
 
@@ -45,7 +48,8 @@ const defaultValues:any = {
   allowedWallets: "",
   maxParticipants: 0 ,
   rewardAmount:0,
-  isActive: false
+  isActive: false,
+  entityAddress: "",
 };
 
 type TaskAddProps = {
@@ -57,20 +61,24 @@ export default function TaskAdd({ router }: TaskAddProps) {
     resolver: zodResolver(taskSchema()),
     defaultValues: defaultValues,
   });
+   const getAllEntity = useEntityList()
+  const entityList = getAllEntity?.data?.data?.entityTaskManagerCreateds
+  console.log(entityList, 'entityList')
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { data: hash, writeContract } = useWriteContract()
-  const entityAddress = "0xcb8ecb06074dc3d881594d71cadb21b3dee09232"
+
  
 
   const handleSubmit = async (data: any) => {
+ 
    
     const { detailsUrl, rewardToken, rewardAmount, maxParticipants, owner, isActive } = data
     const expiryDate = new Date(data.expiryDate).getTime()
     const allowedWallets = [data.allowedWallets]
     
     writeContract({
-      address:`${entityAddress}`,
+      address: data.entityAddress as `0x${string}`,
       abi: EntityTaskManagementABI,
       functionName: "createTask",
       args: [{ detailsUrl, rewardToken, rewardAmount, allowedWallets, maxParticipants, expiryDate, owner, isActive }]
@@ -132,19 +140,58 @@ export default function TaskAdd({ router }: TaskAddProps) {
                             </FormItem>
                           )}
                         />
+                         <FormField
+                          control={form.control}
+                          name="entityAddress"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Select Entity</FormLabel>
+                              <FormControl>
+                                        <Select
+                                  onValueChange={(value) => field.onChange(value)}
+                                  value={field.value} 
+                                
+                                >
+          <SelectTrigger>
+            <SelectValue placeholder="Select Entity" />
+          </SelectTrigger>
+          <SelectContent>
+          {entityList?.map((entity:any) => (
+              <SelectItem key={entity.entityTaskManager} value={entity.entityTaskManager}>
+                {entity._name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
                         <FormField
                           control={form.control}
                           name="rewardToken"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Token Address</FormLabel>
+                              <FormLabel>Select Token</FormLabel>
                               <FormControl>
-                                <Input
-                                  placeholder="Write token address"
-                                  {...field}
-                                  value={field.value ?? ""}
-                                />
+                               <Select
+                                  onValueChange={(value) => field.onChange(value)}
+                                  value={field.value} 
+                                
+                                >
+          <SelectTrigger>
+            <SelectValue placeholder="Select reward" />
+          </SelectTrigger>
+          <SelectContent>
+          {tokenList?.map((token:any) => (
+            <SelectItem key={token.name} value={ token.address}>
+                {token.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -162,8 +209,12 @@ export default function TaskAdd({ router }: TaskAddProps) {
         placeholder="0"
                                 
                                   {...field}
-                                value={field.value ?? ""}
-                                onChange={(e) => field.onChange(parseInt(e.target.value))}
+                                 value={field.value !== undefined && field.value !== null ? field.value.toString() : ""}
+                                onChange={(e) => {
+          const value = e.target.value;
+          
+          field.onChange(value === "" ? undefined : parseInt(value, 10));
+        }}
                                 />
                               <FormMessage />
                             </FormItem>
@@ -183,8 +234,12 @@ export default function TaskAdd({ router }: TaskAddProps) {
                                   type="number"
                                   placeholder="0"
                                   {...field}
-                                  value={field.value ?? ""}
-                                  onChange={(e) => field.onChange(parseInt(e.target.value))}
+                              value={field.value !== undefined && field.value !== null ? field.value.toString() : ""}
+                                                        onChange={(e) => {
+          const value = e.target.value;
+          
+          field.onChange(value === "" ? undefined : parseInt(value, 10));
+        }}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -327,47 +382,35 @@ export default function TaskAdd({ router }: TaskAddProps) {
                         />
                       </div>
 
-                      <div className="w-full mb-5">
-                        <FormField
+                     <FormField
                           control={form.control}
                           name="allowedWallets"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Add assignes</FormLabel>
-
-                              {/* <Select
-                                onValueChange={field.onChange}
-                                value={field.value ?? ""}
-                              >
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select assignees for the task" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {ownerList.map((owner) => (
-                                    <SelectItem
-                                      key={owner.cuid}
-                                      value={owner.name}
-                                    >
-                                      {owner.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select> */}
-                                <Input
-                                  type="string"
-                                  placeholder="Add Participants wallet Address"
-                                  {...field}
-                                  value={field.value ?? ""}
-                                />
-
+                              <FormLabel>Select Token</FormLabel>
+                              <FormControl>
+                               <Select
+                                  onValueChange={(value) => field.onChange(value)}
+                                  value={field.value} 
+                                
+                                >
+          <SelectTrigger>
+            <SelectValue placeholder="Select Participant" />
+          </SelectTrigger>
+          <SelectContent>
+          {participantList?.map((token:any) => (
+            <SelectItem key={token.walletAddress} value={ token.walletAddress}>
+                {token.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+                              </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-                      </div>
-
+               
                       <div className="w-full flex justify-end gap-4">
                         <Button
                           variant="outline"
