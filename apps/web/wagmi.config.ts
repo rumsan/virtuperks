@@ -13,7 +13,7 @@ declare module "wagmi" {
   }
 }
 const ganache = {
-  id: 8545, 
+  id: 8545,
   name: "Ganache",
   network: "ganache",
   nativeCurrency: {

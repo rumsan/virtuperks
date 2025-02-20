@@ -1,5 +1,6 @@
 "use client";
 
+import { userList } from "@/sampleData";
 import {
   Avatar,
   AvatarFallback,
@@ -17,9 +18,23 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useAccount } from "wagmi";
 
 export default function DesktopNav() {
   const [activeNavBar, setActiveNavBar] = useState("dashboard");
+
+  const { address } = useAccount();
+  console.log(address, "address");
+
+  const findRole = userList.find((user) => {
+    return user.address === address;
+  });
+  console.log(findRole, "findRole");
+
+  // const hello = new SubgraphService("");
+
+  // const a = hello.getRoleGrantedList();
+  // console.log(a, "a");
 
   const handleNavClick = (nav: string) => {
     setActiveNavBar(nav);
@@ -94,30 +109,32 @@ export default function DesktopNav() {
             History
           </Link>
         </nav>
-        <div className="ml-auto flex items-center gap-4 h-full">
-          <Link
-            href="/tasks"
-            onClick={() => handleNavClick("tasks")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("tasks")}`}
-          >
-            <LayoutList
-              size={18}
-              strokeWidth={2.65}
-              color={`${activeNavBar === "tasks" ? "#297AD6" : "#334155"}`}
-            />
-            My Tasks
-          </Link>
-          <div className="flex items-center h-10 p-2 bg-[#F1F5F9] rounded-md p-2">
-            <span className="flex items-center gap-2 font-normal text-[#1E293B] text-sm middle-ellipsis">
-              <Wallet size={18} strokeWidth={2.65} color="#334155" />
-              <ConnectKitButton showAvatar={false} theme="auto" />
-            </span>
+        {findRole?.role === "participant" && (
+          <div className="ml-auto flex items-center gap-4 h-full">
+            <Link
+              href="/tasks"
+              onClick={() => handleNavClick("tasks")}
+              className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("tasks")}`}
+            >
+              <LayoutList
+                size={18}
+                strokeWidth={2.65}
+                color={`${activeNavBar === "tasks" ? "#297AD6" : "#334155"}`}
+              />
+              My Tasks
+            </Link>
+            <div className="flex items-center h-10 p-2 bg-[#F1F5F9] rounded-md p-2">
+              <span className="flex items-center gap-2 font-normal text-[#1E293B] text-sm middle-ellipsis">
+                <Wallet size={18} strokeWidth={2.65} color="#334155" />
+                <ConnectKitButton showAvatar={false} theme="auto" />
+              </span>
+            </div>
+            <Avatar className="bg-red-400 h-7 w-7">
+              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
           </div>
-          <Avatar className="bg-red-400 h-7 w-7">
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-        </div>
+        )}
       </div>
     </header>
   );
