@@ -5,10 +5,9 @@ import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
 
 import { PATHS } from "@/routes/paths";
-import { AccessManagerABI, EntityFactoryABI } from "@workspace/contracts/abis";
+import { EntityFactoryABI } from "@workspace/contracts/abis";
 import { ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { keccak256 } from "viem";
 import { useDeployContract, useWriteContract } from "wagmi";
 import DepartmentBaseForm from "./department.form";
 import { departmentSchema } from "./schema";
@@ -38,9 +37,9 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
   //  const handleAppSubmit = async (data: any) => {
   // //  console.log(data,'data from form')
   //    const appId = keccak256(data.name);
-  //    console.log(appId, 'appid')
-  //    console.log(process.env.NEXT_PUBLIC_ACCESSMANAGER, 'accessmanager')
-  //    console.log(AccessManagerABI, 'abi')
+ 
+    
+     
  
 
   //   writeContract({
@@ -52,10 +51,7 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
   //   });
   // };
   const createEntityButton = async (data: any) => {
-    console.log(data.appId,'appId')
- 
-    const appId =
-      "0x2b56db881889710dae7660e2ab8f4d36e231cec73c9923c95f531a52fe704183";
+    
   
     writeContract({
       address: process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}` || '0x ',

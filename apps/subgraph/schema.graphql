@@ -68,7 +68,7 @@ type EntityTaskManagerCreated @entity(immutable: true) {
 }
 type ParticiantApplied @entity(immutable: true) {
   id: Bytes!
-  internal_id: Bytes! # bytes32
+  internal_id: Bytes! # address
   participant: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
@@ -77,7 +77,7 @@ type ParticiantApplied @entity(immutable: true) {
 
 type TaskAccepted @entity(immutable: true) {
   id: Bytes!
-  internal_id: Bytes! # bytes32
+  internal_id: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
@@ -85,7 +85,7 @@ type TaskAccepted @entity(immutable: true) {
 
 type TaskApproved @entity(immutable: true) {
   id: Bytes!
-  internal_id: Bytes! # bytes32
+  internal_id: Bytes! # address
   approver: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
@@ -94,7 +94,7 @@ type TaskApproved @entity(immutable: true) {
 
 type TaskCompleted @entity(immutable: true) {
   id: Bytes!
-  internal_id: Bytes! # bytes32
+  internal_id: Bytes! # address
   participant: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
@@ -103,7 +103,7 @@ type TaskCompleted @entity(immutable: true) {
 
 type TaskCreated @entity(immutable: true) {
   id: Bytes!
-  internal_id:Bytes! # bytes32
+  internal_id:Bytes! # address
   createdBy: Bytes! # address
   detailsUrl: String! # string
   rewardToken: Bytes! # address
