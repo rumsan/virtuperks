@@ -76,13 +76,13 @@ dataSources:
         - event: EntityTaskManagerCreated(address,address,bytes32,string)
           handler: handleEntityTaskManagerCreated
       file: ./src/factory-contract.ts
+
+templates:
   - kind: ethereum
     name: EntityContract
     network: mainnet
     source:
-      address: "0xB5AE3e2883934457cb593793f034b401867e1372"
       abi: EntityContract
-      startBlock: 31
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -105,7 +105,6 @@ dataSources:
           handler: handleTaskApproved
         - event: TaskCompleted(indexed string,indexed address)
           handler: handleTaskCompleted
-        - event: TaskCreated(indexed string,indexed
-            address,string,address,uint256,address[],uint256,uint256,address,bool)
+        - event: TaskCreated(indexed string,indexed address,string,address,uint256,address[],uint256,uint256,address,bool)
           handler: handleTaskCreated
       file: ./src/entity-contract.ts

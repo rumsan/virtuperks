@@ -1,14 +1,12 @@
-import {
-  assert,
-  describe,
-  test,
-  clearStore,
-  beforeAll,
-  afterAll
-} from "matchstick-as/assembly/index"
 import { Address, Bytes } from "@graphprotocol/graph-ts"
-import { EntityTaskManagerCreated } from "../generated/schema"
-import { EntityTaskManagerCreated as EntityTaskManagerCreatedEvent } from "../generated/FactoryContract/FactoryContract"
+import {
+  afterAll,
+  assert,
+  beforeAll,
+  clearStore,
+  describe,
+  test
+} from "matchstick-as/assembly/index"
 import { handleEntityTaskManagerCreated } from "../src/factory-contract"
 import { createEntityTaskManagerCreatedEvent } from "./factory-contract-utils"
 

@@ -37,7 +37,8 @@ import { useEntityList } from "@/hooks/subgraph/querycall";
 import { useWriteContract } from "wagmi";
 import { taskSchema } from "./schema";
 
-import { participantList, tokenList } from "@/sampleData";
+import { EntityList, participantList, tokenList } from "@/sampleData";
+import { isAddress } from "viem";
 
 const defaultValues:any = {
 
@@ -71,19 +72,29 @@ export default function TaskAdd({ router }: TaskAddProps) {
  
 
   const handleSubmit = async (data: any) => {
- 
-   
-    const { detailsUrl, rewardToken, rewardAmount, maxParticipants, owner, isActive } = data
-    const expiryDate = new Date(data.expiryDate).getTime()
-    const allowedWallets = [data.allowedWallets]
-    
-    writeContract({
-      address: data.entityAddress as `0x${string}`,
-      abi: EntityTaskManagementABI,
-      functionName: "createTask",
-      args: [{ detailsUrl, rewardToken, rewardAmount, allowedWallets, maxParticipants, expiryDate, owner, isActive }]
+    console.log(data.entityAddress, "data from form");
 
- })
+    if (!isAddress(data.entityAddress)) {
+        console.error("Invalid Ethereum address:", data.entityAddress);
+        return;
+    }
+
+    const { detailsUrl, rewardToken, owner, isActive } = data;
+    const expiryDate = Math.floor(new Date(data.expiryDate).getTime() / 1000); // Convert to seconds
+    const allowedWallets = Array.isArray(data.allowedWallets) ? data.allowedWallets : [data.allowedWallets]; // Ensure it's an array
+    const rewardAmount = BigInt(data.rewardAmount);
+    const maxParticipants = BigInt(data.maxParticipants);
+
+    try {
+        await writeContract({
+            address: data.entityAddress as `0x${string}`,
+            abi: EntityTaskManagementABI,
+            functionName: "createTask",
+            args: [{ detailsUrl, rewardToken, rewardAmount, allowedWallets, maxParticipants, expiryDate, owner, isActive }]
+        });
+    } catch (error) {
+        console.error("Transaction failed:", error);
+    }
 
   };
 
@@ -156,9 +167,9 @@ export default function TaskAdd({ router }: TaskAddProps) {
             <SelectValue placeholder="Select Entity" />
           </SelectTrigger>
           <SelectContent>
-          {entityList?.map((entity:any) => (
-              <SelectItem key={entity.entityTaskManager} value={entity.entityTaskManager}>
-                {entity._name}
+          {EntityList?.map((entity:any) => (
+              <SelectItem key={entity.name} value={entity.address}>
+                {entity.name}
               </SelectItem>
             ))}
           </SelectContent>

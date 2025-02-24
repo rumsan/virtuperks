@@ -5,9 +5,10 @@ import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
 
 import { PATHS } from "@/routes/paths";
-import { EntityFactoryABI } from "@workspace/contracts/abis";
+import { AccessManagerABI, EntityFactoryABI } from "@workspace/contracts/abis";
 import { ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { keccak256 } from "viem";
 import { useDeployContract, useWriteContract } from "wagmi";
 import DepartmentBaseForm from "./department.form";
 import { departmentSchema } from "./schema";
