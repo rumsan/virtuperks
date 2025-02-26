@@ -1,6 +1,7 @@
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import { ListTable } from "@/components/common/list/list.table";
 import { PATHS } from "@/routes/paths";
+import { Participants } from "@/sampleData";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -21,54 +22,6 @@ import ListToolBar from "./list.toolbar";
 type ParticipantListProps = {
   router: any;
 };
-
-export const Participants = [
-  {
-    cuid: "cui3cn39nakoqxin3",
-    name: "Hello A",
-    email: "hello@gmail.com",
-    walletAddress: "0x03hdh7gd83h9d3nd",
-    gender: "Male",
-    manager: "Manager A",
-    userRole: "owner",
-  },
-  {
-    cuid: "cui3cn39nakoqxin3",
-    name: "Hello A",
-    email: "hello@gmail.com",
-    walletAddress: "0x03hdh7gd83h9d3nd",
-    gender: "Male",
-    manager: "Manager A",
-    userRole: "owner",
-  },
-  {
-    cuid: "cui3cn39nakoqxin3",
-    name: "Hello A",
-    email: "hello@gmail.com",
-    walletAddress: "0x03hdh7gd83h9d3nd",
-    gender: "Male",
-    manager: "Manager A",
-    userRole: "owner",
-  },
-  {
-    cuid: "cui3cn39nakoqxin3",
-    name: "Hello A",
-    email: "hello@gmail.com",
-    walletAddress: "0x03hdh7gd83h9d3nd",
-    gender: "Male",
-    manager: "Manager A",
-    userRole: "owner",
-  },
-  {
-    cuid: "cui3cn39nakoqxin3",
-    name: "Hello A",
-    email: "hello@gmail.com",
-    walletAddress: "0x03hdh7gd83h9d3nd",
-    gender: "Male",
-    manager: "Manager A",
-    userRole: "owner",
-  },
-];
 
 const ParticipantList = ({ router }: ParticipantListProps) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
