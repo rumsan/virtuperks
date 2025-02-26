@@ -62,25 +62,7 @@ export default function TreasurerAdd({ router }: TreasurerAddProps) {
                 <Form {...form}>
                   <form onSubmit={handleSubmit}>
                     <div className="p-6">
-                      <div className="grid grid-cols-2 gap-4 mb-5">
-                        <FormField
-                          control={form.control}
-                          name="name"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Treasurer Name</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="Write treasurer name"
-                                  {...field}
-                                  value={field.value ?? ""}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
+                      <div className="grid grid-cols-1 gap-4 mb-5">
                         <FormField
                           control={form.control}
                           name="walletAddress"
