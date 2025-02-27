@@ -2,7 +2,7 @@ import { DataTablePagination } from "@/components/common/list/list.pagination";
 import { ListTable } from "@/components/common/list/list.table";
 import { ColumnDef, Table } from "@tanstack/react-table";
 import { Card } from "@workspace/ui/components/card";
-import DepartmentAction from "./details.action";
+import SearchAction from "@/components/common/list/list.search";
 
 interface ListTableProps<T, TData> {
   columns: ColumnDef<T>[];
@@ -26,7 +26,7 @@ const DepartmentDetailsTable = <T, TData>({
         </p>
       </div>
       <Card className="p-4">
-        <DepartmentAction />
+        <SearchAction />
         <ListTable table={table} columns={columns} />
         <hr />
         <DataTablePagination

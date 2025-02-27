@@ -1,5 +1,3 @@
-import { TreasurerChart } from "@/components/treasurers/details/details.chart";
-import { TreasurerLineChart } from "@/components/treasurers/details/details.lineChart";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Copy, Dot, User } from "lucide-react";
 
@@ -47,9 +45,7 @@ const ParticipantCard = () => {
             <span className="text-base">Total Tokens Created</span>
             <span className="text-2xl font-bold text-primary mt-2">10,000</span>
           </CardTitle>
-          <div className="flex items-center justify-center w-[50%] h-full">
-            <TreasurerChart />
-          </div>
+          <div className="flex items-center justify-center w-[50%] h-full"></div>
         </div>
         <div className="grid grid-cols-3 gap-3 items-center w-full h-[40%]">
           <div className="w-full h-full flex flex-col bg-blue-100 rounded-lg p-3 gap-2">
@@ -73,9 +69,7 @@ const ParticipantCard = () => {
             <span>Allocation Chart</span>
           </CardTitle>
         </div>
-        <div className="w-full">
-          <TreasurerLineChart />
-        </div>
+        <div className="w-full"></div>
       </Card>
     </div>
   );

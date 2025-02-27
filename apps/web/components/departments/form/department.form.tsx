@@ -23,21 +23,6 @@ interface DepartmentFormProps {
   children: React.ReactNode;
 }
 
-export const departmentOwnerList = [
-  {
-    id: 1,
-    name: "A",
-  },
-  {
-    id: 2,
-    name: "B",
-  },
-  {
-    id: 3,
-    name: "C",
-  },
-];
-
 export default function DepartmentBaseForm({
   mode,
   saveForm,
