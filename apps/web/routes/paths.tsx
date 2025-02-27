@@ -1,6 +1,6 @@
 const ROOTS = {
   DEPARTMENT: "/departments",
-  TREASURER: "/treasurer",
+  TREASURY: "/treasury",
   PARTICIPANT: "/participants",
 };
 
@@ -12,11 +12,11 @@ export const PATHS = {
     DETAILS: (cuid: string) => `${ROOTS.DEPARTMENT}/${cuid}`,
   },
 
-  TREASURER: {
-    HOME: `${ROOTS.TREASURER}`,
-    ADD: `${ROOTS.TREASURER}/add`,
-    EDIT: (cuid: string) => `${ROOTS.TREASURER}/${cuid}`,
-    DETAILS: (cuid: string) => `${ROOTS.TREASURER}/${cuid}`,
+  TREASURY: {
+    HOME: `${ROOTS.TREASURY}`,
+    ADD: `${ROOTS.TREASURY}/add`,
+    EDIT: (cuid: string) => `${ROOTS.TREASURY}/${cuid}`,
+    DETAILS: (cuid: string) => `${ROOTS.TREASURY}/${cuid}`,
   },
 
   PARTICIPANT: {

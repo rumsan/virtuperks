@@ -43,7 +43,7 @@ export default function TreasurerAdd({ router }: TreasurerAddProps) {
       <div className="w-full items-center ">
         <main className="gap-2 p-4 sm:px-8 md:gap-8 w-full">
           <div
-            onClick={() => router.push(PATHS.TREASURER.HOME)}
+            onClick={() => router.push(PATHS.TREASURY.HOME)}
             className="flex items-center gap-2 cursor-pointer hover:text-gray-400"
           >
             <ArrowLeft size={24} strokeWidth={2} />

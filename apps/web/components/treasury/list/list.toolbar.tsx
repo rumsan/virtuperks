@@ -15,7 +15,7 @@ export default function ListToolBar({ router }: ListToolBar) {
         className="min-w-[12rem] fw-[600] h-10"
         variant="default"
         type="submit"
-        onClick={() => router.push(PATHS.TREASURER.ADD)}
+        onClick={() => router.push(PATHS.TREASURY.ADD)}
       >
         <Plus size={22} strokeWidth={2.75} />
         <span>Add Treasurer</span>

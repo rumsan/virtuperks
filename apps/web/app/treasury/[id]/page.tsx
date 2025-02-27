@@ -1,6 +1,6 @@
 "use client";
 
-import TreasurerDetails from "@/components/treasurers/details/details.main";
+import TreasurerDetails from "@/components/treasury/details/details.main";
 import dynamic from "next/dynamic";
 import { useParams, useRouter } from "next/navigation";
 

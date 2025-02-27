@@ -1,6 +1,6 @@
 "use client";
 
-import TreasurerAdd from "@/components/treasurers/form/treasurer.add";
+import TreasurerAdd from "@/components/treasury/form/treasurer.add";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 

@@ -13,7 +13,7 @@ const TreasurerListCard = ({ router }: TreasurerListCardProps) => {
     <div className="grid grid-cols-4 gap-4 w-full">
       <Card
         className="w-full flex items-center justify-center text-blue-500 bg-blue-50 border-sm border-primary border-dashed cursor-pointer hover:shadow-lg hover:text-blue-400 gap-2"
-        onClick={() => router.push(PATHS.TREASURER.ADD)}
+        onClick={() => router.push(PATHS.TREASURY.ADD)}
       >
         <span className="text-center text-base">Add treasurer</span>
         <Plus size={24} />
@@ -25,7 +25,7 @@ const TreasurerListCard = ({ router }: TreasurerListCardProps) => {
               key={treasurer.id}
               className="cursor-pointer hover:shadow-lg p-4"
               onClick={() =>
-                router.push(PATHS.TREASURER.DETAILS(treasurer.cuid))
+                router.push(PATHS.TREASURY.DETAILS(treasurer.cuid))
               }
             >
               <CardTitle className="flex flex-col gap-1 w-full">

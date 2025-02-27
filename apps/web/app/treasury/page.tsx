@@ -1,6 +1,6 @@
 "use client";
 
-import { TreasurerList } from "@/components/treasurers/list";
+import { TreasurerList } from "@/components/treasury/list";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
