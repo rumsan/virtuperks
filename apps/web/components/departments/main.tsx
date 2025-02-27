@@ -1,9 +1,13 @@
-import { DepartmentList } from "./list";
+import DepartmentList from "./list";
 
-function Department() {
+interface Department {
+  router: any;
+}
+
+function Department({ router }: Department) {
   return (
     <main className="w-full">
-      <DepartmentList />
+      <DepartmentList router={router} />
     </main>
   );
 }

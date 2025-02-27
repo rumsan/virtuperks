@@ -9,17 +9,10 @@ import {
   FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select";
+import { Wallet } from "lucide-react";
+import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Department } from "./schema";
-import React from "react";
-import { Wallet } from "lucide-react";
 
 interface DepartmentFormProps {
   mode: "add" | "edit";
@@ -58,7 +51,7 @@ export default function DepartmentBaseForm({
     },
     (errors) => {
       console.log("Validation errors:", errors);
-    }
+    },
   );
   return (
     <>
@@ -84,35 +77,7 @@ export default function DepartmentBaseForm({
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="owner"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Department Owner</FormLabel>
 
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value ?? ""}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select department owner" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {departmentOwnerList.map((owner) => (
-                          <SelectItem key={owner.id} value={owner.name}>
-                            {owner.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <FormField
                 control={form.control}
                 name="walletAddress"
@@ -138,7 +103,7 @@ export default function DepartmentBaseForm({
               />
             </div>
 
-            <div className="w-full flex justify-end">
+            <div className="w-full flex justify-end mt-5">
               <>{children}</>
             </div>
           </div>

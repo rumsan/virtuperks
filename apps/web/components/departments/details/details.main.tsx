@@ -1,6 +1,7 @@
 "use client";
 
 import { PATHS } from "@/routes/paths";
+import { Departments } from "@/sampleData";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -11,15 +12,8 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@workspace/ui/components/tabs";
 import { ArrowLeft } from "lucide-react";
 import React from "react";
-import { Departments } from "../list/list.card";
 import DepartmentDetailsCard from "./details.card";
 import { useColumns } from "./details.column";
 import DepartmentDetailsTable from "./details.table";
@@ -85,32 +79,14 @@ export default function DepartmentDetails({
         </h3>
       </div>
 
-      <Tabs defaultValue="departmentOverview" className="">
-        <div className="w-[400px]">
-          <TabsList className="flex bg-blue-50 h-10">
-            <TabsTrigger value="departmentOverview" className="w-full h-8">
-              Department Overview
-            </TabsTrigger>
-            <TabsTrigger value="allocationHistory" className="w-full h-8">
-              Allocation History
-            </TabsTrigger>
-          </TabsList>
-        </div>
+      <DepartmentDetailsCard cuid={cuid} />
 
-        <div className="w-full">
-          <TabsContent className="w-full" value="departmentOverview">
-            <DepartmentDetailsCard cuid={cuid} />
-          </TabsContent>
-          <TabsContent className="w-full" value="allocationHistory">
-            <DepartmentDetailsTable
-              table={table}
-              columns={columns}
-              setPagination={setPagination}
-              pagination={pagination}
-            />
-          </TabsContent>
-        </div>
-      </Tabs>
+      <DepartmentDetailsTable
+        table={table}
+        columns={columns}
+        pagination={pagination}
+        setPagination={setPagination}
+      />
     </main>
   );
 }
