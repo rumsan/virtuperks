@@ -1,3 +1,4 @@
+import { DialogButton } from "@/components/common/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
@@ -10,6 +11,7 @@ import {
   FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Token, tokenSchema } from "../../token/form/schema";
 
@@ -18,6 +20,8 @@ const defaultValues: Token = {
 };
 
 const DepartmentTokenAllocate = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
   const form = useForm({
     resolver: zodResolver(tokenSchema()),
     defaultValues: defaultValues,
@@ -26,6 +30,12 @@ const DepartmentTokenAllocate = () => {
   const handleSubmit = async (data: any) => {
     console.log(data, "data");
   };
+
+  const handleDialogButton = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setIsOpen(true);
+  };
+
   return (
     <div className="my-6">
       <Card className="rounded-lg w-full">
@@ -71,9 +81,14 @@ const DepartmentTokenAllocate = () => {
                     type="submit"
                     variant="default"
                     className="w-[170px] flex justify-center items-center gap-2"
+                    onClick={(e) => handleDialogButton(e)}
                   >
                     Allocate
                   </Button>
+
+                  {isOpen && (
+                    <DialogButton isOpen={isOpen} setIsOpen={setIsOpen} />
+                  )}
                 </div>
               </div>
             </form>
