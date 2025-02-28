@@ -76,19 +76,23 @@ type TaskCreated @entity(immutable: true) {
   entityTaskManagerCreated: EntityTaskManagerCreated! # Reference to the EntityTaskManagerCreated
   createdBy: Bytes! # Address of the task creator
   internal_id: Bytes! # Task ID
-  detailsUrl: String! # Task details URL
-  rewardToken: Bytes! # Address of the reward token
-  rewardAmount: BigInt! # Reward amount
-  allowedWallets: [Bytes!]! # Allowed wallets
-  maxParticipants: BigInt! # Maximum participants
-  expiryDate: BigInt! # Expiry date
-  owner: Bytes! # Task owner
+ 
   
-  isActive: Boolean! # Task status
+
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+type TaskDetail @entity(immutable: false) {
+  id: Bytes! # Task ID (e.g., detailsUrl)
+  detailsUrl: String! # URL to the task details
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+
 
 type ParticiantApplied @entity(immutable: true) {
   id: Bytes! # Event ID (transaction hash + log index)

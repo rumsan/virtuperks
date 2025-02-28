@@ -76,7 +76,7 @@ let completionId = event.transaction.hash.concatI32(event.logIndex.toI32());
 }
 
 export function handleTaskCreated(event: TaskCreatedEvent): void {
-  
+  log.info('TaskCreated event fired', [event.address.toHexString() || 'not found']);
   let entity = EntityTaskManagerCreated.load(event.address);
   if (!entity) return;
   log.info('TaskCreated event fired', [entity.id.toHexString()]);
@@ -88,14 +88,8 @@ export function handleTaskCreated(event: TaskCreatedEvent): void {
   task.entityTaskManagerCreated = entity.entityTaskManager
   task.internal_id = event.params.id
   task.createdBy = event.params.createdBy;
-  task.detailsUrl = event.params.detailsUrl;
-  task.rewardToken = event.params.rewardToken;
-  task.rewardAmount = event.params.rewardAmount;
-  task.allowedWallets =  changetype<Bytes[]>(event.params.allowedWallets)
-  task.maxParticipants = event.params.maxParticipants;
-  task.expiryDate = event.params.expiryDate;
-  task.owner = event.params.owner;
-  task.isActive = event.params.isActive;
+
+  
   task.blockNumber = event.block.number;
   task.blockTimestamp = event.block.timestamp;
   task.transactionHash = event.transaction.hash;
