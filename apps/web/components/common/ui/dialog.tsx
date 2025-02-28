@@ -20,7 +20,7 @@ export function DialogButton({ isOpen, setIsOpen }: DialogButtonProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Open Dialog</Button>
+        {/* <Button variant="outline">Open Dialog</Button> */}
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="items-center justify-center">
