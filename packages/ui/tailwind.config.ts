@@ -4,12 +4,19 @@ import tailwindcssAnimate from 'tailwindcss-animate';
 const config = {
   darkMode: ['class'],
   content: [
-    'app/**/*.{ts,tsx}',
-    'components/**/*.{ts,tsx}',
+    './app/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
     '../../packages/ui/src/components/**/*.{ts,tsx}',
   ],
   theme: {
     extend: {
+      backgroundImage: {
+        logo: "url('/bg/logo.png')",
+      },
+      fontFamily: {
+        sans: ['var(--font-sans)', ...fontFamily.sans],
+        mono: ['var(--font-mono)', ...fontFamily.mono],
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

@@ -1,5 +1,7 @@
 const ROOTS = {
   DEPARTMENT: "/departments",
+  TREASURY: "/treasury",
+  PARTICIPANT: "/participants",
   TREASURER: "/treasurer",
   TASKS: "/tasks",
   TASKPORTAL: "/task_portal",
@@ -13,11 +15,24 @@ export const PATHS = {
     DETAILS: (cuid: string) => `${ROOTS.DEPARTMENT}/${cuid}`,
   },
 
+  TREASURY: {
+    HOME: `${ROOTS.TREASURY}`,
+    ADD: `${ROOTS.TREASURY}/add`,
+    EDIT: (cuid: string) => `${ROOTS.TREASURY}/${cuid}`,
+    DETAILS: (cuid: string) => `${ROOTS.TREASURY}/${cuid}`,
+  },
+
+  PARTICIPANT: {
+    HOME: `${ROOTS.PARTICIPANT}`,
+    ADD: `${ROOTS.PARTICIPANT}/add`,
+    DETAILS: (cuid: string) => `${ROOTS.PARTICIPANT}/${cuid}`,
+  },
+
   TREASURER: {
-    HOME: `${ROOTS.TREASURER}`,
-    ADD: `${ROOTS.TREASURER}/add`,
-    EDIT: (cuid: string) => `${ROOTS.TREASURER}/${cuid}`,
-    DETAILS: (cuid: string) => `${ROOTS.TREASURER}/${cuid}`,
+    TOKEN: {
+      HOME: `${ROOTS.TREASURER}/token`,
+      CREATE: `${ROOTS.TREASURER}/token/create`,
+    },
   },
 
   TASKS: {

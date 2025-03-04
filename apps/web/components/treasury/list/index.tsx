@@ -17,9 +17,9 @@ export function TreasurerList({ router }: TreasurerListProps) {
             List of all the treasurers
           </h3>
         </div>
-        <ListToolBar />
+        <ListToolBar router={router} />
       </div>
-      <TreasurerListCard />
+      <TreasurerListCard router={router} />
     </main>
   );
 }
