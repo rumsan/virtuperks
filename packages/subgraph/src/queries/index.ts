@@ -1,5 +1,5 @@
 export const CreatedAppList = `query 
-  appCreateds
+  CreatedAppList
   {
     appCreateds(first:10){
     appId
@@ -10,7 +10,7 @@ export const CreatedAppList = `query
   }`;
 
 export const RoleGrantedList = `
-  query RoleGranted {
+  query RoleGrantedList {
     roleGranteds(first: 10, orderBy: appId) {
       id
       appId
@@ -24,7 +24,7 @@ export const RoleGrantedList = `
 `;
 
 export const ApprovalList = `
-  query Approval {
+  query ApprovalList {
     approvals(first: 10, orderBy: owner) {
       id
       owner
@@ -38,7 +38,7 @@ export const ApprovalList = `
 `;
 
 export const TransferList = `
-  query Transfer {
+  query TransferList {
     transfers(first: 10, orderBy: from) {
       id
       from
@@ -65,11 +65,26 @@ export const TaskCreatedList = `
 `;
 
 export const ParticiantAppliedList = `
-  query ParticiantApplied {
+  query ParticiantAppliedList {
     particiantApplieds(first: 10, orderBy: TaskManagement_id) {
       id
       TaskManagement_id
       participant
+      blockNumber
+      blockTimestamp
+      transactionHash
+    }
+  }
+`;
+
+export const EntityTaskManagerCreatedList = `
+  query EntityTaskManagerCreatedList {
+    entityTaskManagerCreateds(first: 10, orderBy: blockTimestamp) {
+      id
+      entityTaskManager
+      aclAddress
+      _appId
+      _name
       blockNumber
       blockTimestamp
       transactionHash

@@ -91,10 +91,10 @@ export default function DepartmentBaseForm({
               /> */}
               <FormField
                 control={form.control}
-                name="walletAddress"
+                name="appId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Wallet Address</FormLabel>
+                    <FormLabel>App Id address</FormLabel>
                     <FormControl>
                       <div className="relative flex items-center">
                         <Input

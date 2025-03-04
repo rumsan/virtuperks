@@ -3,7 +3,7 @@
 import { getDefaultConfig } from "connectkit";
 import { defineChain } from "viem";
 import { createConfig, http } from "wagmi";
-import { mainnet, polygonAmoy, sepolia } from "wagmi/chains";
+import { baseSepolia, mainnet, polygonAmoy, sepolia } from "wagmi/chains";
 
 import { safe } from "wagmi/connectors";
 
@@ -39,7 +39,8 @@ export const config = createConfig(
       // sepolia,
       // arbitrumGoerli,
       // polygon,
-      localChain,
+      //localChain,
+      baseSepolia
       // arbitrumSepolia,
       // rahatChain,
     ],
@@ -50,6 +51,7 @@ export const config = createConfig(
       // walletConnect({
       //   projectId: '1234',
       // }),
+      
       safe(),
     ],
     transports: {
@@ -58,6 +60,7 @@ export const config = createConfig(
       // [arbitrumSepolia.id]: http(),
       [polygonAmoy.id]: http(),
       [localChain.id]: http(),
+      [baseSepolia.id]: http(),
     },
     walletConnectProjectId: "",
     // Required App Info

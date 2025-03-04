@@ -1,7 +1,8 @@
 import { Cuid } from "@/components/departments/details/details.main";
+import { TaskList } from "@/sampleData";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Clock, ExternalLink, Trophy, UserRoundCog, Users } from "lucide-react";
-import { TaskList } from "../list";
+
 
 type TaskDetailsProps = {
   cuid: Cuid;

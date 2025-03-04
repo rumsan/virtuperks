@@ -1,13 +1,14 @@
-import {cacheExchange, Client, fetchExchange} from '@urql/core';
+import { cacheExchange, Client, fetchExchange } from '@urql/core';
 
 import {
   ApprovalList,
   //ApprovalList,
   CreatedAppList,
+  EntityTaskManagerCreatedList,
   ParticiantAppliedList,
   RoleGrantedList,
   TaskCreatedList,
-  TransferList,
+  TransferList
 } from '../queries';
 
 export class SubgraphService {
@@ -52,6 +53,13 @@ export class SubgraphService {
   async getParticiantAppliedList() {
     const {data, error} = await this.subgraphQuery.query(
       ParticiantAppliedList,
+      {},
+    );
+    return {data, error};
+  }
+    async getEntityManagerCreatedList() {
+    const {data, error} = await this.subgraphQuery.query(
+      EntityTaskManagerCreatedList,
       {},
     );
     return {data, error};

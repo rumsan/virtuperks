@@ -55,45 +55,84 @@ type Transfer @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
-type ParticiantApplied @entity(immutable: true) {
-  id: Bytes!
-  internal_id: Bytes! # address
-  participant: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type TaskAccepted @entity(immutable: true) {
-  id: Bytes!
-  internal_id: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type TaskApproved @entity(immutable: true) {
-  id: Bytes!
-  internal_id: Bytes! # address
-  approver: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type TaskCompleted @entity(immutable: true) {
-  id: Bytes!
-  internal_id: Bytes! # address
-  participant: Bytes! # address
+type EntityTaskManagerCreated @entity {
+  id: Bytes! # Address of the EntityTaskManagerCreatedCreated contract
+  entityTaskManager: Bytes! # address
+  aclAddress: Bytes! # Address of the ACL contract
+   appId: Bytes! # App ID
+  name: String! # Name of the entity
+  tasks: [TaskCreated!]! @derivedFrom(field: "entityTaskManagerCreated") # Tasks created by this entity
+  participantApplications: [ParticiantApplied!]! @derivedFrom(field: "entityTaskManagerCreated") # Participant applications
+  taskAcceptances: [TaskAccepted!]! @derivedFrom(field: "entityTaskManagerCreated") # Task acceptances
+  taskApprovals: [TaskApproved!]! @derivedFrom(field: "entityTaskManagerCreated") # Task approvals
+  taskCompletions: [TaskCompleted!]! @derivedFrom(field: "entityTaskManagerCreated") # Task completions
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
 type TaskCreated @entity(immutable: true) {
-  id: Bytes!
-  internal_id: Bytes! # address
-  createdBy: Bytes! # address
+  id: Bytes! # Task ID (e.g., detailsUrl)
+  entityTaskManagerCreated: EntityTaskManagerCreated! # Reference to the EntityTaskManagerCreated
+  createdBy: Bytes! # Address of the task creator
+  internal_id: Bytes! # Task ID
+ 
+  
+
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskDetail @entity(immutable: false) {
+  id: Bytes! # Task ID (e.g., detailsUrl)
+  detailsUrl: String! # URL to the task details
+  rewardToken: Bytes! # Address of the reward token
+  rewardAmount: BigInt! # Amount of the reward
+  maxParticipants: BigInt! # Maximum number of participants
+  expiryDate: BigInt! # Expiry date of the task
+  owner: Bytes! # Address of the task owner
+  isActive: Boolean! # Whether the task is active
+
+
+}
+
+
+
+type ParticiantApplied @entity(immutable: true) {
+  id: Bytes! # Event ID (transaction hash + log index)
+  entityTaskManagerCreated: EntityTaskManagerCreated! # Reference to the EntityTaskManagerCreated
+  internal_id: Bytes! # Task ID
+  participant: Bytes! # Address of the participant
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskAccepted @entity(immutable: true) {
+  id: Bytes! # Event ID (transaction hash + log index)
+  entityTaskManagerCreated: EntityTaskManagerCreated! # Reference to the EntityTaskManagerCreated
+  internal_id: Bytes! # Task ID
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskApproved @entity(immutable: true) {
+  id: Bytes! # Event ID (transaction hash + log index)
+  entityTaskManagerCreated: EntityTaskManagerCreated! # Reference to the EntityTaskManagerCreated
+  internal_id: Bytes! # Task ID
+  approver: Bytes! # Address of the approver
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskCompleted @entity(immutable: true) {
+  id: Bytes! # Event ID (transaction hash + log index)
+  entityTaskManagerCreated: EntityTaskManagerCreated! # Reference to the EntityTaskManagerCreated
+  internal_id: Bytes! # Task ID
+  participant: Bytes! # Address of the participant
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

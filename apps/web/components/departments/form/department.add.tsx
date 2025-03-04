@@ -5,23 +5,24 @@ import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
 
 import { PATHS } from "@/routes/paths";
-import { deployEntityTaskManager } from "@/utils/ethers";
-import { useEthersSigner } from "@/utils/etherSigner";
+import { AccessManagerABI, EntityFactoryABI } from "@workspace/contracts/abis";
 import { ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { keccak256 } from "viem";
+import { useDeployContract, useWriteContract } from "wagmi";
 import DepartmentBaseForm from "./department.form";
 import { departmentSchema } from "./schema";
 
 const defaultValues: any = {
   name: "",
-  //owner: "",
-  walletAddress: "",
+ 
+  appId: "",
 };
 
 type DepartmentAddProps = {
   router: any;
 };
-const accessManagerContract = "0x50D75C1BC6a1cE35002C9f92D0AF4B3684aa6B74";
+
 
 export default function DepartmentAdd({ router }: DepartmentAddProps) {
   const form = useForm({
@@ -29,35 +30,37 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
     defaultValues: defaultValues,
   });
 
-  const signer = useEthersSigner({ chainId: 8545 });
+  // const signer = useEthersSigner({ chainId: 8545 });
+  const {deployContractAsync}= useDeployContract()
 
-  //const { data: hash, writeContract } = useWriteContract();
-  //way to call the function of the deployed contract
-  // const handleDepartmentSubmit = async (data: any) => {
-  //   const appId = keccak256(toBytes(data.name));
-
-  //   const adminAddress = "0x959FD7Ef9089B7142B6B908Dc3A8af7Aa8ff0FA1";
+  const { data: hash, writeContract } = useWriteContract();
+  //functin that call the createApp function in the accessManager contract
+  //  const handleAppSubmit = async (data: any) => {
+  // //  console.log(data,'data from form')
+  //    const appId = keccak256(data.name);
+ 
+    
+     
+ 
 
   //   writeContract({
-  //     address: AccessManagerAddress,
-  //     abi: AccessManager,
+  //     address: process.env.NEXT_PUBLIC_ACCESSMANAGER as `0x${string}` || '0x0000000000000000,',
+  //     abi: AccessManagerABI,
   //     functionName: "createApp",
-  //     args: [appId, adminAddress],
+  //     args: [appId, process.env.NEXT_PUBLIC_ADMIN],
+  //       //chainId of the network
   //   });
   // };
-  const createEntityButton = async () => {
-    if (!signer) {
-      alert("Signer is not available");
-      return;
-    }
-    const appId =
-      "0x87c3aefca89371d66a3eb9d8a8b7866fad1000286f175d57d502b71d34b7e7bd";
-    const deployContract = await deployEntityTaskManager(
-      signer,
-      accessManagerContract,
-      appId,
-    );
-  console.log(deployContract, "deployContractfrom component");
+  const createEntityButton = async (data: any) => {
+    
+  
+    writeContract({
+      address: process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}` || '0x ',
+      abi: EntityFactoryABI,
+      functionName: "createEntityTaskManager",
+      args: [process.env.NEXT_PUBLIC_ACCESSMANAGER , data.appId, data.name],
+   })
+
   };
 
   return (
