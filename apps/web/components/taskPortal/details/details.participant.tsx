@@ -1,12 +1,63 @@
-import { participantList } from "@/sampleData";
+import { ListTable } from "@/components/common/list/list.table";
+import { participantList, TaskHistory } from "@/sampleData";
+import {
+  ColumnFiltersState,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
+  useReactTable,
+  VisibilityState,
+} from "@tanstack/react-table";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { User } from "lucide-react";
 import { useState } from "react";
+import { useHistoryColumns } from "./history.column";
 
 const TaskPortalParticipant = () => {
   const [hoveredWallet, setHoveredWallet] = useState<string | null>(null);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
+  const columns = useHistoryColumns();
+  const table = useReactTable({
+    data: TaskHistory || [],
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+  });
+
   return (
     <>
+      <div className="flex flex-col w-[80%] p-2">
+        <div className="flex flex-col gap-1">
+          <span className="text-[#0F172A] font-bold text-base">
+            Task History Table
+          </span>
+          <span className="text-[#64748B] text-sm">History of the task</span>
+        </div>
+        <ListTable table={table} columns={columns} />
+      </div>
+
       <Card className="w-[20%] ml-auto p-4">
         <CardTitle className="flex flex-col gap-2 w-full">
           <span>Participants</span>
