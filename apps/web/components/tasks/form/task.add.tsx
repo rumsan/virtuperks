@@ -34,11 +34,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useEntityList } from "@/hooks/subgraph/querycall";
-import { useWriteContract } from "wagmi";
+import { useReadContract, useWriteContract } from "wagmi";
 import { taskSchema } from "./schema";
 
 import { EntityList, participantList, tokenList } from "@/sampleData";
-import { isAddress } from "viem";
+import { isAddress, keccak256 } from "viem";
 
 const defaultValues:any = {
 
@@ -67,12 +67,20 @@ export default function TaskAdd({ router }: TaskAddProps) {
 
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const { data: hash, writeContract } = useWriteContract()
+  const { data: hash, writeContract,writeContractAsync,context} = useWriteContract()
+ const result = useReadContract({
+    abi:EntityTaskManagementABI,
+   address: '0xac9aa567eb42f9fbdbe2e1707a3fb971a7ec9bae',
+    args:["https://github.com/Pratiksharai-Rumsan/task-management/issues/1"],
+    functionName: 'tasks',
+ })
+  console.log(result,'result from component')
 
  
 
   const handleSubmit = async (data: any) => {
     console.log(data.entityAddress, "data from form");
+    
 
     if (!isAddress(data.entityAddress)) {
         console.error("Invalid Ethereum address:", data.entityAddress);
@@ -80,18 +88,22 @@ export default function TaskAdd({ router }: TaskAddProps) {
     }
 
     const { detailsUrl, rewardToken, owner, isActive } = data;
+    const taskId = keccak256(data.detailsUrl);
     const expiryDate = Math.floor(new Date(data.expiryDate).getTime() / 1000); // Convert to seconds
     const allowedWallets = Array.isArray(data.allowedWallets) ? data.allowedWallets : [data.allowedWallets]; // Ensure it's an array
     const rewardAmount = BigInt(data.rewardAmount);
+   
     const maxParticipants = BigInt(data.maxParticipants);
-
+    console.log({taskId,detailsUrl, rewardToken,expiryDate,allowedWallets,rewardAmount,maxParticipants,owner,isActive},'data to be sent')
     try {
-        await writeContract({
+        const tx = await writeContractAsync({
             address: data.entityAddress as `0x${string}`,
             abi: EntityTaskManagementABI,
             functionName: "createTask",
             args: [{ detailsUrl, rewardToken, rewardAmount, allowedWallets, maxParticipants, expiryDate, owner, isActive }]
         });
+      console.log(tx,'createTask')
+
     } catch (error) {
         console.error("Transaction failed:", error);
     }
@@ -339,10 +351,16 @@ export default function TaskAdd({ router }: TaskAddProps) {
                                         field.onChange(date);
                                         setIsPopoverOpen(false);
                                       }}
-                                      disabled={(date) =>
-                                        date > new Date() ||
-                                        date < new Date("2022-01-01")
-                                      }
+                                      // disabled={(date) =>
+                                      //   date > new Date() ||
+                                      //   date < new Date("2022-01-01")
+                                      // }
+                                      disabled={(date) => {
+    // Disable past dates and dates before the upcoming month
+   const today = new Date();
+                today.setHours(0, 0, 0, 0); // Normalize today's date to the start of the day
+                return date < today;
+  }}
                                       initialFocus
                                     />
                                   </PopoverContent>

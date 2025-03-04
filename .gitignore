@@ -79,3 +79,5 @@ apps/subgraph/node_modules/
 
 #Sample Data
 apps/web/sampleData.ts
+
+play/

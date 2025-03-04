@@ -30,40 +30,26 @@ interface IEntityTaskManager {
         STATUS status;
     }
 
-    event TaskCreated(
-        string indexed id,
-        address indexed createdBy,
-        string detailsUrl,
-        address rewardToken,
-        uint256 rewardAmount,
-        address[] allowedWallets,
-        uint256 maxParticipants,
-        uint256 expiryDate,
-        address owner,
-        bool isActive
-    );
-    event TaskAccepted(string indexed id);
-    event ParticiantApplied(string indexed id, address indexed participant);
-    event TaskCompleted(string indexed id, address indexed participant);
-    event TaskApproved(string indexed id, address indexed approver);
+    event TaskCreated(bytes32 indexed id, address indexed createdBy);
+    event TaskAccepted(bytes32 indexed id);
+    event ParticiantApplied(bytes32 indexed id, address indexed participant);
+    event TaskCompleted(bytes32 indexed id, address indexed participant);
+    event TaskApproved(bytes32 indexed id, address indexed approver);
 
     function createTask(Task memory task) external;
 
-    function participate(string memory taskId) external;
+    function participate(bytes32 taskId) external;
 
-    function acceptParticipant(
-        string memory taskId,
-        address participant
-    ) external;
+    function acceptParticipant(bytes32 taskId, address participant) external;
 
-    function completeTask(string memory taskId) external;
+    function completeTask(bytes32 taskId) external;
 
     //verify completely new task
     //transfer tokens to the participant
-    function verifyCompletion(string memory taskId) external;
+    function verifyCompletion(bytes32 taskId) external;
 
     function taskAssignments(
-        string memory taskId,
+        bytes32 taskId,
         address participant
     ) external view returns (STATUS status);
 

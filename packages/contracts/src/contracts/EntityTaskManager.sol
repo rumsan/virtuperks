@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+// SPDX-License-Identifier: LGPL-3.0
+pragma solidity 0.8.20;
 
 import './interfaces/IAccessManagerV2.sol';
 import './interfaces/IEntityTaskManager.sol';
@@ -7,14 +7,15 @@ import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
 //TODO: Don not allow token to withdraw from this contract if it is already allocated as rewards
 contract EntityTaskManager is IEntityTaskManager {
+    event PINGED(address indexed sender, uint256 timestamp);
     IAccessManagerV2 public acl;
     string public name;
 
     bytes32 public constant ENTITY_OWNER = keccak256('ENTITY_OWNER');
     bytes32 public constant PARTICIPANT = keccak256('PARTICIPANT');
 
-    mapping(string => Task) public tasks;
-    mapping(string => mapping(address => STATUS)) public taskAssignments;
+    mapping(bytes32 => Task) public tasks;
+    mapping(bytes32 => mapping(address => STATUS)) public taskAssignments;
     // mapping(address => uint256) public allocatedRewards;
 
     bytes32 public appId;
@@ -30,6 +31,11 @@ contract EntityTaskManager is IEntityTaskManager {
         _;
     }
 
+    //Just for testin
+    function ping() public {
+        emit PINGED(msg.sender, block.timestamp);
+    }
+
     /// @notice This function creates a new Task
     /// @param task The task object
 
@@ -41,28 +47,20 @@ contract EntityTaskManager is IEntityTaskManager {
         if (task.owner == address(0)) {
             task.owner = msg.sender;
         }
-
-        tasks[task.detailsUrl] = task;
+        bytes32 taskId = findHash(task.detailsUrl);
+        tasks[taskId] = task;
         // Emit the new event with all task details
 
         emit TaskCreated(
-            task.detailsUrl,
-            msg.sender, // createdBy should be msg.sender
-            task.detailsUrl,
-            task.rewardToken,
-            task.rewardAmount,
-            task.allowedWallets,
-            task.maxParticipants,
-            task.expiryDate,
-            task.owner, // Correctly adding the owner here
-            task.isActive
+            taskId,
+            msg.sender // createdBy should be msg.sender
         );
     }
 
     /// @notice This function will provide access for participant to apply for the task
     /// @param taskId The id of the task
 
-    function participate(string memory taskId) public onlyRole(PARTICIPANT) {
+    function participate(bytes32 taskId) public onlyRole(PARTICIPANT) {
         require(tasks[taskId].isActive, 'Task is not active');
         require(tasks[taskId].expiryDate > block.timestamp, 'Task is expired');
         bool isAllowed = false;
@@ -79,7 +77,7 @@ contract EntityTaskManager is IEntityTaskManager {
     }
 
     function acceptParticipant(
-        string memory taskId,
+        bytes32 taskId,
         address participant
     ) public onlyRole(ENTITY_OWNER) {
         require(tasks[taskId].owner != address(0), 'Task does not exist');
@@ -90,7 +88,7 @@ contract EntityTaskManager is IEntityTaskManager {
 
     /// @notice This function will change the status of the task
     /// @param taskId The id of the task
-    function completeTask(string memory taskId) public onlyRole(PARTICIPANT) {
+    function completeTask(bytes32 taskId) public onlyRole(PARTICIPANT) {
         require(
             taskAssignments[taskId][msg.sender] == STATUS.ACCEPTED,
             'Task is not accepted or already completed'
@@ -104,7 +102,8 @@ contract EntityTaskManager is IEntityTaskManager {
 
     /// @notice This function will change the status of the task
     /// @param taskId The id of the task
-    function verifyCompletion(string memory taskId) external {
+    function verifyCompletion(bytes32 taskId) external {
+        
         require(tasks[taskId].owner == msg.sender, 'not a owner of this task');
         require(tasks[taskId].isActive, 'Task is not active');
 
@@ -141,5 +140,9 @@ contract EntityTaskManager is IEntityTaskManager {
         tasks[taskId].isActive = false;
 
         emit TaskApproved(taskId, msg.sender);
+    }
+
+    function findHash(string memory detailsUrl) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(detailsUrl));
     }
 }

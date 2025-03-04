@@ -1,0 +1,91 @@
+import { expect } from "chai";
+import {
+    loadFixture,
+} from "@nomicfoundation/hardhat-toolbox/network-helpers";
+import hre from "hardhat";
+import { deployTaskManagementFixture, TaskManagementFixture, taskDetails1 } from "./fixtures";
+import exp from "constants";
+
+//function to get the unixtimestamp 
+function getUnixTimeStamp() {
+    return Math.floor(new Date().getTime() / 1000);
+}
+
+describe('------ Task Management Tests ------', function () {
+
+    describe("Deployment", function () {
+        let tmf: TaskManagementFixture;
+        // let provider: EthereumProvider;
+        before(async function () {
+            tmf = await loadFixture(deployTaskManagementFixture);
+        });
+        it("should deploy contracts with expected initial values", async function () {
+            expect(await tmf.rewardToken.name()).to.equal('Rahat');
+            expect(await tmf.rewardToken.symbol()).to.equal('RTH');
+            expect(await tmf.rewardToken.decimals()).to.equal(0n);
+            expect(await tmf.rewardToken.totalSupply()).to.equal(0n);
+        });
+
+        it('should deploy entities with expected initial values', async function () {
+            expect(await tmf.redEntity.appId()).to.equal(hre.ethers.id('RedCafe'));
+            expect(await tmf.blueEntity.appId()).to.equal(hre.ethers.id('BlueCafe'));
+            expect(await tmf.redEntity.acl()).to.equal(tmf.accessManagerV2.target);
+            expect(await tmf.blueEntity.acl()).to.equal(tmf.accessManagerV2.target);
+        });
+    });
+
+    describe("Happy Path: Red Task Management", function () {
+        let tmf: TaskManagementFixture;
+        before(async function () {
+            tmf = await loadFixture(deployTaskManagementFixture);
+        });
+
+        it("should create a task", async function () {
+            await tmf.redEntity.connect(tmf.redCakeTaskOwner).createTask(
+                [taskDetails1,
+                    tmf.rewardToken.target,
+                    100,
+                    [tmf.participant1.address, tmf.participant2.address],
+                    getUnixTimeStamp() + 86400,
+                    tmf.redCakeTaskOwner.address,
+                    true]
+            );
+            const task = await tmf.redEntity.tasks(taskDetails1);
+            expect(task.detailsUrl).to.equal(taskDetails1);
+            expect(task.rewardToken).to.equal(tmf.rewardToken.target);
+            expect(task.rewardAmount).to.equal(100);
+            expect(task.isActive).to.equal(true);
+            expect(task.owner).to.equal(tmf.redCakeTaskOwner.address);
+        });
+
+        it('should participate in a task', async function () {
+            const taskDetails1 = 'https://www.rumsantask.com/task1';
+            await tmf.redEntity.connect(tmf.participant1).participate(taskDetails1);
+            const taskAssignments = await tmf.redEntity.taskAssignments(taskDetails1);
+            expect(taskAssignments[0]).to.equal(tmf.participant1.address);
+            expect(taskAssignments[1]).to.equal(0);//UNACCEPTED
+        });
+
+        it('should accept participation in a task', async function () {
+            await tmf.redEntity.connect(tmf.redCakeTaskOwner).acceptParticipant(taskDetails1, tmf.participant1.address);
+            const taskAssignments = await tmf.redEntity.taskAssignments(taskDetails1);
+            expect(taskAssignments[1]).to.equal(1);//ACCEPTED
+        });
+
+        it('should complete a task', async function () {
+            await tmf.redEntity.connect(tmf.participant1).completeTask(taskDetails1);
+            const taskAssignments = await tmf.redEntity.taskAssignments(taskDetails1);
+            expect(taskAssignments[1]).to.equal(2);//COMPLETED
+        });
+
+        it('should approve a task', async function () {
+            await tmf.redEntity.connect(tmf.redCakeTaskOwner).approveTask(taskDetails1);
+            const task = await tmf.redEntity.tasks(taskDetails1);
+            const taskAssignments = await tmf.redEntity.taskAssignments(taskDetails1);
+            expect(task.isActive).to.equal(false);
+            expect(taskAssignments[1]).to.equal(3);//VERIFIED
+        });
+
+    });
+
+});

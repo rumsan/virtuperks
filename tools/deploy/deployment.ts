@@ -99,16 +99,16 @@ async function main() {
   const seedProject = new SeedProject();
   const RUMSAN_APP_ID = ethers.id('RUMSAN_APP');
   const name = 'rumsan'
- const {accessManagerV2} =
-   await seedProject.deployCommonContracts(RUMSAN_APP_ID);
-  console.log('Common contracts deployed');
+//  const {accessManagerV2} =
+//    await seedProject.deployCommonContracts(RUMSAN_APP_ID);
+//   console.log('Common contracts deployed');
   await seedProject.deployEntityContract(
-    accessManagerV2.contract.target,
+    '0x279BFe2E7ac4841F9486c2da42DB5a638285BDd9',
     ethers.id('RUMSAN_ENTITY'),
     name
   );
-  await seedProject.deployEntityContractFactory();
-console.log('deploy factory contract')
+  //await seedProject.deployEntityContractFactory();
+//console.log('deploy factory contract')
   await seedProject.writeToDeploymentFile('contracts', seedProject.contracts);
 }
 

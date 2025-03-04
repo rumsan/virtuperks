@@ -14,9 +14,9 @@ const _abi = [
     inputs: [
       {
         indexed: true,
-        internalType: "string",
+        internalType: "bytes32",
         name: "id",
-        type: "string",
+        type: "bytes32",
       },
       {
         indexed: true,
@@ -33,9 +33,9 @@ const _abi = [
     inputs: [
       {
         indexed: true,
-        internalType: "string",
+        internalType: "bytes32",
         name: "id",
-        type: "string",
+        type: "bytes32",
       },
     ],
     name: "TaskAccepted",
@@ -46,9 +46,9 @@ const _abi = [
     inputs: [
       {
         indexed: true,
-        internalType: "string",
+        internalType: "bytes32",
         name: "id",
-        type: "string",
+        type: "bytes32",
       },
       {
         indexed: true,
@@ -65,9 +65,9 @@ const _abi = [
     inputs: [
       {
         indexed: true,
-        internalType: "string",
+        internalType: "bytes32",
         name: "id",
-        type: "string",
+        type: "bytes32",
       },
       {
         indexed: true,
@@ -84,63 +84,15 @@ const _abi = [
     inputs: [
       {
         indexed: true,
-        internalType: "string",
+        internalType: "bytes32",
         name: "id",
-        type: "string",
+        type: "bytes32",
       },
       {
         indexed: true,
         internalType: "address",
         name: "createdBy",
         type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "detailsUrl",
-        type: "string",
-      },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "rewardToken",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "rewardAmount",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "address[]",
-        name: "allowedWallets",
-        type: "address[]",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "maxParticipants",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "expiryDate",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "bool",
-        name: "isActive",
-        type: "bool",
       },
     ],
     name: "TaskCreated",
@@ -149,9 +101,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "string",
+        internalType: "bytes32",
         name: "taskId",
-        type: "string",
+        type: "bytes32",
       },
       {
         internalType: "address",
@@ -167,9 +119,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "string",
+        internalType: "bytes32",
         name: "taskId",
-        type: "string",
+        type: "bytes32",
       },
     ],
     name: "completeTask",
@@ -248,9 +200,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "string",
+        internalType: "bytes32",
         name: "taskId",
-        type: "string",
+        type: "bytes32",
       },
     ],
     name: "participate",
@@ -261,9 +213,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "string",
+        internalType: "bytes32",
         name: "taskId",
-        type: "string",
+        type: "bytes32",
       },
       {
         internalType: "address",
@@ -285,9 +237,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "string",
+        internalType: "bytes32",
         name: "taskId",
-        type: "string",
+        type: "bytes32",
       },
     ],
     name: "verifyCompletion",

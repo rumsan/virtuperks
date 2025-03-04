@@ -15,6 +15,7 @@ import {
   TaskCompleted as TaskCompletedEvent,
   TaskCreated as TaskCreatedEvent,
 } from "../generated/templates/EntityContract/EntityContract";
+import { fetchTaskDetails } from "./utils";
 
 export function handleParticiantApplied(event: ParticiantAppliedEvent): void {
  let entity = EntityTaskManagerCreated.load(event.address as Bytes);
@@ -80,8 +81,10 @@ export function handleTaskCreated(event: TaskCreatedEvent): void {
   let entity = EntityTaskManagerCreated.load(event.address);
   if (!entity) return;
   log.info('TaskCreated event fired', [entity.id.toHexString()]);
+  log.info('id of tasks',[event.params.id.toHexString()])
 
   // Create a new TaskCreated entity
+  //let taskId = event.transaction.hash.concatI32(event.logIndex.toI32());
   let taskId = event.transaction.hash.concatI32(event.logIndex.toI32());
   let task = new TaskCreated(taskId);
  
@@ -90,10 +93,13 @@ export function handleTaskCreated(event: TaskCreatedEvent): void {
   task.createdBy = event.params.createdBy;
 
   
+
+  
   task.blockNumber = event.block.number;
   task.blockTimestamp = event.block.timestamp;
   task.transactionHash = event.transaction.hash;
   task.save();
+  fetchTaskDetails(event.params.id, event.address);
   
 
  

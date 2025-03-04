@@ -100,14 +100,14 @@ templates:
       eventHandlers:
         - event: PINGED(indexed address,uint256)
           handler: handlePinged
-        - event: ParticiantApplied(indexed string,indexed address)
+        - event: ParticiantApplied(indexed bytes32,indexed address)
           handler: handleParticiantApplied
-        - event: TaskAccepted(indexed string)
+        - event: TaskAccepted(indexed bytes32)
           handler: handleTaskAccepted
-        - event: TaskApproved(indexed string,indexed address)
+        - event: TaskApproved(indexed bytes32,indexed address)
           handler: handleTaskApproved
-        - event: TaskCompleted(indexed string,indexed address)
+        - event: TaskCompleted(indexed bytes32,indexed address)
           handler: handleTaskCompleted
-        - event: TaskCreated(indexed string,indexed address)
+        - event: TaskCreated(indexed bytes32,indexed address)
           handler: handleTaskCreated
       file: ./src/entity-contract.ts

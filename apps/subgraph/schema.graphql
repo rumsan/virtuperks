@@ -87,9 +87,14 @@ type TaskCreated @entity(immutable: true) {
 type TaskDetail @entity(immutable: false) {
   id: Bytes! # Task ID (e.g., detailsUrl)
   detailsUrl: String! # URL to the task details
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+  rewardToken: Bytes! # Address of the reward token
+  rewardAmount: BigInt! # Amount of the reward
+  maxParticipants: BigInt! # Maximum number of participants
+  expiryDate: BigInt! # Expiry date of the task
+  owner: Bytes! # Address of the task owner
+  isActive: Boolean! # Whether the task is active
+
+
 }
 
 
