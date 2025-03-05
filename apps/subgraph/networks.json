@@ -1,8 +1,8 @@
 {
   "base-sepolia": {
     "AccessManager": {
-      "address": "0x279BFe2E7ac4841F9486c2da42DB5a638285BDd9",
-      "startBlock": 22308327
+      "address": "0x658999bb7af05fCd8ACEBD20DEAACE42577c0521",
+      "startBlock": 22693063
     }
   }
 }

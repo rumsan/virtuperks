@@ -97,7 +97,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
     console.log({taskId,detailsUrl, rewardToken,expiryDate,allowedWallets,rewardAmount,maxParticipants,owner,isActive},'data to be sent')
     try {
         const tx = await writeContractAsync({
-            address: data.entityAddress as `0x${string}`,
+            address: '0xD676f47A6B14A08233d57b6fC099d1869B6e30de',
             abi: EntityTaskManagementABI,
             functionName: "createTask",
             args: [{ detailsUrl, rewardToken, rewardAmount, allowedWallets, maxParticipants, expiryDate, owner, isActive }]
