@@ -8,8 +8,8 @@ dataSources:
     name: AccessManager
     network: base-sepolia
     source:
-      address: "0x658999bb7af05fCd8ACEBD20DEAACE42577c0521"
       abi: AccessManager
+      address: "0x658999bb7af05fCd8ACEBD20DEAACE42577c0521"
       startBlock: 22693063
     mapping:
       kind: ethereum/events
@@ -33,3 +33,80 @@ dataSources:
         - event: RoleRevoked(bytes32,indexed bytes32,indexed address)
           handler: handleRoleRevoked
       file: ./src/access-manager.ts
+  - kind: ethereum
+    name: RewardToken
+    network: base-sepolia
+    source:
+      abi: RewardToken
+      address: "0x35EE2D55188637771F95758d541A7fEd441520b2"
+      startBlock: 22693063
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - Transfer
+      abis:
+        - name: RewardToken
+          file: ./abis/RewardToken.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/reward-token.ts
+  - kind: ethereum
+    name: EntityFactory
+    network: base-sepolia
+    source:
+      abi: EntityFactory
+      address: "0x09F5d44a0AcD946883E19b03d6189f0665FFCC36"
+      startBlock: 22693063
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - EntityTaskManagerCreated
+      abis:
+        - name: EntityFactory
+          file: ./abis/EntityFactory.json
+      eventHandlers:
+        - event: EntityTaskManagerCreated(address,address,bytes32,string)
+          handler: handleEntityTaskManagerCreated
+      file: ./src/entity-factory.ts
+templates:
+  - kind: ethereum
+    name: EntityContract
+    network: base-sepolia
+    source:
+      abi: EntityContract
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - PINGED
+        - ParticiantApplied
+        - TaskAccepted
+        - TaskApproved
+        - TaskCompleted
+        - TaskCreated
+      abis:
+        - name: EntityContract
+          file: ./abis/EntityContract.json
+      eventHandlers:
+        - event: PINGED(indexed address,uint256)
+          handler: handlePINGED
+        - event: ParticiantApplied(indexed bytes32,indexed address)
+          handler: handleParticiantApplied
+        - event: TaskAccepted(indexed bytes32)
+          handler: handleTaskAccepted
+        - event: TaskApproved(indexed bytes32,indexed address)
+          handler: handleTaskApproved
+        - event: TaskCompleted(indexed bytes32,indexed address)
+          handler: handleTaskCompleted
+        - event: TaskCreated(indexed bytes32,indexed address)
+          handler: handleTaskCreated
+      file: ./src/entity-contract.ts

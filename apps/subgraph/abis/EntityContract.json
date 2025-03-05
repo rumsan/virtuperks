@@ -1,0 +1,291 @@
+[
+  {
+    "inputs": [
+      { "internalType": "address", "name": "aclAddress", "type": "address" },
+      { "internalType": "bytes32", "name": "_appId", "type": "bytes32" },
+      { "internalType": "string", "name": "_name", "type": "string" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "PINGED",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "id",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "participant",
+        "type": "address"
+      }
+    ],
+    "name": "ParticiantApplied",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "id",
+        "type": "bytes32"
+      }
+    ],
+    "name": "TaskAccepted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "id",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "approver",
+        "type": "address"
+      }
+    ],
+    "name": "TaskApproved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "id",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "participant",
+        "type": "address"
+      }
+    ],
+    "name": "TaskCompleted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "id",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "createdBy",
+        "type": "address"
+      }
+    ],
+    "name": "TaskCreated",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "ENTITY_OWNER",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "PARTICIPANT",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "taskId", "type": "bytes32" },
+      { "internalType": "address", "name": "participant", "type": "address" }
+    ],
+    "name": "acceptParticipant",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "acl",
+    "outputs": [
+      {
+        "internalType": "contract IAccessManagerV2",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "appId",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "taskId", "type": "bytes32" }
+    ],
+    "name": "completeTask",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          { "internalType": "string", "name": "detailsUrl", "type": "string" },
+          {
+            "internalType": "address",
+            "name": "rewardToken",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "rewardAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address[]",
+            "name": "allowedWallets",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxParticipants",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "expiryDate",
+            "type": "uint256"
+          },
+          { "internalType": "address", "name": "owner", "type": "address" },
+          { "internalType": "bool", "name": "isActive", "type": "bool" }
+        ],
+        "internalType": "struct IEntityTaskManager.Task",
+        "name": "task",
+        "type": "tuple"
+      }
+    ],
+    "name": "createTask",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "detailsUrl", "type": "string" }
+    ],
+    "name": "findHash",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "name",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "taskId", "type": "bytes32" }
+    ],
+    "name": "participate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "ping",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "", "type": "bytes32" },
+      { "internalType": "address", "name": "", "type": "address" }
+    ],
+    "name": "taskAssignments",
+    "outputs": [
+      {
+        "internalType": "enum IEntityTaskManager.STATUS",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "name": "tasks",
+    "outputs": [
+      { "internalType": "string", "name": "detailsUrl", "type": "string" },
+      { "internalType": "address", "name": "rewardToken", "type": "address" },
+      { "internalType": "uint256", "name": "rewardAmount", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "maxParticipants",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "expiryDate", "type": "uint256" },
+      { "internalType": "address", "name": "owner", "type": "address" },
+      { "internalType": "bool", "name": "isActive", "type": "bool" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "taskId", "type": "bytes32" }
+    ],
+    "name": "verifyCompletion",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

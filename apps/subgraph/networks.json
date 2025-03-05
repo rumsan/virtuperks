@@ -3,6 +3,19 @@
     "AccessManager": {
       "address": "0x658999bb7af05fCd8ACEBD20DEAACE42577c0521",
       "startBlock": 22693063
+    },
+    "RewardToken": {
+      "address": "0x35EE2D55188637771F95758d541A7fEd441520b2",
+      "startBlock": 22693063
+
+    },
+    "EntityFactory": {
+      "address": "0x09F5d44a0AcD946883E19b03d6189f0665FFCC36",
+      "startBlock": 22693063
+    },
+    "EntityContract": {
+      "address": "0x005084e60dA2A22e822166f9c75f13a946Dc6B19",
+      "startBlock": 22693063
     }
   }
 }

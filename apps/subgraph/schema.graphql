@@ -36,3 +36,97 @@ type RoleRevoked @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+type Approval @entity(immutable: true) {
+  id: Bytes!
+  owner: Bytes! # address
+  spender: Bytes! # address
+  value: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Transfer @entity(immutable: true) {
+  id: Bytes!
+  from: Bytes! # address
+  to: Bytes! # address
+  value: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type EntityTaskManagerCreated @entity(immutable: true) {
+  id: Bytes!
+  entityTaskManager: Bytes! # address
+  aclAddress: Bytes! # address
+  _appId: Bytes! # bytes32
+  _name: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type PINGED @entity(immutable: true) {
+  id: Bytes!
+  sender: Bytes! # address
+  timestamp: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ParticiantApplied @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  participant: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskAccepted @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskApproved @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  approver: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskCompleted @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  participant: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskCreated @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  createdBy: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskDetail @entity(immutable: false) {
+  id: Bytes! # Task ID (e.g., detailsUrl)
+  detailsUrl: String! # URL to the task details
+  rewardToken: Bytes! # Address of the reward token
+  rewardAmount: BigInt! # Amount of the reward
+  maxParticipants: BigInt! # Maximum number of participants
+  expiryDate: BigInt! # Expiry date of the task
+  owner: Bytes! # Address of the task owner
+  isActive: Boolean! # Whether the task is active
+
+
+}
