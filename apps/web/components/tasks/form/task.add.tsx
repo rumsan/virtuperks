@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent } from "@workspace/ui/components/card";
 
 import { PATHS } from "@/routes/paths";
-import { EntityTaskManagementABI } from "@workspace/contracts/abis";
+// import { EntityTaskManagementABI } from "@workspace/contracts/abis";
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
 import {
@@ -37,8 +37,9 @@ import { useEntityList } from "@/hooks/subgraph/querycall";
 import { useReadContract, useWriteContract } from "wagmi";
 import { taskSchema } from "./schema";
 
+import { EntityManagerABI } from "@/abi/entityManager";
 import { EntityList, participantList, tokenList } from "@/sampleData";
-import { isAddress, keccak256 } from "viem";
+import { isAddress } from "viem";
 
 const defaultValues:any = {
 
@@ -69,7 +70,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { data: hash, writeContract,writeContractAsync,context} = useWriteContract()
  const result = useReadContract({
-    abi:EntityTaskManagementABI,
+    abi:EntityManagerABI,
    address: '0xac9aa567eb42f9fbdbe2e1707a3fb971a7ec9bae',
     args:["https://github.com/Pratiksharai-Rumsan/task-management/issues/1"],
     functionName: 'tasks',
@@ -79,7 +80,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
  
 
   const handleSubmit = async (data: any) => {
-    console.log(data.entityAddress, "data from form");
+    console.log(data.entityAddress, "entityAddress");
     
 
     if (!isAddress(data.entityAddress)) {
@@ -88,17 +89,17 @@ export default function TaskAdd({ router }: TaskAddProps) {
     }
 
     const { detailsUrl, rewardToken, owner, isActive } = data;
-    const taskId = keccak256(data.detailsUrl);
-    const expiryDate = Math.floor(new Date(data.expiryDate).getTime() / 1000); // Convert to seconds
+    // const taskId = keccak256(data.detailsUrl);
+    const expiryDate = BigInt(Math.floor(new Date(data.expiryDate).getTime() / 1000)); // Convert to seconds
     const allowedWallets = Array.isArray(data.allowedWallets) ? data.allowedWallets : [data.allowedWallets]; // Ensure it's an array
     const rewardAmount = BigInt(data.rewardAmount);
    
     const maxParticipants = BigInt(data.maxParticipants);
-    console.log({taskId,detailsUrl, rewardToken,expiryDate,allowedWallets,rewardAmount,maxParticipants,owner,isActive},'data to be sent')
+    console.log({detailsUrl, rewardToken,expiryDate,allowedWallets,rewardAmount,maxParticipants,owner,isActive},'data to be sent')
     try {
         const tx = await writeContractAsync({
-            address: '0xD676f47A6B14A08233d57b6fC099d1869B6e30de',
-            abi: EntityTaskManagementABI,
+            address: data.entityAddress,
+            abi: EntityManagerABI,
             functionName: "createTask",
             args: [{ detailsUrl, rewardToken, rewardAmount, allowedWallets, maxParticipants, expiryDate, owner, isActive }]
         });

@@ -1,5 +1,5 @@
-[
- {
+export const EntityManagerABI = [
+  {
       "inputs": [
         {
           "internalType": "address",
@@ -406,4 +406,7 @@
     }
 
 
-]
+
+
+
+]  as const

@@ -9,8 +9,8 @@ dataSources:
     network: base-sepolia
     source:
       abi: AccessManager
-      address: "0x658999bb7af05fCd8ACEBD20DEAACE42577c0521"
-      startBlock: 22693063
+      address: "0xA913b20e261Be87CbFc163DA4Cf95eeB5C1D4A21"
+      startBlock: 22737223
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -38,8 +38,8 @@ dataSources:
     network: base-sepolia
     source:
       abi: RewardToken
-      address: "0x35EE2D55188637771F95758d541A7fEd441520b2"
-      startBlock: 22693063
+      address: "0xca062ccF699547772e9eE342C0fE8091fDbA5c2B"
+      startBlock: 22693068
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -61,8 +61,8 @@ dataSources:
     network: base-sepolia
     source:
       abi: EntityFactory
-      address: "0x09F5d44a0AcD946883E19b03d6189f0665FFCC36"
-      startBlock: 22693063
+      address: "0xA708f0657EcfFf1262d338bbe11EC76723f1b1d1"
+      startBlock: 22737238
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9

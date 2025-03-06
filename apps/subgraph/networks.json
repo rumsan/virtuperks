@@ -1,21 +1,22 @@
 {
+    
   "base-sepolia": {
     "AccessManager": {
-      "address": "0x658999bb7af05fCd8ACEBD20DEAACE42577c0521",
-      "startBlock": 22693063
+      "address": "0xA913b20e261Be87CbFc163DA4Cf95eeB5C1D4A21",
+      "startBlock": 22737223
     },
     "RewardToken": {
-      "address": "0x35EE2D55188637771F95758d541A7fEd441520b2",
-      "startBlock": 22693063
+      "address": "0xca062ccF699547772e9eE342C0fE8091fDbA5c2B",
+      "startBlock": 22737228
 
     },
     "EntityFactory": {
-      "address": "0x09F5d44a0AcD946883E19b03d6189f0665FFCC36",
-      "startBlock": 22693063
+      "address": "0xA708f0657EcfFf1262d338bbe11EC76723f1b1d1",
+      "startBlock": 22737238
     },
     "EntityContract": {
-      "address": "0x005084e60dA2A22e822166f9c75f13a946Dc6B19",
-      "startBlock": 22693063
+      "address": "0xeC635DB4De5FBF3586B090AE788B7E1ca4848e5f",
+      "startBlock": 22737233
     }
   }
 }

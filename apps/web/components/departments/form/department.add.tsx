@@ -5,10 +5,9 @@ import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
 
 import { PATHS } from "@/routes/paths";
-import { AccessManagerABI, EntityFactoryABI } from "@workspace/contracts/abis";
+import { EntityFactoryABI } from "@workspace/contracts/abis";
 import { ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { keccak256 } from "viem";
 import { useDeployContract, useWriteContract } from "wagmi";
 import DepartmentBaseForm from "./department.form";
 import { departmentSchema } from "./schema";
@@ -54,12 +53,13 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
   const createEntityButton = async (data: any) => {
     
   
-    writeContract({
+ const  createEntity =  writeContract({
       address: process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}` || '0x ',
       abi: EntityFactoryABI,
       functionName: "createEntityTaskManager",
       args: [process.env.NEXT_PUBLIC_ACCESSMANAGER , data.appId, data.name],
-   })
+ })
+  console.log(createEntity,'entity created')
 
   };
 

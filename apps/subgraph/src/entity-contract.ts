@@ -1,4 +1,12 @@
 import {
+  PINGED,
+  ParticiantApplied,
+  TaskAccepted,
+  TaskApproved,
+  TaskCompleted,
+  TaskCreated
+} from "../generated/schema"
+import {
   PINGED as PINGEDEvent,
   ParticiantApplied as ParticiantAppliedEvent,
   TaskAccepted as TaskAcceptedEvent,
@@ -6,14 +14,7 @@ import {
   TaskCompleted as TaskCompletedEvent,
   TaskCreated as TaskCreatedEvent,
 } from "../generated/templates/EntityContract/EntityContract"
-import {
-  PINGED,
-  ParticiantApplied,
-  TaskAccepted,
-  TaskApproved,
-  TaskCompleted,
-  TaskCreated,
-} from "../generated/schema"
+import { fetchTaskDetails } from "./utils"
 
 export function handlePINGED(event: PINGEDEvent): void {
   let entity = new PINGED(
@@ -85,15 +86,26 @@ export function handleTaskCompleted(event: TaskCompletedEvent): void {
 }
 
 export function handleTaskCreated(event: TaskCreatedEvent): void {
-  let entity = new TaskCreated(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
-  )
-  entity.internal_id = event.params.id
-  entity.createdBy = event.params.createdBy
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
+//   let entity = EntityTaskManagerCreated.load(event.address);
+  
+//   log.info('EntityTaskManager', [event.address.toHexString()]);
+// if (!entity) {
+//   log.error("EntityTaskManagerCreated not found for address: {}", [event.address.toHexString()]);
+//   return;
+// }
+//   log.info('TaskCreated event fired', [entity.id.toHexString()]);
+//   log.info('id of tasks',[event.params.id.toHexString()])
+  let taskId = event.transaction.hash.concatI32(event.logIndex.toI32());
+  let task = new TaskCreated(taskId);
+  task.internal_id = event.params.id
+  task.createdBy = event.params.createdBy
 
-  entity.save()
+  task.blockNumber = event.block.number
+  task.blockTimestamp = event.block.timestamp
+  task.transactionHash = event.transaction.hash
+
+  task.save()
+  fetchTaskDetails(event.params.id, event.address);
+
 }
