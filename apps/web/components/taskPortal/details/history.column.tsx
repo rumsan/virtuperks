@@ -41,5 +41,23 @@ export function useHistoryColumns<T>(): ColumnDef<T>[] {
         );
       },
     },
+
+    {
+      accessorKey: "transactionHash",
+      header: () => (
+        <div className="text-left text-[#475569] font-bold">
+          Tnx Hash
+        </div>
+      ),
+
+      cell: ({ row }) => {
+        return (
+          <p className="flex items-center text-[#3D3D5A] text-sm gap-1">
+            <span>{row.getValue("transactionHash")}</span>
+            <Copy size={14} strokeWidth={3} color="#94A3B8" />
+          </p>
+        );
+      },
+    },
   ];
 }

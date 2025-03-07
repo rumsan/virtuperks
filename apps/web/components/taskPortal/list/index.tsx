@@ -15,6 +15,7 @@ import {
 import React from "react";
 import { useColumns } from "../details/details.column";
 import TaskPortalCard from "./list.card";
+import NoTask from "./no.task";
 
 interface TaskPortalMainProps {
   router: any;
@@ -63,8 +64,11 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
             Overview of all the tasks
           </h3>
         </div>
-
-        <TaskPortalCard router={router} />
+        {TaskList.length === 0 ? (
+          <NoTask />
+        ) : (
+          <TaskPortalCard table={table} router={router} />
+        )}
 
         <div className="mt-5 mb-5">
           <DataTablePagination

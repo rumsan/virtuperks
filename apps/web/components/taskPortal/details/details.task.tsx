@@ -26,9 +26,24 @@ const TaskPortalDetails = ({ cuid }: TaskPortalDetailsProps) => {
             </span>
             <ExternalLink size={16} color="#297AD6" strokeWidth={2.75} />
           </div>
+
+          <div className="w-full overflow-hidden">
+            <p className="text-[#334155] text-sm line-clamp-1 font-normal">
+              Lorem Ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem Ipsum has been the industry's standard dummy text
+              ever since the 1500s, when an unknown printer took a galley of
+              type and scrambled it to make a type specimen book. It has
+              survived not only five centuries, but also the leap into
+              electronic typesetting, remaining essentially unchanged. It was
+              popularised in the 1960s with the release of Letraset sheets
+              containing Lorem Ipsum passages, and more recently with desktop
+              publishing software like Aldus PageMaker including versions of
+              Lorem Ipsum.
+            </p>
+          </div>
         </CardTitle>
 
-        <div className="mt-3 mb-3 w-full overflow-hidden">
+        {/* <div className="mt-3 mb-3 w-full overflow-hidden">
           <p className="text-[#334155] text-sm line-clamp-1">
             Lorem Ipsum is simply dummy text of the printing and typesetting
             industry. Lorem Ipsum has been the industry's standard dummy text
@@ -40,9 +55,9 @@ const TaskPortalDetails = ({ cuid }: TaskPortalDetailsProps) => {
             and more recently with desktop publishing software like Aldus
             PageMaker including versions of Lorem Ipsum.
           </p>
-        </div>
+        </div> */}
 
-        <div className="flex flex-col text-gray-500 font-normal gap-1 text-sm">
+        <div className="flex flex-col text-gray-500 font-normal gap-1 text-sm mt-4">
           <span className="flex items-center gap-2">
             <UserRoundCog color="#64748B" size={20} strokeWidth={2.5} />
             Task Owner: {taskData?.owner}
