@@ -1,5 +1,5 @@
 import { Cuid } from "@/components/departments/details/details.main";
-import { TaskList } from "@/sampleData";
+import { useTaskList } from "@/hooks/subgraph/querycall";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { ExternalLink, Timer, Trophy, UserRoundCog, Users } from "lucide-react";
 
@@ -8,16 +8,24 @@ type TaskPortalDetailsProps = {
 };
 
 const TaskPortalDetails = ({ cuid }: TaskPortalDetailsProps) => {
-  const taskData = TaskList.find((task) => task.cuid === cuid.id);
+  const getAllTask = useTaskList();
+
+  const TaskList = getAllTask?.data?.data?.taskCreateds;
+
+  const filteredTasks = TaskList?.filter((task) => {
+    return task?.taskDetail;
+  }).map((task) => task.taskDetail);
+
+  const taskData = filteredTasks?.find((task) => task.id === cuid.id);
 
   return (
     <>
       <Card className="w-[80%] h-full p-4">
         <CardTitle className="flex flex-col gap-1 w-full">
           <div className="flex items-center gap-2">
-            <span>{taskData?.title}</span>
+            <span>Organize a blood donation campaign</span>
             <span className="w-20 h-6 flex items-center justify-center bg-green-50 rounded-full text-green-700 p-1 text-sm font-normal">
-              {taskData?.status}
+              {taskData?.isActive === true ? `active` : `expired`}
             </span>
           </div>
           <div className="flex items-center gap-2 cursor-pointer hover:text-blue-400">
@@ -29,33 +37,10 @@ const TaskPortalDetails = ({ cuid }: TaskPortalDetailsProps) => {
 
           <div className="w-full overflow-hidden">
             <p className="text-[#334155] text-sm line-clamp-1 font-normal">
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s, when an unknown printer took a galley of
-              type and scrambled it to make a type specimen book. It has
-              survived not only five centuries, but also the leap into
-              electronic typesetting, remaining essentially unchanged. It was
-              popularised in the 1960s with the release of Letraset sheets
-              containing Lorem Ipsum passages, and more recently with desktop
-              publishing software like Aldus PageMaker including versions of
-              Lorem Ipsum.
+              {taskData?.detailsUrl}
             </p>
           </div>
         </CardTitle>
-
-        {/* <div className="mt-3 mb-3 w-full overflow-hidden">
-          <p className="text-[#334155] text-sm line-clamp-1">
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s, when an unknown printer took a galley of type
-            and scrambled it to make a type specimen book. It has survived not
-            only five centuries, but also the leap into electronic typesetting,
-            remaining essentially unchanged. It was popularised in the 1960s
-            with the release of Letraset sheets containing Lorem Ipsum passages,
-            and more recently with desktop publishing software like Aldus
-            PageMaker including versions of Lorem Ipsum.
-          </p>
-        </div> */}
 
         <div className="flex flex-col text-gray-500 font-normal gap-1 text-sm mt-4">
           <span className="flex items-center gap-2">
@@ -64,11 +49,11 @@ const TaskPortalDetails = ({ cuid }: TaskPortalDetailsProps) => {
           </span>
           <span className="flex items-center gap-2">
             <Users color="#64748B" size={20} strokeWidth={2.5} />
-            {taskData?.participants} members participating
+            {taskData?.maxParticipants} members participating
           </span>
           <span className="flex items-center gap-2">
             <Timer color="#64748B" size={20} strokeWidth={2.5} /> Deadline:{" "}
-            {taskData?.date}
+            {taskData?.expiryDate}
           </span>
         </div>
       </Card>
@@ -77,7 +62,9 @@ const TaskPortalDetails = ({ cuid }: TaskPortalDetailsProps) => {
         <div className="flex items-center justify-center rounded-full h-10 w-10 bg-blue-50">
           <Trophy color="#297AD6" size={20} />
         </div>
-        <span className="text-2xl text-[#297AD6] font-bold">100 Tokens</span>
+        <span className="text-2xl text-[#297AD6] font-bold">
+          {taskData?.rewardAmount} tokens
+        </span>
       </Card>
     </>
   );

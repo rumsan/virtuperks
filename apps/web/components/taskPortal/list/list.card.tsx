@@ -12,47 +12,49 @@ interface TaskPortalCardProps {
 const TaskPortalCard = ({ table, router }: TaskPortalCardProps) => {
   const paginatedTasks = table.getRowModel().rows.map((row) => row.original);
 
-  const filteredTasks = paginatedTasks.filter(
-    (task) =>
-      task.status.toLowerCase() === "open" ||
-      task.status.toLowerCase() === "completed",
-  );
+  const filteredTasks = paginatedTasks
+    ?.filter((task) => {
+      console.log(task, "task in function");
+      return task?.taskDetail;
+    })
+    .map((task) => task.taskDetail);
+
   return (
     <>
       {filteredTasks.length > 0 ? (
         filteredTasks.map((task) => (
           <Card
-            key={task.cuid}
+            key={task.id}
             className="w-full cursor-pointer p-4"
             onClick={() =>
-              task.cuid && router.push(PATHS.TASKPORTAL.DETAILS(task.cuid))
+              task.id && router.push(PATHS.TASKPORTAL.DETAILS(task.id))
             }
           >
             <CardTitle className="flex flex-col gap-1 w-full">
               <div className="flex items-center gap-2">
-                <span>{task?.title}</span>
+                <span>Organize a blood donation campaign</span>
                 <span className="w-20 h-6 flex items-center justify-center bg-green-50 rounded-full text-green-700 p-1 text-sm font-normal">
-                  {task?.status}
+                  {task?.isActive === true ? `active` : `expired`}
                 </span>
               </div>
               <div className="flex items-center gap-2 cursor-pointer hover:text-blue-400">
                 <span className="text-[#297AD6] text-sm font-normal">
-                  {task?.url}
+                  {task?.detailsUrl}
                 </span>
                 <ExternalLink size={16} color="#297AD6" strokeWidth={2.75} />
               </div>
               <div className="flex items-center gap-1 text-sm">
                 <div className="flex items-center font-normal text-[#64748B] gap-1">
                   <Users size={18} strokeWidth={2.5} color="#64748B" />
-                  <span>{task.participants} members participating</span>
+                  <span>{task?.maxParticipants} members participating</span>
                   <Dot color="#94A3B8" />
                   <Timer size={18} strokeWidth={2.5} color="#64748B" />
-                  <span>Deadline: {task.date}</span>
+                  <span>Deadline: {task?.expiryDate}</span>
                 </div>
                 <div className="flex justify-end ml-auto items-center gap-2">
                   <Coins color="#297AD6" />
                   <span className="text-xl text-[#297AD6] font-bold">
-                    {task.tokens} tokens
+                    {task?.rewardAmount} tokens
                   </span>
                 </div>
               </div>
