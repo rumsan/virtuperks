@@ -5,7 +5,6 @@ import { Card, CardContent } from "@workspace/ui/components/card";
 
 import { PATHS } from "@/routes/paths";
 // import { EntityTaskManagementABI } from "@workspace/contracts/abis";
-import { ownerList } from "@/sampleData";
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
 import {
@@ -38,7 +37,7 @@ import { useEntityList } from "@/hooks/subgraph/querycall";
 import { useWriteContract } from "wagmi";
 import { taskSchema } from "./schema";
 
-import { EntityList, participantList, tokenList } from "@/sampleData";
+import { participantList, tokenList } from "@/sampleData";
 import { EntityTaskManagementABI } from "@workspace/contracts/abis";
 import { isAddress } from "viem";
 
@@ -66,6 +65,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
   });
    const getAllEntity = useEntityList()
   const entityList = getAllEntity?.data?.data?.entityTaskManagerCreateds
+
 
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -96,8 +96,8 @@ export default function TaskAdd({ router }: TaskAddProps) {
             abi: EntityTaskManagementABI,
             functionName: "createTask",
             args: [{ detailsUrl, rewardToken, rewardAmount, allowedWallets, maxParticipants, expiryDate, owner, isActive }]
-        });
-     
+        }); 
+     router.push(PATHS.TASKPORTAL.HOME)
 
     } catch (error) {
         console.error("Transaction failed:", error);
@@ -174,9 +174,9 @@ export default function TaskAdd({ router }: TaskAddProps) {
             <SelectValue placeholder="Select Entity" />
           </SelectTrigger>
           <SelectContent>
-          {EntityList?.map((entity:any) => (
-              <SelectItem key={entity.name} value={entity.address}>
-                {entity.name}
+          {entityList?.map((entity:any) => (
+              <SelectItem key={entity.id} value={entity.entityTaskManager}>
+                {entity._name}
               </SelectItem>
             ))}
           </SelectContent>

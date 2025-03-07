@@ -9,7 +9,6 @@ import {
   FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
-import { Wallet } from "lucide-react";
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Department } from "./schema";
@@ -61,29 +60,7 @@ export default function DepartmentBaseForm({
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="appId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>App Id address</FormLabel>
-                    <FormControl>
-                      <div className="relative flex items-center">
-                        <Input
-                          placeholder="Enter wallet address of department manager"
-                          {...field}
-                          value={field.value ?? ""}
-                          className="pr-8"
-                        />
-                        <div className="absolute right-2 flex items-center">
-                          <Wallet size={20} color="#424242" />
-                        </div>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              
             </div>
 
             <div className="w-full flex justify-end mt-5">
