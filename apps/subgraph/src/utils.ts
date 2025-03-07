@@ -1,13 +1,15 @@
-import { Address, Bytes } from "@graphprotocol/graph-ts";
+import { Address, Bytes, log } from "@graphprotocol/graph-ts";
 import { TaskDetail } from "../generated/schema";
 import { EntityContract } from "../generated/templates/EntityContract/EntityContract";
 
 
-export function fetchTaskDetails(taskId:Bytes, contractAddress: Address): TaskDetail | null {
+export function fetchTaskDetails(taskId:Bytes, contractAddress: Address, taskCreatedId:Bytes): TaskDetail | null {
    
     let taskDetail = TaskDetail.load(taskId);
 
-    const contract = EntityContract.bind(contractAddress);
+  const contract = EntityContract.bind(contractAddress);
+  log.debug("fetchTaskDetails: {}", [taskId.toHexString()]);
+  log.debug("fetchTaskDetailsTaskcreated: {}", [taskCreatedId.toHexString()]);
     //const taskString = taskId.toString()
   
     const taskData = contract.try_tasks(taskId);
@@ -34,6 +36,7 @@ export function fetchTaskDetails(taskId:Bytes, contractAddress: Address): TaskDe
   taskDetail.isActive = taskData.value.getIsActive();
   
   //taskDetail.createdBy = taskData.value.;
+  taskDetail.task = taskCreatedId
 
  
   taskDetail.save();

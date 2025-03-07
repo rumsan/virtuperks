@@ -33,7 +33,7 @@ export default function DepartmentEdit({ router }: ExpenseEditProps) {
     <>
       {" "}
       <div className="w-full items-center ">
-        <main className="gap-2 p-4 sm:px-8 md:gap-8 w-full">
+        <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
           <div className="flex items-center gap-2">
             <ArrowLeft size={24} strokeWidth={2} />
             <span className="font-base text-gray-700">Back</span>

@@ -1,6 +1,7 @@
 import { newMockEvent } from "matchstick-as"
-import { ethereum, Address, BigInt } from "@graphprotocol/graph-ts"
+import { ethereum, Address, BigInt, Bytes } from "@graphprotocol/graph-ts"
 import {
+  PINGED,
   ParticiantApplied,
   TaskAccepted,
   TaskApproved,
@@ -8,8 +9,26 @@ import {
   TaskCreated
 } from "../generated/EntityContract/EntityContract"
 
+export function createPINGEDEvent(sender: Address, timestamp: BigInt): PINGED {
+  let pingedEvent = changetype<PINGED>(newMockEvent())
+
+  pingedEvent.parameters = new Array()
+
+  pingedEvent.parameters.push(
+    new ethereum.EventParam("sender", ethereum.Value.fromAddress(sender))
+  )
+  pingedEvent.parameters.push(
+    new ethereum.EventParam(
+      "timestamp",
+      ethereum.Value.fromUnsignedBigInt(timestamp)
+    )
+  )
+
+  return pingedEvent
+}
+
 export function createParticiantAppliedEvent(
-  id: string,
+  id: Bytes,
   participant: Address
 ): ParticiantApplied {
   let particiantAppliedEvent = changetype<ParticiantApplied>(newMockEvent())
@@ -17,7 +36,7 @@ export function createParticiantAppliedEvent(
   particiantAppliedEvent.parameters = new Array()
 
   particiantAppliedEvent.parameters.push(
-    new ethereum.EventParam("id", ethereum.Value.fromString(id))
+    new ethereum.EventParam("id", ethereum.Value.fromFixedBytes(id))
   )
   particiantAppliedEvent.parameters.push(
     new ethereum.EventParam(
@@ -29,20 +48,20 @@ export function createParticiantAppliedEvent(
   return particiantAppliedEvent
 }
 
-export function createTaskAcceptedEvent(id: string): TaskAccepted {
+export function createTaskAcceptedEvent(id: Bytes): TaskAccepted {
   let taskAcceptedEvent = changetype<TaskAccepted>(newMockEvent())
 
   taskAcceptedEvent.parameters = new Array()
 
   taskAcceptedEvent.parameters.push(
-    new ethereum.EventParam("id", ethereum.Value.fromString(id))
+    new ethereum.EventParam("id", ethereum.Value.fromFixedBytes(id))
   )
 
   return taskAcceptedEvent
 }
 
 export function createTaskApprovedEvent(
-  id: string,
+  id: Bytes,
   approver: Address
 ): TaskApproved {
   let taskApprovedEvent = changetype<TaskApproved>(newMockEvent())
@@ -50,7 +69,7 @@ export function createTaskApprovedEvent(
   taskApprovedEvent.parameters = new Array()
 
   taskApprovedEvent.parameters.push(
-    new ethereum.EventParam("id", ethereum.Value.fromString(id))
+    new ethereum.EventParam("id", ethereum.Value.fromFixedBytes(id))
   )
   taskApprovedEvent.parameters.push(
     new ethereum.EventParam("approver", ethereum.Value.fromAddress(approver))
@@ -60,7 +79,7 @@ export function createTaskApprovedEvent(
 }
 
 export function createTaskCompletedEvent(
-  id: string,
+  id: Bytes,
   participant: Address
 ): TaskCompleted {
   let taskCompletedEvent = changetype<TaskCompleted>(newMockEvent())
@@ -68,7 +87,7 @@ export function createTaskCompletedEvent(
   taskCompletedEvent.parameters = new Array()
 
   taskCompletedEvent.parameters.push(
-    new ethereum.EventParam("id", ethereum.Value.fromString(id))
+    new ethereum.EventParam("id", ethereum.Value.fromFixedBytes(id))
   )
   taskCompletedEvent.parameters.push(
     new ethereum.EventParam(
@@ -81,65 +100,18 @@ export function createTaskCompletedEvent(
 }
 
 export function createTaskCreatedEvent(
-  id: string,
-  createdBy: Address,
-  detailsUrl: string,
-  rewardToken: Address,
-  rewardAmount: BigInt,
-  allowedWallets: Array<Address>,
-  maxParticipants: BigInt,
-  expiryDate: BigInt,
-  owner: Address,
-  isActive: boolean
+  id: Bytes,
+  createdBy: Address
 ): TaskCreated {
   let taskCreatedEvent = changetype<TaskCreated>(newMockEvent())
 
   taskCreatedEvent.parameters = new Array()
 
   taskCreatedEvent.parameters.push(
-    new ethereum.EventParam("id", ethereum.Value.fromString(id))
+    new ethereum.EventParam("id", ethereum.Value.fromFixedBytes(id))
   )
   taskCreatedEvent.parameters.push(
     new ethereum.EventParam("createdBy", ethereum.Value.fromAddress(createdBy))
-  )
-  taskCreatedEvent.parameters.push(
-    new ethereum.EventParam("detailsUrl", ethereum.Value.fromString(detailsUrl))
-  )
-  taskCreatedEvent.parameters.push(
-    new ethereum.EventParam(
-      "rewardToken",
-      ethereum.Value.fromAddress(rewardToken)
-    )
-  )
-  taskCreatedEvent.parameters.push(
-    new ethereum.EventParam(
-      "rewardAmount",
-      ethereum.Value.fromUnsignedBigInt(rewardAmount)
-    )
-  )
-  taskCreatedEvent.parameters.push(
-    new ethereum.EventParam(
-      "allowedWallets",
-      ethereum.Value.fromAddressArray(allowedWallets)
-    )
-  )
-  taskCreatedEvent.parameters.push(
-    new ethereum.EventParam(
-      "maxParticipants",
-      ethereum.Value.fromUnsignedBigInt(maxParticipants)
-    )
-  )
-  taskCreatedEvent.parameters.push(
-    new ethereum.EventParam(
-      "expiryDate",
-      ethereum.Value.fromUnsignedBigInt(expiryDate)
-    )
-  )
-  taskCreatedEvent.parameters.push(
-    new ethereum.EventParam("owner", ethereum.Value.fromAddress(owner))
-  )
-  taskCreatedEvent.parameters.push(
-    new ethereum.EventParam("isActive", ethereum.Value.fromBoolean(isActive))
   )
 
   return taskCreatedEvent

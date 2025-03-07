@@ -53,14 +53,29 @@ export const TransferList = `
 
 export const TaskCreatedList = `
   query TaskCreatedList {
-    taskCreateds(first: 10, orderBy: TaskManagement_id) {
+    taskCreateds(first: 15) {
       id
-      TaskManagement_id
       createdBy
       blockNumber
       blockTimestamp
       transactionHash
+    
+    taskDetail {
+    detailsUrl
+    expiryDate
+    id
+    isActive
+    maxParticipants
+    owner
+    rewardAmount
+    rewardToken
     }
+    entityTaskManager {
+    _appId
+    _name
+    id
+    }
+}
   }
 `;
 

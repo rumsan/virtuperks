@@ -4,7 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent } from "@workspace/ui/components/card";
 
 import { PATHS } from "@/routes/paths";
-import { EntityTaskManagementABI } from "@workspace/contracts/abis";
+// import { EntityTaskManagementABI } from "@workspace/contracts/abis";
+import { ownerList } from "@/sampleData";
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
 import {
@@ -34,11 +35,12 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useEntityList } from "@/hooks/subgraph/querycall";
-import { useReadContract, useWriteContract } from "wagmi";
+import { useWriteContract } from "wagmi";
 import { taskSchema } from "./schema";
 
 import { EntityList, participantList, tokenList } from "@/sampleData";
-import { isAddress, keccak256 } from "viem";
+import { EntityTaskManagementABI } from "@workspace/contracts/abis";
+import { isAddress } from "viem";
 
 const defaultValues:any = {
 
@@ -68,18 +70,11 @@ export default function TaskAdd({ router }: TaskAddProps) {
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { data: hash, writeContract,writeContractAsync,context} = useWriteContract()
- const result = useReadContract({
-    abi:EntityTaskManagementABI,
-   address: '0xac9aa567eb42f9fbdbe2e1707a3fb971a7ec9bae',
-    args:["https://github.com/Pratiksharai-Rumsan/task-management/issues/1"],
-    functionName: 'tasks',
- })
-  console.log(result,'result from component')
 
  
 
   const handleSubmit = async (data: any) => {
-    console.log(data.entityAddress, "data from form");
+
     
 
     if (!isAddress(data.entityAddress)) {
@@ -88,21 +83,21 @@ export default function TaskAdd({ router }: TaskAddProps) {
     }
 
     const { detailsUrl, rewardToken, owner, isActive } = data;
-    const taskId = keccak256(data.detailsUrl);
-    const expiryDate = Math.floor(new Date(data.expiryDate).getTime() / 1000); // Convert to seconds
+    
+    const expiryDate = BigInt(Math.floor(new Date(data.expiryDate).getTime() / 1000)); // Convert to seconds
     const allowedWallets = Array.isArray(data.allowedWallets) ? data.allowedWallets : [data.allowedWallets]; // Ensure it's an array
     const rewardAmount = BigInt(data.rewardAmount);
    
     const maxParticipants = BigInt(data.maxParticipants);
-    console.log({taskId,detailsUrl, rewardToken,expiryDate,allowedWallets,rewardAmount,maxParticipants,owner,isActive},'data to be sent')
+   
     try {
         const tx = await writeContractAsync({
-            address: data.entityAddress as `0x${string}`,
+            address: data.entityAddress,
             abi: EntityTaskManagementABI,
             functionName: "createTask",
             args: [{ detailsUrl, rewardToken, rewardAmount, allowedWallets, maxParticipants, expiryDate, owner, isActive }]
         });
-      console.log(tx,'createTask')
+     
 
     } catch (error) {
         console.error("Transaction failed:", error);
@@ -114,10 +109,10 @@ export default function TaskAdd({ router }: TaskAddProps) {
     <>
       {" "}
       <div className="w-full items-center ">
-        <main className="gap-2 p-4 sm:px-8 md:gap-8 w-full">
+        <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
           <div
             onClick={() => router.push(PATHS.TASKS.HOME)}
-            className="flex items-center gap-2 cursor-pointer hover:text-gray-400"
+            className="flex items-center gap-2 cursor-pointer hover:text-gray-400 my-3"
           >
             <ArrowLeft size={24} strokeWidth={2} />
             <span className="font-base text-gray-700">Back</span>

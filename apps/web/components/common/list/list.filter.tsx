@@ -14,10 +14,7 @@ export default function ListFilter() {
   return (
     <Select>
       <SelectTrigger className="w-[280px] h-10">
-        <SelectValue
-          className="text-gray-400"
-          placeholder="Select department group"
-        />
+        <SelectValue className="text-gray-400" placeholder="Select role" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>

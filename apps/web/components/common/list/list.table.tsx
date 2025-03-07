@@ -50,7 +50,7 @@ export function ListTable<T, TData>({
         {table.getRowModel().rows?.length ? (
           table.getRowModel().rows.map((row) => (
             <TableRow
-              className="text-sm text-black-900 cursor-pointer h-5"
+              className="text-sm text-black-900 cursor-pointer h-10"
               key={row.id}
               data-state={row.getIsSelected() && "selected"}
               onClick={() => handleRowClick && handleRowClick(row.original)}

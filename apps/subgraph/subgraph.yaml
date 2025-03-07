@@ -1,4 +1,4 @@
-specVersion: 1.0.0
+specVersion: 1.2.0
 indexerHints:
   prune: auto
 schema:
@@ -8,12 +8,12 @@ dataSources:
     name: AccessManager
     network: base-sepolia
     source:
-      address: "0x279BFe2E7ac4841F9486c2da42DB5a638285BDd9"
       abi: AccessManager
-      startBlock: 22308327
+      address: "0xA913b20e261Be87CbFc163DA4Cf95eeB5C1D4A21"
+      startBlock: 22737223
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.7
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - AppCreated
@@ -37,12 +37,12 @@ dataSources:
     name: RewardToken
     network: base-sepolia
     source:
-      address: "0x01a1c045175bDA62F1E246a028353251e0541f45"
       abi: RewardToken
-      startBlock: 22308333
+      address: "0xca062ccF699547772e9eE342C0fE8091fDbA5c2B"
+      startBlock: 22693068
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.7
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - Approval
@@ -57,26 +57,25 @@ dataSources:
           handler: handleTransfer
       file: ./src/reward-token.ts
   - kind: ethereum
-    name: FactoryContract
+    name: EntityFactory
     network: base-sepolia
     source:
-      address: "0xaB4519C16e757a70c5b8ed8635faFe86B91CAe5B"
-      abi: FactoryContract
-      startBlock: 22308342
+      abi: EntityFactory
+      address: "0xA708f0657EcfFf1262d338bbe11EC76723f1b1d1"
+      startBlock: 22737238
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.7
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - EntityTaskManagerCreated
       abis:
-        - name: FactoryContract
-          file: ./abis/FactoryContract.json
+        - name: EntityFactory
+          file: ./abis/EntityFactory.json
       eventHandlers:
         - event: EntityTaskManagerCreated(address,address,bytes32,string)
           handler: handleEntityTaskManagerCreated
-      file: ./src/factory-contract.ts
-
+      file: ./src/entity-factory.ts
 templates:
   - kind: ethereum
     name: EntityContract
@@ -85,7 +84,7 @@ templates:
       abi: EntityContract
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.7
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - PINGED
@@ -99,7 +98,7 @@ templates:
           file: ./abis/EntityContract.json
       eventHandlers:
         - event: PINGED(indexed address,uint256)
-          handler: handlePinged
+          handler: handlePINGED
         - event: ParticiantApplied(indexed bytes32,indexed address)
           handler: handleParticiantApplied
         - event: TaskAccepted(indexed bytes32)

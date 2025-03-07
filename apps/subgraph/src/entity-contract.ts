@@ -1,106 +1,133 @@
-import { Bytes, log } from "@graphprotocol/graph-ts";
+import { log } from "@graphprotocol/graph-ts"
 import {
   EntityTaskManagerCreated,
-
+  PINGED,
   ParticiantApplied,
   TaskAccepted,
   TaskApproved,
   TaskCompleted,
   TaskCreated
-} from "../generated/schema";
+} from "../generated/schema"
 import {
+  PINGED as PINGEDEvent,
   ParticiantApplied as ParticiantAppliedEvent,
   TaskAccepted as TaskAcceptedEvent,
   TaskApproved as TaskApprovedEvent,
   TaskCompleted as TaskCompletedEvent,
   TaskCreated as TaskCreatedEvent,
-} from "../generated/templates/EntityContract/EntityContract";
-import { fetchTaskDetails } from "./utils";
+} from "../generated/templates/EntityContract/EntityContract"
+import { fetchTaskDetails } from "./utils"
+
+export function handlePINGED(event: PINGEDEvent): void {
+  let entity = new PINGED(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.sender = event.params.sender
+  entity.timestamp = event.params.timestamp
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
 
 export function handleParticiantApplied(event: ParticiantAppliedEvent): void {
- let entity = EntityTaskManagerCreated.load(event.address as Bytes);
-  if (!entity) return;
-  let applicationId = event.transaction.hash.concatI32(event.logIndex.toI32());
+  let entity = new ParticiantApplied(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.internal_id = event.params.id
+  entity.participant = event.params.participant
 
-  let application = new ParticiantApplied(applicationId);
-  application.entityTaskManagerCreated = entity.entityTaskManager
-  application.internal_id = event.params.id;
-  application.participant = event.params.participant;
-  application.blockNumber = event.block.number;
-  application.blockTimestamp = event.block.timestamp;
-  application.transactionHash = event.transaction.hash;
-  application.save();
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
 }
 
 export function handleTaskAccepted(event: TaskAcceptedEvent): void {
-   let entity = EntityTaskManagerCreated.load(event.address as Bytes);
-  if (!entity) return;
-    let acceptanceId = event.transaction.hash.concatI32(event.logIndex.toI32());
+  let entity = new TaskAccepted(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.internal_id = event.params.id
 
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
 
-  let acceptance = new TaskAccepted(acceptanceId);
-  acceptance.entityTaskManagerCreated = entity.entityTaskManager
-  acceptance.internal_id = event.params.id;
-  acceptance.blockNumber = event.block.number;
-  acceptance.blockTimestamp = event.block.timestamp;
-  acceptance.transactionHash = event.transaction.hash;
-  acceptance.save();
+  entity.save()
 }
 
 export function handleTaskApproved(event: TaskApprovedEvent): void {
-  let entity = EntityTaskManagerCreated.load(event.address as Bytes);
-  if (!entity) return;
-   let approvalId = event.transaction.hash.concatI32(event.logIndex.toI32());
+  let entity = new TaskApproved(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.internal_id = event.params.id
+  entity.approver = event.params.approver
 
-  let approval = new TaskApproved(approvalId);
-  approval.entityTaskManagerCreated = entity.entityTaskManager
-  approval.internal_id = event.params.id;
-  approval.approver = event.params.approver;
-  approval.blockNumber = event.block.number;
-  approval.blockTimestamp = event.block.timestamp;
-  approval.transactionHash = event.transaction.hash;
-  approval.save();
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
 }
 
 export function handleTaskCompleted(event: TaskCompletedEvent): void {
-  let entity = EntityTaskManagerCreated.load(event.address as Bytes);
-  if (!entity) return;
-let completionId = event.transaction.hash.concatI32(event.logIndex.toI32());
-  let completion = new TaskCompleted(completionId);
-  completion.entityTaskManagerCreated = entity.entityTaskManager
-  completion.internal_id = event.params.id;
-  completion.participant = event.params.participant;
-  completion.blockNumber = event.block.number;
-  completion.blockTimestamp = event.block.timestamp;
-  completion.transactionHash = event.transaction.hash;
-  completion.save();
+  let entity = new TaskCompleted(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.internal_id = event.params.id
+  entity.participant = event.params.participant
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
 }
 
 export function handleTaskCreated(event: TaskCreatedEvent): void {
-  log.info('TaskCreated event fired', [event.address.toHexString() || 'not found']);
-  let entity = EntityTaskManagerCreated.load(event.address);
-  if (!entity) return;
-  log.info('TaskCreated event fired', [entity.id.toHexString()]);
-  log.info('id of tasks',[event.params.id.toHexString()])
+  
 
-  // Create a new TaskCreated entity
+
+  log.info('TaskCreated event fired: {}', [event.address.toHexString()]);
+
+  
+
   //let taskId = event.transaction.hash.concatI32(event.logIndex.toI32());
-  let taskId = event.transaction.hash.concatI32(event.logIndex.toI32());
-  let task = new TaskCreated(taskId);
- 
-  task.entityTaskManagerCreated = entity.entityTaskManager
+  let task = new TaskCreated(event.params.id);
   task.internal_id = event.params.id
-  task.createdBy = event.params.createdBy;
+  task.createdBy = event.params.createdBy
+
+  task.blockNumber = event.block.number
+  task.blockTimestamp = event.block.timestamp
+  task.transactionHash = event.transaction.hash
+  // task.entityTaskManager = event.address;
 
   
 
-  
-  task.blockNumber = event.block.number;
-  task.blockTimestamp = event.block.timestamp;
-  task.transactionHash = event.transaction.hash;
-  task.save();
-  fetchTaskDetails(event.params.id, event.address);
-  
-
+  // Optionally link the task to an EntityTaskManagerCreated entity
+  let entity = EntityTaskManagerCreated.load(event.address);
  
+  if (entity) {
+    
+    task.entityTaskManager = entity.id
+    log.info("Linked TaskCreated to EntityTaskManagerCreated: {}", [entity.id.toHexString()]);
+  } else {
+    log.info("No EntityTaskManagerCreated found for address: {}", [event.address.toHexString()]);
+  }
+  
+  let taskDetail = fetchTaskDetails(event.params.id, event.address, event.params.id);
+  if (taskDetail) {
+    task.taskDetail = taskDetail.id;
+    log.info("TaskDetail saved: {}", [taskDetail.id.toHexString()]);
+  } else {
+    log.error("Failed to fetch TaskDetail for task ID: {}", [event.params.id.toHexString()]);
+  }
+  task.save()
+
+
+  
+
 }

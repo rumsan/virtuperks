@@ -1,6 +1,7 @@
 "use client";
 
 import { PATHS } from "@/routes/paths";
+import { Departments } from "@/sampleData";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -13,8 +14,6 @@ import {
 } from "@tanstack/react-table";
 import { ArrowLeft } from "lucide-react";
 import React from "react";
-
-import { Departments } from "@/sampleData";
 import DepartmentDetailsCard from "./details.card";
 import { useColumns } from "./details.column";
 import DepartmentDetailsTable from "./details.table";
@@ -65,7 +64,7 @@ export default function DepartmentDetails({
   });
 
   return (
-    <main className="gap-2 p-4 sm:px-8 md:gap-8 w-full">
+    <main className="gap-2 p-4 sm:px-8 md:gap-8">
       <div
         onClick={() => router.push(PATHS.DEPARTMENT.HOME)}
         className="flex items-center gap-2 cursor-pointer hover:text-gray-400"
@@ -85,8 +84,8 @@ export default function DepartmentDetails({
       <DepartmentDetailsTable
         table={table}
         columns={columns}
-        setPagination={setPagination}
         pagination={pagination}
+        setPagination={setPagination}
       />
     </main>
   );

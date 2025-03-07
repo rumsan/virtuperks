@@ -1,8 +1,7 @@
 import { Cuid } from "@/components/departments/details/details.main";
 import { TaskList } from "@/sampleData";
 import { Card, CardTitle } from "@workspace/ui/components/card";
-import { Clock, ExternalLink, Trophy, UserRoundCog, Users } from "lucide-react";
-
+import { ExternalLink, Timer, Trophy, UserRoundCog, Users } from "lucide-react";
 
 type TaskDetailsProps = {
   cuid: Cuid;
@@ -23,15 +22,15 @@ const TaskDetails = ({ cuid, router }: TaskDetailsProps) => {
             </span>
           </div>
           <div className="flex items-center gap-2 cursor-pointer hover:text-blue-400">
-            <span className="text-blue-500 text-sm font-normal">
+            <span className="text-[#297AD6] text-sm font-normal">
               View Github repository
             </span>
-            <ExternalLink size={16} color="#297ad6" strokeWidth={2.75} />
+            <ExternalLink size={16} color="#297AD6" strokeWidth={2.75} />
           </div>
         </CardTitle>
 
         <div className="mt-3 mb-3 w-full overflow-hidden">
-          <p className="text-gray-600 text-sm line-clamp-1">
+          <p className="text-[#334155] text-sm line-clamp-1">
             Lorem Ipsum is simply dummy text of the printing and typesetting
             industry. Lorem Ipsum has been the industry's standard dummy text
             ever since the 1500s, when an unknown printer took a galley of type
@@ -46,15 +45,15 @@ const TaskDetails = ({ cuid, router }: TaskDetailsProps) => {
 
         <div className="flex flex-col text-gray-500 font-normal gap-1 text-sm">
           <span className="flex items-center gap-2">
-            <UserRoundCog color="#64748b" size={20} strokeWidth={2.5} />
+            <UserRoundCog color="#64748B" size={20} strokeWidth={2.5} />
             Task Owner: {taskData?.owner}
           </span>
           <span className="flex items-center gap-2">
-            <Users color="#64748b" size={20} strokeWidth={2.5} />
+            <Users color="#64748B" size={20} strokeWidth={2.5} />
             {taskData?.participants} members participating
           </span>
           <span className="flex items-center gap-2">
-            <Clock color="#64748b" size={20} strokeWidth={2.5} /> Deadline:{" "}
+            <Timer color="#64748B" size={20} strokeWidth={2.5} /> Deadline:{" "}
             {taskData?.date}
           </span>
         </div>
@@ -62,9 +61,9 @@ const TaskDetails = ({ cuid, router }: TaskDetailsProps) => {
 
       <Card className="w-[20%] flex flex-col items-center justify-center ml-auto p-4 gap-3">
         <div className="flex items-center justify-center rounded-full h-10 w-10 bg-blue-50">
-          <Trophy color="#297ad6" size={20} />
+          <Trophy color="#297AD6" size={20} />
         </div>
-        <span className="text-2xl text-blue-500 font-bold">100 Tokens</span>
+        <span className="text-2xl text-[#297AD6] font-bold">100 Tokens</span>
       </Card>
     </>
   );

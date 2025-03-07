@@ -1,29 +1,28 @@
-import { Address } from "@graphprotocol/graph-ts"
 import {
-  afterAll,
   assert,
-  beforeAll,
-  clearStore,
   describe,
-  test
+  test,
+  clearStore,
+  beforeAll,
+  afterAll
 } from "matchstick-as/assembly/index"
-import { handleParticiantApplied } from "../src/entity-contract"
-import { createParticiantAppliedEvent } from "./entity-contract-utils"
+import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts"
+import { PINGED } from "../generated/schema"
+import { PINGED as PINGEDEvent } from "../generated/EntityContract/EntityContract"
+import { handlePINGED } from "../src/entity-contract"
+import { createPINGEDEvent } from "./entity-contract-utils"
 
 // Tests structure (matchstick-as >=0.5.0)
 // https://thegraph.com/docs/en/developer/matchstick/#tests-structure-0-5-0
 
 describe("Describe entity assertions", () => {
   beforeAll(() => {
-    let id = "Example string value"
-    let participant = Address.fromString(
+    let sender = Address.fromString(
       "0x0000000000000000000000000000000000000001"
     )
-    let newParticiantAppliedEvent = createParticiantAppliedEvent(
-      id,
-      participant
-    )
-    handleParticiantApplied(newParticiantAppliedEvent)
+    let timestamp = BigInt.fromI32(234)
+    let newPINGEDEvent = createPINGEDEvent(sender, timestamp)
+    handlePINGED(newPINGEDEvent)
   })
 
   afterAll(() => {
@@ -33,15 +32,21 @@ describe("Describe entity assertions", () => {
   // For more test scenarios, see:
   // https://thegraph.com/docs/en/developer/matchstick/#write-a-unit-test
 
-  test("ParticiantApplied created and stored", () => {
-    assert.entityCount("ParticiantApplied", 1)
+  test("PINGED created and stored", () => {
+    assert.entityCount("PINGED", 1)
 
     // 0xa16081f360e3847006db660bae1c6d1b2e17ec2a is the default address used in newMockEvent() function
     assert.fieldEquals(
-      "ParticiantApplied",
+      "PINGED",
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
-      "participant",
+      "sender",
       "0x0000000000000000000000000000000000000001"
+    )
+    assert.fieldEquals(
+      "PINGED",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "timestamp",
+      "234"
     )
 
     // More assert options:

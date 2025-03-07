@@ -14,6 +14,16 @@ export function useColumns<T>(): ColumnDef<T>[] {
       },
     },
     {
+      accessorKey: "tresurerName",
+      header: () => (
+        <div className="text-left text-gray-600 font-bold">Treasurer Name</div>
+      ),
+
+      cell: ({ row }) => {
+        return <p>Ram Thapa Magar</p>;
+      },
+    },
+    {
       accessorKey: "date",
       header: () => (
         <div className="text-left text-gray-600 font-bold">Date</div>
