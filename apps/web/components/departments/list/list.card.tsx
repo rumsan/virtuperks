@@ -1,5 +1,6 @@
 import { useEntityList } from "@/hooks/subgraph/querycall";
 import { PATHS } from "@/routes/paths";
+import { EntityList } from "@/sampleData";
 import {
   Card,
   CardDescription,
@@ -11,6 +12,7 @@ const DepartmentListCard = ({ router }: any) => {
   // const listOftheDepartments = useEntity();
   const getAllEntity = useEntityList()
   const entityList = getAllEntity?.data?.data?.entityTaskManagerCreateds
+  console.log(entityList, 'entityList') 
 
   
   
@@ -25,8 +27,8 @@ const DepartmentListCard = ({ router }: any) => {
         <span className="text-center text-base">Add Department</span>
         <Plus size={24} />
       </Card>
-      {Departments &&
-        Departments.map((department) => {
+      {entityList &&
+        entityList.map((department:any) => {
           return (
             <Card
               key={department.id}
@@ -36,10 +38,10 @@ const DepartmentListCard = ({ router }: any) => {
               }
             >
               <CardTitle className="flex text-base">
-                <span className="text-[#334155]">{department.name}</span>
+                <span className="text-[#334155]">{department._name}</span>
 
                 <span className="ml-auto w-[90px] flex items-center justify-center bg-[#F1F5F9] rounded-xl font-normal text-[#334155] text-sm">
-                  {department.dName}
+                  {department._name}
                 </span>
               </CardTitle>
               <CardDescription className="flex gap-2 text-sm">
