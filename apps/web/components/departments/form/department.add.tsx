@@ -67,7 +67,7 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
     <>
       {" "}
       <div className="w-full items-center ">
-        <main className="gap-2 p-4 sm:px-8 md:gap-8 w-full">
+        <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
           <div
             onClick={() => router.push(PATHS.DEPARTMENT.HOME)}
             className="flex items-center gap-2 cursor-pointer hover:text-gray-400"

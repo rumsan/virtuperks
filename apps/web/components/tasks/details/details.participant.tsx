@@ -30,6 +30,8 @@ const TaskParticipant = ({ router }: any) => {
     pageSize: 10,
   });
 
+  console.log(participantList, "participantList");
+
   const columns = useColumns();
   const table = useReactTable({
     data: participantList || [],
@@ -94,7 +96,7 @@ const TaskParticipant = ({ router }: any) => {
           {participantList.map((participant) => (
             <div
               key={participant.walletAddress}
-              className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-100 gap-4"
+              className="flex items-center justify-center h-8 w-8 rounded-full bg-[#F1F5F9] gap-4"
             >
               <User color="#64748B" size={20} />
             </div>

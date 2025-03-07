@@ -60,35 +60,7 @@ export default function DepartmentBaseForm({
                   </FormItem>
                 )}
               />
-              {/* <FormField
-                control={form.control}
-                name="owner"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Department Owner</FormLabel>
 
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value ?? ""}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select department owner" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {departmentOwnerList.map((owner) => (
-                          <SelectItem key={owner.id} value={owner.name}>
-                            {owner.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
               <FormField
                 control={form.control}
                 name="appId"
@@ -114,7 +86,7 @@ export default function DepartmentBaseForm({
               />
             </div>
 
-            <div className="w-full flex justify-end">
+            <div className="w-full flex justify-end mt-5">
               <>{children}</>
             </div>
           </div>

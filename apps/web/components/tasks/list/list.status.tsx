@@ -17,7 +17,7 @@ const TaskListStatus = ({ router }: any) => {
               <CircleDashed className="justify-end ml-auto" size={20} />
             </CardTitle>
           </CardHeader>
-          <CardDescription className="p-3 text-2xl text-primary font-bold">
+          <CardDescription className="p-3 text-2xl text-[#297AD6] font-bold">
             <span>10</span>
           </CardDescription>
         </Card>
@@ -29,7 +29,7 @@ const TaskListStatus = ({ router }: any) => {
               <CircleCheckBig className="justify-end ml-auto" size={20} />
             </CardTitle>
           </CardHeader>
-          <CardDescription className="p-3 font-normal text-2xl text-primary font-bold">
+          <CardDescription className="p-3 font-normal text-2xl text-[#297AD6] font-bold">
             <span>5</span>
           </CardDescription>
         </Card>
@@ -41,7 +41,7 @@ const TaskListStatus = ({ router }: any) => {
               <CircleDashed className="justify-end ml-auto" size={20} />
             </CardTitle>
           </CardHeader>
-          <CardDescription className="p-3 font-normal text-2xl text-primary font-bold">
+          <CardDescription className="p-3 font-normal text-2xl text-[#297AD6] font-bold">
             <span>15</span>
           </CardDescription>
         </Card>

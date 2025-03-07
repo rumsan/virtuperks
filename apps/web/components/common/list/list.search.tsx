@@ -1,7 +1,7 @@
 import { Input } from "@workspace/ui/components/input";
 import { Search } from "lucide-react";
 
-const DepartmentAction = () => {
+const SearchAction = () => {
   return (
     <div className="w-full h-10 flex rounded-md border border-gray-200 rounded-md items-center p-3">
       <p className="text-gray-500">
@@ -16,4 +16,4 @@ const DepartmentAction = () => {
   );
 };
 
-export default DepartmentAction;
+export default SearchAction;
