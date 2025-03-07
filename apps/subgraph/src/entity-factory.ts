@@ -1,6 +1,6 @@
-import { log } from "@graphprotocol/graph-ts"
-import { EntityTaskManagerCreated as EntityTaskManagerCreatedEvent } from "../generated/EntityFactory/EntityFactory"
-import { EntityTaskManagerCreated } from "../generated/schema"
+import { log } from "@graphprotocol/graph-ts";
+import { EntityTaskManagerCreated as EntityTaskManagerCreatedEvent } from "../generated/EntityFactory/EntityFactory";
+import { EntityTaskManagerCreated } from "../generated/schema";
 import { EntityContract } from "../generated/templates";
 
 
@@ -8,7 +8,7 @@ export function handleEntityTaskManagerCreated(
   event: EntityTaskManagerCreatedEvent,
 ): void {
   let entity = new EntityTaskManagerCreated(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.params.entityTaskManager
   )
   entity.entityTaskManager = event.params.entityTaskManager
   entity.aclAddress = event.params.aclAddress
@@ -18,6 +18,8 @@ export function handleEntityTaskManagerCreated(
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+  
+  
 
   entity.save()
    log.debug("EntityTaskManagerCreated: {}", [entity.entityTaskManager.toHexString()]);

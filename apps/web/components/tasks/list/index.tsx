@@ -1,5 +1,6 @@
 "use client";
 
+import { useTaskList } from "@/hooks/subgraph/querycall";
 import { PATHS } from "@/routes/paths";
 import { TaskList } from "@/sampleData";
 import { Button } from "@workspace/ui/components/button";
@@ -21,6 +22,8 @@ interface TaskListMainProps {
 
 export default function TaskListMain({ router }: TaskListMainProps) {
   const [tabStatus, setTabStatus] = useState("active");
+  const getAllTask = useTaskList()
+  console.log(getAllTask?.data?.data?.taskCreateds, 'getAlltask')
 
   return (
     <main className="gap-2 p-4 sm:px-8 sm:py-10 md:gap-8 w-full">

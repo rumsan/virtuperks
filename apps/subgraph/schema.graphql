@@ -64,6 +64,7 @@ type EntityTaskManagerCreated @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  tasks: [TaskCreated!] @derivedFrom(field: "entityTaskManager")
 }
 type PINGED @entity(immutable: true) {
   id: Bytes!
@@ -116,6 +117,8 @@ type TaskCreated @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  entityTaskManager: EntityTaskManagerCreated # Relationship to EntityTaskManagerCreated
+  taskDetail: TaskDetail 
 }
 
 type TaskDetail @entity(immutable: false) {
@@ -127,6 +130,7 @@ type TaskDetail @entity(immutable: false) {
   expiryDate: BigInt! # Expiry date of the task
   owner: Bytes! # Address of the task owner
   isActive: Boolean! # Whether the task is active
+  task: TaskCreated
 
 
 }

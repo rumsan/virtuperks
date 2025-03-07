@@ -14,6 +14,7 @@ const ListCardDetails = ({
   router,
   tabStatus,
 }: ListCardDetailsProps) => {
+ 
   const filteredTaskList = () => {
     if (tabStatus === "active") {
       return taskList.filter((task) => task.status.toLowerCase() === "open");

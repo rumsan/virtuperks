@@ -1,4 +1,6 @@
+import { log } from "@graphprotocol/graph-ts"
 import {
+  EntityTaskManagerCreated,
   PINGED,
   ParticiantApplied,
   TaskAccepted,
@@ -86,26 +88,46 @@ export function handleTaskCompleted(event: TaskCompletedEvent): void {
 }
 
 export function handleTaskCreated(event: TaskCreatedEvent): void {
-
-//   let entity = EntityTaskManagerCreated.load(event.address);
   
-//   log.info('EntityTaskManager', [event.address.toHexString()]);
-// if (!entity) {
-//   log.error("EntityTaskManagerCreated not found for address: {}", [event.address.toHexString()]);
-//   return;
-// }
-//   log.info('TaskCreated event fired', [entity.id.toHexString()]);
-//   log.info('id of tasks',[event.params.id.toHexString()])
-  let taskId = event.transaction.hash.concatI32(event.logIndex.toI32());
-  let task = new TaskCreated(taskId);
+
+
+  log.info('TaskCreated event fired: {}', [event.address.toHexString()]);
+
+  
+
+  //let taskId = event.transaction.hash.concatI32(event.logIndex.toI32());
+  let task = new TaskCreated(event.params.id);
   task.internal_id = event.params.id
   task.createdBy = event.params.createdBy
 
   task.blockNumber = event.block.number
   task.blockTimestamp = event.block.timestamp
   task.transactionHash = event.transaction.hash
+  // task.entityTaskManager = event.address;
 
+  
+
+  // Optionally link the task to an EntityTaskManagerCreated entity
+  let entity = EntityTaskManagerCreated.load(event.address);
+ 
+  if (entity) {
+    
+    task.entityTaskManager = entity.id
+    log.info("Linked TaskCreated to EntityTaskManagerCreated: {}", [entity.id.toHexString()]);
+  } else {
+    log.info("No EntityTaskManagerCreated found for address: {}", [event.address.toHexString()]);
+  }
+  
+  let taskDetail = fetchTaskDetails(event.params.id, event.address, event.params.id);
+  if (taskDetail) {
+    task.taskDetail = taskDetail.id;
+    log.info("TaskDetail saved: {}", [taskDetail.id.toHexString()]);
+  } else {
+    log.error("Failed to fetch TaskDetail for task ID: {}", [event.params.id.toHexString()]);
+  }
   task.save()
-  fetchTaskDetails(event.params.id, event.address);
+
+
+  
 
 }

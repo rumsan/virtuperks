@@ -13,6 +13,7 @@ const DepartmentListCard = ({ router }: any) => {
   // const listOftheDepartments = useEntity();
   const getAllEntity = useEntityList()
   const entityList = getAllEntity?.data?.data?.entityTaskManagerCreateds
+
   
   
   

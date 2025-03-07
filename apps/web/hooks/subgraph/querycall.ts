@@ -27,3 +27,15 @@ export const useEntityList = () => {
     },
   });
 };
+
+export const useTaskList = () => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["tasks"],
+    queryFn: async () => {
+      const getAllData = await queryService?.getTaskCreatedList()
+      return getAllData;
+    },
+  });
+}
