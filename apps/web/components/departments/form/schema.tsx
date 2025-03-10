@@ -10,7 +10,7 @@ export const departmentSchema = () => {
   const _schema = {
     name: z.string().min(1, "Department name is required"),
     
-    appId: z.string().min(1, "AppId address is required"),
+ 
   };
   return z.object(_schema);
 };

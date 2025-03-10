@@ -1,7 +1,8 @@
 "use client";
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
-import { TaskList } from "@/sampleData";
+import { useTaskList } from "@/hooks/subgraph/querycall";
+// import { TaskList } from "@/sampleData";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -15,7 +16,6 @@ import {
 import React from "react";
 import { useColumns } from "../details/details.column";
 import TaskPortalCard from "./list.card";
-import NoTask from "./no.task";
 
 interface TaskPortalMainProps {
   router: any;
@@ -36,8 +36,12 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
 
   const columns = useColumns();
 
+  const getAllTask = useTaskList();
+
+  const TaskList = getAllTask?.data?.data?.taskCreateds || [];
+
   const table = useReactTable({
-    data: TaskList || [],
+    data: getAllTask?.data?.data?.taskCreateds || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -64,11 +68,8 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
             Overview of all the tasks
           </h3>
         </div>
-        {TaskList.length === 0 ? (
-          <NoTask />
-        ) : (
-          <TaskPortalCard table={table} router={router} />
-        )}
+
+        <TaskPortalCard table={table} router={router} />
 
         <div className="mt-5 mb-5">
           <DataTablePagination

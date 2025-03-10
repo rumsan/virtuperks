@@ -20,8 +20,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
   const { isConnected } = useAccount();
 
-  console.log(isConnected, "isConnected");
-
   const handleApplyTask = () => {
     if (isConnected) {
       setIsOpen(true);
@@ -29,8 +27,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
       setAlertDialog(true);
     }
   };
-
-  console.log(isOpen, "isOpen");
 
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
