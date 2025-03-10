@@ -1,6 +1,6 @@
 'use client';
 
-import { config } from '@/wagmi.config';
+import { config } from '@/app/wagmi.config';
 import { WagmiProvider } from 'wagmi';
 
 export const Wagmi = ({ children }: { children: React.ReactNode }) => {
