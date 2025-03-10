@@ -41,15 +41,14 @@ import { participantList, tokenList } from "@/sampleData";
 import { EntityTaskManagementABI } from "@workspace/contracts/abis";
 import { isAddress } from "viem";
 
-const defaultValues:any = {
-
+const defaultValues: any = {
   detailsUrl: "",
   owner: "",
   rewardToken: "",
   expiryDate: "",
   allowedWallets: "",
-  maxParticipants: 0 ,
-  rewardAmount:0,
+  maxParticipants: 0,
+  rewardAmount: 0,
   isActive: false,
   entityAddress: "",
 };
@@ -63,48 +62,58 @@ export default function TaskAdd({ router }: TaskAddProps) {
     resolver: zodResolver(taskSchema()),
     defaultValues: defaultValues,
   });
-   const getAllEntity = useEntityList()
-  const entityList = getAllEntity?.data?.data?.entityTaskManagerCreateds
-
-
+  const getAllEntity = useEntityList();
+  const entityList = getAllEntity?.data?.data?.entityTaskManagerCreateds;
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const { data: hash, writeContract,writeContractAsync,context} = useWriteContract()
-
- 
+  const {
+    data: hash,
+    writeContract,
+    writeContractAsync,
+    context,
+  } = useWriteContract();
 
   const handleSubmit = async (data: any) => {
-
-    
-
     if (!isAddress(data.entityAddress)) {
-        console.error("Invalid Ethereum address:", data.entityAddress);
-        return;
+      console.error("Invalid Ethereum address:", data.entityAddress);
+      return;
     }
 
     const { detailsUrl, rewardToken, owner, isActive } = data;
-    
-    const expiryDate = BigInt(Math.floor(new Date(data.expiryDate).getTime() / 1000)); // Convert to seconds
-    const allowedWallets = Array.isArray(data.allowedWallets) ? data.allowedWallets : [data.allowedWallets]; // Ensure it's an array
+
+    const expiryDate = BigInt(
+      Math.floor(new Date(data.expiryDate).getTime() / 1000),
+    ); // Convert to seconds
+    const allowedWallets = Array.isArray(data.allowedWallets)
+      ? data.allowedWallets
+      : [data.allowedWallets]; // Ensure it's an array
     const rewardAmount = BigInt(data.rewardAmount);
-   
+
     const maxParticipants = BigInt(data.maxParticipants);
-   
+
     try {
-        const tx = await writeContractAsync({
-            address: data.entityAddress,
-            abi: EntityTaskManagementABI,
-            functionName: "createTask",
-            args: [{ detailsUrl, rewardToken, rewardAmount, allowedWallets, maxParticipants, expiryDate, owner, isActive }]
-        }); 
-     router.push(PATHS.TASKPORTAL.HOME)
-
+      const tx = await writeContractAsync({
+        address: data.entityAddress,
+        abi: EntityTaskManagementABI,
+        functionName: "createTask",
+        args: [
+          {
+            detailsUrl,
+            rewardToken,
+            rewardAmount,
+            allowedWallets,
+            maxParticipants,
+            expiryDate,
+            owner,
+            isActive,
+          },
+        ],
+      });
+      router.push(PATHS.TASKPORTAL.HOME);
     } catch (error) {
-        console.error("Transaction failed:", error);
+      console.error("Transaction failed:", error);
     }
-
   };
-
   return (
     <>
       {" "}
@@ -158,29 +167,33 @@ export default function TaskAdd({ router }: TaskAddProps) {
                             </FormItem>
                           )}
                         />
-                         <FormField
+                        <FormField
                           control={form.control}
                           name="entityAddress"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Select Entity</FormLabel>
                               <FormControl>
-                                        <Select
-                                  onValueChange={(value) => field.onChange(value)}
-                                  value={field.value} 
-                                
+                                <Select
+                                  onValueChange={(value) =>
+                                    field.onChange(value)
+                                  }
+                                  value={field.value}
                                 >
-          <SelectTrigger>
-            <SelectValue placeholder="Select Entity" />
-          </SelectTrigger>
-          <SelectContent>
-          {entityList?.map((entity:any) => (
-              <SelectItem key={entity.id} value={entity.entityTaskManager}>
-                {entity._name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select Entity" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {entityList?.map((entity: any) => (
+                                      <SelectItem
+                                        key={entity.id}
+                                        value={entity.entityTaskManager}
+                                      >
+                                        {entity._name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -194,22 +207,26 @@ export default function TaskAdd({ router }: TaskAddProps) {
                             <FormItem>
                               <FormLabel>Select Token</FormLabel>
                               <FormControl>
-                               <Select
-                                  onValueChange={(value) => field.onChange(value)}
-                                  value={field.value} 
-                                
+                                <Select
+                                  onValueChange={(value) =>
+                                    field.onChange(value)
+                                  }
+                                  value={field.value}
                                 >
-          <SelectTrigger>
-            <SelectValue placeholder="Select reward" />
-          </SelectTrigger>
-          <SelectContent>
-          {tokenList?.map((token:any) => (
-            <SelectItem key={token.name} value={ token.address}>
-                {token.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select reward" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {tokenList?.map((token: any) => (
+                                      <SelectItem
+                                        key={token.name}
+                                        value={token.address}
+                                      >
+                                        {token.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -222,18 +239,26 @@ export default function TaskAdd({ router }: TaskAddProps) {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Max Number of Participants</FormLabel>
-                               <Input
-                                   type="number"
-        placeholder="0"
-                                
-                                  {...field}
-                                 value={field.value !== undefined && field.value !== null ? field.value.toString() : ""}
+                              <Input
+                                type="number"
+                                placeholder="0"
+                                {...field}
+                                value={
+                                  field.value !== undefined &&
+                                  field.value !== null
+                                    ? field.value.toString()
+                                    : ""
+                                }
                                 onChange={(e) => {
-          const value = e.target.value;
-          
-          field.onChange(value === "" ? undefined : parseInt(value, 10));
-        }}
-                                />
+                                  const value = e.target.value;
+
+                                  field.onChange(
+                                    value === ""
+                                      ? undefined
+                                      : parseInt(value, 10),
+                                  );
+                                }}
+                              />
                               <FormMessage />
                             </FormItem>
                           )}
@@ -252,12 +277,21 @@ export default function TaskAdd({ router }: TaskAddProps) {
                                   type="number"
                                   placeholder="0"
                                   {...field}
-                              value={field.value !== undefined && field.value !== null ? field.value.toString() : ""}
-                                                        onChange={(e) => {
-          const value = e.target.value;
-          
-          field.onChange(value === "" ? undefined : parseInt(value, 10));
-        }}
+                                  value={
+                                    field.value !== undefined &&
+                                    field.value !== null
+                                      ? field.value.toString()
+                                      : ""
+                                  }
+                                  onChange={(e) => {
+                                    const value = e.target.value;
+
+                                    field.onChange(
+                                      value === ""
+                                        ? undefined
+                                        : parseInt(value, 10),
+                                    );
+                                  }}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -273,18 +307,19 @@ export default function TaskAdd({ router }: TaskAddProps) {
                               <FormLabel>Event status </FormLabel>
                               <FormControl>
                                 <Select
-                                  onValueChange={(value) => field.onChange(value === "true")}
-                                  value={field.value ? "true" : "false"} 
-                                
+                                  onValueChange={(value) =>
+                                    field.onChange(value === "true")
+                                  }
+                                  value={field.value ? "true" : "false"}
                                 >
-          <SelectTrigger>
-            <SelectValue placeholder="Select event status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="true">True</SelectItem>
-            <SelectItem value="false">False</SelectItem>
-          </SelectContent>
-        </Select>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select event status" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="true">True</SelectItem>
+                                    <SelectItem value="false">False</SelectItem>
+                                  </SelectContent>
+                                </Select>
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -351,11 +386,11 @@ export default function TaskAdd({ router }: TaskAddProps) {
                                       //   date < new Date("2022-01-01")
                                       // }
                                       disabled={(date) => {
-    // Disable past dates and dates before the upcoming month
-   const today = new Date();
-                today.setHours(0, 0, 0, 0); // Normalize today's date to the start of the day
-                return date < today;
-  }}
+                                        // Disable past dates and dates before the upcoming month
+                                        const today = new Date();
+                                        today.setHours(0, 0, 0, 0); // Normalize today's date to the start of the day
+                                        return date < today;
+                                      }}
                                       initialFocus
                                     />
                                   </PopoverContent>
@@ -393,12 +428,12 @@ export default function TaskAdd({ router }: TaskAddProps) {
                                   ))}
                                 </SelectContent>
                               </Select> */}
-                               <Input
-                                  type="string"
-                                  placeholder="Add owner Address"
-                                  {...field}
-                                  value={field.value ?? ""}
-                                />
+                              <Input
+                                type="string"
+                                placeholder="Add owner Address"
+                                {...field}
+                                value={field.value ?? ""}
+                              />
 
                               <FormMessage />
                             </FormItem>
@@ -406,35 +441,37 @@ export default function TaskAdd({ router }: TaskAddProps) {
                         />
                       </div>
 
-                     <FormField
-                          control={form.control}
-                          name="allowedWallets"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Select Token</FormLabel>
-                              <FormControl>
-                               <Select
-                                  onValueChange={(value) => field.onChange(value)}
-                                  value={field.value} 
-                                
-                                >
-          <SelectTrigger>
-            <SelectValue placeholder="Select Participant" />
-          </SelectTrigger>
-          <SelectContent>
-          {participantList?.map((token:any) => (
-            <SelectItem key={token.walletAddress} value={ token.walletAddress}>
-                {token.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-               
+                      <FormField
+                        control={form.control}
+                        name="allowedWallets"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Select Token</FormLabel>
+                            <FormControl>
+                              <Select
+                                onValueChange={(value) => field.onChange(value)}
+                                value={field.value}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select Participant" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {participantList?.map((token: any) => (
+                                    <SelectItem
+                                      key={token.walletAddress}
+                                      value={token.walletAddress}
+                                    >
+                                      {token.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
                       <div className="w-full flex justify-end gap-4">
                         <Button
                           variant="outline"

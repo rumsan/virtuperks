@@ -1,3 +1,4 @@
+import { EntityTaskManagementABI } from "@workspace/contracts/abis";
 import { Button } from "@workspace/ui/components/button";
 import {
   Dialog,
@@ -9,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
+import { useWriteContract } from "wagmi";
 
 interface DialogButtonProps {
   isOpen: boolean;
@@ -16,6 +18,7 @@ interface DialogButtonProps {
   title: string;
   subTitle: string;
   buttonName: string;
+  taskData: any;
 }
 
 export function DialogButton({
@@ -24,8 +27,26 @@ export function DialogButton({
   title,
   subTitle,
   buttonName,
+  taskData,
 }: DialogButtonProps) {
-  console.log(isOpen, "isOpen");
+  const { writeContractAsync, error } = useWriteContract();
+
+  const handleApplyTask = async () => {
+    try {
+      const result = await writeContractAsync({
+        address: taskData?.entityTaskManager?.id,
+        abi: EntityTaskManagementABI,
+        functionName: "participate",
+        args: [taskData?.id],
+      });
+      console.log(error, "error");
+      console.log(result, "result");
+      console.log(error, "error");
+    } catch (error) {
+      console.error("Transaction failed:", error);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -55,6 +76,7 @@ export function DialogButton({
             className="w-[170px] flex justify-center items-center gap-2 bg-[#297AD6]"
             onClick={() => {
               setIsOpen(false);
+              handleApplyTask();
             }}
           >
             {buttonName}

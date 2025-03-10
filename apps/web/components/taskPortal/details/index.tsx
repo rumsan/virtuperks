@@ -1,6 +1,7 @@
 import { CustomAlertDialog } from "@/components/common/ui/alert.dialog";
 import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
+import { useTaskList } from "@/hooks/subgraph/querycall";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -19,6 +20,11 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const [alertDialog, setAlertDialog] = useState(false);
 
   const { isConnected } = useAccount();
+
+  const getAllTask = useTaskList();
+  const TaskList = getAllTask?.data?.data?.taskCreateds;
+
+  const taskData = TaskList?.find((task) => task?.id === cuid?.id);
 
   const handleApplyTask = () => {
     if (isConnected) {
@@ -47,9 +53,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
           </div>
           <div className="flex items-center ml-auto gap-4">
             <Button className="bg-[#297AD6]" onClick={handleApplyTask}>
-              <span className="text-[#F8FAFC]">
-                {isConnected === true ? "Mark as completed" : "Apply for task"}
-              </span>{" "}
+              <span className="text-[#F8FAFC]">Apply for task</span>{" "}
               <ArrowRight color="#F8FAFC" strokeWidth={2.5} size={20} />
             </Button>
           </div>
@@ -67,6 +71,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             title="Are you sure you want to apply for this task?"
             subTitle="There are 5 more slots remaining in this task"
             buttonName="Apply"
+            taskData={taskData}
           />
         )}
 
