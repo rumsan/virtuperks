@@ -1,13 +1,12 @@
-import {randomBytes} from 'crypto';
+import { randomBytes } from 'crypto';
 import * as dotenv from 'dotenv';
-import {ethers, uuidV4} from 'ethers';
-import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'fs';
-import {ContractArtifacts, ContractDetails} from '../types/contract';
+import { ethers, uuidV4 } from 'ethers';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { ContractArtifacts, ContractDetails } from '../types/contract';
 dotenv.config();
 
 //configs
-const PROVIDER = process.env.NETWORK_PROVIDER;
-const PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY;
+
 
 export class commonLib {
   provider: ethers.JsonRpcProvider;
@@ -107,5 +106,57 @@ export class commonLib {
     fileData = {...fileData, ...newData};
     writeFileSync(filePath, JSON.stringify(fileData, null, 2));
     console.log('completed writing to deployment file');
+  }
+
+  public async createApp(accessManagerAddress:string,appId:string,address:string) {
+    const signer = this.getDeployerWallet();
+    const { abi } = await this.getContractArtifacts('AccessManagerV2');
+    const accessManager = new ethers.Contract(
+      accessManagerAddress,
+      abi,
+      signer,
+    );
+    if (accessManager.createApp) {
+      const tx = await accessManager.createApp(appId, address);
+      await tx.wait();
+      
+      console.log(`App "${appId}" created`);
+    } else {
+      throw new Error('createApp function is undefined on accessManager contract');
+    }
+    
+  }
+
+ 
+  public async assignRole(
+    accessManagerAddress: string,
+    appId:string,
+    role: string,
+    account: string,
+  ) {
+    const signer = this.getDeployerWallet();
+
+    
+    const { abi } = await this.getContractArtifacts('AccessManagerV2');
+
+   
+    const accessManager = new ethers.Contract(
+      accessManagerAddress,
+      abi,
+      signer,
+    );
+
+ 
+    const roleHash = ethers.id(role);
+
+    if (accessManager.grantRole) {
+      const tx = await accessManager.grantRole(appId, roleHash, account);
+      await tx.wait(); // Wait for the transaction to be mined
+      console.log(`Role "${role}" assigned to account "${account}"`);
+    } else {
+      throw new Error('grantRole function is undefined on accessManager contract');
+    }
+   // Wait for the transaction to be mined
+    console.log(`Role "${role}" assigned to account "${account}"`);
   }
 }

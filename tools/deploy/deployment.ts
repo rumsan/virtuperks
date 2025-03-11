@@ -43,6 +43,22 @@ class SeedProject extends commonLib {
     };
     console.log('acessManager deployed', accessManagerV2.contract.target);
   
+    //create a app
+  await this.createApp(accessManagerV2.contract.target as string, appId, '0x4E90a36B45879F5baE71B57Ad525e817aFA54890');
+      // Assign roles after deploying AccessManagerV2
+  await this.assignRole(
+    accessManagerV2.contract.target as string,
+    appId,
+    'MINTER',
+    '0x4E90a36B45879F5baE71B57Ad525e817aFA54890', // Replace with the actual admin address
+  );
+  await this.assignRole(
+    accessManagerV2.contract.target as string,
+    appId,
+    'ENTITY_OWNER',
+    '0x4E90a36B45879F5baE71B57Ad525e817aFA54890', // Replace with the actual user address
+  );
+  
 
     const rewardToken = await this.deployContract('RewardToken', [
       appId,
@@ -103,8 +119,8 @@ async function main() {
    await seedProject.deployCommonContracts(RUMSAN_APP_ID);
   console.log('Common contracts deployed');
   await seedProject.deployEntityContract(
-    '0x279BFe2E7ac4841F9486c2da42DB5a638285BDd9',
-    ethers.id('RUMSAN_ENTITY'),
+    accessManagerV2.contract.target as string,
+    ethers.id('RUMSAN_APP'),
     name
   );
   await seedProject.deployEntityContractFactory();
