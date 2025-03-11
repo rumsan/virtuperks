@@ -1,167 +1,147 @@
 import {
   createUseReadContract,
+  createUseWriteContract,
   createUseSimulateContract,
   createUseWatchContractEvent,
-  createUseWriteContract,
-} from "wagmi/codegen";
+} from 'wagmi/codegen'
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Access Manager
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export const accessManagerAbi = [
-  { type: "constructor", inputs: [], stateMutability: "nonpayable" },
+  {type: 'constructor', inputs: [], stateMutability: 'nonpayable'},
   {
-    type: "error",
-    inputs: [{ name: "target", internalType: "address", type: "address" }],
-    name: "AddressEmptyCode",
+    type: 'error',
+    inputs: [{name: 'target', internalType: 'address', type: 'address'}],
+    name: 'AddressEmptyCode',
   },
-  { type: "error", inputs: [], name: "FailedCall" },
+  {type: 'error', inputs: [], name: 'FailedCall'},
   {
-    type: "event",
+    type: 'event',
     anonymous: false,
     inputs: [
+      {name: 'appId', internalType: 'bytes32', type: 'bytes32', indexed: true},
       {
-        name: "appId",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: true,
-      },
-      {
-        name: "account",
-        internalType: "address",
-        type: "address",
+        name: 'account',
+        internalType: 'address',
+        type: 'address',
         indexed: true,
       },
     ],
-    name: "AppCreated",
+    name: 'AppCreated',
   },
   {
-    type: "event",
+    type: 'event',
     anonymous: false,
     inputs: [
+      {name: 'appId', internalType: 'bytes32', type: 'bytes32', indexed: true},
       {
-        name: "appId",
-        internalType: "bytes32",
-        type: "bytes32",
+        name: 'previousOwner',
+        internalType: 'address',
+        type: 'address',
         indexed: true,
       },
       {
-        name: "previousOwner",
-        internalType: "address",
-        type: "address",
-        indexed: true,
-      },
-      {
-        name: "newOwner",
-        internalType: "address",
-        type: "address",
+        name: 'newOwner',
+        internalType: 'address',
+        type: 'address',
         indexed: true,
       },
     ],
-    name: "OwnershipTransferred",
+    name: 'OwnershipTransferred',
   },
   {
-    type: "event",
+    type: 'event',
     anonymous: false,
     inputs: [
+      {name: 'appId', internalType: 'bytes32', type: 'bytes32', indexed: false},
+      {name: 'role', internalType: 'bytes32', type: 'bytes32', indexed: true},
       {
-        name: "appId",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: false,
-      },
-      { name: "role", internalType: "bytes32", type: "bytes32", indexed: true },
-      {
-        name: "account",
-        internalType: "address",
-        type: "address",
+        name: 'account',
+        internalType: 'address',
+        type: 'address',
         indexed: true,
       },
     ],
-    name: "RoleGranted",
+    name: 'RoleGranted',
   },
   {
-    type: "event",
+    type: 'event',
     anonymous: false,
     inputs: [
+      {name: 'appId', internalType: 'bytes32', type: 'bytes32', indexed: false},
+      {name: 'role', internalType: 'bytes32', type: 'bytes32', indexed: true},
       {
-        name: "appId",
-        internalType: "bytes32",
-        type: "bytes32",
-        indexed: false,
-      },
-      { name: "role", internalType: "bytes32", type: "bytes32", indexed: true },
-      {
-        name: "account",
-        internalType: "address",
-        type: "address",
+        name: 'account',
+        internalType: 'address',
+        type: 'address',
         indexed: true,
       },
     ],
-    name: "RoleRevoked",
+    name: 'RoleRevoked',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [
-      { name: "appId", internalType: "bytes32", type: "bytes32" },
-      { name: "account", internalType: "address", type: "address" },
+      {name: 'appId', internalType: 'bytes32', type: 'bytes32'},
+      {name: 'account', internalType: 'address', type: 'address'},
     ],
-    name: "createApp",
+    name: 'createApp',
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: 'nonpayable',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [
-      { name: "appId", internalType: "bytes32", type: "bytes32" },
-      { name: "role", internalType: "bytes32", type: "bytes32" },
-      { name: "account", internalType: "address", type: "address" },
+      {name: 'appId', internalType: 'bytes32', type: 'bytes32'},
+      {name: 'role', internalType: 'bytes32', type: 'bytes32'},
+      {name: 'account', internalType: 'address', type: 'address'},
     ],
-    name: "grantRole",
+    name: 'grantRole',
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: 'nonpayable',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [
-      { name: "appId", internalType: "bytes32", type: "bytes32" },
-      { name: "role", internalType: "bytes32", type: "bytes32" },
-      { name: "account", internalType: "address", type: "address" },
+      {name: 'appId', internalType: 'bytes32', type: 'bytes32'},
+      {name: 'role', internalType: 'bytes32', type: 'bytes32'},
+      {name: 'account', internalType: 'address', type: 'address'},
     ],
-    name: "hasRole",
-    outputs: [{ name: "", internalType: "bool", type: "bool" }],
-    stateMutability: "view",
+    name: 'hasRole',
+    outputs: [{name: '', internalType: 'bool', type: 'bool'}],
+    stateMutability: 'view',
   },
   {
-    type: "function",
-    inputs: [{ name: "data", internalType: "bytes[]", type: "bytes[]" }],
-    name: "multicall",
-    outputs: [{ name: "results", internalType: "bytes[]", type: "bytes[]" }],
-    stateMutability: "nonpayable",
+    type: 'function',
+    inputs: [{name: 'data', internalType: 'bytes[]', type: 'bytes[]'}],
+    name: 'multicall',
+    outputs: [{name: 'results', internalType: 'bytes[]', type: 'bytes[]'}],
+    stateMutability: 'nonpayable',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [
-      { name: "appId", internalType: "bytes32", type: "bytes32" },
-      { name: "role", internalType: "bytes32", type: "bytes32" },
-      { name: "account", internalType: "address", type: "address" },
+      {name: 'appId', internalType: 'bytes32', type: 'bytes32'},
+      {name: 'role', internalType: 'bytes32', type: 'bytes32'},
+      {name: 'account', internalType: 'address', type: 'address'},
     ],
-    name: "revokeRole",
+    name: 'revokeRole',
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: 'nonpayable',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [
-      { name: "appId", internalType: "bytes32", type: "bytes32" },
-      { name: "newOwner", internalType: "address", type: "address" },
+      {name: 'appId', internalType: 'bytes32', type: 'bytes32'},
+      {name: 'newOwner', internalType: 'address', type: 'address'},
     ],
-    name: "transferOwnership",
+    name: 'transferOwnership',
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: 'nonpayable',
   },
-] as const;
+] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // EntityTaskManager
@@ -169,248 +149,229 @@ export const accessManagerAbi = [
 
 export const entityTaskManagerAbi = [
   {
-    type: "constructor",
+    type: 'constructor',
     inputs: [
-      { name: "aclAddress", internalType: "address", type: "address" },
-      { name: "_appId", internalType: "bytes32", type: "bytes32" },
-      { name: "_name", internalType: "string", type: "string" },
+      {name: 'aclAddress', internalType: 'address', type: 'address'},
+      {name: '_appId', internalType: 'bytes32', type: 'bytes32'},
+      {name: '_name', internalType: 'string', type: 'string'},
     ],
-    stateMutability: "nonpayable",
+    stateMutability: 'nonpayable',
   },
   {
-    type: "event",
+    type: 'event',
     anonymous: false,
     inputs: [
-      { name: "id", internalType: "string", type: "string", indexed: true },
+      {name: 'sender', internalType: 'address', type: 'address', indexed: true},
       {
-        name: "participant",
-        internalType: "address",
-        type: "address",
+        name: 'timestamp',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'PINGED',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {name: 'id', internalType: 'bytes32', type: 'bytes32', indexed: true},
+      {
+        name: 'participant',
+        internalType: 'address',
+        type: 'address',
         indexed: true,
       },
     ],
-    name: "ParticiantApplied",
+    name: 'ParticiantApplied',
   },
   {
-    type: "event",
+    type: 'event',
     anonymous: false,
     inputs: [
-      { name: "id", internalType: "string", type: "string", indexed: true },
+      {name: 'id', internalType: 'bytes32', type: 'bytes32', indexed: true},
     ],
-    name: "TaskAccepted",
+    name: 'TaskAccepted',
   },
   {
-    type: "event",
+    type: 'event',
     anonymous: false,
     inputs: [
-      { name: "id", internalType: "string", type: "string", indexed: true },
+      {name: 'id', internalType: 'bytes32', type: 'bytes32', indexed: true},
       {
-        name: "approver",
-        internalType: "address",
-        type: "address",
+        name: 'approver',
+        internalType: 'address',
+        type: 'address',
         indexed: true,
       },
     ],
-    name: "TaskApproved",
+    name: 'TaskApproved',
   },
   {
-    type: "event",
+    type: 'event',
     anonymous: false,
     inputs: [
-      { name: "id", internalType: "string", type: "string", indexed: true },
+      {name: 'id', internalType: 'bytes32', type: 'bytes32', indexed: true},
       {
-        name: "participant",
-        internalType: "address",
-        type: "address",
+        name: 'participant',
+        internalType: 'address',
+        type: 'address',
         indexed: true,
       },
     ],
-    name: "TaskCompleted",
+    name: 'TaskCompleted',
   },
   {
-    type: "event",
+    type: 'event',
     anonymous: false,
     inputs: [
-      { name: "id", internalType: "string", type: "string", indexed: true },
+      {name: 'id', internalType: 'bytes32', type: 'bytes32', indexed: true},
       {
-        name: "createdBy",
-        internalType: "address",
-        type: "address",
+        name: 'createdBy',
+        internalType: 'address',
+        type: 'address',
         indexed: true,
       },
-      {
-        name: "detailsUrl",
-        internalType: "string",
-        type: "string",
-        indexed: false,
-      },
-      {
-        name: "rewardToken",
-        internalType: "address",
-        type: "address",
-        indexed: false,
-      },
-      {
-        name: "rewardAmount",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: false,
-      },
-      {
-        name: "allowedWallets",
-        internalType: "address[]",
-        type: "address[]",
-        indexed: false,
-      },
-      {
-        name: "maxParticipants",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: false,
-      },
-      {
-        name: "expiryDate",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: false,
-      },
-      {
-        name: "owner",
-        internalType: "address",
-        type: "address",
-        indexed: false,
-      },
-      { name: "isActive", internalType: "bool", type: "bool", indexed: false },
     ],
-    name: "TaskCreated",
+    name: 'TaskCreated',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [],
-    name: "ENTITY_OWNER",
-    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
-    stateMutability: "view",
+    name: 'ENTITY_OWNER',
+    outputs: [{name: '', internalType: 'bytes32', type: 'bytes32'}],
+    stateMutability: 'view',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [],
-    name: "PARTICIPANT",
-    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
-    stateMutability: "view",
+    name: 'PARTICIPANT',
+    outputs: [{name: '', internalType: 'bytes32', type: 'bytes32'}],
+    stateMutability: 'view',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [
-      { name: "taskId", internalType: "string", type: "string" },
-      { name: "participant", internalType: "address", type: "address" },
+      {name: 'taskId', internalType: 'bytes32', type: 'bytes32'},
+      {name: 'participant', internalType: 'address', type: 'address'},
     ],
-    name: "acceptParticipant",
+    name: 'acceptParticipant',
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: 'nonpayable',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [],
-    name: "acl",
+    name: 'acl',
     outputs: [
-      { name: "", internalType: "contract IAccessManagerV2", type: "address" },
+      {name: '', internalType: 'contract IAccessManagerV2', type: 'address'},
     ],
-    stateMutability: "view",
+    stateMutability: 'view',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [],
-    name: "appId",
-    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
-    stateMutability: "view",
+    name: 'appId',
+    outputs: [{name: '', internalType: 'bytes32', type: 'bytes32'}],
+    stateMutability: 'view',
   },
   {
-    type: "function",
-    inputs: [{ name: "taskId", internalType: "string", type: "string" }],
-    name: "completeTask",
+    type: 'function',
+    inputs: [{name: 'taskId', internalType: 'bytes32', type: 'bytes32'}],
+    name: 'completeTask',
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: 'nonpayable',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [
       {
-        name: "task",
-        internalType: "struct IEntityTaskManager.Task",
-        type: "tuple",
+        name: 'task',
+        internalType: 'struct IEntityTaskManager.Task',
+        type: 'tuple',
         components: [
-          { name: "detailsUrl", internalType: "string", type: "string" },
-          { name: "rewardToken", internalType: "address", type: "address" },
-          { name: "rewardAmount", internalType: "uint256", type: "uint256" },
+          {name: 'detailsUrl', internalType: 'string', type: 'string'},
+          {name: 'rewardToken', internalType: 'address', type: 'address'},
+          {name: 'rewardAmount', internalType: 'uint256', type: 'uint256'},
           {
-            name: "allowedWallets",
-            internalType: "address[]",
-            type: "address[]",
+            name: 'allowedWallets',
+            internalType: 'address[]',
+            type: 'address[]',
           },
-          { name: "maxParticipants", internalType: "uint256", type: "uint256" },
-          { name: "expiryDate", internalType: "uint256", type: "uint256" },
-          { name: "owner", internalType: "address", type: "address" },
-          { name: "isActive", internalType: "bool", type: "bool" },
+          {name: 'maxParticipants', internalType: 'uint256', type: 'uint256'},
+          {name: 'expiryDate', internalType: 'uint256', type: 'uint256'},
+          {name: 'owner', internalType: 'address', type: 'address'},
+          {name: 'isActive', internalType: 'bool', type: 'bool'},
         ],
       },
     ],
-    name: "createTask",
+    name: 'createTask',
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: 'nonpayable',
   },
   {
-    type: "function",
+    type: 'function',
+    inputs: [{name: 'detailsUrl', internalType: 'string', type: 'string'}],
+    name: 'findHash',
+    outputs: [{name: '', internalType: 'bytes32', type: 'bytes32'}],
+    stateMutability: 'pure',
+  },
+  {
+    type: 'function',
     inputs: [],
-    name: "name",
-    outputs: [{ name: "", internalType: "string", type: "string" }],
-    stateMutability: "view",
+    name: 'name',
+    outputs: [{name: '', internalType: 'string', type: 'string'}],
+    stateMutability: 'view',
   },
   {
-    type: "function",
-    inputs: [{ name: "taskId", internalType: "string", type: "string" }],
-    name: "participate",
+    type: 'function',
+    inputs: [{name: 'taskId', internalType: 'bytes32', type: 'bytes32'}],
+    name: 'participate',
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: 'nonpayable',
   },
   {
-    type: "function",
+    type: 'function',
+    inputs: [],
+    name: 'ping',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     inputs: [
-      { name: "", internalType: "string", type: "string" },
-      { name: "", internalType: "address", type: "address" },
+      {name: '', internalType: 'bytes32', type: 'bytes32'},
+      {name: '', internalType: 'address', type: 'address'},
     ],
-    name: "taskAssignments",
+    name: 'taskAssignments',
     outputs: [
-      {
-        name: "",
-        internalType: "enum IEntityTaskManager.STATUS",
-        type: "uint8",
-      },
+      {name: '', internalType: 'enum IEntityTaskManager.STATUS', type: 'uint8'},
     ],
-    stateMutability: "view",
+    stateMutability: 'view',
   },
   {
-    type: "function",
-    inputs: [{ name: "", internalType: "string", type: "string" }],
-    name: "tasks",
+    type: 'function',
+    inputs: [{name: '', internalType: 'bytes32', type: 'bytes32'}],
+    name: 'tasks',
     outputs: [
-      { name: "detailsUrl", internalType: "string", type: "string" },
-      { name: "rewardToken", internalType: "address", type: "address" },
-      { name: "rewardAmount", internalType: "uint256", type: "uint256" },
-      { name: "maxParticipants", internalType: "uint256", type: "uint256" },
-      { name: "expiryDate", internalType: "uint256", type: "uint256" },
-      { name: "owner", internalType: "address", type: "address" },
-      { name: "isActive", internalType: "bool", type: "bool" },
+      {name: 'detailsUrl', internalType: 'string', type: 'string'},
+      {name: 'rewardToken', internalType: 'address', type: 'address'},
+      {name: 'rewardAmount', internalType: 'uint256', type: 'uint256'},
+      {name: 'maxParticipants', internalType: 'uint256', type: 'uint256'},
+      {name: 'expiryDate', internalType: 'uint256', type: 'uint256'},
+      {name: 'owner', internalType: 'address', type: 'address'},
+      {name: 'isActive', internalType: 'bool', type: 'bool'},
     ],
-    stateMutability: "view",
+    stateMutability: 'view',
   },
   {
-    type: "function",
-    inputs: [{ name: "taskId", internalType: "string", type: "string" }],
-    name: "verifyCompletion",
+    type: 'function',
+    inputs: [{name: 'taskId', internalType: 'bytes32', type: 'bytes32'}],
+    name: 'verifyCompletion',
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: 'nonpayable',
   },
-] as const;
+] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Reward Token
@@ -418,236 +379,221 @@ export const entityTaskManagerAbi = [
 
 export const rewardTokenAbi = [
   {
-    type: "constructor",
+    type: 'constructor',
     inputs: [
-      { name: "_appId", internalType: "bytes32", type: "bytes32" },
-      { name: "_name", internalType: "string", type: "string" },
-      { name: "_symbol", internalType: "string", type: "string" },
-      { name: "_decimals", internalType: "uint8", type: "uint8" },
-      { name: "_accessManager", internalType: "address", type: "address" },
-      { name: "_forwarder", internalType: "address", type: "address" },
+      {name: '_appId', internalType: 'bytes32', type: 'bytes32'},
+      {name: '_name', internalType: 'string', type: 'string'},
+      {name: '_symbol', internalType: 'string', type: 'string'},
+      {name: '_decimals', internalType: 'uint8', type: 'uint8'},
+      {name: '_accessManager', internalType: 'address', type: 'address'},
+      {name: '_forwarder', internalType: 'address', type: 'address'},
     ],
-    stateMutability: "nonpayable",
+    stateMutability: 'nonpayable',
   },
   {
-    type: "error",
+    type: 'error',
     inputs: [
-      { name: "spender", internalType: "address", type: "address" },
-      { name: "allowance", internalType: "uint256", type: "uint256" },
-      { name: "needed", internalType: "uint256", type: "uint256" },
+      {name: 'spender', internalType: 'address', type: 'address'},
+      {name: 'allowance', internalType: 'uint256', type: 'uint256'},
+      {name: 'needed', internalType: 'uint256', type: 'uint256'},
     ],
-    name: "ERC20InsufficientAllowance",
+    name: 'ERC20InsufficientAllowance',
   },
   {
-    type: "error",
+    type: 'error',
     inputs: [
-      { name: "sender", internalType: "address", type: "address" },
-      { name: "balance", internalType: "uint256", type: "uint256" },
-      { name: "needed", internalType: "uint256", type: "uint256" },
+      {name: 'sender', internalType: 'address', type: 'address'},
+      {name: 'balance', internalType: 'uint256', type: 'uint256'},
+      {name: 'needed', internalType: 'uint256', type: 'uint256'},
     ],
-    name: "ERC20InsufficientBalance",
+    name: 'ERC20InsufficientBalance',
   },
   {
-    type: "error",
-    inputs: [{ name: "approver", internalType: "address", type: "address" }],
-    name: "ERC20InvalidApprover",
+    type: 'error',
+    inputs: [{name: 'approver', internalType: 'address', type: 'address'}],
+    name: 'ERC20InvalidApprover',
   },
   {
-    type: "error",
-    inputs: [{ name: "receiver", internalType: "address", type: "address" }],
-    name: "ERC20InvalidReceiver",
+    type: 'error',
+    inputs: [{name: 'receiver', internalType: 'address', type: 'address'}],
+    name: 'ERC20InvalidReceiver',
   },
   {
-    type: "error",
-    inputs: [{ name: "sender", internalType: "address", type: "address" }],
-    name: "ERC20InvalidSender",
+    type: 'error',
+    inputs: [{name: 'sender', internalType: 'address', type: 'address'}],
+    name: 'ERC20InvalidSender',
   },
   {
-    type: "error",
-    inputs: [{ name: "spender", internalType: "address", type: "address" }],
-    name: "ERC20InvalidSpender",
+    type: 'error',
+    inputs: [{name: 'spender', internalType: 'address', type: 'address'}],
+    name: 'ERC20InvalidSpender',
   },
   {
-    type: "event",
+    type: 'event',
     anonymous: false,
     inputs: [
+      {name: 'owner', internalType: 'address', type: 'address', indexed: true},
       {
-        name: "owner",
-        internalType: "address",
-        type: "address",
+        name: 'spender',
+        internalType: 'address',
+        type: 'address',
         indexed: true,
       },
-      {
-        name: "spender",
-        internalType: "address",
-        type: "address",
-        indexed: true,
-      },
-      {
-        name: "value",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: false,
-      },
+      {name: 'value', internalType: 'uint256', type: 'uint256', indexed: false},
     ],
-    name: "Approval",
+    name: 'Approval',
   },
   {
-    type: "event",
+    type: 'event',
     anonymous: false,
     inputs: [
-      { name: "from", internalType: "address", type: "address", indexed: true },
-      { name: "to", internalType: "address", type: "address", indexed: true },
-      {
-        name: "value",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: false,
-      },
+      {name: 'from', internalType: 'address', type: 'address', indexed: true},
+      {name: 'to', internalType: 'address', type: 'address', indexed: true},
+      {name: 'value', internalType: 'uint256', type: 'uint256', indexed: false},
     ],
-    name: "Transfer",
+    name: 'Transfer',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [],
-    name: "MINTER_ROLE",
-    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
-    stateMutability: "view",
+    name: 'MINTER_ROLE',
+    outputs: [{name: '', internalType: 'bytes32', type: 'bytes32'}],
+    stateMutability: 'view',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [],
-    name: "accessManager",
+    name: 'accessManager',
     outputs: [
-      { name: "", internalType: "contract IAccessManagerV2", type: "address" },
+      {name: '', internalType: 'contract IAccessManagerV2', type: 'address'},
     ],
-    stateMutability: "view",
+    stateMutability: 'view',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [
-      { name: "owner", internalType: "address", type: "address" },
-      { name: "spender", internalType: "address", type: "address" },
+      {name: 'owner', internalType: 'address', type: 'address'},
+      {name: 'spender', internalType: 'address', type: 'address'},
     ],
-    name: "allowance",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    stateMutability: "view",
+    name: 'allowance',
+    outputs: [{name: '', internalType: 'uint256', type: 'uint256'}],
+    stateMutability: 'view',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [],
-    name: "appId",
-    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
-    stateMutability: "view",
+    name: 'appId',
+    outputs: [{name: '', internalType: 'bytes32', type: 'bytes32'}],
+    stateMutability: 'view',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [
-      { name: "spender", internalType: "address", type: "address" },
-      { name: "value", internalType: "uint256", type: "uint256" },
+      {name: 'spender', internalType: 'address', type: 'address'},
+      {name: 'value', internalType: 'uint256', type: 'uint256'},
     ],
-    name: "approve",
-    outputs: [{ name: "", internalType: "bool", type: "bool" }],
-    stateMutability: "nonpayable",
+    name: 'approve',
+    outputs: [{name: '', internalType: 'bool', type: 'bool'}],
+    stateMutability: 'nonpayable',
   },
   {
-    type: "function",
-    inputs: [{ name: "account", internalType: "address", type: "address" }],
-    name: "balanceOf",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    stateMutability: "view",
+    type: 'function',
+    inputs: [{name: 'account', internalType: 'address', type: 'address'}],
+    name: 'balanceOf',
+    outputs: [{name: '', internalType: 'uint256', type: 'uint256'}],
+    stateMutability: 'view',
   },
   {
-    type: "function",
-    inputs: [{ name: "value", internalType: "uint256", type: "uint256" }],
-    name: "burn",
+    type: 'function',
+    inputs: [{name: 'value', internalType: 'uint256', type: 'uint256'}],
+    name: 'burn',
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: 'nonpayable',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [
-      { name: "account", internalType: "address", type: "address" },
-      { name: "value", internalType: "uint256", type: "uint256" },
+      {name: 'account', internalType: 'address', type: 'address'},
+      {name: 'value', internalType: 'uint256', type: 'uint256'},
     ],
-    name: "burnFrom",
+    name: 'burnFrom',
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: 'nonpayable',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [],
-    name: "decimals",
-    outputs: [{ name: "", internalType: "uint8", type: "uint8" }],
-    stateMutability: "view",
+    name: 'decimals',
+    outputs: [{name: '', internalType: 'uint8', type: 'uint8'}],
+    stateMutability: 'view',
   },
   {
-    type: "function",
-    inputs: [{ name: "forwarder", internalType: "address", type: "address" }],
-    name: "isTrustedForwarder",
-    outputs: [{ name: "", internalType: "bool", type: "bool" }],
-    stateMutability: "view",
+    type: 'function',
+    inputs: [{name: 'forwarder', internalType: 'address', type: 'address'}],
+    name: 'isTrustedForwarder',
+    outputs: [{name: '', internalType: 'bool', type: 'bool'}],
+    stateMutability: 'view',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [
-      { name: "_address", internalType: "address", type: "address" },
-      { name: "_amount", internalType: "uint256", type: "uint256" },
+      {name: '_address', internalType: 'address', type: 'address'},
+      {name: '_amount', internalType: 'uint256', type: 'uint256'},
     ],
-    name: "mint",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    stateMutability: "nonpayable",
+    name: 'mint',
+    outputs: [{name: '', internalType: 'uint256', type: 'uint256'}],
+    stateMutability: 'nonpayable',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [],
-    name: "name",
-    outputs: [{ name: "", internalType: "string", type: "string" }],
-    stateMutability: "view",
+    name: 'name',
+    outputs: [{name: '', internalType: 'string', type: 'string'}],
+    stateMutability: 'view',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [],
-    name: "symbol",
-    outputs: [{ name: "", internalType: "string", type: "string" }],
-    stateMutability: "view",
+    name: 'symbol',
+    outputs: [{name: '', internalType: 'string', type: 'string'}],
+    stateMutability: 'view',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [],
-    name: "totalSupply",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    stateMutability: "view",
+    name: 'totalSupply',
+    outputs: [{name: '', internalType: 'uint256', type: 'uint256'}],
+    stateMutability: 'view',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [
-      { name: "to", internalType: "address", type: "address" },
-      { name: "value", internalType: "uint256", type: "uint256" },
+      {name: 'to', internalType: 'address', type: 'address'},
+      {name: 'value', internalType: 'uint256', type: 'uint256'},
     ],
-    name: "transfer",
-    outputs: [{ name: "", internalType: "bool", type: "bool" }],
-    stateMutability: "nonpayable",
+    name: 'transfer',
+    outputs: [{name: '', internalType: 'bool', type: 'bool'}],
+    stateMutability: 'nonpayable',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [
-      { name: "from", internalType: "address", type: "address" },
-      { name: "to", internalType: "address", type: "address" },
-      { name: "value", internalType: "uint256", type: "uint256" },
+      {name: 'from', internalType: 'address', type: 'address'},
+      {name: 'to', internalType: 'address', type: 'address'},
+      {name: 'value', internalType: 'uint256', type: 'uint256'},
     ],
-    name: "transferFrom",
-    outputs: [{ name: "", internalType: "bool", type: "bool" }],
-    stateMutability: "nonpayable",
+    name: 'transferFrom',
+    outputs: [{name: '', internalType: 'bool', type: 'bool'}],
+    stateMutability: 'nonpayable',
   },
   {
-    type: "function",
+    type: 'function',
     inputs: [],
-    name: "trustedForwarder",
-    outputs: [{ name: "", internalType: "address", type: "address" }],
-    stateMutability: "view",
+    name: 'trustedForwarder',
+    outputs: [{name: '', internalType: 'address', type: 'address'}],
+    stateMutability: 'view',
   },
-] as const;
+] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // React
@@ -658,22 +604,22 @@ export const rewardTokenAbi = [
  */
 export const useReadAccessManager = /*#__PURE__*/ createUseReadContract({
   abi: accessManagerAbi,
-});
+})
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link accessManagerAbi}__ and `functionName` set to `"hasRole"`
  */
 export const useReadAccessManagerHasRole = /*#__PURE__*/ createUseReadContract({
   abi: accessManagerAbi,
-  functionName: "hasRole",
-});
+  functionName: 'hasRole',
+})
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link accessManagerAbi}__
  */
 export const useWriteAccessManager = /*#__PURE__*/ createUseWriteContract({
   abi: accessManagerAbi,
-});
+})
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link accessManagerAbi}__ and `functionName` set to `"createApp"`
@@ -681,8 +627,8 @@ export const useWriteAccessManager = /*#__PURE__*/ createUseWriteContract({
 export const useWriteAccessManagerCreateApp =
   /*#__PURE__*/ createUseWriteContract({
     abi: accessManagerAbi,
-    functionName: "createApp",
-  });
+    functionName: 'createApp',
+  })
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link accessManagerAbi}__ and `functionName` set to `"grantRole"`
@@ -690,8 +636,8 @@ export const useWriteAccessManagerCreateApp =
 export const useWriteAccessManagerGrantRole =
   /*#__PURE__*/ createUseWriteContract({
     abi: accessManagerAbi,
-    functionName: "grantRole",
-  });
+    functionName: 'grantRole',
+  })
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link accessManagerAbi}__ and `functionName` set to `"multicall"`
@@ -699,8 +645,8 @@ export const useWriteAccessManagerGrantRole =
 export const useWriteAccessManagerMulticall =
   /*#__PURE__*/ createUseWriteContract({
     abi: accessManagerAbi,
-    functionName: "multicall",
-  });
+    functionName: 'multicall',
+  })
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link accessManagerAbi}__ and `functionName` set to `"revokeRole"`
@@ -708,8 +654,8 @@ export const useWriteAccessManagerMulticall =
 export const useWriteAccessManagerRevokeRole =
   /*#__PURE__*/ createUseWriteContract({
     abi: accessManagerAbi,
-    functionName: "revokeRole",
-  });
+    functionName: 'revokeRole',
+  })
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link accessManagerAbi}__ and `functionName` set to `"transferOwnership"`
@@ -717,15 +663,15 @@ export const useWriteAccessManagerRevokeRole =
 export const useWriteAccessManagerTransferOwnership =
   /*#__PURE__*/ createUseWriteContract({
     abi: accessManagerAbi,
-    functionName: "transferOwnership",
-  });
+    functionName: 'transferOwnership',
+  })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link accessManagerAbi}__
  */
 export const useSimulateAccessManager = /*#__PURE__*/ createUseSimulateContract(
-  { abi: accessManagerAbi },
-);
+  {abi: accessManagerAbi},
+)
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link accessManagerAbi}__ and `functionName` set to `"createApp"`
@@ -733,8 +679,8 @@ export const useSimulateAccessManager = /*#__PURE__*/ createUseSimulateContract(
 export const useSimulateAccessManagerCreateApp =
   /*#__PURE__*/ createUseSimulateContract({
     abi: accessManagerAbi,
-    functionName: "createApp",
-  });
+    functionName: 'createApp',
+  })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link accessManagerAbi}__ and `functionName` set to `"grantRole"`
@@ -742,8 +688,8 @@ export const useSimulateAccessManagerCreateApp =
 export const useSimulateAccessManagerGrantRole =
   /*#__PURE__*/ createUseSimulateContract({
     abi: accessManagerAbi,
-    functionName: "grantRole",
-  });
+    functionName: 'grantRole',
+  })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link accessManagerAbi}__ and `functionName` set to `"multicall"`
@@ -751,8 +697,8 @@ export const useSimulateAccessManagerGrantRole =
 export const useSimulateAccessManagerMulticall =
   /*#__PURE__*/ createUseSimulateContract({
     abi: accessManagerAbi,
-    functionName: "multicall",
-  });
+    functionName: 'multicall',
+  })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link accessManagerAbi}__ and `functionName` set to `"revokeRole"`
@@ -760,8 +706,8 @@ export const useSimulateAccessManagerMulticall =
 export const useSimulateAccessManagerRevokeRole =
   /*#__PURE__*/ createUseSimulateContract({
     abi: accessManagerAbi,
-    functionName: "revokeRole",
-  });
+    functionName: 'revokeRole',
+  })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link accessManagerAbi}__ and `functionName` set to `"transferOwnership"`
@@ -769,14 +715,14 @@ export const useSimulateAccessManagerRevokeRole =
 export const useSimulateAccessManagerTransferOwnership =
   /*#__PURE__*/ createUseSimulateContract({
     abi: accessManagerAbi,
-    functionName: "transferOwnership",
-  });
+    functionName: 'transferOwnership',
+  })
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link accessManagerAbi}__
  */
 export const useWatchAccessManagerEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({ abi: accessManagerAbi });
+  /*#__PURE__*/ createUseWatchContractEvent({abi: accessManagerAbi})
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link accessManagerAbi}__ and `eventName` set to `"AppCreated"`
@@ -784,8 +730,8 @@ export const useWatchAccessManagerEvent =
 export const useWatchAccessManagerAppCreatedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: accessManagerAbi,
-    eventName: "AppCreated",
-  });
+    eventName: 'AppCreated',
+  })
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link accessManagerAbi}__ and `eventName` set to `"OwnershipTransferred"`
@@ -793,8 +739,8 @@ export const useWatchAccessManagerAppCreatedEvent =
 export const useWatchAccessManagerOwnershipTransferredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: accessManagerAbi,
-    eventName: "OwnershipTransferred",
-  });
+    eventName: 'OwnershipTransferred',
+  })
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link accessManagerAbi}__ and `eventName` set to `"RoleGranted"`
@@ -802,8 +748,8 @@ export const useWatchAccessManagerOwnershipTransferredEvent =
 export const useWatchAccessManagerRoleGrantedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: accessManagerAbi,
-    eventName: "RoleGranted",
-  });
+    eventName: 'RoleGranted',
+  })
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link accessManagerAbi}__ and `eventName` set to `"RoleRevoked"`
@@ -811,15 +757,15 @@ export const useWatchAccessManagerRoleGrantedEvent =
 export const useWatchAccessManagerRoleRevokedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: accessManagerAbi,
-    eventName: "RoleRevoked",
-  });
+    eventName: 'RoleRevoked',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link entityTaskManagerAbi}__
  */
 export const useReadEntityTaskManager = /*#__PURE__*/ createUseReadContract({
   abi: entityTaskManagerAbi,
-});
+})
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"ENTITY_OWNER"`
@@ -827,8 +773,8 @@ export const useReadEntityTaskManager = /*#__PURE__*/ createUseReadContract({
 export const useReadEntityTaskManagerEntityOwner =
   /*#__PURE__*/ createUseReadContract({
     abi: entityTaskManagerAbi,
-    functionName: "ENTITY_OWNER",
-  });
+    functionName: 'ENTITY_OWNER',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"PARTICIPANT"`
@@ -836,16 +782,16 @@ export const useReadEntityTaskManagerEntityOwner =
 export const useReadEntityTaskManagerParticipant =
   /*#__PURE__*/ createUseReadContract({
     abi: entityTaskManagerAbi,
-    functionName: "PARTICIPANT",
-  });
+    functionName: 'PARTICIPANT',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"acl"`
  */
 export const useReadEntityTaskManagerAcl = /*#__PURE__*/ createUseReadContract({
   abi: entityTaskManagerAbi,
-  functionName: "acl",
-});
+  functionName: 'acl',
+})
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"appId"`
@@ -853,15 +799,24 @@ export const useReadEntityTaskManagerAcl = /*#__PURE__*/ createUseReadContract({
 export const useReadEntityTaskManagerAppId =
   /*#__PURE__*/ createUseReadContract({
     abi: entityTaskManagerAbi,
-    functionName: "appId",
-  });
+    functionName: 'appId',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"findHash"`
+ */
+export const useReadEntityTaskManagerFindHash =
+  /*#__PURE__*/ createUseReadContract({
+    abi: entityTaskManagerAbi,
+    functionName: 'findHash',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"name"`
  */
 export const useReadEntityTaskManagerName = /*#__PURE__*/ createUseReadContract(
-  { abi: entityTaskManagerAbi, functionName: "name" },
-);
+  {abi: entityTaskManagerAbi, functionName: 'name'},
+)
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"taskAssignments"`
@@ -869,8 +824,8 @@ export const useReadEntityTaskManagerName = /*#__PURE__*/ createUseReadContract(
 export const useReadEntityTaskManagerTaskAssignments =
   /*#__PURE__*/ createUseReadContract({
     abi: entityTaskManagerAbi,
-    functionName: "taskAssignments",
-  });
+    functionName: 'taskAssignments',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"tasks"`
@@ -878,15 +833,15 @@ export const useReadEntityTaskManagerTaskAssignments =
 export const useReadEntityTaskManagerTasks =
   /*#__PURE__*/ createUseReadContract({
     abi: entityTaskManagerAbi,
-    functionName: "tasks",
-  });
+    functionName: 'tasks',
+  })
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entityTaskManagerAbi}__
  */
 export const useWriteEntityTaskManager = /*#__PURE__*/ createUseWriteContract({
   abi: entityTaskManagerAbi,
-});
+})
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"acceptParticipant"`
@@ -894,8 +849,8 @@ export const useWriteEntityTaskManager = /*#__PURE__*/ createUseWriteContract({
 export const useWriteEntityTaskManagerAcceptParticipant =
   /*#__PURE__*/ createUseWriteContract({
     abi: entityTaskManagerAbi,
-    functionName: "acceptParticipant",
-  });
+    functionName: 'acceptParticipant',
+  })
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"completeTask"`
@@ -903,8 +858,8 @@ export const useWriteEntityTaskManagerAcceptParticipant =
 export const useWriteEntityTaskManagerCompleteTask =
   /*#__PURE__*/ createUseWriteContract({
     abi: entityTaskManagerAbi,
-    functionName: "completeTask",
-  });
+    functionName: 'completeTask',
+  })
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"createTask"`
@@ -912,8 +867,8 @@ export const useWriteEntityTaskManagerCompleteTask =
 export const useWriteEntityTaskManagerCreateTask =
   /*#__PURE__*/ createUseWriteContract({
     abi: entityTaskManagerAbi,
-    functionName: "createTask",
-  });
+    functionName: 'createTask',
+  })
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"participate"`
@@ -921,8 +876,17 @@ export const useWriteEntityTaskManagerCreateTask =
 export const useWriteEntityTaskManagerParticipate =
   /*#__PURE__*/ createUseWriteContract({
     abi: entityTaskManagerAbi,
-    functionName: "participate",
-  });
+    functionName: 'participate',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"ping"`
+ */
+export const useWriteEntityTaskManagerPing =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: entityTaskManagerAbi,
+    functionName: 'ping',
+  })
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"verifyCompletion"`
@@ -930,14 +894,14 @@ export const useWriteEntityTaskManagerParticipate =
 export const useWriteEntityTaskManagerVerifyCompletion =
   /*#__PURE__*/ createUseWriteContract({
     abi: entityTaskManagerAbi,
-    functionName: "verifyCompletion",
-  });
+    functionName: 'verifyCompletion',
+  })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entityTaskManagerAbi}__
  */
 export const useSimulateEntityTaskManager =
-  /*#__PURE__*/ createUseSimulateContract({ abi: entityTaskManagerAbi });
+  /*#__PURE__*/ createUseSimulateContract({abi: entityTaskManagerAbi})
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"acceptParticipant"`
@@ -945,8 +909,8 @@ export const useSimulateEntityTaskManager =
 export const useSimulateEntityTaskManagerAcceptParticipant =
   /*#__PURE__*/ createUseSimulateContract({
     abi: entityTaskManagerAbi,
-    functionName: "acceptParticipant",
-  });
+    functionName: 'acceptParticipant',
+  })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"completeTask"`
@@ -954,8 +918,8 @@ export const useSimulateEntityTaskManagerAcceptParticipant =
 export const useSimulateEntityTaskManagerCompleteTask =
   /*#__PURE__*/ createUseSimulateContract({
     abi: entityTaskManagerAbi,
-    functionName: "completeTask",
-  });
+    functionName: 'completeTask',
+  })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"createTask"`
@@ -963,8 +927,8 @@ export const useSimulateEntityTaskManagerCompleteTask =
 export const useSimulateEntityTaskManagerCreateTask =
   /*#__PURE__*/ createUseSimulateContract({
     abi: entityTaskManagerAbi,
-    functionName: "createTask",
-  });
+    functionName: 'createTask',
+  })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"participate"`
@@ -972,8 +936,17 @@ export const useSimulateEntityTaskManagerCreateTask =
 export const useSimulateEntityTaskManagerParticipate =
   /*#__PURE__*/ createUseSimulateContract({
     abi: entityTaskManagerAbi,
-    functionName: "participate",
-  });
+    functionName: 'participate',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"ping"`
+ */
+export const useSimulateEntityTaskManagerPing =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: entityTaskManagerAbi,
+    functionName: 'ping',
+  })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"verifyCompletion"`
@@ -981,14 +954,23 @@ export const useSimulateEntityTaskManagerParticipate =
 export const useSimulateEntityTaskManagerVerifyCompletion =
   /*#__PURE__*/ createUseSimulateContract({
     abi: entityTaskManagerAbi,
-    functionName: "verifyCompletion",
-  });
+    functionName: 'verifyCompletion',
+  })
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entityTaskManagerAbi}__
  */
 export const useWatchEntityTaskManagerEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({ abi: entityTaskManagerAbi });
+  /*#__PURE__*/ createUseWatchContractEvent({abi: entityTaskManagerAbi})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `eventName` set to `"PINGED"`
+ */
+export const useWatchEntityTaskManagerPingedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: entityTaskManagerAbi,
+    eventName: 'PINGED',
+  })
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `eventName` set to `"ParticiantApplied"`
@@ -996,8 +978,8 @@ export const useWatchEntityTaskManagerEvent =
 export const useWatchEntityTaskManagerParticiantAppliedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: entityTaskManagerAbi,
-    eventName: "ParticiantApplied",
-  });
+    eventName: 'ParticiantApplied',
+  })
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `eventName` set to `"TaskAccepted"`
@@ -1005,8 +987,8 @@ export const useWatchEntityTaskManagerParticiantAppliedEvent =
 export const useWatchEntityTaskManagerTaskAcceptedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: entityTaskManagerAbi,
-    eventName: "TaskAccepted",
-  });
+    eventName: 'TaskAccepted',
+  })
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `eventName` set to `"TaskApproved"`
@@ -1014,8 +996,8 @@ export const useWatchEntityTaskManagerTaskAcceptedEvent =
 export const useWatchEntityTaskManagerTaskApprovedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: entityTaskManagerAbi,
-    eventName: "TaskApproved",
-  });
+    eventName: 'TaskApproved',
+  })
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `eventName` set to `"TaskCompleted"`
@@ -1023,8 +1005,8 @@ export const useWatchEntityTaskManagerTaskApprovedEvent =
 export const useWatchEntityTaskManagerTaskCompletedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: entityTaskManagerAbi,
-    eventName: "TaskCompleted",
-  });
+    eventName: 'TaskCompleted',
+  })
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `eventName` set to `"TaskCreated"`
@@ -1032,22 +1014,22 @@ export const useWatchEntityTaskManagerTaskCompletedEvent =
 export const useWatchEntityTaskManagerTaskCreatedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: entityTaskManagerAbi,
-    eventName: "TaskCreated",
-  });
+    eventName: 'TaskCreated',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardTokenAbi}__
  */
 export const useReadRewardToken = /*#__PURE__*/ createUseReadContract({
   abi: rewardTokenAbi,
-});
+})
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"MINTER_ROLE"`
  */
 export const useReadRewardTokenMinterRole = /*#__PURE__*/ createUseReadContract(
-  { abi: rewardTokenAbi, functionName: "MINTER_ROLE" },
-);
+  {abi: rewardTokenAbi, functionName: 'MINTER_ROLE'},
+)
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"accessManager"`
@@ -1055,40 +1037,40 @@ export const useReadRewardTokenMinterRole = /*#__PURE__*/ createUseReadContract(
 export const useReadRewardTokenAccessManager =
   /*#__PURE__*/ createUseReadContract({
     abi: rewardTokenAbi,
-    functionName: "accessManager",
-  });
+    functionName: 'accessManager',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"allowance"`
  */
 export const useReadRewardTokenAllowance = /*#__PURE__*/ createUseReadContract({
   abi: rewardTokenAbi,
-  functionName: "allowance",
-});
+  functionName: 'allowance',
+})
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"appId"`
  */
 export const useReadRewardTokenAppId = /*#__PURE__*/ createUseReadContract({
   abi: rewardTokenAbi,
-  functionName: "appId",
-});
+  functionName: 'appId',
+})
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"balanceOf"`
  */
 export const useReadRewardTokenBalanceOf = /*#__PURE__*/ createUseReadContract({
   abi: rewardTokenAbi,
-  functionName: "balanceOf",
-});
+  functionName: 'balanceOf',
+})
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"decimals"`
  */
 export const useReadRewardTokenDecimals = /*#__PURE__*/ createUseReadContract({
   abi: rewardTokenAbi,
-  functionName: "decimals",
-});
+  functionName: 'decimals',
+})
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"isTrustedForwarder"`
@@ -1096,24 +1078,24 @@ export const useReadRewardTokenDecimals = /*#__PURE__*/ createUseReadContract({
 export const useReadRewardTokenIsTrustedForwarder =
   /*#__PURE__*/ createUseReadContract({
     abi: rewardTokenAbi,
-    functionName: "isTrustedForwarder",
-  });
+    functionName: 'isTrustedForwarder',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"name"`
  */
 export const useReadRewardTokenName = /*#__PURE__*/ createUseReadContract({
   abi: rewardTokenAbi,
-  functionName: "name",
-});
+  functionName: 'name',
+})
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"symbol"`
  */
 export const useReadRewardTokenSymbol = /*#__PURE__*/ createUseReadContract({
   abi: rewardTokenAbi,
-  functionName: "symbol",
-});
+  functionName: 'symbol',
+})
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"totalSupply"`
@@ -1121,8 +1103,8 @@ export const useReadRewardTokenSymbol = /*#__PURE__*/ createUseReadContract({
 export const useReadRewardTokenTotalSupply =
   /*#__PURE__*/ createUseReadContract({
     abi: rewardTokenAbi,
-    functionName: "totalSupply",
-  });
+    functionName: 'totalSupply',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"trustedForwarder"`
@@ -1130,53 +1112,53 @@ export const useReadRewardTokenTotalSupply =
 export const useReadRewardTokenTrustedForwarder =
   /*#__PURE__*/ createUseReadContract({
     abi: rewardTokenAbi,
-    functionName: "trustedForwarder",
-  });
+    functionName: 'trustedForwarder',
+  })
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardTokenAbi}__
  */
 export const useWriteRewardToken = /*#__PURE__*/ createUseWriteContract({
   abi: rewardTokenAbi,
-});
+})
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"approve"`
  */
 export const useWriteRewardTokenApprove = /*#__PURE__*/ createUseWriteContract({
   abi: rewardTokenAbi,
-  functionName: "approve",
-});
+  functionName: 'approve',
+})
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"burn"`
  */
 export const useWriteRewardTokenBurn = /*#__PURE__*/ createUseWriteContract({
   abi: rewardTokenAbi,
-  functionName: "burn",
-});
+  functionName: 'burn',
+})
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"burnFrom"`
  */
 export const useWriteRewardTokenBurnFrom = /*#__PURE__*/ createUseWriteContract(
-  { abi: rewardTokenAbi, functionName: "burnFrom" },
-);
+  {abi: rewardTokenAbi, functionName: 'burnFrom'},
+)
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"mint"`
  */
 export const useWriteRewardTokenMint = /*#__PURE__*/ createUseWriteContract({
   abi: rewardTokenAbi,
-  functionName: "mint",
-});
+  functionName: 'mint',
+})
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"transfer"`
  */
 export const useWriteRewardTokenTransfer = /*#__PURE__*/ createUseWriteContract(
-  { abi: rewardTokenAbi, functionName: "transfer" },
-);
+  {abi: rewardTokenAbi, functionName: 'transfer'},
+)
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"transferFrom"`
@@ -1184,15 +1166,15 @@ export const useWriteRewardTokenTransfer = /*#__PURE__*/ createUseWriteContract(
 export const useWriteRewardTokenTransferFrom =
   /*#__PURE__*/ createUseWriteContract({
     abi: rewardTokenAbi,
-    functionName: "transferFrom",
-  });
+    functionName: 'transferFrom',
+  })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardTokenAbi}__
  */
 export const useSimulateRewardToken = /*#__PURE__*/ createUseSimulateContract({
   abi: rewardTokenAbi,
-});
+})
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"approve"`
@@ -1200,8 +1182,8 @@ export const useSimulateRewardToken = /*#__PURE__*/ createUseSimulateContract({
 export const useSimulateRewardTokenApprove =
   /*#__PURE__*/ createUseSimulateContract({
     abi: rewardTokenAbi,
-    functionName: "approve",
-  });
+    functionName: 'approve',
+  })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"burn"`
@@ -1209,8 +1191,8 @@ export const useSimulateRewardTokenApprove =
 export const useSimulateRewardTokenBurn =
   /*#__PURE__*/ createUseSimulateContract({
     abi: rewardTokenAbi,
-    functionName: "burn",
-  });
+    functionName: 'burn',
+  })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"burnFrom"`
@@ -1218,8 +1200,8 @@ export const useSimulateRewardTokenBurn =
 export const useSimulateRewardTokenBurnFrom =
   /*#__PURE__*/ createUseSimulateContract({
     abi: rewardTokenAbi,
-    functionName: "burnFrom",
-  });
+    functionName: 'burnFrom',
+  })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"mint"`
@@ -1227,8 +1209,8 @@ export const useSimulateRewardTokenBurnFrom =
 export const useSimulateRewardTokenMint =
   /*#__PURE__*/ createUseSimulateContract({
     abi: rewardTokenAbi,
-    functionName: "mint",
-  });
+    functionName: 'mint',
+  })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"transfer"`
@@ -1236,8 +1218,8 @@ export const useSimulateRewardTokenMint =
 export const useSimulateRewardTokenTransfer =
   /*#__PURE__*/ createUseSimulateContract({
     abi: rewardTokenAbi,
-    functionName: "transfer",
-  });
+    functionName: 'transfer',
+  })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardTokenAbi}__ and `functionName` set to `"transferFrom"`
@@ -1245,14 +1227,14 @@ export const useSimulateRewardTokenTransfer =
 export const useSimulateRewardTokenTransferFrom =
   /*#__PURE__*/ createUseSimulateContract({
     abi: rewardTokenAbi,
-    functionName: "transferFrom",
-  });
+    functionName: 'transferFrom',
+  })
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardTokenAbi}__
  */
 export const useWatchRewardTokenEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({ abi: rewardTokenAbi });
+  /*#__PURE__*/ createUseWatchContractEvent({abi: rewardTokenAbi})
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardTokenAbi}__ and `eventName` set to `"Approval"`
@@ -1260,8 +1242,8 @@ export const useWatchRewardTokenEvent =
 export const useWatchRewardTokenApprovalEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: rewardTokenAbi,
-    eventName: "Approval",
-  });
+    eventName: 'Approval',
+  })
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardTokenAbi}__ and `eventName` set to `"Transfer"`
@@ -1269,5 +1251,5 @@ export const useWatchRewardTokenApprovalEvent =
 export const useWatchRewardTokenTransferEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: rewardTokenAbi,
-    eventName: "Transfer",
-  });
+    eventName: 'Transfer',
+  })

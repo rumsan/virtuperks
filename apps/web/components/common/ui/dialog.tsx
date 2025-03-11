@@ -1,4 +1,4 @@
-import { EntityTaskManagementABI } from "@workspace/contracts/abis";
+import { useWriteEntityTaskManagerParticipate } from "@/hooks/wagmi/contracts";
 import { Button } from "@workspace/ui/components/button";
 import {
   Dialog,
@@ -10,7 +10,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
-import { useWriteContract } from "wagmi";
 
 interface DialogButtonProps {
   isOpen: boolean;
@@ -29,22 +28,13 @@ export function DialogButton({
   buttonName,
   taskData,
 }: DialogButtonProps) {
-  const { writeContractAsync, error } = useWriteContract();
+  const { writeContractAsync } = useWriteEntityTaskManagerParticipate();
 
   const handleApplyTask = async () => {
-    try {
-      const result = await writeContractAsync({
-        address: taskData?.entityTaskManager?.id,
-        abi: EntityTaskManagementABI,
-        functionName: "participate",
-        args: [taskData?.id],
-      });
-      console.log(error, "error");
-      console.log(result, "result");
-      console.log(error, "error");
-    } catch (error) {
-      console.error("Transaction failed:", error);
-    }
+    const result = await writeContractAsync({
+      address: (taskData?.entityTaskManager?.id as `0x${string}`) || "0x",
+      args: [taskData?.id],
+    });
   };
 
   return (
