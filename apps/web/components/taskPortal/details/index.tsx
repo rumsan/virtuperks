@@ -2,6 +2,7 @@ import { CustomAlertDialog } from "@/components/common/ui/alert.dialog";
 import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
 import { useTaskList } from "@/hooks/subgraph/querycall";
+import { useWriteEntityTaskManagerParticipate } from "@/hooks/wagmi/contracts";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -26,12 +27,21 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
   const taskData = TaskList?.find((task) => task?.id === cuid?.id);
 
+  const { writeContractAsync } = useWriteEntityTaskManagerParticipate();
+
   const handleApplyTask = () => {
     if (isConnected) {
       setIsOpen(true);
     } else {
       setAlertDialog(true);
     }
+  };
+
+  const handleApplyTaskLogic = async () => {
+    const result = await writeContractAsync({
+      address: (taskData?.entityTaskManager?.id as `0x${string}`) || "0x",
+      args: [taskData?.id],
+    });
   };
 
   return (
@@ -71,12 +81,12 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             title="Are you sure you want to apply for this task?"
             subTitle="There are 5 more slots remaining in this task"
             buttonName="Apply"
-            taskData={taskData}
+            handleApplyTaskLogic={handleApplyTaskLogic}
           />
         )}
 
         <div className="flex w-full gap-4">
-          <TaskPortalDetails cuid={cuid} />
+          <TaskPortalDetails taskData={taskData} />
         </div>
 
         <div className="flex w-full gap-4">
