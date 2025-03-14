@@ -1,4 +1,4 @@
-import MainLayout from "@/components/layout/main.layout";
+import EntityOwnerNav from "@/components/layout/nav/entity_owner.nav";
 import Validation from "@/providers/validation";
 import { PropsWithChildren } from "react";
 
@@ -6,7 +6,7 @@ const layout = ({ children }: PropsWithChildren) => {
   return (
     <div>
       <Validation role={process.env.NEXT_PUBLIC_ENTITY_OWNER_ROLE || ""}>
-        <MainLayout>{children}</MainLayout>
+        <EntityOwnerNav>{children}</EntityOwnerNav>
       </Validation>
     </div>
   );

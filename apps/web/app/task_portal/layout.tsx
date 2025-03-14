@@ -1,10 +1,10 @@
-import MainLayout from "@/components/layout/main.layout";
+import TaskPortalNav from "@/components/layout/nav/task_portal.nav";
 import { PropsWithChildren } from "react";
 
 const layout = ({ children }: PropsWithChildren) => {
   return (
     <div>
-      <MainLayout>{children}</MainLayout>
+      <TaskPortalNav>{children}</TaskPortalNav>
     </div>
   );
 };

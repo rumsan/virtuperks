@@ -7,7 +7,6 @@ import {
 } from "@workspace/ui/components/avatar";
 import { ConnectKitButton } from "connectkit";
 import {
-  Briefcase,
   Coins,
   Layers,
   LayoutDashboard,
@@ -16,9 +15,9 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { PropsWithChildren, useState } from "react";
 
-export default function DesktopNav() {
+export default function EntityOwnerNav({ children }: PropsWithChildren) {
   const [activeNavBar, setActiveNavBar] = useState("dashboard");
 
   const handleNavClick = (nav: string) => {
@@ -33,7 +32,7 @@ export default function DesktopNav() {
 
   return (
     <header className="border-b bg-white">
-      <div className="flex h-14 items-center px-4 gap-8">
+      <div className="flex h-14 items-center px-4 gap-8 border-b-2 border-[#E2E8F0]">
         <nav className="flex items-center justify-center w-[50px] h-full">
           <Link href="/" className="flex items-center gap-2">
             <Image
@@ -44,11 +43,10 @@ export default function DesktopNav() {
             />
           </Link>
         </nav>
-
         <nav className="flex items-center gap-6 h-full">
           <Link
-            href="/"
-            onClick={() => handleNavClick("dashboard")}
+            href="/participants"
+            onClick={() => handleNavClick("participants")}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("dashboard")}`}
           >
             <LayoutDashboard
@@ -56,11 +54,23 @@ export default function DesktopNav() {
               strokeWidth={2.65}
               color={`${activeNavBar === "dashboard" ? "#297AD6" : "#334155"}`}
             />
-            Dashboard
+            Participants
           </Link>
           <Link
             href="/departments"
             onClick={() => handleNavClick("departments")}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("treasurer")}`}
+          >
+            <Coins
+              size={18}
+              strokeWidth={2.65}
+              color={`${activeNavBar === "treasurer" ? "#297AD6" : "#334155"}`}
+            />
+            Departments
+          </Link>
+          <Link
+            href="/tasks"
+            onClick={() => handleNavClick("tasks")}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("departments")}`}
           >
             <Layers
@@ -68,29 +78,17 @@ export default function DesktopNav() {
               strokeWidth={2.65}
               color={`${activeNavBar === "departments" ? "#297AD6" : "#334155"}`}
             />
-            Department
-          </Link>
-          <Link
-            href="/tasks"
-            onClick={() => handleNavClick("tasks")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("tasks")}`}
-          >
-            <Briefcase
-              size={18}
-              strokeWidth={2.65}
-              color={`${activeNavBar === "tasks" ? "#297AD6" : "#334155"}`}
-            />
             Task Management
           </Link>
           <Link
-            href="/treasurer"
-            onClick={() => handleNavClick("treasurer")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("treasurer")}`}
+            href="/history"
+            onClick={() => handleNavClick("history")}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("departments")}`}
           >
-            <Coins
+            <Layers
               size={18}
               strokeWidth={2.65}
-              color={`${activeNavBar === "treasurer" ? "#297AD6" : "#334155"}`}
+              color={`${activeNavBar === "departments" ? "#297AD6" : "#334155"}`}
             />
             History
           </Link>
@@ -120,7 +118,10 @@ export default function DesktopNav() {
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         </div>
+
+        {/* )} */}
       </div>
+      <div className="h-[calc(100dvh-60px)] overflow-auto">{children}</div>
     </header>
   );
 }

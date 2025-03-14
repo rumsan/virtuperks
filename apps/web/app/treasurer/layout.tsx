@@ -1,10 +1,10 @@
-import MainLayout from "@/components/layout/main.layout";
+import TreasurerNav from "@/components/layout/nav/treasurer.nav";
 import { PropsWithChildren } from "react";
 
 const layout = ({ children }: PropsWithChildren) => {
   return (
     <div>
-      <MainLayout>{children}</MainLayout>
+      <TreasurerNav>{children}</TreasurerNav>
     </div>
   );
 };
