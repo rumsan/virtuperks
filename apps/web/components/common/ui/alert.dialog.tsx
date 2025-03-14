@@ -12,12 +12,18 @@ import { Wallet } from "lucide-react";
 
 interface CustomAlertDialogProps {
   alertDialog: boolean;
-  setAlertDialog: any;
+  setAlertDialog: (open: boolean) => void;
+  textData?: string;
+  buttonName?: string;
+  onClose: (shouldClose: boolean) => void;
 }
 
 export function CustomAlertDialog({
   alertDialog,
   setAlertDialog,
+  textData,
+  buttonName,
+  onClose,
 }: CustomAlertDialogProps) {
   return (
     <AlertDialog open={alertDialog} onOpenChange={setAlertDialog}>
@@ -26,19 +32,19 @@ export function CustomAlertDialog({
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center justify-center text-[#0F172A] text-base font-normal gap-2">
             <Wallet size={20} strokeWidth={2.5} />
-            <span>Connect your wallet address first!</span>
+            <span>{textData ?? "Connect your wallet address first!"}</span>
           </AlertDialogTitle>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel
             onClick={() => {
-              setAlertDialog(false);
+              onClose(false);
             }}
           >
             Cancel
           </AlertDialogCancel>
 
-          <ConnectKitButton
+          {/* <ConnectKitButton
             customTheme={{
               "--ck-accent-color": "#00D54B",
               "--ck-accent-text-color": "#ffffff",
@@ -46,7 +52,29 @@ export function CustomAlertDialog({
             }}
             showAvatar={false}
             theme="auto"
-          />
+          /> */}
+          {buttonName ? (
+            <AlertDialogCancel
+              onClick={() => {
+                onClose(true);
+              }}
+            >
+              {buttonName}
+            </AlertDialogCancel>
+          ) : (
+            <ConnectKitButton
+              customTheme={{
+                "--ck-accent-color": "#00D54B",
+                "--ck-accent-text-color": "#ffffff",
+                "--ck-overlay-background": "rgba(255, 0, 0, 0.5)",
+              }}
+              showAvatar={false}
+              theme="auto"
+              onClose={() => {
+                onClose(true);
+              }}
+            />
+          )}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

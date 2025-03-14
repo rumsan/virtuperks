@@ -59,6 +59,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
           <CustomAlertDialog
             alertDialog={alertDialog}
             setAlertDialog={setAlertDialog}
+            textData="Connect your wallet first"
           />
         ) : (
           <DialogButton

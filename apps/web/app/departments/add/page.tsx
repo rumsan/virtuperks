@@ -6,7 +6,11 @@ import { useRouter } from "next/navigation";
 
 function Page() {
   const router = useRouter();
-  return <DepartmentAdd router={router} />;
+  return (
+    <div>
+      <DepartmentAdd router={router} />
+    </div>
+  );
 }
 
 export default dynamic(() => Promise.resolve(Page), {

@@ -7,7 +7,11 @@ import { useParams, useRouter } from "next/navigation";
 function Page() {
   const id = useParams() as { id: string };
   const router = useRouter();
-  return <DepartmentDetails cuid={id} router={router} />;
+  return (
+    <div>
+      <DepartmentDetails cuid={id} router={router} />;
+    </div>
+  );
 }
 
 export default dynamic(() => Promise.resolve(Page), {

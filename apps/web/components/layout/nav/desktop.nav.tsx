@@ -1,6 +1,5 @@
 "use client";
 
-import { userList } from "@/sampleData";
 import {
   Avatar,
   AvatarFallback,
@@ -18,23 +17,9 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { useAccount } from "wagmi";
 
 export default function DesktopNav() {
   const [activeNavBar, setActiveNavBar] = useState("dashboard");
-
-  const { address } = useAccount();
-  console.log(address, "address");
-
-  const findRole = userList.find((user) => {
-    return user.address === address;
-  });
-  console.log(findRole, "findRole");
-
-  // const hello = new SubgraphService("");
-
-  // const a = hello.getRoleGrantedList();
-  // console.log(a, "a");
 
   const handleNavClick = (nav: string) => {
     setActiveNavBar(nav);
