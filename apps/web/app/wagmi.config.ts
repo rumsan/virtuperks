@@ -40,7 +40,7 @@ export const config = createConfig(
       // arbitrumGoerli,
       // polygon,
       //localChain,
-      baseSepolia,
+     baseSepolia,
       // arbitrumSepolia,
       // rahatChain,
     ],

@@ -45,13 +45,13 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
     
   
  const  createEntity =  await  writeContractAsync({
-      address: process.env.NEXT_PUBLIC_FACTORY_ADDRESS_LOCAL as `0x${string}` || '0x ',
+      address: process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}` || '0x ',
       abi: EntityFactoryABI,
       functionName: "createEntityTaskManager",
-      args: [process.env.NEXT_PUBLIC_ACCESSMANAGER_LOCAL , appId, data.name],
+      args: [process.env.NEXT_PUBLIC_ACCESSMANAGER , appId, data.name],
  })
-  console.log(createEntity,'createEntity')
-   // router.push(PATHS.DEPARTMENT.HOME)
+  
+   router.push(PATHS.DEPARTMENT.HOME)
 
   };
 

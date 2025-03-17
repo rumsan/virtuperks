@@ -61,6 +61,7 @@ export const TaskCreatedList = `
       transactionHash
     
     taskDetail {
+    allowedWallets
     detailsUrl
     expiryDate
     id
@@ -85,9 +86,22 @@ export const ParticiantAppliedList = `
       id
       TaskManagement_id
       participant
+      status
       blockNumber
       blockTimestamp
       transactionHash
+    
+    taskDetail {
+    allowedWallets
+    detailsUrl
+    expiryDate
+    id
+    isActive
+    maxParticipants
+    owner
+    rewardAmount
+    rewardToken
+    }
     }
   }
 `;
@@ -106,3 +120,73 @@ export const EntityTaskManagerCreatedList = `
     }
   }
 `;
+
+export const TaskCompletedList = `
+  query TaskCompletedList {
+    taskCompleteds(first: 10, orderBy: blockTimestamp) {
+      id
+      taskId
+      participant
+      blockNumber
+      blockTimestamp
+      transactionHash
+      status
+      taskDetail {
+      allowedWallets
+        detailsUrl
+        id
+        isActive
+        maxParticipants
+        owner
+        rewardAmount
+      }
+    }
+  }
+`;
+
+export const TaskAcceptedList = `
+  query TaskAcceptedList {
+    taskAccepteds(first: 10, orderBy: blockTimestamp) {
+      id
+      taskId
+      blockNumber
+      blockTimestamp
+      transactionHash
+      status
+      taskDetail {
+      allowedWallets
+        detailsUrl
+        id
+        isActive
+        maxParticipants
+        owner
+        maxParticipants
+      }
+    }
+  }
+`;
+
+export const TaskApprovedList = `
+  query TaskApprovedList {
+    taskApproveds(first: 10, orderBy: blockTimestamp) {
+      id
+      taskId
+      approver
+      blockNumber
+      blockTimestamp
+      transactionHash
+      status
+      taskDetail {
+       allowedWallets
+        detailsUrl
+        id
+        isActive
+        maxParticipants
+        owner
+        rewardAmount
+        rewardToken
+      }
+    }
+  }
+`;
+

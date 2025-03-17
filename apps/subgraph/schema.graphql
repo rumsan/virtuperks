@@ -90,17 +90,21 @@ type TaskAccepted @entity(immutable: true) {
   id: Bytes!
   internal_id: Bytes! # bytes32
   blockNumber: BigInt!
+  status: String # string
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  taskDetail: TaskDetail
 }
 
 type TaskApproved @entity(immutable: true) {
   id: Bytes!
   internal_id: Bytes! # bytes32
   approver: Bytes! # address
+  status: String # string
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  taskDetail: TaskDetail
 }
 
 type TaskCompleted @entity(immutable: true) {
@@ -108,8 +112,10 @@ type TaskCompleted @entity(immutable: true) {
   internal_id: Bytes! # bytes32
   participant: Bytes! # address
   blockNumber: BigInt!
+  status: String # string
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  taskDetail: TaskDetail
 }
 
 type TaskCreated @entity(immutable: true) {

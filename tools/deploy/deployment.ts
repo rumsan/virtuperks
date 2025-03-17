@@ -44,19 +44,19 @@ class SeedProject extends commonLib {
     console.log('acessManager deployed', accessManagerV2.contract.target);
   
     //create a app
-  await this.createApp(accessManagerV2.contract.target as string, appId, '0x95023d0a88FB04630B3c8BEA560C3980CCA7806C');
+  await this.createApp(accessManagerV2.contract.target as string, appId, '0x127359CD56487f76307b186651ddbf684B9c2dFE');
       // Assign roles after deploying AccessManagerV2
   await this.assignRole(
     accessManagerV2.contract.target as string,
     appId,
     'MINTER',
-    '0x95023d0a88FB04630B3c8BEA560C3980CCA7806C', // Replace with the actual admin address
+    '0x127359CD56487f76307b186651ddbf684B9c2dFE', // Replace with the actual admin address
   );
   await this.assignRole(
     accessManagerV2.contract.target as string,
     appId,
     'ENTITY_OWNER',
-    '0x95023d0a88FB04630B3c8BEA560C3980CCA7806C', // Replace with the actual user address
+    '0x127359CD56487f76307b186651ddbf684B9c2dFE', // Replace with the actual user address
   );
   
 

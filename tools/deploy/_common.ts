@@ -12,7 +12,7 @@ export class commonLib {
   provider: ethers.JsonRpcProvider;
 
   constructor() {
-    this.provider = new ethers.JsonRpcProvider(process.env.NETWORK_PROVIDER_LOCAL);
+    this.provider = new ethers.JsonRpcProvider(process.env.NETWORK_PROVIDER);
   }
   static getUUID() {
     return uuidV4(randomBytes(16));
@@ -22,7 +22,7 @@ export class commonLib {
   }
   public getDeployerWallet() {
     return new ethers.Wallet(
-      process.env.DEPLOYER_PRIVATE_KEY_LOCAL as string,
+      process.env.DEPLOYER_PRIVATE_KEY as string,
       this.provider,
     );
   }
