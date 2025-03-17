@@ -12,10 +12,11 @@ import {
 
 interface DialogButtonProps {
   isOpen: boolean;
-  setIsOpen: any;
+  setIsOpen: (isOpen: boolean) => void;
   title: string;
   subTitle: string;
   buttonName: string;
+  handleApplyTaskLogic?: () => void;
 }
 
 export function DialogButton({
@@ -24,8 +25,8 @@ export function DialogButton({
   title,
   subTitle,
   buttonName,
+  handleApplyTaskLogic,
 }: DialogButtonProps) {
-  console.log(isOpen, "isOpen");
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -55,6 +56,7 @@ export function DialogButton({
             className="w-[170px] flex justify-center items-center gap-2 bg-[#297AD6]"
             onClick={() => {
               setIsOpen(false);
+              handleApplyTaskLogic();
             }}
           >
             {buttonName}
