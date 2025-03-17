@@ -1,4 +1,4 @@
-import { log } from "@graphprotocol/graph-ts"
+import { Address, Bytes, log } from "@graphprotocol/graph-ts"
 import {
   EntityTaskManagerCreated,
   PINGED,
@@ -42,8 +42,50 @@ export function handleParticiantApplied(event: ParticiantAppliedEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+  entity.status = 'UNACCEPTED'
+  
+  
 
-  entity.save()
+
+  let task = TaskCreated.load(event.address);
+  if (task) {
+    // Get the EntityTaskManagerCreated entity
+    if (task.entityTaskManager) {
+       let taskManagerId = task.entityTaskManager as Bytes
+      let entityTaskManager = EntityTaskManagerCreated.load(taskManagerId)
+      
+      if (entityTaskManager) {
+        // Now we have the correct entityTaskManager address
+         let entityTaskManagerAddress = Address.fromBytes(entityTaskManager.entityTaskManager)
+        let taskDetail = fetchTaskDetails(
+          task.id,
+          entityTaskManagerAddress, // This is the address we need
+          task.internal_id
+        )
+
+        if (taskDetail) {
+          entity.taskDetail = taskDetail.id
+          log.info(
+            "Participant {} applied for task {}. Task Details: {}",
+            [
+              entity.participant.toHexString(),
+              task.id.toHexString(),
+              taskDetail.detailsUrl
+            ]
+          )
+        } else {
+          log.error("Failed to fetch task details for task ID: {}", [event.params.id.toHexString()])
+        }
+      } else {
+        log.error("EntityTaskManager not found for task: {}", [task.id.toHexString()])
+      }
+    }
+  
+    else {
+      log.error("Task or required fields are undefined for task ID: {}", [event.params.id.toHexString()]);
+    }
+    entity.save()
+  }
 }
 
 export function handleTaskAccepted(event: TaskAcceptedEvent): void {
@@ -85,6 +127,8 @@ export function handleTaskCompleted(event: TaskCompletedEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  
 }
 
 export function handleTaskCreated(event: TaskCreatedEvent): void {

@@ -1,5 +1,7 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useQuery } from "@tanstack/react-query";
+import { EntityTaskManagementABI } from "@workspace/contracts/abis";
+import { useReadContract } from "wagmi";
 
 export const useApplist = () => {
   const { queryService } = useGraphService();
@@ -38,4 +40,19 @@ export const useTaskList = () => {
       return getAllData;
     },
   });
+}
+
+export const useGetAllowedWallets = (entityId: string, entityAddress:string) => { 
+
+  return useReadContract({
+     abi: EntityTaskManagementABI,
+    address: entityAddress as `0x${string}`,
+   
+    functionName: "getAllowedWallets",
+ 
+    args: [entityId],
+   
+})
+
+
 }

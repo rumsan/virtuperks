@@ -1,5 +1,5 @@
 import { Cuid } from "@/components/departments/details/details.main";
-import { useTaskList } from "@/hooks/subgraph/querycall";
+import { useGetAllowedWallets, useTaskList } from "@/hooks/subgraph/querycall";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { ExternalLink, Timer, Trophy, UserRoundCog, Users } from "lucide-react";
 
@@ -11,12 +11,18 @@ const TaskPortalDetails = ({ cuid }: TaskPortalDetailsProps) => {
   const getAllTask = useTaskList();
 
   const TaskList = getAllTask?.data?.data?.taskCreateds;
+  console.log(TaskList, 'TaskList');  
 
-  const filteredTasks = TaskList?.filter((task) => {
-    return task?.taskDetail;
-  }).map((task) => task.taskDetail);
+  // const filteredTasks = TaskList?.filter((task) => {
+  //   return task?.taskDetail;
+  // }).map((task) => task.taskDetail);
 
-  const taskData = filteredTasks?.find((task) => task.id === cuid.id);
+  const taskData = TaskList?.find((task) => task.id === cuid.id); 
+
+  
+  const { data: allowedWallet, isLoading: isLoadingWallets } = useGetAllowedWallets(taskData?.id, taskData?.entityTaskManager.id);
+  console.log(allowedWallet, 'allowedWallet');
+  
 
   return (
     <>
