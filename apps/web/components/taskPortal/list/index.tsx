@@ -39,6 +39,7 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
   const getAllTask = useTaskList();
 
   const TaskList = getAllTask?.data?.data?.taskCreateds || [];
+ 
 
   const table = useReactTable({
     data: getAllTask?.data?.data?.taskCreateds || [],

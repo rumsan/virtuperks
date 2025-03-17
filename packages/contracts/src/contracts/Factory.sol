@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.20;
 
 import './EntityTaskManager.sol';
 
@@ -18,7 +18,6 @@ contract EntityTaskManagerFactory {
         address aclAddress,
         bytes32 _appId,
         string memory _name
-        
     ) public {
         // Deploy a new instance of EntityTaskManager
 

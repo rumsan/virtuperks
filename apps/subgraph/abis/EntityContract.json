@@ -1,4 +1,6 @@
 [
+
+
  {
       "inputs": [
         {
@@ -286,6 +288,25 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "taskId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getAllowedWallets",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "allowedWallets",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "name",
       "outputs": [
@@ -404,6 +425,5 @@
       "stateMutability": "nonpayable",
       "type": "function"
     }
-
 
 ]

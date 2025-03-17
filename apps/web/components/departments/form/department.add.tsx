@@ -50,7 +50,8 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
       functionName: "createEntityTaskManager",
       args: [process.env.NEXT_PUBLIC_ACCESSMANAGER , appId, data.name],
  })
-    router.push(PATHS.DEPARTMENT.HOME)
+  
+   router.push(PATHS.DEPARTMENT.HOME)
 
   };
 

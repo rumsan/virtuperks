@@ -1,6 +1,9 @@
 /** @type import('hardhat/config').HardhatUserConfig */
 import '@nomicfoundation/hardhat-toolbox';
 import * as dotenv from 'dotenv';
+
+import '@nomicfoundation/hardhat-ethers';
+import '@typechain/hardhat';
 import { HardhatUserConfig } from 'hardhat/config';
 dotenv.config();
 

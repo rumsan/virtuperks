@@ -16,7 +16,7 @@ interface QueryProviderProps {
 
 export function GraphQueryProvider({ children }: QueryProviderProps) {
  // const graphql = "http://localhost:8000/subgraphs/name/virtuperks";
-  const graphql = "https://api.studio.thegraph.com/query/101438/reward-test/version/latest";
+ const graphql = "https://api.studio.thegraph.com/query/101438/raman-subgraph/version/latest";
 
   return (
     <GraphContext.Provider

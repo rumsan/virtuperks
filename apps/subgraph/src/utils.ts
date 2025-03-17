@@ -8,11 +8,11 @@ export function fetchTaskDetails(taskId:Bytes, contractAddress: Address, taskCre
     let taskDetail = TaskDetail.load(taskId);
 
   const contract = EntityContract.bind(contractAddress);
-  log.debug("fetchTaskDetails: {}", [taskId.toHexString()]);
-  log.debug("fetchTaskDetailsTaskcreated: {}", [taskCreatedId.toHexString()]);
+;
     //const taskString = taskId.toString()
   
-    const taskData = contract.try_tasks(taskId);
+  const taskData = contract.try_tasks(taskId);
+   const wallets = contract.try_getAllowedWallets(taskId);
    
 
    if (!taskDetail) {
@@ -22,6 +22,10 @@ export function fetchTaskDetails(taskId:Bytes, contractAddress: Address, taskCre
 
   if (taskData.reverted) {
   
+    return null;
+  }
+   if (taskData.reverted || wallets.reverted) {
+    log.error("Data fetch reverted for taskId: {}", [taskId.toHexString()]);
     return null;
   }
 
@@ -34,6 +38,16 @@ export function fetchTaskDetails(taskId:Bytes, contractAddress: Address, taskCre
   taskDetail.expiryDate = taskData.value.getExpiryDate();
   taskDetail.owner = taskData.value.getOwner();
   taskDetail.isActive = taskData.value.getIsActive();
+
+  if (!wallets.reverted) {
+     const allowedWalletsBytes = wallets.value.map<Bytes>((address: Address) => {
+      return address as Bytes;
+    });
+    taskDetail.allowedWallets = allowedWalletsBytes;
+ 
+  }
+  
+
   
   //taskDetail.createdBy = taskData.value.;
   taskDetail.task = taskCreatedId
