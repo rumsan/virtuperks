@@ -30,8 +30,6 @@ const TaskParticipant = ({ router }: any) => {
     pageSize: 10,
   });
 
-  console.log(participantList, "participantList");
-
   const columns = useColumns();
   const table = useReactTable({
     data: participantList || [],
