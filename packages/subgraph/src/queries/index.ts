@@ -91,6 +91,11 @@ export const ParticiantAppliedList = `
       transactionHash
     
     taskDetail {
+    task{
+      entityTaskManager{
+        entityTaskManager
+      }
+    }
     allowedWallets
     detailsUrl
     expiryDate
@@ -147,7 +152,6 @@ export const TaskAcceptedList = `
   query TaskAcceptedList {
     taskAccepteds(first: 10, orderBy: blockTimestamp) {
       id
-      taskId
       blockNumber
       blockTimestamp
       transactionHash
