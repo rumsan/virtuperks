@@ -82,9 +82,8 @@ export const TaskCreatedList = `
 
 export const ParticiantAppliedList = `
   query ParticiantAppliedList {
-    particiantApplieds(first: 10, orderBy: TaskManagement_id) {
+    particiantApplieds(first: 10) {
       id
-      TaskManagement_id
       participant
       status
       blockNumber
@@ -189,4 +188,3 @@ export const TaskApprovedList = `
     }
   }
 `;
-

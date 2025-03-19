@@ -16,14 +16,13 @@ export const useApplist = () => {
   });
 };
 
-
 export const useEntityList = () => {
   const { queryService } = useGraphService();
 
   return useQuery({
     queryKey: ["entity"],
     queryFn: async () => {
-      const getAllData = await queryService?.getEntityManagerCreatedList()
+      const getAllData = await queryService?.getEntityManagerCreatedList();
 
       return getAllData;
     },
@@ -36,23 +35,44 @@ export const useTaskList = () => {
   return useQuery({
     queryKey: ["tasks"],
     queryFn: async () => {
-      const getAllData = await queryService?.getTaskCreatedList()
+      const getAllData = await queryService?.getTaskCreatedList();
       return getAllData;
     },
   });
-}
+};
 
-export const useGetAllowedWallets = (entityId: string, entityAddress:string) => { 
-
+export const useGetAllowedWallets = (
+  entityId: string,
+  entityAddress: string,
+) => {
   return useReadContract({
-     abi: EntityTaskManagementABI,
+    abi: EntityTaskManagementABI,
     address: entityAddress as `0x${string}`,
-   
+
     functionName: "getAllowedWallets",
- 
+
     args: [entityId],
-   
-})
+  });
+};
 
+export const useGetParticipantApplied = () => {
+  const { queryService } = useGraphService();
+  return useQuery({
+    queryKey: ["participant"],
+    queryFn: async () => {
+      const getAllData = await queryService?.getParticiantAppliedList();
+      return getAllData;
+    },
+  });
+};
 
-}
+export const useGetAcceptedList = () => {
+  const { queryService } = useGraphService();
+  return useQuery({
+    queryKey: ["accepted"],
+    queryFn: async () => {
+      const getAllData = await queryService?.getTaskAcceptedList();
+      return getAllData;
+    },
+  });
+};

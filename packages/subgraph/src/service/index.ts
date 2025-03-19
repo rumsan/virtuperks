@@ -7,6 +7,7 @@ import {
   EntityTaskManagerCreatedList,
   ParticiantAppliedList,
   RoleGrantedList,
+  TaskAcceptedList,
   TaskCreatedList,
   TransferList,
 } from '../queries';
@@ -66,7 +67,7 @@ export class SubgraphService {
   }
 
   async getTaskAcceptedList() {
-    const {data, error} = await this.subgraphQuery.query(ApprovalList, {});
+    const {data, error} = await this.subgraphQuery.query(TaskAcceptedList, {});
     return {data, error};
   }
 }

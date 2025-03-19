@@ -1,6 +1,9 @@
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import { ListTable } from "@/components/common/list/list.table";
-import { participantList } from "@/sampleData";
+import {
+  useGetAcceptedList,
+  useGetParticipantApplied,
+} from "@/hooks/subgraph/querycall";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -14,7 +17,7 @@ import {
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Input } from "@workspace/ui/components/input";
 import { Search, User } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useColumns } from "./details.column";
 
 const TaskParticipant = ({ router }: any) => {
@@ -29,10 +32,26 @@ const TaskParticipant = ({ router }: any) => {
     pageIndex: 0,
     pageSize: 10,
   });
-
   const columns = useColumns();
+
+  const data = useGetParticipantApplied();
+  const [participantList, setParticipantList] = useState([]);
+
+  useEffect(() => {
+    const participantData = data?.data?.data?.particiantApplieds || [];
+    const filteredData = participantData.filter(
+      (data) => data?.status === "UNACCEPTED",
+    );
+
+    if (JSON.stringify(filteredData) !== JSON.stringify(participantList)) {
+      setParticipantList(filteredData);
+    }
+  }, [data, participantList]);
+
+  const data1 = useGetAcceptedList();
+
   const table = useReactTable({
-    data: participantList || [],
+    data: participantList,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -93,7 +112,7 @@ const TaskParticipant = ({ router }: any) => {
         <div className="flex items-center w-full mt-5 mb-5 gap-2 flex-wrap">
           {participantList.map((participant) => (
             <div
-              key={participant.walletAddress}
+              key={participant?.participant}
               className="flex items-center justify-center h-8 w-8 rounded-full bg-[#F1F5F9] gap-4"
             >
               <User color="#64748B" size={20} />

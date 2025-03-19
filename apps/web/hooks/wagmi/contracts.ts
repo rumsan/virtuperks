@@ -318,6 +318,15 @@ export const entityTaskManagerAbi = [
   },
   {
     type: 'function',
+    inputs: [{name: 'taskId', internalType: 'bytes32', type: 'bytes32'}],
+    name: 'getAllowedWallets',
+    outputs: [
+      {name: 'allowedWallets', internalType: 'address[]', type: 'address[]'},
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     inputs: [],
     name: 'name',
     outputs: [{name: '', internalType: 'string', type: 'string'}],
@@ -809,6 +818,15 @@ export const useReadEntityTaskManagerFindHash =
   /*#__PURE__*/ createUseReadContract({
     abi: entityTaskManagerAbi,
     functionName: 'findHash',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link entityTaskManagerAbi}__ and `functionName` set to `"getAllowedWallets"`
+ */
+export const useReadEntityTaskManagerGetAllowedWallets =
+  /*#__PURE__*/ createUseReadContract({
+    abi: entityTaskManagerAbi,
+    functionName: 'getAllowedWallets',
   })
 
 /**
