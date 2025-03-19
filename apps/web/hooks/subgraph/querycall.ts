@@ -55,15 +55,24 @@ export const useGetAllowedWallets = (
   });
 };
 
-export const useGetParticipantApplied = () => {
+export const useGetParticipantApplied = (taskId: any) => {
   const { queryService } = useGraphService();
-  return useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["participant"],
     queryFn: async () => {
       const getAllData = await queryService?.getParticiantAppliedList();
       return getAllData;
     },
   });
+
+  const filterData = data?.data?.particiantApplieds.filter(
+    (data: any) => data?.taskDetail.id === taskId.id
+  ) || [];
+
+  return {
+    participantDatas: filterData,
+    isLoading
+  };
 };
 
 export const useGetAcceptedList = () => {

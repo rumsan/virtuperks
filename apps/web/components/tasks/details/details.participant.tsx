@@ -19,8 +19,12 @@ import { Input } from "@workspace/ui/components/input";
 import { Search, User } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useColumns } from "./details.column";
+type TaskParticipantProps = {
+ taskId:any,
+  router:string
+};
 
-const TaskParticipant = ({ router }: any) => {
+const TaskParticipant = ({taskId, router}:TaskParticipantProps) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -34,19 +38,19 @@ const TaskParticipant = ({ router }: any) => {
   });
   const columns = useColumns();
 
-  const data = useGetParticipantApplied();
+  const {participantDatas} = useGetParticipantApplied(taskId);
   const [participantList, setParticipantList] = useState([]);
 
   useEffect(() => {
-    const participantData = data?.data?.data?.particiantApplieds || [];
+    const participantData = participantDatas || [];
     const filteredData = participantData.filter(
-      (data) => data?.status === "UNACCEPTED",
+      (data:any) => data?.status === "UNACCEPTED",
     );
 
     if (JSON.stringify(filteredData) !== JSON.stringify(participantList)) {
       setParticipantList(filteredData);
     }
-  }, [data, participantList]);
+  }, [participantDatas, participantList]);
 
   const data1 = useGetAcceptedList();
 
