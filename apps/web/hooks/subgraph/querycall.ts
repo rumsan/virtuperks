@@ -76,3 +76,14 @@ export const useGetAcceptedList = () => {
     },
   });
 };
+
+export const useGetTaskCompletedList = () => {
+  const { queryService } = useGraphService();
+  return useQuery({
+    queryKey: ["completed"],
+    queryFn: async () => {
+      const getAllData = await queryService?.getTaskCompletedList();
+      return getAllData;
+    },
+  });
+};
