@@ -34,7 +34,7 @@ export function handlePINGED(event: PINGEDEvent): void {
 
 export function handleParticiantApplied(event: ParticiantAppliedEvent): void {
   let participant = new ParticiantApplied(
-    event.params.id
+  event.transaction.hash.concatI32(event.logIndex.toI32())
   )
    participant.internal_id = event.params.id
   participant.participant = event.params.participant
@@ -62,7 +62,7 @@ export function handleParticiantApplied(event: ParticiantAppliedEvent): void {
 
 export function handleTaskAccepted(event: TaskAcceptedEvent): void {
   let entity = new TaskAccepted(
-   event.params.id
+  event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.internal_id = event.params.id
 
@@ -73,7 +73,7 @@ export function handleTaskAccepted(event: TaskAcceptedEvent): void {
     let taskDetail = fetchTaskDetails(event.params.id, event.address, event.params.id);
   if (taskDetail) {
     entity.taskDetail = taskDetail.id;
-    log.info("TaskDetail saved: {}", [taskDetail.id.toHexString()]);
+    log.info("TaskDetail saved from handleTaskaccepted: {}", [taskDetail.id.toHexString()]);
   } else {
     log.error("Failed to fetch TaskDetail for task ID: {}", [event.params.id.toHexString()]);
   }
@@ -84,7 +84,7 @@ export function handleTaskAccepted(event: TaskAcceptedEvent): void {
 
 export function handleTaskApproved(event: TaskApprovedEvent): void {
   let entity = new TaskApproved(
-   event.params.id
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.internal_id = event.params.id
   entity.approver = event.params.approver
@@ -107,7 +107,7 @@ export function handleTaskApproved(event: TaskApprovedEvent): void {
 
 export function handleTaskCompleted(event: TaskCompletedEvent): void {
   let entity = new TaskCompleted(
-    event.params.id
+    event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.internal_id = event.params.id
   entity.participant = event.params.participant
