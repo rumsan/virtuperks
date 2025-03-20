@@ -1,6 +1,5 @@
 import { useEntityList } from "@/hooks/subgraph/querycall";
 import { PATHS } from "@/routes/paths";
-import { EntityList } from "@/sampleData";
 import {
   Card,
   CardDescription,
@@ -9,14 +8,8 @@ import {
 import { ArrowRight, Coins, Plus, User } from "lucide-react";
 
 const DepartmentListCard = ({ router }: any) => {
-  // const listOftheDepartments = useEntity();
-  const getAllEntity = useEntityList()
-  const entityList = getAllEntity?.data?.data?.entityTaskManagerCreateds
-
-
-  
-  
-  
+  const getAllEntity = useEntityList();
+  const entityList = getAllEntity?.data?.data?.entityTaskManagerCreateds;
 
   return (
     <div className="grid grid-cols-4 gap-4 w-full p-4">
@@ -28,7 +21,8 @@ const DepartmentListCard = ({ router }: any) => {
         <Plus size={24} />
       </Card>
       {entityList &&
-        entityList.map((department:any) => {
+        entityList.map((department: DepartmentDetails) => {
+          console.log(department, "departmentttt");
           return (
             <Card
               key={department.id}

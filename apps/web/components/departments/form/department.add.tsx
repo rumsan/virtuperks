@@ -10,18 +10,15 @@ import { ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useWriteContract } from "wagmi";
 import DepartmentBaseForm from "./department.form";
-import { departmentSchema } from "./schema";
+import { Department, departmentSchema } from "./schema";
 
-const defaultValues: any = {
+const defaultValues: Department = {
   name: "",
- 
-
 };
 
 type DepartmentAddProps = {
   router: any;
 };
-
 
 export default function DepartmentAdd({ router }: DepartmentAddProps) {
   const form = useForm({
@@ -29,30 +26,20 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
     defaultValues: defaultValues,
   });
 
- 
- 
+  const { data, writeContractAsync } = useWriteContract();
 
-  const { data: hash, writeContractAsync } = useWriteContract();
-
- 
-    
-     
- 
-
-
-  const createEntityButton = async (data: any) => {
-  const appId = process.env.NEXT_PUBLIC_APP_ID
-    
-  
- const  createEntity =  await  writeContractAsync({
-      address: process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}` || '0x ',
+  const createEntityButton = async (data: Department) => {
+    console.log(data, "inside data");
+    const appId = process.env.NEXT_PUBLIC_APP_ID;
+    await writeContractAsync({
+      address:
+        (process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}`) || "0x ",
       abi: EntityFactoryABI,
       functionName: "createEntityTaskManager",
-      args: [process.env.NEXT_PUBLIC_ACCESSMANAGER , appId, data.name],
- })
-  
-   router.push(PATHS.DEPARTMENT.HOME)
+      args: [process.env.NEXT_PUBLIC_ACCESSMANAGER, appId, data.name],
+    });
 
+    router.push(PATHS.DEPARTMENT.HOME);
   };
 
   return (
@@ -81,7 +68,6 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
                   mode="add"
                   form={form}
                   defaultValues={defaultValues}
-                  // saveForm={handleDepartmentSubmit}
                   saveForm={createEntityButton}
                 >
                   <div className="flex justify-end gap-4">
