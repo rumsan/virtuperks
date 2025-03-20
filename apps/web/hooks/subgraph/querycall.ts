@@ -96,13 +96,21 @@ export const useGetAcceptedList = (taskId: any) => {
   };
 };
 
-export const useGetTaskCompletedList = () => {
+export const useGetTaskCompletedList = (taskId:any) => {
   const { queryService } = useGraphService();
-  return useQuery({
+  const {data, isLoading} =  useQuery({
     queryKey: ["completed"],
     queryFn: async () => {
       const getAllData = await queryService?.getTaskCompletedList();
       return getAllData;
     },
   });
+  const filterData = data?.data?.taskCompleteds.filter(
+    (data: any) => data?.taskDetail.id === taskId?.id
+  ) || [];
+
+  return {
+    completedData: filterData,
+    completedLoading: isLoading
+  }
 };

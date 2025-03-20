@@ -1,7 +1,7 @@
 import { CustomAlertDialog } from "@/components/common/ui/alert.dialog";
 import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
-import { useGetAcceptedList, useTaskList } from "@/hooks/subgraph/querycall";
+import { useGetAcceptedList, useGetTaskCompletedList, useTaskList } from "@/hooks/subgraph/querycall";
 import {
   useWriteEntityTaskManagerCompleteTask,
   useWriteEntityTaskManagerParticipate,
@@ -22,6 +22,7 @@ type TaskPortalMainProps = {
 const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [alertDialog, setAlertDialog] = useState(false);
+  const [isTaskCompleted, setIsTaskCompleted] = useState(false);
 
   const { isConnected } = useAccount();
 
@@ -29,11 +30,13 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const TaskList = getAllTask?.data?.data?.taskCreateds;
 
   const taskData = TaskList?.find((task: any) => task?.id === cuid?.id);
-  console.log(taskData, "task data"); 
+ 
 
   const { address } = useAccount();
 
   const { acceptedParticipant } = useGetAcceptedList(cuid);
+  const { completedData } = useGetTaskCompletedList(cuid)
+
 
 
   const abc = acceptedParticipant?.find((task:any) => {
@@ -70,17 +73,51 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
     });
   };
 
+  const isTaskAlreadyCompleted = completedData?.some(
+    (data: any) => data?.participant?.toLowerCase() === address?.toLowerCase()
+  );
+
   const handleCompletedTask = async () => {
-    console.log(taskData?.entityTaskManager?.id, "entity id");
-    console.log(abc?.taskDetail?.id, "tasj id");
-    const result = await writeCompleteTask({
-      address: (taskData?.entityTaskManager?.id as `0x${string}`) || "0x",
-      args: [abc?.taskDetail?.id],
-    });
+    try {
+      const result = await writeCompleteTask({
+        address: (taskData?.entityTaskManager?.id as `0x${string}`) || "0x",
+        args: [abc?.taskDetail?.id],
+      });
+      
+      // Set local state after successful completion
+      if (result) {
+        setIsTaskCompleted(true);
+      }
+    } catch (error) {
+      console.error("Error completing task:", error);
+    }
   };
 
-  // const completedData = useGetTaskCompletedList();
-  // console.log(completedData?.data, "completed data");
+  const getButtonContent = () => {
+    if (isTaskAlreadyCompleted || isTaskCompleted) {
+      return (
+        <Button className="bg-[#03AB65]" disabled>
+          <span className="text-[#F8FAFC]">Task Completed</span>
+        </Button>
+      );
+    }
+
+    if (isAccepted === "ACCEPTED") {
+      return (
+        <Button className="bg-[#297AD6]" onClick={handleCompletedTask}>
+          <span className="text-[#F8FAFC]">Mark as completed</span>
+          <ArrowRight color="#F8FAFC" strokeWidth={2.5} size={20} />
+        </Button>
+      );
+    }
+
+    return (
+      <Button className="bg-[#297AD6]" onClick={handleApplyTask}>
+        <span className="text-[#F8FAFC]">Apply for task</span>
+        <ArrowRight color="#F8FAFC" strokeWidth={2.5} size={20} />
+      </Button>
+    );
+  };
 
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
@@ -100,17 +137,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             </h3>
           </div>
           <div className="flex items-center ml-auto gap-4">
-            {isAccepted === "ACCEPTED" ? (
-              <Button className="bg-[#297AD6]" onClick={handleCompletedTask}>
-                <span className="text-[#F8FAFC]">Mark as completed</span>{" "}
-                <ArrowRight color="#F8FAFC" strokeWidth={2.5} size={20} />{" "}
-              </Button>
-            ) : (
-              <Button className="bg-[#297AD6]" onClick={handleApplyTask}>
-                <span className="text-[#F8FAFC]">Apply for task</span>{" "}
-                <ArrowRight color="#F8FAFC" strokeWidth={2.5} size={20} />
-              </Button>
-            )}
+            {getButtonContent()}
           </div>
         </div>
 

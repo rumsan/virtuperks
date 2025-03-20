@@ -130,6 +130,7 @@ export const TaskCompletedList = `
   query TaskCompletedList {
     taskCompleteds(first: 10, orderBy: blockTimestamp) {
       id
+      internal_id
       participant
       blockNumber
       blockTimestamp
