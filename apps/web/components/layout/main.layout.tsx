@@ -9,7 +9,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     <div>
       <main className="flex w-full flex-col bg-muted/40">
         <DesktopNav />
-
         <div className="h-[calc(100dvh-60px)] overflow-auto">{children}</div>
       </main>
     </div>
