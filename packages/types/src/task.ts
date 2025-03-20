@@ -47,3 +47,12 @@ export type ExtendedTaskData = TaskData & {
     allowedWallets: string[];
   };
 };
+
+export type ExtendedTaskDetails = TaskDetail & {
+  taskDetail: TaskDetail & {
+    allowedWallets: string[];
+    __typename: string;
+  };
+};
+
+

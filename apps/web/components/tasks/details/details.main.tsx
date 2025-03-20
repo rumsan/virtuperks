@@ -41,11 +41,11 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
         </div>
 
         <div className="flex w-full gap-4">
-          <TaskDetails cuid={cuid} router={router} />
+          <TaskDetails cuid={cuid} />
         </div>
 
         <div className="flex w-full gap-4">
-          <TaskParticipant taskId={cuid} router={router} />
+          <TaskParticipant taskId={cuid} />
         </div>
       </div>
     </main>

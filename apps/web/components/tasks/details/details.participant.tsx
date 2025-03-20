@@ -23,11 +23,10 @@ import React, { useEffect, useState } from "react";
 import { useColumns } from "./details.column";
 
 type TaskParticipantProps = {
- taskId:any,
-  router:string
+  taskId: string;
 };
 
-const TaskParticipant = ({taskId, router}:TaskParticipantProps) => {
+const TaskParticipant = ({ taskId }: TaskParticipantProps) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -42,24 +41,23 @@ const TaskParticipant = ({taskId, router}:TaskParticipantProps) => {
   const columns = useColumns();
 
   const { participantDatas } = useGetParticipantApplied(taskId);
- 
-  const { acceptedLoading, acceptedParticipant } = useGetAcceptedList(taskId);
 
-  
+  const { acceptedParticipant } = useGetAcceptedList(taskId);
+
   const [participantList, setParticipantList] = useState<any[]>([]);
-
 
   useEffect(() => {
     const filteredParticipants = filterUnacceptedParticipants(
       participantDatas,
-      acceptedParticipant
+      acceptedParticipant,
     );
 
-    if (JSON.stringify(filteredParticipants) !== JSON.stringify(participantList)) {
+    if (
+      JSON.stringify(filteredParticipants) !== JSON.stringify(participantList)
+    ) {
       setParticipantList(filteredParticipants);
     }
   }, [participantDatas, acceptedParticipant, participantList]);
-
 
   const table = useReactTable({
     data: participantList,
@@ -121,20 +119,25 @@ const TaskParticipant = ({taskId, router}:TaskParticipantProps) => {
         </CardTitle>
 
         <div className="flex items-center w-full mt-5 mb-5 gap-2 flex-wrap">
-          {acceptedParticipant?.map((participant: any) => (
-            <div 
-              key={participant?.participant}
-              className="flex flex-col items-center gap-1"
-              title={participant?.participant} // Add title attribute for hover
-            >
-              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-[#F1F5F9] cursor-pointer">
-                <User color="#64748B" size={20} />
-              </div>
-              <span className="text-xs text-gray-500">
-                {shortAddress(participant?.participant)}
-              </span>
-            </div>
-          ))}
+          {acceptedParticipant?.map(
+            (participant) => (
+              console.log(participant, "participant 1111"),
+              (
+                <div
+                  key={participant?.participant}
+                  className="flex flex-col items-center gap-1"
+                  title={participant?.participant} // Add title attribute for hover
+                >
+                  <div className="flex items-center justify-center h-8 w-8 rounded-full bg-[#F1F5F9] cursor-pointer">
+                    <User color="#64748B" size={20} />
+                  </div>
+                  <span className="text-xs text-gray-500">
+                    {shortAddress(participant?.participant)}
+                  </span>
+                </div>
+              )
+            ),
+          )}
         </div>
       </Card>
     </>

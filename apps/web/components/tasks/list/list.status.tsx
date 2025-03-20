@@ -6,7 +6,7 @@ import {
 } from "@workspace/ui/components/card";
 import { CircleCheckBig, CircleDashed } from "lucide-react";
 
-const TaskListStatus = ({ router }: any) => {
+const TaskListStatus = () => {
   return (
     <div className="flex items-center w-full">
       <div className="grid grid-cols-3 gap-4">

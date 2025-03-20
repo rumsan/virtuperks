@@ -1,12 +1,10 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Card, CardContent } from "@workspace/ui/components/card";
-
 import { PATHS } from "@/routes/paths";
-// import { EntityTaskManagementABI } from "@workspace/contracts/abis";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
+import { Card, CardContent } from "@workspace/ui/components/card";
 import {
   Form,
   FormControl,
@@ -53,6 +51,28 @@ const defaultValues: any = {
   entityAddress: "",
 };
 
+type AllowedWalletTokenType = {
+  name: string;
+  walletAddress: string;
+};
+
+type RewardTokenType = {
+  address: string;
+  name: string;
+};
+
+type EntityType = {
+  aclAddress: string;
+  blockNumber: string;
+  blockTimeStamp: string;
+  entityTaskManager: string;
+  id: string;
+  transactionHash: string;
+  __typename: string;
+  _appId: string;
+  _name: string;
+};
+
 type TaskAddProps = {
   router: any;
 };
@@ -80,7 +100,6 @@ export default function TaskAdd({ router }: TaskAddProps) {
     }
 
     const { detailsUrl, rewardToken, owner, isActive } = data;
-
     const expiryDate = BigInt(
       Math.floor(new Date(data.expiryDate).getTime() / 1000),
     ); // Convert to seconds
@@ -184,7 +203,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
                                     <SelectValue placeholder="Select Entity" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    {entityList?.map((entity: any) => (
+                                    {entityList?.map((entity: EntityType) => (
                                       <SelectItem
                                         key={entity.id}
                                         value={entity.entityTaskManager}
@@ -217,14 +236,16 @@ export default function TaskAdd({ router }: TaskAddProps) {
                                     <SelectValue placeholder="Select reward" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    {tokenList?.map((token: any) => (
-                                      <SelectItem
-                                        key={token.name}
-                                        value={token.address}
-                                      >
-                                        {token.name}
-                                      </SelectItem>
-                                    ))}
+                                    {tokenList?.map(
+                                      (token: RewardTokenType) => (
+                                        <SelectItem
+                                          key={token.name}
+                                          value={token.address}
+                                        >
+                                          {token.name}
+                                        </SelectItem>
+                                      ),
+                                    )}
                                   </SelectContent>
                                 </Select>
                               </FormControl>
@@ -344,7 +365,6 @@ export default function TaskAdd({ router }: TaskAddProps) {
                                           <CalendarIcon
                                             color="#64748B"
                                             strokeWidth={2.5}
-                                            // size={24}
                                             className="w-8 h-8 ml-auto"
                                           />
                                         </div>
@@ -381,14 +401,9 @@ export default function TaskAdd({ router }: TaskAddProps) {
                                         field.onChange(date);
                                         setIsPopoverOpen(false);
                                       }}
-                                      // disabled={(date) =>
-                                      //   date > new Date() ||
-                                      //   date < new Date("2022-01-01")
-                                      // }
                                       disabled={(date) => {
-                                        // Disable past dates and dates before the upcoming month
                                         const today = new Date();
-                                        today.setHours(0, 0, 0, 0); // Normalize today's date to the start of the day
+                                        today.setHours(0, 0, 0, 0);
                                         return date < today;
                                       }}
                                       initialFocus
@@ -407,27 +422,6 @@ export default function TaskAdd({ router }: TaskAddProps) {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Set Task Owner</FormLabel>
-
-                              {/* <Select
-                                onValueChange={field.onChange}
-                                value={field.value ?? ""}
-                              >
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select task owner" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {ownerList.map((owner) => (
-                                    <SelectItem
-                                      key={owner.cuid}
-                                      value={owner.name}
-                                    >
-                                      {owner.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select> */}
                               <Input
                                 type="string"
                                 placeholder="Add owner Address"
@@ -456,14 +450,16 @@ export default function TaskAdd({ router }: TaskAddProps) {
                                   <SelectValue placeholder="Select Participant" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  {participantList?.map((token: any) => (
-                                    <SelectItem
-                                      key={token.walletAddress}
-                                      value={token.walletAddress}
-                                    >
-                                      {token.name}
-                                    </SelectItem>
-                                  ))}
+                                  {participantList?.map(
+                                    (token: AllowedWalletTokenType) => (
+                                      <SelectItem
+                                        key={token.walletAddress}
+                                        value={token.walletAddress}
+                                      >
+                                        {token.name}
+                                      </SelectItem>
+                                    ),
+                                  )}
                                 </SelectContent>
                               </Select>
                             </FormControl>

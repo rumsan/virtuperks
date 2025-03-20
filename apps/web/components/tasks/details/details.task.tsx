@@ -1,26 +1,31 @@
 import { Cuid } from "@/components/departments/details/details.main";
 import { useGetAcceptedList, useTaskList } from "@/hooks/subgraph/querycall";
+import { ExtendedTaskData, ExtendedTaskDetails } from "@workspace/types/task";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { ExternalLink, Timer, Trophy, UserRoundCog, Users } from "lucide-react";
 
 type TaskDetailsProps = {
   cuid: Cuid;
-  router: any;
 };
 console.log("hello from details page");
 
-const TaskDetails = ({ cuid, router }: TaskDetailsProps) => {
+const TaskDetails = ({ cuid }: TaskDetailsProps) => {
   const getAllTask = useTaskList();
   const taskList = getAllTask?.data?.data?.taskCreateds;
 
-  const filteredTaskList = taskList?.map((task) => {
+  console.log(getAllTask?.data?.data, "getALlTaskkk");
+
+  const filteredTaskList = taskList?.map((task: ExtendedTaskData) => {
     return task?.taskDetail;
   });
 
-  const taskData = filteredTaskList?.find((task) => task?.id === cuid?.id);
+  console.log(filteredTaskList, "filteredTaskListttt");
+
+  const taskData = filteredTaskList?.find(
+    (task: ExtendedTaskDetails) => task?.id === cuid?.id,
+  );
 
   const data = useGetAcceptedList(cuid?.id);
-  console.log(data, "data");
 
   return (
     <>

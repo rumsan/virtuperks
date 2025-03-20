@@ -32,7 +32,7 @@ export default function TaskListMain({ router }: TaskListMainProps) {
             Overview of all the tasks
           </h3>
         </div>
-        <TaskListStatus router={router} />
+        <TaskListStatus />
 
         <div className="flex items-center">
           <div className="flex flex-col w-[80%] gap-1">
