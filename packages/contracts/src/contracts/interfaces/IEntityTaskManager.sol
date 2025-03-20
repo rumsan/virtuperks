@@ -31,7 +31,7 @@ interface IEntityTaskManager {
     }
 
     event TaskCreated(bytes32 indexed id, address indexed createdBy);
-    event TaskAccepted(bytes32 indexed id);
+    event TaskAccepted(bytes32 indexed id, address indexed participant);
     event ParticiantApplied(bytes32 indexed id, address indexed participant);
     event TaskCompleted(bytes32 indexed id, address indexed participant);
     event TaskApproved(bytes32 indexed id, address indexed approver);

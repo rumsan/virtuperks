@@ -37,6 +37,12 @@ const _abi = [
         name: "id",
         type: "bytes32",
       },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "participant",
+        type: "address",
+      },
     ],
     name: "TaskAccepted",
     type: "event",

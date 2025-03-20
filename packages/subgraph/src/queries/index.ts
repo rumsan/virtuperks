@@ -82,9 +82,9 @@ export const TaskCreatedList = `
 
 export const ParticiantAppliedList = `
   query ParticiantAppliedList {
-    particiantApplieds(first: 10, orderBy: TaskManagement_id) {
+    particiantApplieds(first: 10) {
       id
-      TaskManagement_id
+      internal_id
       participant
       status
       blockNumber
@@ -92,6 +92,11 @@ export const ParticiantAppliedList = `
       transactionHash
     
     taskDetail {
+    task{
+      entityTaskManager{
+        entityTaskManager
+      }
+    }
     allowedWallets
     detailsUrl
     expiryDate
@@ -125,7 +130,7 @@ export const TaskCompletedList = `
   query TaskCompletedList {
     taskCompleteds(first: 10, orderBy: blockTimestamp) {
       id
-      taskId
+      internal_id
       participant
       blockNumber
       blockTimestamp
@@ -148,7 +153,8 @@ export const TaskAcceptedList = `
   query TaskAcceptedList {
     taskAccepteds(first: 10, orderBy: blockTimestamp) {
       id
-      taskId
+      internal_id
+      participant
       blockNumber
       blockTimestamp
       transactionHash
@@ -161,6 +167,8 @@ export const TaskAcceptedList = `
         maxParticipants
         owner
         maxParticipants
+        rewardAmount
+        rewardToken
       }
     }
   }
@@ -189,4 +197,3 @@ export const TaskApprovedList = `
     }
   }
 `;
-
