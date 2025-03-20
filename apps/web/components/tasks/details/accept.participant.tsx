@@ -4,6 +4,7 @@ const useAcceptParticipant = () => {
   const { writeContractAsync } = useWriteEntityTaskManagerAcceptParticipant();
 
   const handleAcceptParticipant = async (id, participant) => {
+   
     
      const result = await writeContractAsync({
       address: (process.env.NEXT_PUBLIC_ENTITY_ID as `0x${string}`) || "0x",

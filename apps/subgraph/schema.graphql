@@ -88,6 +88,7 @@ type ParticiantApplied @entity(immutable: true) {
 
 type TaskAccepted @entity(immutable: true) {
   id: Bytes!
+  participant: Bytes! # address
   internal_id: Bytes! # bytes32
   blockNumber: BigInt!
   status: String # string

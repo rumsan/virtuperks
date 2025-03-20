@@ -61,16 +61,20 @@ export function handleParticiantApplied(event: ParticiantAppliedEvent): void {
 }
 
 export function handleTaskAccepted(event: TaskAcceptedEvent): void {
+  log.info('TaskAccepted event fired first: {}', [event.address.toHexString()]);
+   log.info('TaskAccepted event fired: {}', [event.params.participant.toHexString()]);
   let entity = new TaskAccepted(
   event.transaction.hash.concatI32(event.logIndex.toI32())
   )
+  entity.participant = event.params.participant
   entity.internal_id = event.params.id
+  
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
   entity.status = 'ACCEPTED'
-    let taskDetail = fetchTaskDetails(event.params.id, event.address, event.params.id);
+  let taskDetail = fetchTaskDetails(event.params.id, event.address, event.params.id);
   if (taskDetail) {
     entity.taskDetail = taskDetail.id;
     log.info("TaskDetail saved from handleTaskaccepted: {}", [taskDetail.id.toHexString()]);

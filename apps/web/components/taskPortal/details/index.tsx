@@ -26,7 +26,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const TaskList = getAllTask?.data?.data?.taskCreateds;
 
   const taskData = TaskList?.find((task) => task?.id === cuid?.id);
-
+console.log(taskData,'taskData')
   const { writeContractAsync } = useWriteEntityTaskManagerParticipate();
 
   const handleApplyTask = () => {

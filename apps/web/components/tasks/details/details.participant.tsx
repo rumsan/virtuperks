@@ -4,6 +4,7 @@ import {
   useGetAcceptedList,
   useGetParticipantApplied,
 } from "@/hooks/subgraph/querycall";
+import { filterUnacceptedParticipants } from "@/utils/filterData";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -19,6 +20,7 @@ import { Input } from "@workspace/ui/components/input";
 import { Search, User } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useColumns } from "./details.column";
+
 type TaskParticipantProps = {
  taskId:any,
   router:string
@@ -38,21 +40,25 @@ const TaskParticipant = ({taskId, router}:TaskParticipantProps) => {
   });
   const columns = useColumns();
 
-  const {participantDatas} = useGetParticipantApplied(taskId);
-  const [participantList, setParticipantList] = useState([]);
+  const { participantDatas } = useGetParticipantApplied(taskId);
+ console.log(participantDatas, "participantDatas"); 
+  const { acceptedLoading, acceptedParticipant } = useGetAcceptedList(taskId);
+  console.log(acceptedParticipant, "acceptedParticipant");  
+  
+  const [participantList, setParticipantList] = useState<any[]>([]);
+  console.log(participantList, "participantList");
 
   useEffect(() => {
-    const participantData = participantDatas || [];
-    const filteredData = participantData.filter(
-      (data:any) => data?.status === "UNACCEPTED",
+    const filteredParticipants = filterUnacceptedParticipants(
+      participantDatas,
+      acceptedParticipant
     );
 
-    if (JSON.stringify(filteredData) !== JSON.stringify(participantList)) {
-      setParticipantList(filteredData);
+    if (JSON.stringify(filteredParticipants) !== JSON.stringify(participantList)) {
+      setParticipantList(filteredParticipants);
     }
-  }, [participantDatas, participantList]);
+  }, [participantDatas, acceptedParticipant, participantList]);
 
-  const data1 = useGetAcceptedList();
 
   const table = useReactTable({
     data: participantList,

@@ -83,7 +83,7 @@ contract EntityTaskManager is IEntityTaskManager {
         require(tasks[taskId].owner != address(0), 'Task does not exist');
         require(tasks[taskId].isActive, 'Task is not active');
         taskAssignments[taskId][participant] = STATUS.ACCEPTED;
-        emit TaskAccepted(taskId);
+        emit TaskAccepted(taskId, participant);
     }
 
     /// @notice This function will change the status of the task

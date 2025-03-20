@@ -75,13 +75,23 @@ export const useGetParticipantApplied = (taskId: any) => {
   };
 };
 
-export const useGetAcceptedList = () => {
+export const useGetAcceptedList = (taskId: any) => {
   const { queryService } = useGraphService();
-  return useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["accepted"],
     queryFn: async () => {
       const getAllData = await queryService?.getTaskAcceptedList();
       return getAllData;
     },
   });
+
+
+  const filterData = data?.data?.taskAccepteds.filter(
+    (data: any) => data?.taskDetail.id === taskId?.id
+  ) || [];
+
+  return {
+    acceptedParticipant: filterData,
+    acceptedLoading: isLoading
+  };
 };

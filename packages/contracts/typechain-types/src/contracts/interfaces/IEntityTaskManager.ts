@@ -141,10 +141,11 @@ export namespace ParticiantAppliedEvent {
 }
 
 export namespace TaskAcceptedEvent {
-  export type InputTuple = [id: BytesLike];
-  export type OutputTuple = [id: string];
+  export type InputTuple = [id: BytesLike, participant: AddressLike];
+  export type OutputTuple = [id: string, participant: string];
   export interface OutputObject {
     id: string;
+    participant: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -350,7 +351,7 @@ export interface IEntityTaskManager extends BaseContract {
       ParticiantAppliedEvent.OutputObject
     >;
 
-    "TaskAccepted(bytes32)": TypedContractEvent<
+    "TaskAccepted(bytes32,address)": TypedContractEvent<
       TaskAcceptedEvent.InputTuple,
       TaskAcceptedEvent.OutputTuple,
       TaskAcceptedEvent.OutputObject
