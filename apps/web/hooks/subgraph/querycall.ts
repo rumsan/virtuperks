@@ -95,3 +95,14 @@ export const useGetAcceptedList = (taskId: any) => {
     acceptedLoading: isLoading
   };
 };
+
+export const useGetTaskCompletedList = () => {
+  const { queryService } = useGraphService();
+  return useQuery({
+    queryKey: ["completed"],
+    queryFn: async () => {
+      const getAllData = await queryService?.getTaskCompletedList();
+      return getAllData;
+    },
+  });
+};

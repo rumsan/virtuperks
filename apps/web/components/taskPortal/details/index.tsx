@@ -1,8 +1,11 @@
 import { CustomAlertDialog } from "@/components/common/ui/alert.dialog";
 import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
-import { useTaskList } from "@/hooks/subgraph/querycall";
-import { useWriteEntityTaskManagerParticipate } from "@/hooks/wagmi/contracts";
+import { useGetAcceptedList, useTaskList } from "@/hooks/subgraph/querycall";
+import {
+  useWriteEntityTaskManagerCompleteTask,
+  useWriteEntityTaskManagerParticipate,
+} from "@/hooks/wagmi/contracts";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -25,9 +28,32 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const getAllTask = useTaskList();
   const TaskList = getAllTask?.data?.data?.taskCreateds;
 
-  const taskData = TaskList?.find((task) => task?.id === cuid?.id);
-console.log(taskData,'taskData')
-  const { writeContractAsync } = useWriteEntityTaskManagerParticipate();
+  const taskData = TaskList?.find((task: any) => task?.id === cuid?.id);
+  console.log(taskData, "task data"); 
+
+  const { address } = useAccount();
+
+  const { acceptedParticipant } = useGetAcceptedList(cuid);
+
+
+  const abc = acceptedParticipant?.find((task:any) => {
+    return task?.taskDetail?.id === cuid?.id;
+  });
+
+  function handleStatus(address, abc) {
+    const isValidAddress = abc?.taskDetail?.allowedWallets?.map((add) => {
+      return add === address?.toLowerCase();
+    });
+
+    return isValidAddress ? abc?.status : "Invalid";
+  }
+
+  const isAccepted = handleStatus(address, abc);
+
+  const { writeContractAsync: writeParticipant } =
+    useWriteEntityTaskManagerParticipate();
+  const { writeContractAsync: writeCompleteTask } =
+    useWriteEntityTaskManagerCompleteTask();
 
   const handleApplyTask = () => {
     if (isConnected) {
@@ -38,11 +64,23 @@ console.log(taskData,'taskData')
   };
 
   const handleApplyTaskLogic = async () => {
-    const result = await writeContractAsync({
+    const result = await writeParticipant({
       address: (taskData?.entityTaskManager?.id as `0x${string}`) || "0x",
       args: [taskData?.id],
     });
   };
+
+  const handleCompletedTask = async () => {
+    console.log(taskData?.entityTaskManager?.id, "entity id");
+    console.log(abc?.taskDetail?.id, "tasj id");
+    const result = await writeCompleteTask({
+      address: (taskData?.entityTaskManager?.id as `0x${string}`) || "0x",
+      args: [abc?.taskDetail?.id],
+    });
+  };
+
+  // const completedData = useGetTaskCompletedList();
+  // console.log(completedData?.data, "completed data");
 
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
@@ -62,10 +100,17 @@ console.log(taskData,'taskData')
             </h3>
           </div>
           <div className="flex items-center ml-auto gap-4">
-            <Button className="bg-[#297AD6]" onClick={handleApplyTask}>
-              <span className="text-[#F8FAFC]">Apply for task</span>{" "}
-              <ArrowRight color="#F8FAFC" strokeWidth={2.5} size={20} />
-            </Button>
+            {isAccepted === "ACCEPTED" ? (
+              <Button className="bg-[#297AD6]" onClick={handleCompletedTask}>
+                <span className="text-[#F8FAFC]">Mark as completed</span>{" "}
+                <ArrowRight color="#F8FAFC" strokeWidth={2.5} size={20} />{" "}
+              </Button>
+            ) : (
+              <Button className="bg-[#297AD6]" onClick={handleApplyTask}>
+                <span className="text-[#F8FAFC]">Apply for task</span>{" "}
+                <ArrowRight color="#F8FAFC" strokeWidth={2.5} size={20} />
+              </Button>
+            )}
           </div>
         </div>
 
