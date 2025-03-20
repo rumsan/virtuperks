@@ -27,10 +27,10 @@ const TaskPortalParticipant = () => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
+  // const [pagination, setPagination] = useState({
+  //   pageIndex: 0,
+  //   pageSize: 10,
+  // });
 
   const columns = useHistoryColumns();
   const table = useReactTable({

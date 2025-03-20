@@ -45,9 +45,7 @@ export function useHistoryColumns<T>(): ColumnDef<T>[] {
     {
       accessorKey: "transactionHash",
       header: () => (
-        <div className="text-left text-[#475569] font-bold">
-          Tnx Hash
-        </div>
+        <div className="text-left text-[#475569] font-bold">Tnx Hash</div>
       ),
 
       cell: ({ row }) => {

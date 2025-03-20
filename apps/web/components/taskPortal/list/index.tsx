@@ -2,7 +2,6 @@
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import { useTaskList } from "@/hooks/subgraph/querycall";
-// import { TaskList } from "@/sampleData";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -37,9 +36,6 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
   const columns = useColumns();
 
   const getAllTask = useTaskList();
-
-  const TaskList = getAllTask?.data?.data?.taskCreateds || [];
- 
 
   const table = useReactTable({
     data: getAllTask?.data?.data?.taskCreateds || [],

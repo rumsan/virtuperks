@@ -1,12 +1,17 @@
 import { CustomAlertDialog } from "@/components/common/ui/alert.dialog";
 import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
-import { useGetAcceptedList, useGetTaskCompletedList, useTaskList } from "@/hooks/subgraph/querycall";
+import {
+  useGetAcceptedList,
+  useGetTaskCompletedList,
+  useTaskList,
+} from "@/hooks/subgraph/querycall";
 import {
   useWriteEntityTaskManagerCompleteTask,
   useWriteEntityTaskManagerParticipate,
 } from "@/hooks/wagmi/contracts";
 import { PATHS } from "@/routes/paths";
+import { AcceptedTaskData, TaskData } from "@workspace/types/task";
 import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useState } from "react";
@@ -29,29 +34,29 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const getAllTask = useTaskList();
   const TaskList = getAllTask?.data?.data?.taskCreateds;
 
-  const taskData = TaskList?.find((task: any) => task?.id === cuid?.id);
- 
+  const taskData = TaskList?.find((task: TaskData) => {
+    return task?.id === cuid?.id;
+  });
 
   const { address } = useAccount();
 
   const { acceptedParticipant } = useGetAcceptedList(cuid);
-  const { completedData } = useGetTaskCompletedList(cuid)
+  const { completedData } = useGetTaskCompletedList(cuid);
 
-
-
-  const abc = acceptedParticipant?.find((task:any) => {
+  const abc = acceptedParticipant?.find((task: AcceptedTaskData) => {
     return task?.taskDetail?.id === cuid?.id;
   });
 
-  function handleStatus(address, abc) {
-    const isValidAddress = abc?.taskDetail?.allowedWallets?.map((add) => {
-      return add === address?.toLowerCase();
-    });
-
+  function handleStatus(address: `0x${string}`, abc: AcceptedTaskData) {
+    const isValidAddress = abc?.taskDetail?.allowedWallets?.map(
+      (add: string) => {
+        return add === address?.toLowerCase();
+      },
+    );
     return isValidAddress ? abc?.status : "Invalid";
   }
 
-  const isAccepted = handleStatus(address, abc);
+  const isAccepted = handleStatus(address as `0x${string}`, abc);
 
   const { writeContractAsync: writeParticipant } =
     useWriteEntityTaskManagerParticipate();
@@ -67,14 +72,16 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   };
 
   const handleApplyTaskLogic = async () => {
-    const result = await writeParticipant({
+    await writeParticipant({
       address: (taskData?.entityTaskManager?.id as `0x${string}`) || "0x",
       args: [taskData?.id],
     });
   };
 
   const isTaskAlreadyCompleted = completedData?.some(
-    (data: any) => data?.participant?.toLowerCase() === address?.toLowerCase()
+    (data: AcceptedTaskData) => {
+      return data?.participant?.toLowerCase() === address?.toLowerCase();
+    },
   );
 
   const handleCompletedTask = async () => {
@@ -83,8 +90,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
         address: (taskData?.entityTaskManager?.id as `0x${string}`) || "0x",
         args: [abc?.taskDetail?.id],
       });
-      
-      // Set local state after successful completion
       if (result) {
         setIsTaskCompleted(true);
       }
