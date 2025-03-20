@@ -74,6 +74,26 @@ export const useGetParticipantApplied = (taskId: any) => {
     isLoading
   };
 };
+export const usegetSingTask = (taskId:any) => {
+  const { queryService } = useGraphService();
+
+
+ const {data, isLoading}=  useQuery({
+    queryKey: ["singleTask"],
+    queryFn: async () => {
+      const getAllData = await queryService?.getTaskCreatedList();
+      return getAllData;
+    },
+ });
+
+  const filterData = data?.data?.taskCreateds.find(
+    (data: any) => data?.id === taskId.id
+  ) || [];
+  return {
+    taskData: filterData,
+    taskLoading: isLoading
+  }
+};
 
 export const useGetAcceptedList = (taskId: any) => {
   const { queryService } = useGraphService();

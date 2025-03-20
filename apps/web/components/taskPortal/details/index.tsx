@@ -15,7 +15,7 @@ import TaskPortalParticipant from "./details.participant";
 import TaskPortalDetails from "./details.task";
 
 type TaskPortalMainProps = {
-  cuid: Cuid;
+  cuid: any;
   router: any;
 };
 
@@ -25,6 +25,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const [isTaskCompleted, setIsTaskCompleted] = useState(false);
 
   const { isConnected } = useAccount();
+ 
 
   const getAllTask = useTaskList();
   const TaskList = getAllTask?.data?.data?.taskCreateds;
@@ -162,7 +163,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
         </div>
 
         <div className="flex w-full gap-4">
-          <TaskPortalParticipant />
+          <TaskPortalParticipant taskId={ cuid} />
         </div>
       </div>
     </main>

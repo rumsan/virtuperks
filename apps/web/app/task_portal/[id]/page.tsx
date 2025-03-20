@@ -6,7 +6,8 @@ import { useParams, useRouter } from "next/navigation";
 
 function Page() {
   const id = useParams() as { id: string };
-  console.log("id", id);
+ 
+
   const router = useRouter();
   return <TaskPortalMain cuid={id} router={router} />;
 }

@@ -57,7 +57,7 @@ const TaskParticipant = ({taskId, router}:TaskParticipantProps) => {
       acceptedParticipant,
       completedData
     );
-  console.log("kathamndu", filteredParticipants);
+ 
 
     if (JSON.stringify(filteredParticipants) !== JSON.stringify(participantList)) {
       
