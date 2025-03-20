@@ -190,6 +190,12 @@ export const entityTaskManagerAbi = [
     anonymous: false,
     inputs: [
       {name: 'id', internalType: 'bytes32', type: 'bytes32', indexed: true},
+      {
+        name: 'participant',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
     ],
     name: 'TaskAccepted',
   },

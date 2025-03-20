@@ -3,8 +3,9 @@ import { ListTable } from "@/components/common/list/list.table";
 import {
   useGetAcceptedList,
   useGetParticipantApplied,
+  useGetTaskCompletedList,
 } from "@/hooks/subgraph/querycall";
-import { filterUnacceptedParticipants } from "@/utils/filterData";
+import { filterParticipants } from "@/utils/filterData";
 import { shortAddress } from "@/utils/shortAddress"; // Create this utility if not exists
 import {
   ColumnFiltersState,
@@ -42,23 +43,28 @@ const TaskParticipant = ({taskId, router}:TaskParticipantProps) => {
   const columns = useColumns();
 
   const { participantDatas } = useGetParticipantApplied(taskId);
- 
   const { acceptedLoading, acceptedParticipant } = useGetAcceptedList(taskId);
+  const { completedData } = useGetTaskCompletedList(taskId);
+
 
   
   const [participantList, setParticipantList] = useState<any[]>([]);
 
 
   useEffect(() => {
-    const filteredParticipants = filterUnacceptedParticipants(
+    const filteredParticipants = filterParticipants(
       participantDatas,
-      acceptedParticipant
+      acceptedParticipant,
+      completedData
     );
+  console.log("kathamndu", filteredParticipants);
 
     if (JSON.stringify(filteredParticipants) !== JSON.stringify(participantList)) {
+      
+
       setParticipantList(filteredParticipants);
     }
-  }, [participantDatas, acceptedParticipant, participantList]);
+  }, [participantDatas, acceptedParticipant, completedData, participantList]);
 
 
   const table = useReactTable({
