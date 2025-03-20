@@ -5,6 +5,7 @@ import {
   useGetParticipantApplied,
 } from "@/hooks/subgraph/querycall";
 import { filterUnacceptedParticipants } from "@/utils/filterData";
+import { shortAddress } from "@/utils/shortAddress"; // Create this utility if not exists
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -41,12 +42,12 @@ const TaskParticipant = ({taskId, router}:TaskParticipantProps) => {
   const columns = useColumns();
 
   const { participantDatas } = useGetParticipantApplied(taskId);
- console.log(participantDatas, "participantDatas"); 
+ 
   const { acceptedLoading, acceptedParticipant } = useGetAcceptedList(taskId);
-  console.log(acceptedParticipant, "acceptedParticipant");  
+
   
   const [participantList, setParticipantList] = useState<any[]>([]);
-  console.log(participantList, "participantList");
+
 
   useEffect(() => {
     const filteredParticipants = filterUnacceptedParticipants(
@@ -115,17 +116,23 @@ const TaskParticipant = ({taskId, router}:TaskParticipantProps) => {
         <CardTitle className="flex flex-col gap-2 w-full">
           <span>Participants</span>
           <span className="text-sm text-gray-500 font-normal">
-            List of all the participants in this task
+            Accepted participants in this task
           </span>
         </CardTitle>
 
         <div className="flex items-center w-full mt-5 mb-5 gap-2 flex-wrap">
-          {participantList.map((participant) => (
-            <div
+          {acceptedParticipant?.map((participant: any) => (
+            <div 
               key={participant?.participant}
-              className="flex items-center justify-center h-8 w-8 rounded-full bg-[#F1F5F9] gap-4"
+              className="flex flex-col items-center gap-1"
+              title={participant?.participant} // Add title attribute for hover
             >
-              <User color="#64748B" size={20} />
+              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-[#F1F5F9] cursor-pointer">
+                <User color="#64748B" size={20} />
+              </div>
+              <span className="text-xs text-gray-500">
+                {shortAddress(participant?.participant)}
+              </span>
             </div>
           ))}
         </div>
