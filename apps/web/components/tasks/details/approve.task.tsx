@@ -1,9 +1,10 @@
-import { useWriteEntityTaskManagerVerifyCompletion }from "@/hooks/wagmi/contracts";
+import { useWriteEntityTaskManagerVerifyCompletion } from "@/hooks/wagmi/contracts";
 
 const useApproveTask = () => {
   const {writeContractAsync } = useWriteEntityTaskManagerVerifyCompletion();
 
   const handleApproveTask = async (taskId: any) => {
+   console.log("taskid from approval", taskId);
   
     try {
       const result = await writeContractAsync({

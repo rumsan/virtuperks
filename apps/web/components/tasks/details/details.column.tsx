@@ -43,7 +43,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
       if (selectedTask.status === "UNACCEPTED") {
         await handleAcceptParticipant(selectedTask.id, selectedTask.participant);
       } else if (selectedTask.status === "COMPLETED") {
-        //await handleApproveTask(selectedTask.id);
+        await handleApproveTask(selectedTask.id);
       }
       setIsDialogOpen(false);
       setSelectedTask(null);

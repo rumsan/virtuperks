@@ -38,8 +38,8 @@ import { useWriteContract } from "wagmi";
 import { taskSchema } from "./schema";
 
 import { participantList, tokenList } from "@/sampleData";
-import { EntityTaskManagementABI } from "@workspace/contracts/abis";
 import { isAddress } from "viem";
+import { EntityTaskManagementABI } from "@workspace/contracts/abis";
 
 const defaultValues: any = {
   detailsUrl: "",
@@ -73,11 +73,29 @@ export default function TaskAdd({ router }: TaskAddProps) {
     context,
   } = useWriteContract();
 
+  const [selectedParticipants, setSelectedParticipants] = useState<string[]>(
+    [],
+  );
+
+  const handleParticipantSelect = (value: string) => {
+    setSelectedParticipants((prev) => [...prev, value]);
+    form.setValue("allowedWallets", [...selectedParticipants, value]);
+  };
+
+  const removeParticipant = (addressToRemove: string) => {
+    const filtered = selectedParticipants.filter(
+      (addr) => addr !== addressToRemove,
+    );
+    setSelectedParticipants(filtered);
+    form.setValue("allowedWallets", filtered);
+  };
+
   const handleSubmit = async (data: any) => {
     if (!isAddress(data.entityAddress)) {
       console.error("Invalid Ethereum address:", data.entityAddress);
       return;
     }
+   
 
     const { detailsUrl, rewardToken, owner, isActive } = data;
 
@@ -446,27 +464,62 @@ export default function TaskAdd({ router }: TaskAddProps) {
                         name="allowedWallets"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Select Token</FormLabel>
-                            <FormControl>
-                              <Select
-                                onValueChange={(value) => field.onChange(value)}
-                                value={field.value}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select Participant" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {participantList?.map((token: any) => (
-                                    <SelectItem
-                                      key={token.walletAddress}
-                                      value={token.walletAddress}
+                            <FormLabel>Select Participants</FormLabel>
+                            <div className="space-y-4">
+                              <FormControl>
+                                <Select
+                                  onValueChange={handleParticipantSelect}
+                                  value={undefined} // Reset after each selection
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select Participant" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {participantList?.map((token: any) => (
+                                      // Only show participants that haven't been selected yet
+                                      !selectedParticipants.includes(
+                                        token.walletAddress,
+                                      ) && (
+                                        <SelectItem
+                                          key={token.walletAddress}
+                                          value={token.walletAddress}
+                                        >
+                                          {token.name}
+                                        </SelectItem>
+                                      )
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+
+                              {/* Display selected participants */}
+                              <div className="flex flex-wrap gap-2">
+                                {selectedParticipants.map((address) => {
+                                  const participant = participantList.find(
+                                    (p) => p.walletAddress === address,
+                                  );
+                                  return (
+                                    <div
+                                      key={address}
+                                      className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full"
                                     >
-                                      {token.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
+                                      <span className="text-sm">
+                                        {participant?.name}
+                                      </span>
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          removeParticipant(address)
+                                        }
+                                        className="text-gray-500 hover:text-red-500"
+                                      >
+                                        ×
+                                      </button>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
                             <FormMessage />
                           </FormItem>
                         )}
