@@ -176,9 +176,9 @@ export const TaskAcceptedList = `
 
 export const TaskApprovedList = `
   query TaskApprovedList {
-    taskApproveds(first: 10, orderBy: blockTimestamp) {
+    taskApproveds(first: 20, orderBy: blockTimestamp) {
       id
-      taskId
+      internal_id
       approver
       blockNumber
       blockTimestamp
