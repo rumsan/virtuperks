@@ -23,7 +23,7 @@ const TokenCreateForm = () => {
     defaultValues: defaultValues,
   });
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: Token) => {
     console.log(data, "data");
   };
 
@@ -32,7 +32,7 @@ const TokenCreateForm = () => {
       <Card className="rounded-lg w-full">
         <CardContent className="p-0">
           <Form {...form}>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={form.handleSubmit(handleSubmit)}>
               <div className="p-6">
                 <div className="grid grid-cols-1 gap-4 mb-5">
                   <FormField

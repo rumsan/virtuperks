@@ -3,10 +3,8 @@
 import ListFilter from "@/components/common/list/list.filter";
 import { Input } from "@workspace/ui/components/input";
 import { Search } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 export default function ListToolBar() {
-  const router = useRouter();
   return (
     <div className="w-full flex items-center space-x-2">
       <div className="flex w-[85%]">

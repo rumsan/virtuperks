@@ -126,35 +126,35 @@ describe('------ Task Management Tests ------', function () {
         expect(allowedWallets).to.include(tmf.participant2.address);
         });
 
-        // it('should participate in a task', async function () {
-        //     const taskId = await tmf.redEntity.findHash(taskDetails1);
-        //     await tmf.redEntity.connect(tmf.participant1).participate(taskId);
-        //     const status = await tmf.redEntity.taskAssignments(taskId, tmf.participant1.address);
-        //     expect(status).to.equal(0);//UNACCEPTED
-        // });
+        it('should participate in a task', async function () {
+            const taskId = await tmf.redEntity.findHash(taskDetails1);
+            await tmf.redEntity.connect(tmf.participant1).participate(taskId);
+            const status = await tmf.redEntity.taskAssignments(taskId, tmf.participant1.address);
+            expect(status).to.equal(0);//UNACCEPTED
+        });
 
-        // it('should accept participation in a task', async function () {
-        //     const taskId = await tmf.redEntity.findHash(taskDetails1);
-        //     await tmf.redEntity.connect(tmf.redCakeTaskOwner).acceptParticipant(taskId, tmf.participant1.address);
-        //     const status = await tmf.redEntity.taskAssignments(taskId, tmf.participant1.address);
-        //     expect(status).to.equal(1);//ACCEPTED
-        // });
+        it('should accept participation in a task', async function () {
+            const taskId = await tmf.redEntity.findHash(taskDetails1);
+            await tmf.redEntity.connect(tmf.redCakeTaskOwner).acceptParticipant(taskId, tmf.participant1.address);
+            const status = await tmf.redEntity.taskAssignments(taskId, tmf.participant1.address);
+            expect(status).to.equal(1);//ACCEPTED
+        });
 
-        // it('should complete a task', async function () {
-        //     const taskId = await tmf.redEntity.findHash(taskDetails1);
-        //     await tmf.redEntity.connect(tmf.participant1).completeTask(taskId);
-        //     const status = await tmf.redEntity.taskAssignments(taskId, tmf.participant1.address);
-        //     expect(status).to.equal(2);//COMPLETED
-        // });
+        it('should complete a task', async function () {
+            const taskId = await tmf.redEntity.findHash(taskDetails1);
+            await tmf.redEntity.connect(tmf.participant1).completeTask(taskId);
+            const status = await tmf.redEntity.taskAssignments(taskId, tmf.participant1.address);
+            expect(status).to.equal(2);//COMPLETED
+        });
 
-        // it('should verify task completion and distribute rewards', async function () {
-        //     const taskId = await tmf.redEntity.findHash(taskDetails1);
-        //     await tmf.redEntity.connect(tmf.redCakeTaskOwner).verifyCompletion(taskId);
-        //     const task = await tmf.redEntity.tasks(taskId);
-        //     const status = await tmf.redEntity.taskAssignments(taskId, tmf.participant1.address);
-        //     expect(task.isActive).to.equal(false);
-        //     expect(status).to.equal(3);//VERIFIED
-        // });
+        it('should verify task completion and distribute rewards', async function () {
+            const taskId = await tmf.redEntity.findHash(taskDetails1);
+            await tmf.redEntity.connect(tmf.redCakeTaskOwner).verifyCompletion(taskId);
+            const task = await tmf.redEntity.tasks(taskId);
+            const status = await tmf.redEntity.taskAssignments(taskId, tmf.participant1.address);
+            expect(task.isActive).to.equal(false);
+            expect(status).to.equal(3);//VERIFIED
+        });
 
     });
 

@@ -1,23 +1,27 @@
 import { PATHS } from "@/routes/paths";
 import { Table } from "@tanstack/react-table";
+import { TaskCreated } from "@workspace/types/task";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Coins, Dot, ExternalLink, Timer, Users } from "lucide-react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import NoTask from "./no.task";
 
-interface TaskPortalCardProps {
-  table: Table<any>;
-  router: any;
+interface TaskPortalCardProps<TData> {
+  table: Table<TData>;
+  router: AppRouterInstance;
 }
 
-const TaskPortalCard = ({ table, router }: TaskPortalCardProps) => {
+const TaskPortalCard = <TData,>({
+  table,
+  router,
+}: TaskPortalCardProps<TData>) => {
   const paginatedTasks = table.getRowModel().rows.map((row) => row.original);
 
   const filteredTasks = paginatedTasks
     ?.filter((task) => {
-      console.log(task, "task in function");
-      return task?.taskDetail;
+      return (task as TaskCreated)?.taskDetail;
     })
-    .map((task) => task.taskDetail);
+    .map((task) => (task as TaskCreated)?.taskDetail);
 
   return (
     <>

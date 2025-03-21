@@ -17,7 +17,7 @@ const NoTask = () => {
           No tasks created
         </span>
         <span className="text-[#64748B] text-sm font-normal">
-          Tasks will be displayed here once they're created
+          Tasks will be displayed here once they are created
         </span>
       </div>
     </div>

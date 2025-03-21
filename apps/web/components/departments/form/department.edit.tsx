@@ -9,14 +9,9 @@ import { useForm } from "react-hook-form";
 import DepartmentBaseForm from "./department.form";
 import { Department, departmentSchema } from "./schema";
 
-type ExpenseEditProps = {
-  router: any;
-};
-
-export default function DepartmentEdit({ router }: ExpenseEditProps) {
+export default function DepartmentEdit() {
   const defaultValues: Department = {
     name: "Hello Hello",
-  
     appId: "0x0ehfrhf94840t05059n",
   };
 
@@ -25,8 +20,8 @@ export default function DepartmentEdit({ router }: ExpenseEditProps) {
     defaultValues: defaultValues,
   });
 
-  const handleDepartmentSubmit = async (data: any) => {
-    console.log(data, "data");
+  const handleDepartmentSubmit = async (data: Department) => {
+  
   };
 
   return (

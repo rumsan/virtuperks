@@ -1,11 +1,14 @@
 import { PATHS } from "@/routes/paths";
+;
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Coins, Dot, ExternalLink } from "lucide-react";
 import { Task } from "../form/schema";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { TaskCreated} from "@workspace/types/task";
 
 type ListCardDetailsProps = {
-  taskList: Task[];
-  router: any;
+  taskList: TaskCreated[]
+  router: AppRouterInstance;
   tabStatus: string;
 };
 
@@ -14,6 +17,7 @@ const ListCardDetails = ({
   router,
   tabStatus,
 }: ListCardDetailsProps) => {
+ 
   const filteredTaskList = () => {
     if (!taskList || !Array.isArray(taskList)) {
       return [];

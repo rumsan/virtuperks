@@ -1,5 +1,6 @@
 import { ListTable } from "@/components/common/list/list.table";
-import { participantList, TaskHistory } from "@/sampleData";
+import { usegetSingTask } from "@/hooks/subgraph/querycall";
+import { TaskHistory } from "@/sampleData";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -20,8 +21,10 @@ import {
 import { User } from "lucide-react";
 import { useState } from "react";
 import { useHistoryColumns } from "./history.column";
+import { shortAddress } from "@/utils/shortAddress";
+type TaskPortalParticipantProps = { taskId: any };
 
-const TaskPortalParticipant = () => {
+const TaskPortalParticipant = ({taskId }:TaskPortalParticipantProps ) => {
   const [hoveredWallet, setHoveredWallet] = useState<string | null>(null);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -31,6 +34,10 @@ const TaskPortalParticipant = () => {
     pageIndex: 0,
     pageSize: 10,
   });
+ 
+  const { taskData } = usegetSingTask(taskId);
+
+
 
   const columns = useHistoryColumns();
   const table = useReactTable({
@@ -94,27 +101,31 @@ const TaskPortalParticipant = () => {
 
       <Card className="w-[20%] ml-auto p-4">
         <CardTitle className="flex flex-col gap-2 w-full">
-          <span>Participants</span>
+          <span>Allowed Participants</span>
           <span className="text-sm text-gray-500 font-normal">
-            List of all the participants in this task
+            List of all allowed participants in this task
           </span>
         </CardTitle>
 
         <div className="flex items-center w-full mt-5 mb-5 gap-2 flex-wrap">
-          {participantList.map((participant) => (
+          {taskData?.taskDetail?.allowedWallets?.map((wallet: string) => (
             <div
-              key={participant.walletAddress}
-              className="relative flex items-center justify-center h-8 w-8 rounded-full bg-[#F1F5F9] gap-4 cursor-pointer hover:bg-gray-50"
-              onMouseEnter={() => setHoveredWallet(participant.walletAddress)}
+              key={wallet}
+              className="relative"
+              onMouseEnter={() => setHoveredWallet(wallet)}
               onMouseLeave={() => setHoveredWallet(null)}
             >
-              <User color="#64748B" size={20} />
-
-              {hoveredWallet === participant.walletAddress && (
-                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-[#297AD6] text-[#F8FAFC] text-xs px-2 py-1 rounded-md shadow-md">
-                  {participant.walletAddress}
+              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-[#F1F5F9] cursor-pointer">
+                <User color="#64748B" size={20} />
+              </div>
+              {hoveredWallet === wallet && (
+                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-[#297AD6] text-[#F8FAFC] text-xs px-2 py-1 rounded-md shadow-md whitespace-nowrap">
+                  {wallet}
                 </div>
               )}
+              <span className="text-xs text-gray-500 text-center mt-1">
+                {shortAddress(wallet)}
+              </span>
             </div>
           ))}
         </div>

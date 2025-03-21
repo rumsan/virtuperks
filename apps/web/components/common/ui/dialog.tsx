@@ -56,7 +56,7 @@ export function DialogButton({
             className="w-[170px] flex justify-center items-center gap-2 bg-[#297AD6]"
             onClick={() => {
               setIsOpen(false);
-              handleApplyTaskLogic();
+              handleApplyTaskLogic?.();
             }}
           >
             {buttonName}

@@ -24,6 +24,7 @@ import {
 import { ArrowLeft, Wallet } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Participant, participantSchema } from "./schema";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 const defaultValues: Participant = {
   name: "",
@@ -35,7 +36,7 @@ const defaultValues: Participant = {
 };
 
 type ParticipantAddProps = {
-  router: any;
+  router: AppRouterInstance;
 };
 
 export default function ParticipantAdd({ router }: ParticipantAddProps) {
@@ -44,7 +45,7 @@ export default function ParticipantAdd({ router }: ParticipantAddProps) {
     defaultValues: defaultValues,
   });
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: Participant) => {
     console.log(data, "data");
   };
 
@@ -71,7 +72,7 @@ export default function ParticipantAdd({ router }: ParticipantAddProps) {
             <Card className="rounded-lg w-full">
               <CardContent className="p-0">
                 <Form {...form}>
-                  <form onSubmit={handleSubmit}>
+                  <form onSubmit={form.handleSubmit(handleSubmit)}>
                     <div className="p-6">
                       <div className="grid grid-cols-2 gap-4 mb-5">
                         <FormField
@@ -109,12 +110,7 @@ export default function ParticipantAdd({ router }: ParticipantAddProps) {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem
-                                    //   key={owner.id}
-                                    value="male"
-                                  >
-                                    Male
-                                  </SelectItem>
+                                  <SelectItem value="male">Male</SelectItem>
                                   <SelectItem value="female">Female</SelectItem>
                                   <SelectItem value="others">Others</SelectItem>
                                 </SelectContent>
@@ -184,12 +180,7 @@ export default function ParticipantAdd({ router }: ParticipantAddProps) {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem
-                                    //   key={owner.id}
-                                    value="owner"
-                                  >
-                                    Owner
-                                  </SelectItem>
+                                  <SelectItem value="owner">Owner</SelectItem>
                                   <SelectItem value="manager">
                                     Manager
                                   </SelectItem>
@@ -221,10 +212,7 @@ export default function ParticipantAdd({ router }: ParticipantAddProps) {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem
-                                    //   key={owner.id}
-                                    value="managerA"
-                                  >
+                                  <SelectItem value="managerA">
                                     Manager A
                                   </SelectItem>
                                   <SelectItem value="managerB">

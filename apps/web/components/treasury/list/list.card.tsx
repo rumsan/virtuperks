@@ -2,14 +2,14 @@ import { PATHS } from "@/routes/paths";
 import { Treasurers } from "@/sampleData";
 import { Card, CardFooter, CardTitle } from "@workspace/ui/components/card";
 import { ArrowRight, Copy, Plus, Wallet } from "lucide-react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 type TreasurerListCardProps = {
-  router: any;
+  router: AppRouterInstance;
 };
 
 const TreasurerListCard = ({ router }: TreasurerListCardProps) => {
   return (
-    // <div className="flex items-center w-full">
     <div className="grid grid-cols-4 gap-4 w-full">
       <Card
         className="w-full flex items-center justify-center text-blue-500 bg-blue-50 border-sm border-primary border-dashed cursor-pointer hover:shadow-lg hover:text-blue-400 gap-2"
@@ -20,12 +20,13 @@ const TreasurerListCard = ({ router }: TreasurerListCardProps) => {
       </Card>
       {Treasurers &&
         Treasurers.map((treasurer) => {
+          console.log(treasurer, "treasurer");
           return (
             <Card
               key={treasurer.id}
               className="cursor-pointer hover:shadow-lg p-4"
               onClick={() =>
-                router.push(PATHS.TREASURY.DETAILS(treasurer.cuid))
+                router.push(PATHS.TREASURY.DETAILS(treasurer?.id.toString()))
               }
             >
               <CardTitle className="flex flex-col gap-1 w-full">

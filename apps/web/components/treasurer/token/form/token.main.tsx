@@ -7,10 +7,11 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { ArrowLeft } from "lucide-react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import TokenCreateForm from "./token.create";
 
 interface TokenCreateMainProps {
-  router: any;
+  router: AppRouterInstance;
 }
 
 const TokenCreateMain = ({ router }: TokenCreateMainProps) => {

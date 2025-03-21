@@ -1,6 +1,11 @@
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import ParticipantList from "./list";
 
-const Participant = ({ router }: any) => {
+interface RouterType {
+  router: AppRouterInstance;
+}
+
+const Participant = ({ router }: RouterType) => {
   return <ParticipantList router={router} />;
 };
 
