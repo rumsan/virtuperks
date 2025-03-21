@@ -14,7 +14,7 @@ type ParticipantDetailsProps = {
   router: any;
 };
 
-const ParticipantDetails = ({ cuid, router }: ParticipantDetailsProps) => {
+const ParticipantDetails = ({ router }: ParticipantDetailsProps) => {
   return (
     <main className="gap-2 p-4 sm:px-8 md:gap-8">
       <div

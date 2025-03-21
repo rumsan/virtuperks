@@ -59,8 +59,9 @@ const ParticipantList = ({ router }: ParticipantListProps) => {
   });
 
   const handleRowClick = (row: any) => {
-    console.log("hello");
-    router.push(PATHS.PARTICIPANT.DETAILS(row.original.cuid));
+    if (row.original.cuid) {
+      router.push(PATHS.PARTICIPANT.DETAILS(row.original.cuid));
+    }
   };
 
   return (
