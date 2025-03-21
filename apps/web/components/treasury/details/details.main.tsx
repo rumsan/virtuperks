@@ -23,14 +23,11 @@ export type Cuid = {
 };
 
 type TreasurerDetailsProps = {
-  cuid: Cuid;
+  cuid?: Cuid;
   router: any;
 };
 
-export default function TreasurerDetails({
-  cuid,
-  router,
-}: TreasurerDetailsProps) {
+export default function TreasurerDetails({ router }: TreasurerDetailsProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],

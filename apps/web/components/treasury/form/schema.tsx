@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export type Treasurer = {
+  cuid?: string | null;
   name: string | null;
   walletAddress: string | null;
 };
