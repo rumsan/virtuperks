@@ -4,6 +4,7 @@ import { CircleCheck, CircleX, Copy } from "lucide-react";
 import { useState } from "react";
 import useAcceptParticipant from "./accept.participant";
 import useApproveTask from "./approve.task";
+import { getDialogContent } from "@/utils/dialog";
 
 export function useColumns<T>(): ColumnDef<T>[] {
   const { handleAcceptParticipant } = useAcceptParticipant();
@@ -11,17 +12,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
 
-  const getDialogContent = (status: string) => {
-    return {
-      title: status === "UNACCEPTED" 
-        ? "Are you sure you want to accept this participant?" 
-        : "Are you sure you want to approve task request?",
-      subTitle: status === "UNACCEPTED"
-        ? "This will allow the participant to start working on the task"
-        : "This action cannot be undone",
-      buttonName: status === "UNACCEPTED" ? "Accept" : "Approve"
-    };
-  };
+
 
   const handleAction = (row: any) => {
     const status = row.getValue("status");
@@ -29,6 +20,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
     const participant = row.getValue("participant");
 
     if (status === "UNACCEPTED") {
+      console.log("unaccpeted");
       setSelectedTask({ id: internal_id, participant, status });
       setIsDialogOpen(true);
     } else if (status === "COMPLETED") {
@@ -41,8 +33,10 @@ export function useColumns<T>(): ColumnDef<T>[] {
     if (selectedTask) {
   
       if (selectedTask.status === "UNACCEPTED") {
+        console.log(selectedTask.id, "unaccpeted");
         await handleAcceptParticipant(selectedTask.id, selectedTask.participant);
       } else if (selectedTask.status === "COMPLETED") {
+        console.log(selectedTask.id, "completed");
         await handleApproveTask(selectedTask.id);
       }
       setIsDialogOpen(false);

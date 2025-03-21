@@ -1,10 +1,13 @@
 import { useWriteEntityTaskManagerAcceptParticipant } from "@/hooks/wagmi/contracts";
 
 
+
 const useAcceptParticipant = () => {
   const { writeContractAsync } = useWriteEntityTaskManagerAcceptParticipant();
 
   const handleAcceptParticipant = async (id, participant) => {
+    console.log("taskid from accept", id);
+    console.log("participant from accept", participant);
    
     
      const result = await writeContractAsync({

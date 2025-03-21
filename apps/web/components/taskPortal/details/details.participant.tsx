@@ -36,7 +36,7 @@ const TaskPortalParticipant = ({taskId }:TaskPortalParticipantProps ) => {
   });
  
   const { taskData } = usegetSingTask(taskId);
-  console.log(taskData, 'taskData')
+
 
 
   const columns = useHistoryColumns();
