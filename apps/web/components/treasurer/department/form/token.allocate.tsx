@@ -27,7 +27,7 @@ const DepartmentTokenAllocate = () => {
     defaultValues: defaultValues,
   });
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: Token) => {
     console.log(data, "data");
   };
 
@@ -41,7 +41,7 @@ const DepartmentTokenAllocate = () => {
       <Card className="rounded-lg w-full">
         <CardContent className="p-0">
           <Form {...form}>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={form.handleSubmit(handleSubmit)}>
               <div className="p-6">
                 <div className="grid grid-cols-1 gap-4 mb-5">
                   <FormField
@@ -87,7 +87,15 @@ const DepartmentTokenAllocate = () => {
                   </Button>
 
                   {isOpen && (
-                    <DialogButton isOpen={isOpen} setIsOpen={setIsOpen} />
+                    <DialogButton
+                      isOpen={isOpen}
+                      setIsOpen={setIsOpen}
+                      title={"Allocate Token"}
+                      subTitle={
+                        "Are you sure you want to confirm this token alloation?"
+                      }
+                      buttonName={"Confirm"}
+                    />
                   )}
                 </div>
               </div>

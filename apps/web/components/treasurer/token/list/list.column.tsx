@@ -9,7 +9,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
         <div className="text-left text-gray-600 font-bold">Topic</div>
       ),
 
-      cell: ({ row }) => {
+      cell: () => {
         return <p>Token Allocation</p>;
       },
     },
@@ -19,7 +19,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
         <div className="text-left text-gray-600 font-bold">Date</div>
       ),
 
-      cell: ({ row }) => {
+      cell: () => {
         return <p>January 28th, 2025</p>;
       },
     },
@@ -29,7 +29,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
         <div className="text-left text-gray-600 font-bold">Department</div>
       ),
 
-      cell: ({ row }) => {
+      cell: () => {
         return <p>Rahat Tech</p>;
       },
     },
@@ -41,7 +41,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
         </div>
       ),
 
-      cell: ({ row }) => {
+      cell: () => {
         return <p>Ram Thapa Magar</p>;
       },
     },
@@ -51,7 +51,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
         <div className="text-left text-gray-600 font-bold">Tokens</div>
       ),
 
-      cell: ({ row }) => {
+      cell: () => {
         return <p>100</p>;
       },
     },
@@ -61,7 +61,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
         <div className="text-left text-gray-600 font-bold">Action</div>
       ),
       enableHiding: false,
-      cell: ({ row }) => {
+      cell: () => {
         return (
           <p>
             <Eye />
