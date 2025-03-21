@@ -1,10 +1,11 @@
 "use client";
 
+import { NextRouter } from "next/router";
 import DepartmentListCard from "./list.card";
 import ListToolBar from "./list.toolbar";
 
 interface DepartmentListProps {
-  router: any;
+  router: NextRouter;
 }
 
 export default function DepartmentList({ router }: DepartmentListProps) {

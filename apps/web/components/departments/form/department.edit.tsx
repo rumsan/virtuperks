@@ -20,7 +20,7 @@ export default function DepartmentEdit() {
     defaultValues: defaultValues,
   });
 
-  const handleDepartmentSubmit = async (data: string) => {
+  const handleDepartmentSubmit = async (data: Department) => {
     console.log(data, "data");
   };
 

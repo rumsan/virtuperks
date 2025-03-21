@@ -7,6 +7,7 @@ import { Card, CardContent } from "@workspace/ui/components/card";
 import { PATHS } from "@/routes/paths";
 import { EntityFactoryABI } from "@workspace/contracts/abis";
 import { ArrowLeft } from "lucide-react";
+import { NextRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { useWriteContract } from "wagmi";
 import DepartmentBaseForm from "./department.form";
@@ -17,7 +18,7 @@ const defaultValues: Department = {
 };
 
 type DepartmentAddProps = {
-  router: any;
+  router: NextRouter;
 };
 
 export default function DepartmentAdd({ router }: DepartmentAddProps) {
@@ -26,7 +27,7 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
     defaultValues: defaultValues,
   });
 
-  const { data, writeContractAsync } = useWriteContract();
+  const { writeContractAsync } = useWriteContract();
 
   const createEntityButton = async (data: Department) => {
     console.log(data, "inside data");

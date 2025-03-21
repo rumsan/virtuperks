@@ -13,6 +13,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { ArrowLeft } from "lucide-react";
+import { NextRouter } from "next/router";
 import React from "react";
 import DepartmentDetailsCard from "./details.card";
 import { useColumns } from "./details.column";
@@ -24,7 +25,7 @@ export type Cuid = {
 
 type DepartmentDetailsProps = {
   cuid: Cuid;
-  router: any;
+  router: NextRouter;
 };
 
 export default function DepartmentDetails({

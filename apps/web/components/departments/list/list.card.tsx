@@ -6,8 +6,20 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { ArrowRight, Coins, Plus, User } from "lucide-react";
+import { NextRouter } from "next/router";
 
-const DepartmentListCard = ({ router }: any) => {
+interface DepartmentListCardProps {
+  router: NextRouter;
+}
+
+interface DepartmentDetails {
+  id: string;
+  cuid: string;
+  _name: string;
+  eName: string;
+}
+
+const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
   const getAllEntity = useEntityList();
   const entityList = getAllEntity?.data?.data?.entityTaskManagerCreateds;
 
@@ -22,7 +34,6 @@ const DepartmentListCard = ({ router }: any) => {
       </Card>
       {entityList &&
         entityList.map((department: DepartmentDetails) => {
-          console.log(department, "departmentttt");
           return (
             <Card
               key={department.id}
