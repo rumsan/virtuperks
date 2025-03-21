@@ -12,12 +12,13 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import React from "react";
 import { useColumns } from "../details/details.column";
 import TaskPortalCard from "./list.card";
 
 interface TaskPortalMainProps {
-  router: any;
+  router: AppRouterInstance;
 }
 
 export default function TaskPortalMain({ router }: TaskPortalMainProps) {

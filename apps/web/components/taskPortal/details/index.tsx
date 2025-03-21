@@ -14,6 +14,7 @@ import { PATHS } from "@/routes/paths";
 import { AcceptedTaskData, TaskData } from "@workspace/types/task";
 import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import TaskPortalParticipant from "./details.participant";
@@ -21,7 +22,7 @@ import TaskPortalDetails from "./details.task";
 
 type TaskPortalMainProps = {
   cuid: Cuid;
-  router: any;
+  router: AppRouterInstance;
 };
 
 const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
