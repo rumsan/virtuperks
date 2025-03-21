@@ -2,11 +2,9 @@
 
 import DepartmentEdit from "@/components/departments/form/department.edit";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
 
 function Page() {
-  const router = useRouter();
-  return <DepartmentEdit router={router} />;
+  return <DepartmentEdit />;
 }
 
 export default dynamic(() => Promise.resolve(Page), {

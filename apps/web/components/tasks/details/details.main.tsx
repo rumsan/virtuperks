@@ -1,24 +1,26 @@
 import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
-import { useGetApprovedList } from "@/hooks/subgraph/querycall";
+import { useGetApprovedList, usegetSingTask } from "@/hooks/subgraph/querycall";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft, CheckCircle, CircleX } from "lucide-react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
+import useApproveTask from "./approve.task";
 import TaskParticipant from "./details.participant";
 import TaskDetails from "./details.task";
-import useApproveTask from "./approve.task";
 
 type TaskMainProps = {
   cuid: Cuid;
-  router: any;
+  router: AppRouterInstance;
 };
 
 const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const { approvedData } = useGetApprovedList(cuid);
+  const {taskData} = usegetSingTask(cuid)
   const [localStatus, setLocalStatus] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-    const { handleApproveTask } = useApproveTask();
+  const { handleApproveTask } = useApproveTask();
 
   // Check if task is already verified from stored data
   const isVerified = approvedData?.some((data: any) => data.status === "VERIFIED");
@@ -28,7 +30,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
 
   const handleDialogAction = async () => {
     try {
-      await handleApproveTask(cuid.id);
+      await handleApproveTask(cuid.id, taskData.entityTaskManager.id);
       setIsOpen(false);
       setLocalStatus("VERIFIED"); // Update local status immediately after successful approval
     } catch (error) {
@@ -86,11 +88,11 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
         </div>
 
         <div className="flex w-full gap-4">
-          <TaskDetails cuid={cuid} router={router} />
+          <TaskDetails cuid={cuid} />
         </div>
 
         <div className="flex w-full gap-4">
-          <TaskParticipant taskId={cuid} router={router} />
+          <TaskParticipant taskId={cuid} />
         </div>
       </div>
     </main>

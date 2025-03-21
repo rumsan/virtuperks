@@ -3,7 +3,6 @@
 import { addDays } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import * as React from "react";
-// import { DateRange } from "react-day-picker";
 
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
@@ -17,7 +16,7 @@ import { cn } from "@workspace/ui/lib/utils";
 export function DatePickerWithRange({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
-  const [date, setDate] = React.useState({
+  const [date] = React.useState({
     from: new Date(2022, 0, 20),
     to: addDays(new Date(2022, 0, 20), 20),
   });
@@ -49,7 +48,7 @@ export function DatePickerWithRange({
                 mode="range"
                 defaultMonth={date?.from}
                 selected={date}
-                onSelect={setDate}
+                // onSelect={setDate}
                 numberOfMonths={2}
               />
             </PopoverContent>

@@ -4,24 +4,29 @@ import { ColumnDef } from "@tanstack/react-table";
 import { CircleCheck, CircleX, Copy } from "lucide-react";
 import { useState } from "react";
 import useAcceptParticipant from "./accept.participant";
-import useApproveTask from "./approve.task";
 
 export function useColumns<T>(): ColumnDef<T>[] {
   const { handleAcceptParticipant } = useAcceptParticipant();
-  const { handleApproveTask } = useApproveTask();
+  
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
 
 
 
   const handleAction = (row: any) => {
+  
+    const entityId = row.original.taskDetail.task.entityTaskManager.entityTaskManager
+ 
     const status = row.getValue("status");
     const internal_id = row.getValue("internal_id");
     const participant = row.getValue("participant");
+  
+  
 
     if (status === "UNACCEPTED") {
     
-      setSelectedTask({ id: internal_id, participant, status });
+      setSelectedTask({ id: internal_id, participant, status, entityId });
       setIsDialogOpen(true);
     } else if (status === "COMPLETED") {
       setSelectedTask({ id: internal_id, participant, status });
@@ -34,7 +39,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
   
       if (selectedTask.status === "UNACCEPTED") {
         console.log(selectedTask.id, "unaccpeted");
-        await handleAcceptParticipant(selectedTask.id, selectedTask.participant);
+        await handleAcceptParticipant(selectedTask.id, selectedTask.participant, selectedTask.entityId);
       }
       setIsDialogOpen(false);
       setSelectedTask(null);

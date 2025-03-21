@@ -8,13 +8,14 @@ import {
 } from "@workspace/ui/components/tabs";
 import { ArrowLeft } from "lucide-react";
 import ParticipantCard from "./details.card";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 type ParticipantDetailsProps = {
   cuid: Cuid;
-  router: any;
+  router: AppRouterInstance;
 };
 
-const ParticipantDetails = ({ cuid, router }: ParticipantDetailsProps) => {
+const ParticipantDetails = ({ router }: ParticipantDetailsProps) => {
   return (
     <main className="gap-2 p-4 sm:px-8 md:gap-8">
       <div

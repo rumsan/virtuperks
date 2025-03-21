@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export type Participant = {
+  cuid?: string | null;
   name: string | null;
   email: string | null;
   walletAddress: string | null;

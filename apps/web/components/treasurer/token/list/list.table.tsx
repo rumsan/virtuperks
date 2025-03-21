@@ -3,13 +3,19 @@ import SearchAction from "@/components/common/list/list.search";
 import { ListTable } from "@/components/common/list/list.table";
 import { ColumnDef, Table } from "@tanstack/react-table";
 import { Card } from "@workspace/ui/components/card";
+import { Dispatch, SetStateAction } from "react";
 import ListFilter from "./list.filter";
+
+interface Pagination {
+  pageIndex: number;
+  pageSize: number;
+}
 
 interface ListTableProps<T, TData> {
   columns: ColumnDef<T>[];
   table: Table<TData>;
-  pagination: any;
-  setPagination: any;
+  pagination: Pagination;
+  setPagination: Dispatch<SetStateAction<Pagination>>;
 }
 
 const TokenTable = <T, TData>({

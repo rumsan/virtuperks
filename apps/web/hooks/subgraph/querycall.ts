@@ -1,6 +1,7 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useQuery } from "@tanstack/react-query";
 import { EntityTaskManagementABI } from "@workspace/contracts/abis";
+
 import { useReadContract } from "wagmi";
 
 // Add these query key constants
@@ -73,15 +74,23 @@ export const useGetParticipantApplied = (taskId: any) => {
     },
   });
 
-  const filterData = data?.data?.particiantApplieds.filter(
-    (data: any) => data?.taskDetail.id === taskId.id
-  ) || [];
+
+
+  const filterData = data?.data?.particiantApplieds?.filter((data: any) => {
+ 
+    return data?.taskDetail?.id === taskId?.id;
+  }) || [];
+
+  
 
   return {
     participantDatas: filterData,
-    isLoading
+    isLoading,
+    // Return raw data for debugging
+    rawData: data?.data?.particiantApplieds
   };
 };
+
 export const usegetSingTask = (taskId:any) => {
   const { queryService } = useGraphService();
 

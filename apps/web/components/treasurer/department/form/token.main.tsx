@@ -1,10 +1,11 @@
 import { PATHS } from "@/routes/paths";
 import { ArrowLeft } from "lucide-react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import DepartmentTokenAllocate from "./token.allocate";
 import TokenAllocateCard from "./token.card";
 
 interface TokenAllocateMainProps {
-  router: any;
+  router: AppRouterInstance;
 }
 
 const TokenAllocateMain = ({ router }: TokenAllocateMainProps) => {

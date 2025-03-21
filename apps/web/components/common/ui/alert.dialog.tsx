@@ -12,7 +12,7 @@ import { Wallet } from "lucide-react";
 
 interface CustomAlertDialogProps {
   alertDialog: boolean;
-  setAlertDialog: any;
+  setAlertDialog: (alertDialog: boolean) => void;
 }
 
 export function CustomAlertDialog({

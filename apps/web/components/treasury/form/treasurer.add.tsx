@@ -17,6 +17,7 @@ import { Input } from "@workspace/ui/components/input";
 import { ArrowLeft, Wallet } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Treasurer, treasurerSchema } from "./schema";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 const defaultValues: Treasurer = {
   name: "",
@@ -24,7 +25,7 @@ const defaultValues: Treasurer = {
 };
 
 type TreasurerAddProps = {
-  router: any;
+  router: AppRouterInstance;
 };
 
 export default function TreasurerAdd({ router }: TreasurerAddProps) {
@@ -33,7 +34,7 @@ export default function TreasurerAdd({ router }: TreasurerAddProps) {
     defaultValues: defaultValues,
   });
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: Treasurer) => {
     console.log(data, "data");
   };
 
@@ -60,7 +61,7 @@ export default function TreasurerAdd({ router }: TreasurerAddProps) {
             <Card className="rounded-lg w-full">
               <CardContent className="p-0">
                 <Form {...form}>
-                  <form onSubmit={handleSubmit}>
+                  <form onSubmit={form.handleSubmit(handleSubmit)}>
                     <div className="p-6">
                       <div className="grid grid-cols-1 gap-4 mb-5">
                         <FormField

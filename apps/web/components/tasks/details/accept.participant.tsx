@@ -6,15 +6,15 @@ const useAcceptParticipant = () => {
   const { writeContractAsync } = useWriteEntityTaskManagerAcceptParticipant();
   const queryClient = useQueryClient();
 
-  const handleAcceptParticipant = async (id: `0x${string}`, participant: `0x${string}`) => {
+  const handleAcceptParticipant = async (id: `0x${string}`, participant: `0x${string}`, entityId:string ) => {
     try {
       const result = await writeContractAsync({
-        address: (process.env.NEXT_PUBLIC_ENTITY_ID as `0x${string}`) || "0x",
+        address: (entityId as `0x${string}`) || "0x",
         args: [id, participant],
       });
       
       if (result) {
-        console.log(result,'result from the acceptParticipant')
+      
         // Invalidate queries using imported keys
         await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ACCEPTED] });
         await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PARTICIPANT] });

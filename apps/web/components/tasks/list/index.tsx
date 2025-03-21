@@ -10,19 +10,21 @@ import {
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
 import { Plus } from "lucide-react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 import ListCardDetails from "./list.card";
 import { DatePickerWithRange } from "./list.date";
 import TaskListStatus from "./list.status";
 
+
 interface TaskListMainProps {
-  router: any;
+  router: AppRouterInstance;
 }
 
 export default function TaskListMain({ router }: TaskListMainProps) {
   const [tabStatus, setTabStatus] = useState("active");
   const getAllTask = useTaskList();
-  const taskList = getAllTask?.data?.data?.taskCreateds;
+  const taskList = getAllTask?.data?.data?.taskCreateds 
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
       <div className="space-y-4">
@@ -32,7 +34,7 @@ export default function TaskListMain({ router }: TaskListMainProps) {
             Overview of all the tasks
           </h3>
         </div>
-        <TaskListStatus router={router} />
+        <TaskListStatus />
 
         <div className="flex items-center">
           <div className="flex flex-col w-[80%] gap-1">

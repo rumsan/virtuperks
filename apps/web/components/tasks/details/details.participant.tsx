@@ -17,18 +17,22 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
+import { AcceptedTaskData } from "@workspace/types/task";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Input } from "@workspace/ui/components/input";
 import { Search, User } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useColumns } from "./details.column";
 
-type TaskParticipantProps = {
- taskId:any,
-  router:string
+type Cuid = {
+  id: string;
 };
 
-const TaskParticipant = ({taskId, router}:TaskParticipantProps) => {
+type TaskParticipantProps = {
+  taskId: Cuid;
+};
+
+const TaskParticipant = ({ taskId }: TaskParticipantProps) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -43,6 +47,7 @@ const TaskParticipant = ({taskId, router}:TaskParticipantProps) => {
   const columns = useColumns();
 
   const { participantDatas } = useGetParticipantApplied(taskId);
+console.log(participantDatas,'detail.participant')
   const { acceptedLoading, acceptedParticipant } = useGetAcceptedList(taskId);
   const { completedData } = useGetTaskCompletedList(taskId);
 
@@ -65,7 +70,6 @@ const TaskParticipant = ({taskId, router}:TaskParticipantProps) => {
       setParticipantList(filteredParticipants);
     }
   }, [participantDatas, acceptedParticipant, completedData, participantList]);
-
 
   const table = useReactTable({
     data: participantList,
@@ -127,8 +131,8 @@ const TaskParticipant = ({taskId, router}:TaskParticipantProps) => {
         </CardTitle>
 
         <div className="flex items-center w-full mt-5 mb-5 gap-2 flex-wrap">
-          {acceptedParticipant?.map((participant: any) => (
-            <div 
+          {acceptedParticipant?.map((participant: AcceptedTaskData) => (
+            <div
               key={participant?.participant}
               className="flex flex-col items-center gap-1"
               title={participant?.participant} // Add title attribute for hover

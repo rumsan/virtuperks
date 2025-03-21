@@ -15,8 +15,8 @@ import { Department } from "./schema";
 
 interface DepartmentFormProps {
   mode: "add" | "edit";
-  saveForm: (departmentData: any) => void;
-  defaultValues: any;
+  saveForm: (departmentData: Department) => void;
+  defaultValues: Department;
   isEditing?: boolean;
   form: UseFormReturn<Department>;
   children: React.ReactNode;
@@ -59,8 +59,6 @@ export default function DepartmentBaseForm({
                   </FormItem>
                 )}
               />
-
-              
             </div>
 
             <div className="w-full flex justify-end mt-5">

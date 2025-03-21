@@ -5,10 +5,10 @@ const useApproveTask = () => {
   const { writeContractAsync } = useWriteEntityTaskManagerVerifyCompletion();
   const queryClient = useQueryClient();
 
-  const handleApproveTask = async (taskId: string) => {
+  const handleApproveTask = async (taskId: string, entityId:string) => {
     try {
       const result = await writeContractAsync({
-        address: (process.env.NEXT_PUBLIC_ENTITY_ID as `0x${string}`) || "0x",
+        address: (entityId as `0x${string}`) || "0x",
         args: [taskId as `0x${string}`],
       });
 

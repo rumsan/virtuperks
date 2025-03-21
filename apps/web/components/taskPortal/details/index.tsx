@@ -9,15 +9,18 @@ import { PATHS } from "@/routes/paths";
 import { getDialogContents } from "@/utils/dialog";
 import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { getButtonState } from "./button.state";
 import TaskPortalParticipant from "./details.participant";
 import TaskPortalDetails from "./details.task";
+import { Cuid } from "@/components/departments/details/details.main";
+import { TaskCreated } from "@workspace/types/task";
 
 type TaskPortalMainProps = {
-  cuid: any;
-  router: any;
+  cuid: Cuid;
+  router: AppRouterInstance;
 };
 
 const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
@@ -32,11 +35,13 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const getAllTask = useTaskList();
   const TaskList = getAllTask?.data?.data?.taskCreateds;
 
-  const taskData = TaskList?.find((task: any) => task?.id === cuid?.id);
- 
+  const taskData = TaskList?.find((task: TaskCreated) => {
+    return task?.id === cuid?.id;
+  });
 
   const { address } = useAccount();
   const { participantDatas } = useGetParticipantApplied(cuid)
+
 
 
   const { acceptedParticipant } = useGetAcceptedList(cuid);
@@ -110,8 +115,9 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   );
 
   const getButtonContent = () => {
-    // Use localButtonState if available, otherwise use buttonState from props
+  
     const currentState = localButtonState || buttonState;
+
 
     switch (currentState) {
       case "COMPLETED":

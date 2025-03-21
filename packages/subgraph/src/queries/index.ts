@@ -53,7 +53,7 @@ export const TransferList = `
 
 export const TaskCreatedList = `
   query TaskCreatedList {
-    taskCreateds(first: 15) {
+    taskCreateds(first: 100) {
       id
       createdBy
       blockNumber
@@ -82,7 +82,7 @@ export const TaskCreatedList = `
 
 export const ParticiantAppliedList = `
   query ParticiantAppliedList {
-    particiantApplieds(first: 10) {
+    particiantApplieds(first: 100) {  # Increased limit to make sure we get all data
       id
       internal_id
       participant
@@ -90,23 +90,23 @@ export const ParticiantAppliedList = `
       blockNumber
       blockTimestamp
       transactionHash
-    
-    taskDetail {
-    task{
-      entityTaskManager{
+      taskDetail {
+        id   # Make sure this field exists
+        allowedWallets
+        detailsUrl
+        expiryDate
+        isActive
+        maxParticipants
+        owner
+        rewardAmount
+        rewardToken
+        task {
+        entityTaskManager {
         entityTaskManager
+        
+        }
+        }
       }
-    }
-    allowedWallets
-    detailsUrl
-    expiryDate
-    id
-    isActive
-    maxParticipants
-    owner
-    rewardAmount
-    rewardToken
-    }
     }
   }
 `;
@@ -128,7 +128,7 @@ export const EntityTaskManagerCreatedList = `
 
 export const TaskCompletedList = `
   query TaskCompletedList {
-    taskCompleteds(first: 10, orderBy: blockTimestamp) {
+    taskCompleteds(first: 100, orderBy: blockTimestamp) {
       id
       internal_id
       participant
@@ -151,7 +151,7 @@ export const TaskCompletedList = `
 
 export const TaskAcceptedList = `
   query TaskAcceptedList {
-    taskAccepteds(first: 10, orderBy: blockTimestamp) {
+    taskAccepteds(first: 100, orderBy: blockTimestamp) {
       id
       internal_id
       participant
@@ -176,7 +176,7 @@ export const TaskAcceptedList = `
 
 export const TaskApprovedList = `
   query TaskApprovedList {
-    taskApproveds(first: 20, orderBy: blockTimestamp) {
+    taskApproveds(first: 100, orderBy: blockTimestamp) {
       id
       internal_id
       approver
@@ -193,6 +193,12 @@ export const TaskApprovedList = `
         owner
         rewardAmount
         rewardToken
+          task {
+        entityTaskManager {
+        entityTaskManager
+        
+        }
+        }
       }
     }
   }

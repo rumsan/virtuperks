@@ -8,7 +8,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
         <div className="text-left text-gray-600 font-bold">Name</div>
       ),
 
-      cell: ({ row }) => {
+      cell: () => {
         return <p>Ram Thapa Magar</p>;
       },
     },
@@ -20,7 +20,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
         </div>
       ),
 
-      cell: ({ row }) => {
+      cell: () => {
         return <p className="text-center">0x0ej394nf94jf04mo4</p>;
       },
     },

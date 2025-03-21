@@ -1,22 +1,24 @@
 import { Cuid } from "@/components/departments/details/details.main";
 import { useTaskList } from "@/hooks/subgraph/querycall";
+import { TaskCreated } from "@workspace/types/task";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { ExternalLink, Timer, Trophy, UserRoundCog, Users } from "lucide-react";
 
 type TaskDetailsProps = {
   cuid: Cuid;
-  router: any;
 };
 
-const TaskDetails = ({ cuid, router }: TaskDetailsProps) => {
+const TaskDetails = ({ cuid }: TaskDetailsProps) => {
   const getAllTask = useTaskList();
   const taskList = getAllTask?.data?.data?.taskCreateds;
 
-  const filteredTaskList = taskList?.map((task) => {
+  const filteredTaskList = taskList?.map((task: TaskCreated) => {
     return task?.taskDetail;
   });
 
-  const taskData = filteredTaskList?.find((task) => task?.id === cuid?.id);
+  const taskData = filteredTaskList?.find(
+    (task:TaskCreated) => task?.id === cuid?.id,
+  );
 
   return (
     <>
