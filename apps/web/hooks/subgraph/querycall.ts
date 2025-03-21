@@ -3,6 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { EntityTaskManagementABI } from "@workspace/contracts/abis";
 import { useReadContract } from "wagmi";
 
+// Add these query key constants
+export const QUERY_KEYS = {
+  PARTICIPANT: "participant",
+  ACCEPTED: "accepted",
+  COMPLETED: "completed",
+  TASKS: "tasks"
+} as const;
+
 export const useApplist = () => {
   const { queryService } = useGraphService();
 
@@ -33,7 +41,7 @@ export const useTaskList = () => {
   const { queryService } = useGraphService();
 
   return useQuery({
-    queryKey: ["tasks"],
+    queryKey: [QUERY_KEYS.TASKS],
     queryFn: async () => {
       const getAllData = await queryService?.getTaskCreatedList();
       return getAllData;
@@ -58,7 +66,7 @@ export const useGetAllowedWallets = (
 export const useGetParticipantApplied = (taskId: any) => {
   const { queryService } = useGraphService();
   const { data, isLoading } = useQuery({
-    queryKey: ["participant"],
+    queryKey: [QUERY_KEYS.PARTICIPANT],
     queryFn: async () => {
       const getAllData = await queryService?.getParticiantAppliedList();
       return getAllData;
@@ -98,7 +106,7 @@ export const usegetSingTask = (taskId:any) => {
 export const useGetAcceptedList = (taskId: any) => {
   const { queryService } = useGraphService();
   const { data, isLoading } = useQuery({
-    queryKey: ["accepted"],
+    queryKey: [QUERY_KEYS.ACCEPTED],
     queryFn: async () => {
       const getAllData = await queryService?.getTaskAcceptedList();
       return getAllData;
@@ -119,7 +127,7 @@ export const useGetAcceptedList = (taskId: any) => {
 export const useGetTaskCompletedList = (taskId:any) => {
   const { queryService } = useGraphService();
   const {data, isLoading} =  useQuery({
-    queryKey: ["completed"],
+    queryKey: [QUERY_KEYS.COMPLETED],
     queryFn: async () => {
       const getAllData = await queryService?.getTaskCompletedList();
       return getAllData;
@@ -134,3 +142,27 @@ export const useGetTaskCompletedList = (taskId:any) => {
     completedLoading: isLoading
   }
 };
+
+export const useGetApprovedList = (taskId: any) => {
+  
+  const { queryService } = useGraphService();
+  const { data, isLoading } = useQuery({
+    queryKey: ["approved"],
+    queryFn: async () => {
+      const getAllData = await queryService?.getTaskApproveddList()
+      return getAllData;
+    },
+  });
+
+
+
+  const filterData = data?.data?.taskApproveds.filter(
+    (data: any) => data?.taskDetail.id === taskId?.id
+  ) || [];
+ 
+
+  return {
+    approvedData: filterData,
+    approvedLoading: isLoading
+  };
+}

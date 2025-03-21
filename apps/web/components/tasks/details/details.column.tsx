@@ -1,10 +1,10 @@
 import { DialogButton } from "@/components/common/ui/dialog";
+import { getDialogContent } from "@/utils/dialog";
 import { ColumnDef } from "@tanstack/react-table";
 import { CircleCheck, CircleX, Copy } from "lucide-react";
 import { useState } from "react";
 import useAcceptParticipant from "./accept.participant";
 import useApproveTask from "./approve.task";
-import { getDialogContent } from "@/utils/dialog";
 
 export function useColumns<T>(): ColumnDef<T>[] {
   const { handleAcceptParticipant } = useAcceptParticipant();
@@ -20,7 +20,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
     const participant = row.getValue("participant");
 
     if (status === "UNACCEPTED") {
-      console.log("unaccpeted");
+    
       setSelectedTask({ id: internal_id, participant, status });
       setIsDialogOpen(true);
     } else if (status === "COMPLETED") {
@@ -35,9 +35,6 @@ export function useColumns<T>(): ColumnDef<T>[] {
       if (selectedTask.status === "UNACCEPTED") {
         console.log(selectedTask.id, "unaccpeted");
         await handleAcceptParticipant(selectedTask.id, selectedTask.participant);
-      } else if (selectedTask.status === "COMPLETED") {
-        console.log(selectedTask.id, "completed");
-        await handleApproveTask(selectedTask.id);
       }
       setIsDialogOpen(false);
       setSelectedTask(null);
@@ -99,6 +96,11 @@ export function useColumns<T>(): ColumnDef<T>[] {
       cell: ({ row }) => {
         const status = row.getValue("status");
         const dialogContent = getDialogContent(status as string);
+        
+        // Only show actions for UNACCEPTED status
+        if (status === "COMPLETED") {
+          return null; // Hide actions for completed status
+        }
         
         return (
           <>
