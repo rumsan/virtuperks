@@ -15,12 +15,13 @@ import {
 import { Button } from "@workspace/ui/components/button";
 import { Card } from "@workspace/ui/components/card";
 import { Plus } from "lucide-react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import React from "react";
 import { useColumns } from "./list.columns";
 import ListToolBar from "./list.toolbar";
 
 type ParticipantListProps = {
-  router: any;
+  router: AppRouterInstance;
 };
 
 const ParticipantList = ({ router }: ParticipantListProps) => {

@@ -24,6 +24,7 @@ import {
 import { ArrowLeft, Wallet } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Participant, participantSchema } from "./schema";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 const defaultValues: Participant = {
   name: "",
@@ -35,7 +36,7 @@ const defaultValues: Participant = {
 };
 
 type ParticipantAddProps = {
-  router: any;
+  router: AppRouterInstance;
 };
 
 export default function ParticipantAdd({ router }: ParticipantAddProps) {
