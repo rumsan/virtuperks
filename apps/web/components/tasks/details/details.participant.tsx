@@ -16,14 +16,19 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
+import { AcceptedTaskData } from "@workspace/types/task";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Input } from "@workspace/ui/components/input";
 import { Search, User } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useColumns } from "./details.column";
 
+type Cuid = {
+  id: string;
+};
+
 type TaskParticipantProps = {
-  taskId: string;
+  taskId: Cuid;
 };
 
 const TaskParticipant = ({ taskId }: TaskParticipantProps) => {
@@ -44,7 +49,7 @@ const TaskParticipant = ({ taskId }: TaskParticipantProps) => {
 
   const { acceptedParticipant } = useGetAcceptedList(taskId);
 
-  const [participantList, setParticipantList] = useState<any[]>([]);
+  const [participantList, setParticipantList] = useState<string[]>([]);
 
   useEffect(() => {
     const filteredParticipants = filterUnacceptedParticipants(
@@ -119,25 +124,20 @@ const TaskParticipant = ({ taskId }: TaskParticipantProps) => {
         </CardTitle>
 
         <div className="flex items-center w-full mt-5 mb-5 gap-2 flex-wrap">
-          {acceptedParticipant?.map(
-            (participant) => (
-              console.log(participant, "participant 1111"),
-              (
-                <div
-                  key={participant?.participant}
-                  className="flex flex-col items-center gap-1"
-                  title={participant?.participant} // Add title attribute for hover
-                >
-                  <div className="flex items-center justify-center h-8 w-8 rounded-full bg-[#F1F5F9] cursor-pointer">
-                    <User color="#64748B" size={20} />
-                  </div>
-                  <span className="text-xs text-gray-500">
-                    {shortAddress(participant?.participant)}
-                  </span>
-                </div>
-              )
-            ),
-          )}
+          {acceptedParticipant?.map((participant: AcceptedTaskData) => (
+            <div
+              key={participant?.participant}
+              className="flex flex-col items-center gap-1"
+              title={participant?.participant} // Add title attribute for hover
+            >
+              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-[#F1F5F9] cursor-pointer">
+                <User color="#64748B" size={20} />
+              </div>
+              <span className="text-xs text-gray-500">
+                {shortAddress(participant?.participant)}
+              </span>
+            </div>
+          ))}
         </div>
       </Card>
     </>

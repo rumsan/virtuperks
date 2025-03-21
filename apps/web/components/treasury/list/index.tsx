@@ -1,10 +1,11 @@
 "use client";
 
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import TreasurerListCard from "./list.card";
 import ListToolBar from "./list.toolbar";
 
 type TreasurerListProps = {
-  router: any;
+  router: AppRouterInstance;
 };
 
 export function TreasurerList({ router }: TreasurerListProps) {

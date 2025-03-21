@@ -17,6 +17,7 @@ import { Input } from "@workspace/ui/components/input";
 import { ArrowLeft, Wallet } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Treasurer, treasurerSchema } from "./schema";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 const defaultValues: Treasurer = {
   name: "",
@@ -24,7 +25,7 @@ const defaultValues: Treasurer = {
 };
 
 type TreasurerAddProps = {
-  router: any;
+  router: AppRouterInstance;
 };
 
 export default function TreasurerAdd({ router }: TreasurerAddProps) {

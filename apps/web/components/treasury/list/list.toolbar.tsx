@@ -3,9 +3,10 @@
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { Plus } from "lucide-react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 interface ListToolBar {
-  router: any;
+  router: AppRouterInstance;
 }
 
 export default function ListToolBar({ router }: ListToolBar) {

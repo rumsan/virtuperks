@@ -13,6 +13,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { ArrowLeft } from "lucide-react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import React from "react";
 import TreasurerCard from "./details.card";
 import { useColumns } from "./details.columns";
@@ -24,7 +25,7 @@ export type Cuid = {
 
 type TreasurerDetailsProps = {
   cuid?: Cuid;
-  router: any;
+  router: AppRouterInstance;
 };
 
 export default function TreasurerDetails({ router }: TreasurerDetailsProps) {

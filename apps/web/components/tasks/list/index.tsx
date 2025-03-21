@@ -10,13 +10,14 @@ import {
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
 import { Plus } from "lucide-react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 import ListCardDetails from "./list.card";
 import { DatePickerWithRange } from "./list.date";
 import TaskListStatus from "./list.status";
 
 interface TaskListMainProps {
-  router: any;
+  router: AppRouterInstance;
 }
 
 export default function TaskListMain({ router }: TaskListMainProps) {

@@ -2,9 +2,10 @@ import { PATHS } from "@/routes/paths";
 import { Treasurers } from "@/sampleData";
 import { Card, CardFooter, CardTitle } from "@workspace/ui/components/card";
 import { ArrowRight, Copy, Plus, Wallet } from "lucide-react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 type TreasurerListCardProps = {
-  router: any;
+  router: AppRouterInstance;
 };
 
 const TreasurerListCard = ({ router }: TreasurerListCardProps) => {

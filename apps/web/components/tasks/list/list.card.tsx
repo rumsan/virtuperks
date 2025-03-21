@@ -5,7 +5,7 @@ import { Task } from "../form/schema";
 
 type ListCardDetailsProps = {
   taskList: Task[];
-  router: any;
+  router: AppRouterInstance;
   tabStatus: string;
 };
 

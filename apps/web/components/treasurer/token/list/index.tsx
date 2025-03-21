@@ -16,9 +16,10 @@ import TokenCard from "./list.card";
 import { useColumns } from "./list.column";
 import TokenTable from "./list.table";
 import ListToolBar from "./list.toolbar";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 type TokenMainProps = {
-  router: any;
+  router: AppRouterInstance;
 };
 
 export default function TokenMain({ router }: TokenMainProps) {

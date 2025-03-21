@@ -2,12 +2,13 @@ import { Cuid } from "@/components/departments/details/details.main";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft, CircleX, PencilLine } from "lucide-react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import TaskParticipant from "./details.participant";
 import TaskDetails from "./details.task";
 
 type TaskMainProps = {
   cuid: Cuid;
-  router: any;
+  router: AppRouterInstance;
 };
 
 const TaskMain = ({ cuid, router }: TaskMainProps) => {
