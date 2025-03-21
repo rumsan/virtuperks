@@ -7,18 +7,18 @@ import { Card, CardContent } from "@workspace/ui/components/card";
 import { PATHS } from "@/routes/paths";
 import { EntityFactoryABI } from "@workspace/contracts/abis";
 import { ArrowLeft } from "lucide-react";
-import { NextRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { useWriteContract } from "wagmi";
 import DepartmentBaseForm from "./department.form";
 import { Department, departmentSchema } from "./schema";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 const defaultValues: Department = {
   name: "",
 };
 
 type DepartmentAddProps = {
-  router: NextRouter;
+  router: AppRouterInstance;
 };
 
 export default function DepartmentAdd({ router }: DepartmentAddProps) {

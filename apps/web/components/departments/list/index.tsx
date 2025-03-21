@@ -1,11 +1,11 @@
 "use client";
 
-import { NextRouter } from "next/router";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import DepartmentListCard from "./list.card";
 import ListToolBar from "./list.toolbar";
 
 interface DepartmentListProps {
-  router: NextRouter;
+  router: AppRouterInstance;
 }
 
 export default function DepartmentList({ router }: DepartmentListProps) {

@@ -1,8 +1,8 @@
-import { NextRouter } from "next/router";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import DepartmentList from "./list";
 
 interface Department {
-  router: NextRouter;
+  router: AppRouterInstance;
 }
 
 function Department({ router }: Department) {

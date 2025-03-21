@@ -6,10 +6,10 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { ArrowRight, Coins, Plus, User } from "lucide-react";
-import { NextRouter } from "next/router";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 interface DepartmentListCardProps {
-  router: NextRouter;
+  router: AppRouterInstance;
 }
 
 interface DepartmentDetails {
