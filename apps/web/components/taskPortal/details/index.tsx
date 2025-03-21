@@ -11,7 +11,7 @@ import {
   useWriteEntityTaskManagerParticipate,
 } from "@/hooks/wagmi/contracts";
 import { PATHS } from "@/routes/paths";
-import { AcceptedTaskData, TaskData } from "@workspace/types/task";
+import { AcceptedTaskData, TaskCreated } from "@workspace/types/task";
 import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
@@ -35,7 +35,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const getAllTask = useTaskList();
   const TaskList = getAllTask?.data?.data?.taskCreateds;
 
-  const taskData = TaskList?.find((task: TaskData) => {
+  const taskData = TaskList?.find((task: TaskCreated) => {
     return task?.id === cuid?.id;
   });
 

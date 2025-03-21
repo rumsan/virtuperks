@@ -24,13 +24,11 @@ export function useColumns<T>(): ColumnDef<T>[] {
       },
     },
     {
-      accessorKey: "internal_id",
+      accessorKey: "id",
       header: () => <div className="text-left text-gray-600 font-bold">ID</div>,
       cell: ({ row }) => {
         return (
-          <span className="text-sm text-gray-700">
-            {row.getValue("internal_id")}
-          </span>
+          <span className="text-sm text-gray-700">{row.getValue("id")}</span>
         );
       },
     },
@@ -50,7 +48,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
               size={28}
               onClick={() =>
                 handleAcceptParticipant(
-                  row.getValue("internal_id"),
+                  row.getValue("id"),
                   row.getValue("participant"),
                 )
               }

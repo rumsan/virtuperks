@@ -1,4 +1,4 @@
-import { defineConfig } from "@wagmi/cli";
+import { defineConfig,Config } from "@wagmi/cli";
 import { react } from "@wagmi/cli/plugins";
 import {
   AccessManagerABI,
@@ -24,4 +24,4 @@ export default defineConfig({
     },
   ],
   plugins: [react()],
-});
+}) as Config;

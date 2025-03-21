@@ -1,6 +1,7 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useQuery } from "@tanstack/react-query";
 import { EntityTaskManagementABI } from "@workspace/contracts/abis";
+
 import { useReadContract } from "wagmi";
 
 export const useApplist = () => {

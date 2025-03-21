@@ -1,6 +1,6 @@
 import { PATHS } from "@/routes/paths";
 import { Table } from "@tanstack/react-table";
-import { ExtendedTaskData } from "@workspace/types/task";
+import { TaskCreated } from "@workspace/types/task";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Coins, Dot, ExternalLink, Timer, Users } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
@@ -19,9 +19,9 @@ const TaskPortalCard = <TData,>({
 
   const filteredTasks = paginatedTasks
     ?.filter((task) => {
-      return (task as ExtendedTaskData)?.taskDetail;
+      return (task as TaskCreated)?.taskDetail;
     })
-    .map((task) => (task as ExtendedTaskData)?.taskDetail);
+    .map((task) => (task as TaskCreated)?.taskDetail);
 
   return (
     <>

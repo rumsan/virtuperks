@@ -1,4 +1,5 @@
-type TaskDetail = {
+export type TaskDetail = {
+  allowedWallets: string[];
   detailsUrl: string;
   expiryDate: string;
   id: string;
@@ -9,23 +10,14 @@ type TaskDetail = {
   rewardToken: string;
 };
 
-type EntityTaskManager = {
+type EntityTaskManagerCreated = {
   _appId: string;
   _name: string;
   id: string;
-  __typename: string;
 };
 
-export interface TaskData {
-  blockNumber: string;
-  blockTimestamp: string;
-  createdBy: string;
-  entityTaskManager: EntityTaskManager;
-  id: string;
-  taskDetail: TaskDetail;
-  transactionHash: string;
-  __typename: string;
-}
+
+
 
 export interface AcceptedTaskData {
   blockNumber: string;
@@ -42,17 +34,17 @@ export interface AcceptedTaskData {
   __typename: string;
 }
 
-export type ExtendedTaskData = TaskData & {
-  taskDetail: TaskDetail & {
-    allowedWallets: string[];
-  };
-};
 
-export type ExtendedTaskDetails = TaskDetail & {
-  taskDetail: TaskDetail & {
-    allowedWallets: string[];
-    __typename: string;
-  };
-};
 
+
+export type  TaskCreated   =  {
+  blockNumber: string; 
+  blockTimestamp: string; 
+  createdBy: string; 
+  entityTaskManager: EntityTaskManagerCreated; 
+  id: string; 
+  taskDetail: TaskDetail; 
+  transactionHash: string; 
+  __typename: string; 
+}
 
