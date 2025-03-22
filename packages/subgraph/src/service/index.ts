@@ -5,6 +5,8 @@ import {
   //ApprovalList,
   CreatedAppList,
   EntityTaskManagerCreatedList,
+  GetParticipantTaskStatusWithVariables,
+  GetTaskParticipantsWithStatus,
   ParticiantAppliedList,
   RoleGrantedList,
   TaskAcceptedList,
@@ -80,5 +82,21 @@ export class SubgraphService {
     async getTaskApproveddList() {
     const {data, error} = await this.subgraphQuery.query(TaskApprovedList, {});
     return {data, error};
+    }
+  
+  async getParticipantTaskStatus(participant: string, taskId: string) {
+    const { data, error } = await this.subgraphQuery.query(
+      GetParticipantTaskStatusWithVariables,
+      { participant, taskId }
+    );
+    return { data, error };
+  }
+
+  async getTaskParticipantsWithStatus(taskId: string) {
+    const { data, error } = await this.subgraphQuery.query(
+      GetTaskParticipantsWithStatus,
+      { taskId }
+    );
+    return { data, error };
   }
 }

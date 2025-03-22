@@ -1,5 +1,5 @@
-import { Address, Bytes, log } from "@graphprotocol/graph-ts";
-import { TaskDetail } from "../generated/schema";
+import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
+import { ParticipantTaskStatus, TaskDetail } from "../generated/schema";
 import { EntityContract } from "../generated/templates/EntityContract/EntityContract";
 
 
@@ -57,4 +57,41 @@ export function fetchTaskDetails(taskId:Bytes, contractAddress: Address, taskCre
 
   return taskDetail;
 
+}
+
+
+export function updateParticipantTaskStatus(
+  participant: Bytes,
+  taskId: Bytes,
+  status: string,
+  blockNumber: BigInt,
+  blockTimestamp: BigInt,
+  taskDetailId:Bytes | null 
+): void {
+  let id = participant.toHexString() + "-" + taskId.toHexString();
+  let idBytes = Bytes.fromUTF8(id);
+  
+  let statusEntity = ParticipantTaskStatus.load(idBytes);
+  if (!statusEntity) {
+    statusEntity = new ParticipantTaskStatus(idBytes);
+    statusEntity.participant = participant;
+    statusEntity.taskId = taskId;
+  }
+ 
+
+  // Convert BigInt values if needed
+  statusEntity.lastUpdatedBlock = blockNumber;
+  statusEntity.lastUpdatedTimestamp = blockTimestamp;
+  statusEntity.status = status;
+  if (taskDetailId) {
+    statusEntity.taskDetail = taskDetailId;
+  }
+ 
+
+  statusEntity.save();
+  log.info("Updated ParticipantTaskStatus: participant={}, taskId={}, status={}", [
+    participant.toHexString(),
+    taskId.toHexString(),
+    status
+  ]);
 }

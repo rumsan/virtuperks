@@ -144,3 +144,13 @@ type TaskDetail @entity(immutable: false) {
 
 
 }
+
+type ParticipantTaskStatus @entity(immutable: false) {
+  id: Bytes! 
+  participant: Bytes! 
+  taskId: Bytes! 
+  status: String! 
+  lastUpdatedBlock: BigInt! 
+  lastUpdatedTimestamp: BigInt!
+  taskDetail: TaskDetail
+}

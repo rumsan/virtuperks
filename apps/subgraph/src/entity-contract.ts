@@ -16,7 +16,7 @@ import {
   TaskCompleted as TaskCompletedEvent,
   TaskCreated as TaskCreatedEvent,
 } from "../generated/templates/EntityContract/EntityContract"
-import { fetchTaskDetails } from "./utils"
+import { fetchTaskDetails, updateParticipantTaskStatus } from "./utils"
 
 export function handlePINGED(event: PINGEDEvent): void {
   let entity = new PINGED(
@@ -57,7 +57,11 @@ export function handleParticiantApplied(event: ParticiantAppliedEvent): void {
   } else {
     log.error("Failed to fetch TaskDetail for task ID: {}", [event.params.id.toHexString()]);
   }
- participant.save()
+  participant.save()
+  
+    updateParticipantTaskStatus(event.params.participant, event.params.id, 'UNACCEPTED', event.block.number, event.block.timestamp, taskDetail? taskDetail.id:null);
+  
+  
 }
 
 export function handleTaskAccepted(event: TaskAcceptedEvent): void {
@@ -84,6 +88,7 @@ export function handleTaskAccepted(event: TaskAcceptedEvent): void {
 
 
   entity.save()
+  updateParticipantTaskStatus(event.params.participant, event.params.id, 'ACCEPTED', event.block.number, event.block.timestamp, taskDetail? taskDetail.id:null);
 }
 
 export function handleTaskApproved(event: TaskApprovedEvent): void {
@@ -107,6 +112,10 @@ export function handleTaskApproved(event: TaskApprovedEvent): void {
 
 
   entity.save()
+  
+    updateParticipantTaskStatus(event.params.approver, event.params.id, 'VERIFIED', event.block.number, event.block.timestamp, taskDetail?taskDetail.id:null);
+
+  
 }
 
 export function handleTaskCompleted(event: TaskCompletedEvent): void {
@@ -130,7 +139,9 @@ export function handleTaskCompleted(event: TaskCompletedEvent): void {
   }
 
   entity.save()
-
+  
+    updateParticipantTaskStatus(event.params.participant, event.params.id, 'COMPLETED', event.block.number, event.block.timestamp, taskDetail?taskDetail.id:null);
+ 
   
 }
 
@@ -173,6 +184,8 @@ export function handleTaskCreated(event: TaskCreatedEvent): void {
     log.error("Failed to fetch TaskDetail for task ID: {}", [event.params.id.toHexString()]);
   }
   task.save()
+
+  
 
 
   
