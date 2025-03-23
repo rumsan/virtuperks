@@ -287,3 +287,51 @@ export const GetTaskParticipantsWithStatus = `
     }
   }
 `;
+
+export const  GetTaskApprovedAndCompleted= `
+  query GetTaskApprovedAndCompleted($taskId: Bytes!) {
+    taskApproveds(where: { taskDetail: $taskId }) {
+      id
+      internal_id
+      approver
+      blockNumber
+      blockTimestamp
+      transactionHash
+      status
+      taskDetail {
+        allowedWallets
+        detailsUrl
+        id
+        isActive
+        maxParticipants
+        owner
+        rewardAmount
+        rewardToken
+        task {
+          entityTaskManager {
+            entityTaskManager
+            _name
+          }
+        }
+      }
+    }
+    taskCompleteds(where: { taskDetail: $taskId }) {
+      id
+      internal_id
+      participant
+      blockNumber
+      blockTimestamp
+      transactionHash
+      status
+      taskDetail {
+        allowedWallets
+        detailsUrl
+        id
+        isActive
+        maxParticipants
+        owner
+        rewardAmount
+      }
+    }
+  }
+`;
