@@ -175,3 +175,39 @@ export const useGetApprovedList = (taskId: any) => {
     approvedLoading: isLoading
   };
 }
+
+export const useGetParticipantTaskStatus = (participant: any, taskId: any) => {
+  const { queryService } = useGraphService();
+  const { data, isLoading } = useQuery({
+    queryKey: ["participantTaskStatus"],
+    queryFn: async () => {
+      const getAllData = await queryService?.getParticipantTaskStatus(participant, taskId);
+     return getAllData
+    },
+  });
+
+  const filterData = data?.data?.participantTaskStatus || [];
+
+  return {
+    participantTaskStatus: filterData,
+    participantTaskStatusLoading: isLoading
+  };
+}
+
+export const useGetTaskParticipantsWithStatus = (taskId: any) => {
+  const { queryService } = useGraphService();
+  const { data, isLoading } = useQuery({
+    queryKey: ["taskParticipantsWithStatus"],
+    queryFn: async () => {
+      const getAllData = await queryService?.getTaskParticipantsWithStatus(taskId);
+      return getAllData;
+    },
+  });
+
+  const filterData = data?.data?.taskParticipantsWithStatus || [];
+
+  return {
+    taskParticipantsWithStatus: filterData,
+    taskParticipantsWithStatusLoading: isLoading
+  };
+}
