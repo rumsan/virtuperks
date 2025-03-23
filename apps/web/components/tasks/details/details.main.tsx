@@ -1,6 +1,6 @@
 import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
-import { useGetApprovedList, usegetSingTask } from "@/hooks/subgraph/querycall";
+import { useGetApprovedAndCompletedList, useGetApprovedList, usegetSingTask } from "@/hooks/subgraph/querycall";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft, CheckCircle, CircleX } from "lucide-react";
@@ -16,17 +16,36 @@ type TaskMainProps = {
 };
 
 const TaskMain = ({ cuid, router }: TaskMainProps) => {
-  const { approvedData } = useGetApprovedList(cuid);
+  // const { approvedData } = useGetApprovedList(cuid);
   const {taskData} = usegetSingTask(cuid)
+  const { approvedAndCompletedData } = useGetApprovedAndCompletedList(cuid.id)
   const [localStatus, setLocalStatus] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const { handleApproveTask } = useApproveTask();
+   const { taskApproveds, taskCompleteds } = approvedAndCompletedData;
+
+  // Determine button state based on completed and approved data
+  const isButtonDisabled = () => {
+    if (!approvedAndCompletedData) return true;
+    
+   
+    
+    // If there are approved tasks, button should be disabled
+    if (taskApproveds && taskApproveds.length > 0) return true;
+    
+    // If there are no completed tasks, button should be disabled
+    if (!taskCompleteds || taskCompleteds.length === 0) return true;
+    
+    return false;
+  };
 
   // Check if task is already verified from stored data
-  const isVerified = approvedData?.some((data: any) => data.status === "VERIFIED");
+  const isVerified = taskApproveds?.some((data: any) => data.status === "VERIFIED");
+  console.log("isVerified", isVerified);
 
   // Use either immediate status change or stored verified status
   const currentStatus = localStatus || (isVerified ? "VERIFIED" : null);
+  console.log("currentStatus", currentStatus);
 
   const handleDialogAction = async () => {
     try {
@@ -60,7 +79,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
               variant="outline" 
               className={currentStatus === "VERIFIED" ? "border border-[#03AB65] bg-[#03AB65]" : "border border-[#03AB65]"}
               onClick={() => setIsOpen(true)}
-              disabled={currentStatus === "VERIFIED"}
+              disabled={isButtonDisabled()}
             >
               <span className={currentStatus === "VERIFIED" ? "text-white" : "text-[#03AB65]"}>
                 {currentStatus === "VERIFIED" ? "Verified" : "Approve"}

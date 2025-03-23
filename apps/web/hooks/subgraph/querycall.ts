@@ -213,3 +213,21 @@ export const useGetTaskParticipantsWithStatus = (taskId: any) => {
     taskParticipantsWithStatusLoading: isLoading
   };
 }
+
+export const useGetApprovedAndCompletedList = (taskId: any) => {
+  const { queryService } = useGraphService();
+  const { data, isLoading } = useQuery({
+    queryKey: ["approvedAndCompleted"],
+    queryFn: async () => {
+      const getAllData = await queryService?.getTaskApprovedAndCompletedList(taskId);
+      return getAllData;
+    },
+  });
+
+  const filterData = data?.data?.taskApproveds || [];
+
+  return {
+    approvedAndCompletedData: filterData,
+    approvedAndCompletedLoading: isLoading
+  };
+}
