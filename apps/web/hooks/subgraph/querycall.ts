@@ -186,7 +186,8 @@ export const useGetParticipantTaskStatus = (participant: any, taskId: any) => {
     },
   });
 
-  const filterData = data?.data?.participantTaskStatus || [];
+
+  const filterData = data?.data?.participantTaskStatuses || [];
 
   return {
     participantTaskStatus: filterData,
@@ -195,6 +196,7 @@ export const useGetParticipantTaskStatus = (participant: any, taskId: any) => {
 }
 
 export const useGetTaskParticipantsWithStatus = (taskId: any) => {
+
   const { queryService } = useGraphService();
   const { data, isLoading } = useQuery({
     queryKey: ["taskParticipantsWithStatus"],
@@ -204,7 +206,7 @@ export const useGetTaskParticipantsWithStatus = (taskId: any) => {
     },
   });
 
-  const filterData = data?.data?.taskParticipantsWithStatus || [];
+  const filterData = data?.data?.participantTaskStatuses || [];
 
   return {
     taskParticipantsWithStatus: filterData,

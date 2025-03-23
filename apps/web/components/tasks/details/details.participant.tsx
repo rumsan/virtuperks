@@ -1,12 +1,7 @@
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import { ListTable } from "@/components/common/list/list.table";
-import {
-  useGetAcceptedList,
-  useGetParticipantApplied,
-  useGetTaskCompletedList,
-} from "@/hooks/subgraph/querycall";
-import { filterParticipants } from "@/utils/filterData";
-import { shortAddress } from "@/utils/shortAddress"; // Create this utility if not exists
+import { useGetTaskParticipantsWithStatus } from "@/hooks/subgraph/querycall";
+import { shortAddress } from "@/utils/shortAddress";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -17,11 +12,10 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { AcceptedTaskData } from "@workspace/types/task";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Input } from "@workspace/ui/components/input";
 import { Search, User } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useMemo } from "react";
 import { useColumns } from "./details.column";
 
 type Cuid = {
@@ -46,33 +40,25 @@ const TaskParticipant = ({ taskId }: TaskParticipantProps) => {
   });
   const columns = useColumns();
 
-  const { participantDatas } = useGetParticipantApplied(taskId);
-console.log(participantDatas,'detail.participant')
-  const { acceptedLoading, acceptedParticipant } = useGetAcceptedList(taskId);
-  const { completedData } = useGetTaskCompletedList(taskId);
+  const { taskParticipantsWithStatus } = useGetTaskParticipantsWithStatus(taskId.id);
 
+  const { tableData, acceptedParticipants } = useMemo(() => {
+    if (!taskParticipantsWithStatus) return { tableData: [], acceptedParticipants: [] };
 
-  
-  const [participantList, setParticipantList] = useState<any[]>([]);
-
-
-  useEffect(() => {
-    const filteredParticipants = filterParticipants(
-      participantDatas,
-      acceptedParticipant,
-      completedData
-    );
- 
-
-    if (JSON.stringify(filteredParticipants) !== JSON.stringify(participantList)) {
-      
-
-      setParticipantList(filteredParticipants);
-    }
-  }, [participantDatas, acceptedParticipant, completedData, participantList]);
+    return {
+      // For table: show only UNACCEPTED and COMPLETED participants
+      tableData: taskParticipantsWithStatus.filter(participant => 
+        participant.status === "UNACCEPTED" || participant.status === "COMPLETED"
+      ),
+      // For sidebar: show only ACCEPTED participants
+      acceptedParticipants: taskParticipantsWithStatus.filter(participant => 
+        participant.status === "ACCEPTED"
+      )
+    };
+  }, [taskParticipantsWithStatus]);
 
   const table = useReactTable({
-    data: participantList,
+    data: tableData,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -131,17 +117,17 @@ console.log(participantDatas,'detail.participant')
         </CardTitle>
 
         <div className="flex items-center w-full mt-5 mb-5 gap-2 flex-wrap">
-          {acceptedParticipant?.map((participant: AcceptedTaskData) => (
+          {acceptedParticipants.map((participant:any) => (
             <div
-              key={participant?.participant}
+              key={participant.participant}
               className="flex flex-col items-center gap-1"
-              title={participant?.participant} // Add title attribute for hover
+              title={participant.participant}
             >
               <div className="flex items-center justify-center h-8 w-8 rounded-full bg-[#F1F5F9] cursor-pointer">
                 <User color="#64748B" size={20} />
               </div>
               <span className="text-xs text-gray-500">
-                {shortAddress(participant?.participant)}
+                {shortAddress(participant.participant)}
               </span>
             </div>
           ))}
