@@ -1,6 +1,6 @@
 import { Cuid } from "@/components/departments/details/details.main";
 import { useTaskList } from "@/hooks/subgraph/querycall";
-import { TaskCreated } from "@workspace/types/task";
+import { TaskCreated } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { ExternalLink, Timer, Trophy, UserRoundCog, Users } from "lucide-react";
 

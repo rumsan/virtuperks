@@ -7,45 +7,52 @@ import useAcceptParticipant from "./accept.participant";
 
 export function useColumns<T>(): ColumnDef<T>[] {
   const { handleAcceptParticipant } = useAcceptParticipant();
-  
-
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
-
-
+  const [isAcceptLoading, setIsAcceptLoading] = useState(false);
 
   const handleAction = (row: any) => {
+ 
   
     const entityId = row.original.taskDetail.task.entityTaskManager.entityTaskManager
+    const taskId = row.original.taskId
  
     const status = row.getValue("status");
-    const internal_id = row.getValue("internal_id");
+  
     const participant = row.getValue("participant");
   
   
 
     if (status === "UNACCEPTED") {
     
-      setSelectedTask({ id: internal_id, participant, status, entityId });
+      setSelectedTask({ id: taskId, participant, status, entityId });
       setIsDialogOpen(true);
     } else if (status === "COMPLETED") {
-      setSelectedTask({ id: internal_id, participant, status });
+     setSelectedTask({ id: taskId, participant, status });
       setIsDialogOpen(true);
     }
   };
 
   const handleDialogAction = async () => {
     if (selectedTask) {
-  
       if (selectedTask.status === "UNACCEPTED") {
-        console.log(selectedTask.id, "unaccpeted");
-        await handleAcceptParticipant(selectedTask.id, selectedTask.participant, selectedTask.entityId);
+        try {
+          setIsAcceptLoading(true);
+          await handleAcceptParticipant(
+            selectedTask.id, 
+            selectedTask.participant, 
+            selectedTask.entityId
+          );
+          setIsDialogOpen(false);
+          setSelectedTask(null);
+        } catch (error) {
+          console.error("Error accepting participant:", error);
+        } finally {
+          setIsAcceptLoading(false);
+        }
       }
-      setIsDialogOpen(false);
-      setSelectedTask(null);
     }
   };
-
 
   return [
     {
@@ -65,15 +72,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
         );
       },
     },
-    {
-      accessorKey: "internal_id",
-      header: () => <div className="text-left text-gray-600 font-bold">ID</div>,
-      cell: ({ row }) => {
-        return (
-          <span className="text-sm text-gray-700">{row.getValue("internal_id")}</span>
-        );
-      },
-    },
+
 
     {
       accessorKey: "status",
@@ -102,9 +101,9 @@ export function useColumns<T>(): ColumnDef<T>[] {
         const status = row.getValue("status");
         const dialogContent = getDialogContent(status as string);
         
-        // Only show actions for UNACCEPTED status
+       
         if (status === "COMPLETED") {
-          return null; // Hide actions for completed status
+          return null; 
         }
         
         return (
@@ -125,8 +124,9 @@ export function useColumns<T>(): ColumnDef<T>[] {
               setIsOpen={setIsDialogOpen}
               title={dialogContent.title}
               subTitle={dialogContent.subTitle}
-              buttonName={dialogContent.buttonName}
+              buttonName={isAcceptLoading ? "Processing..." : dialogContent.buttonName}
               handleApplyTaskLogic={handleDialogAction}
+              isDisabled={isAcceptLoading}
             />
           </>
         );

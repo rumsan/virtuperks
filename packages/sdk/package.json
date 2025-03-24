@@ -1,17 +1,26 @@
 {
-  "name": "@app/sdk",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "name": "@workspace/sdk",
+  "main": "index.js",
+
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "tsc --watch --preserveWatchOutput"
   },
   "devDependencies": {
     "@workspace/typescript-config": "workspace:*",
     "typescript": "latest"
   },
   "exports": {
-    ".": "./src/index.ts",
-    "./*": "./src/*.ts",
-    "./utils/*": "./src/utils/*.ts"
+    "./type": {
+      "import": "./dist/types/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./constant": {
+      "import": "./dist/constants/events.js",
+      "types": "./dist/constants/events.d.ts"
+    }
+    
+   
+    
   }
 }

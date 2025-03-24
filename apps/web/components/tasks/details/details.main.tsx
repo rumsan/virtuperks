@@ -1,6 +1,6 @@
 import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
-import { useGetApprovedList, usegetSingTask } from "@/hooks/subgraph/querycall";
+import { useGetApprovedAndCompletedList, usegetSingTask } from "@/hooks/subgraph/querycall";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft, CheckCircle, CircleX } from "lucide-react";
@@ -16,25 +16,53 @@ type TaskMainProps = {
 };
 
 const TaskMain = ({ cuid, router }: TaskMainProps) => {
-  const { approvedData } = useGetApprovedList(cuid);
-  const {taskData} = usegetSingTask(cuid)
+  const {taskData} = usegetSingTask(cuid);
+  const { completedData, approvedData } = useGetApprovedAndCompletedList(cuid.id);
   const [localStatus, setLocalStatus] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const { handleApproveTask } = useApproveTask();
+  const [isApproveLoading, setIsApproveLoading] = useState(false);
 
-  // Check if task is already verified from stored data
-  const isVerified = approvedData?.some((data: any) => data.status === "VERIFIED");
+  const getApproveButtonState = () => {
+    // If approved data exists, show approved state
+    if (approvedData && approvedData.length > 0) {
+      return {
+        className: "border border-[#03AB65] bg-[#03AB65]",
+        text: "Verified",
+        disabled: true,
+        onClick: undefined
+      };
+    }
 
-  // Use either immediate status change or stored verified status
-  const currentStatus = localStatus || (isVerified ? "VERIFIED" : null);
+    // If completed data exists but not approved, enable approve button
+    if (completedData && completedData.length > 0) {
+      return {
+        className: "border border-[#03AB65]",
+        text: isApproveLoading ? "Processing..." : "Approve",
+        disabled: isApproveLoading,
+        onClick: () => setIsOpen(true)
+      };
+    }
+
+    // If neither exists, disable approve button
+    return {
+      className: "border border-[#03AB65]",
+      text: "Approve",
+      disabled: true,
+      onClick: undefined
+    };
+  };
 
   const handleDialogAction = async () => {
     try {
+      setIsApproveLoading(true);
       await handleApproveTask(cuid.id, taskData.entityTaskManager.id);
       setIsOpen(false);
       setLocalStatus("VERIFIED"); // Update local status immediately after successful approval
     } catch (error) {
       console.error("Error approving task:", error);
+    } finally {
+      setIsApproveLoading(false);
     }
   };
 
@@ -58,19 +86,20 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
           <div className="flex items-center ml-auto gap-4">
             <Button 
               variant="outline" 
-              className={currentStatus === "VERIFIED" ? "border border-[#03AB65] bg-[#03AB65]" : "border border-[#03AB65]"}
-              onClick={() => setIsOpen(true)}
-              disabled={currentStatus === "VERIFIED"}
+              className={getApproveButtonState().className}
+              onClick={getApproveButtonState().onClick}
+              disabled={getApproveButtonState().disabled}
             >
-              <span className={currentStatus === "VERIFIED" ? "text-white" : "text-[#03AB65]"}>
-                {currentStatus === "VERIFIED" ? "Verified" : "Approve"}
+              <span className={approvedData && approvedData.length > 0 ? "text-white" : "text-[#03AB65]"}>
+                {getApproveButtonState().text}
               </span>
               <CheckCircle 
-                color={currentStatus === "VERIFIED" ? "#ffffff" : "#03AB65"} 
+                color={approvedData && approvedData.length > 0 ? "#ffffff" : "#03AB65"} 
                 strokeWidth={2.5} 
                 size={20} 
               />
             </Button>
+
             <Button variant="outline" className="border border-[#E44134]">
               <span className="text-[#E44134]">Close</span>{" "}
               <CircleX color="#E44134" strokeWidth={2.5} size={20} />
