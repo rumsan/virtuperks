@@ -1,8 +1,9 @@
 import { useGraphService } from "@/providers/subgraph-provider";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { EntityTaskManagementABI } from "@workspace/contracts/abis";
 
 import { useReadContract } from "wagmi";
+import { useWriteEntityTaskManagerAcceptParticipant, useWriteEntityTaskManagerVerifyCompletion } from "../wagmi/contracts";
 
 // Add these query key constants
 export const QUERY_KEYS = {
@@ -64,32 +65,7 @@ export const useGetAllowedWallets = (
   });
 };
 
-export const useGetParticipantApplied = (taskId: any) => {
-  const { queryService } = useGraphService();
-  const { data, isLoading } = useQuery({
-    queryKey: [QUERY_KEYS.PARTICIPANT],
-    queryFn: async () => {
-      const getAllData = await queryService?.getParticiantAppliedList();
-      return getAllData;
-    },
-  });
 
-
-
-  const filterData = data?.data?.particiantApplieds?.filter((data: any) => {
- 
-    return data?.taskDetail?.id === taskId?.id;
-  }) || [];
-
-  
-
-  return {
-    participantDatas: filterData,
-    isLoading,
-    // Return raw data for debugging
-    rawData: data?.data?.particiantApplieds
-  };
-};
 
 export const usegetSingTask = (taskId:any) => {
   const { queryService } = useGraphService();
@@ -112,69 +88,9 @@ export const usegetSingTask = (taskId:any) => {
   }
 };
 
-export const useGetAcceptedList = (taskId: any) => {
-  const { queryService } = useGraphService();
-  const { data, isLoading } = useQuery({
-    queryKey: [QUERY_KEYS.ACCEPTED],
-    queryFn: async () => {
-      const getAllData = await queryService?.getTaskAcceptedList();
-      return getAllData;
-    },
-  });
-
-
-  const filterData = data?.data?.taskAccepteds.filter(
-    (data: any) => data?.taskDetail.id === taskId?.id
-  ) || [];
-
-  return {
-    acceptedParticipant: filterData,
-    acceptedLoading: isLoading
-  };
-};
-
-export const useGetTaskCompletedList = (taskId:any) => {
-  const { queryService } = useGraphService();
-  const {data, isLoading} =  useQuery({
-    queryKey: [QUERY_KEYS.COMPLETED],
-    queryFn: async () => {
-      const getAllData = await queryService?.getTaskCompletedList();
-      return getAllData;
-    },
-  });
-  const filterData = data?.data?.taskCompleteds.filter(
-    (data: any) => data?.taskDetail.id === taskId?.id
-  ) || [];
-
-  return {
-    completedData: filterData,
-    completedLoading: isLoading
-  }
-};
-
-export const useGetApprovedList = (taskId: any) => {
-  
-  const { queryService } = useGraphService();
-  const { data, isLoading } = useQuery({
-    queryKey: ["approved"],
-    queryFn: async () => {
-      const getAllData = await queryService?.getTaskApproveddList()
-      return getAllData;
-    },
-  });
 
 
 
-  const filterData = data?.data?.taskApproveds.filter(
-    (data: any) => data?.taskDetail.id === taskId?.id
-  ) || [];
- 
-
-  return {
-    approvedData: filterData,
-    approvedLoading: isLoading
-  };
-}
 
 export const useGetParticipantTaskStatus = (participant: any, taskId: any) => {
   const { queryService } = useGraphService();
@@ -224,10 +140,58 @@ export const useGetApprovedAndCompletedList = (taskId: any) => {
     },
   });
 
-  const filterData = data?.data?.taskApproveds || [];
+  const filterData = data?.data || {taskCompleteds: [], taskApproveds: []};
 
   return {
-    approvedAndCompletedData: filterData,
+    approvedData: filterData.taskApproveds || [],
+    completedData: filterData.taskCompleteds || [],
     approvedAndCompletedLoading: isLoading
   };
 }
+
+export const useApproveTaskMutation = () => {
+  const queryClient = useQueryClient();
+  const { writeContractAsync } = useWriteEntityTaskManagerVerifyCompletion()
+
+  return useMutation({
+    mutationFn: async ({ taskId, entityId }: { taskId: string; entityId: string }) => {
+      const result = await writeContractAsync({
+        address: (entityId as `0x${string}`) || "0x",
+        args: [taskId as `0x${string}`],
+      });
+      return result;
+    },
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ["approvedAndCompleted"] });
+    },
+  });
+};
+
+
+export const useAcceptParticipantMutation = () => {
+  const queryClient = useQueryClient();
+  const { writeContractAsync } = useWriteEntityTaskManagerAcceptParticipant();
+
+  return useMutation({
+    mutationFn: async ({ 
+      taskId, 
+      participant, 
+      entityId 
+    }: { 
+      taskId: string; 
+      participant: string;
+      entityId: string;
+    }) => {
+      const result = await writeContractAsync({
+        address: (entityId as `0x${string}`) || "0x",
+        args: [taskId as `0x${string}`, participant as `0x${string}`],
+      });
+      return result;
+    },
+    onSuccess: () => {
+      // Invalidate both participant and task status queries
+      queryClient.invalidateQueries({ queryKey: ["approvedAndCompleted"] });
+    },
+  });
+};
