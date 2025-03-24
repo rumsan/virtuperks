@@ -1,6 +1,6 @@
 import { PATHS } from "@/routes/paths";
 import { Table } from "@tanstack/react-table";
-import { TaskCreated } from "@workspace/types/task";
+import { TaskCreated } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Coins, Dot, ExternalLink, Timer, Users } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";

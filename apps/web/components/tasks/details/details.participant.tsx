@@ -12,6 +12,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
+import { ParticipantTaskStatus } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Input } from "@workspace/ui/components/input";
 import { Search, User } from "lucide-react";
@@ -42,16 +43,17 @@ const TaskParticipant = ({ taskId }: TaskParticipantProps) => {
 
   const { taskParticipantsWithStatus } = useGetTaskParticipantsWithStatus(taskId.id);
 
+
   const { tableData, acceptedParticipants } = useMemo(() => {
     if (!taskParticipantsWithStatus) return { tableData: [], acceptedParticipants: [] };
 
     return {
       // For table: show only UNACCEPTED and COMPLETED participants
-      tableData: taskParticipantsWithStatus.filter(participant => 
+      tableData: taskParticipantsWithStatus.filter((participant:ParticipantTaskStatus) => 
         participant.status === "UNACCEPTED" || participant.status === "COMPLETED"
       ),
       // For sidebar: show only ACCEPTED participants
-      acceptedParticipants: taskParticipantsWithStatus.filter(participant => 
+      acceptedParticipants: taskParticipantsWithStatus.filter((participant:ParticipantTaskStatus) => 
         participant.status === "ACCEPTED"
       )
     };

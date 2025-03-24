@@ -13,6 +13,8 @@ import { useWriteContract } from "wagmi";
 import DepartmentBaseForm from "./department.form";
 import { Department, departmentSchema } from "./schema";
 
+
+
 const defaultValues: Department = {
   name: "",
 };
