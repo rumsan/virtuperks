@@ -1,4 +1,4 @@
-import { EVENTS } from '@app/sdk/events';
+import { EVENTS } from '@workspace/sdk/constant';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OnEvent } from '@nestjs/event-emitter';

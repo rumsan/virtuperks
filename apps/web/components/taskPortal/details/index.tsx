@@ -8,7 +8,7 @@ import {
 } from "@/hooks/wagmi/contracts";
 import { PATHS } from "@/routes/paths";
 import { getDialogContents } from "@/utils/dialog";
-import { TaskCreated } from "@workspace/types/task";
+import { TaskCreated } from "@workspace/sdk/type";
 import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";

@@ -1,10 +1,9 @@
 import { PATHS } from "@/routes/paths";
-;
+import { TaskCreated } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Coins, Dot, ExternalLink } from "lucide-react";
-import { Task } from "../form/schema";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { TaskCreated} from "@workspace/types/task";
+;
 
 type ListCardDetailsProps = {
   taskList: TaskCreated[]
@@ -37,7 +36,7 @@ const ListCardDetails = ({
     <div className="grid grid-cols-2 gap-4">
       {filteredTaskList().map(
         (task) => (
-          console.log(task, "task in body"),
+         
           (
             <Card
               key={task?.id}

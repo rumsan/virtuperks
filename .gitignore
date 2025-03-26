@@ -11,7 +11,9 @@ node_modules
 .env.development.local
 .env.test.local
 .env.production.local
-.npmrc
+# .npmrc
+.env.*
+!.env.example
 
 # Turbo
 .turbo
@@ -22,6 +24,7 @@ node_modules
 # Build Outputs
 .next/
 out/
+output/
 build
 dist
 tsconfig.tsbuildinfo
