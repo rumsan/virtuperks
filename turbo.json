@@ -16,6 +16,15 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+     "test": {
+      "cache": false,
+      "dependsOn": ["^build"],
+      "inputs": [
+        "packages/contracts/src/**/*.sol",
+        "packages/contracts/tests/**/*.ts"
+      ],
+      "outputs": ["packages/contracts/artifacts/**"]
     }
   }
 }

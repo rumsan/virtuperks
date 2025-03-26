@@ -2,6 +2,7 @@ import { randomBytes } from 'crypto';
 import * as dotenv from 'dotenv';
 import { Addressable, ethers, uuidV4 } from 'ethers';
 import { commonLib } from './_common';
+import { entityOwnerWallet, participantsWallet } from './deployments/wallets';
 dotenv.config();
 
 interface DeployedContract {
@@ -34,7 +35,7 @@ class SeedProject extends commonLib {
       address: rumsanForwarder.contract.target as string,
       startBlock: rumsanForwarder.blockNumber,
     };
-     console.log('rumsan forwarder deployed', rumsanForwarder.contract.target);
+    console.log('rumsan forwarder deployed', rumsanForwarder.contract.target);
  
     const accessManagerV2 = await this.deployContract('AccessManagerV2', []);
     this.contracts['accessManagerV2'] = {
@@ -43,6 +44,37 @@ class SeedProject extends commonLib {
     };
     console.log('acessManager deployed', accessManagerV2.contract.target);
   
+    // Create app
+    await this.createApp(accessManagerV2.contract.target as string, appId, "0x127359CD56487f76307b186651ddbf684B9c2dFE");
+
+    // Assign MINTER role
+    await this.assignRole(
+      accessManagerV2.contract.target as string,
+      appId,
+      'MINTER',
+         '0x127359CD56487f76307b186651ddbf684B9c2dFE',
+
+    );
+
+    // Assign ENTITY_OWNER role to all entity owners
+    for (const owner of entityOwnerWallet) {
+      await this.assignRole(
+        accessManagerV2.contract.target as string,
+        appId,
+        'ENTITY_OWNER',
+        owner.address
+      );
+    }
+
+    // Assign PARTICIPANT role to all participants
+    for (const participant of participantsWallet) {
+      await this.assignRole(
+        accessManagerV2.contract.target as string,
+        appId,
+        'PARTICIPANT',
+        participant.address
+      );
+    }
 
     const rewardToken = await this.deployContract('RewardToken', [
       appId,
@@ -103,8 +135,8 @@ async function main() {
    await seedProject.deployCommonContracts(RUMSAN_APP_ID);
   console.log('Common contracts deployed');
   await seedProject.deployEntityContract(
-    '0x279BFe2E7ac4841F9486c2da42DB5a638285BDd9',
-    ethers.id('RUMSAN_ENTITY'),
+    accessManagerV2.contract.target as string,
+    ethers.id('RUMSAN_APP'),
     name
   );
   await seedProject.deployEntityContractFactory();

@@ -24,9 +24,11 @@ export const taskSchema = () => {
     //status: z.string().min(1, "Task status is required"),
    // description: z.string().min(1, "Task description is required"),
     owner: z.string().min(1, "Task owner is required"),
-    rewardToken: z.string().min(1, "Task reward token is required"),
+    rewardToken: z.string()
+      .min(1, "Task reward token is required")
+      .default(process.env.NEXT_PUBLIC_RAHAT_TOKEN || ""),
     expiryDate: z.date({ required_error: "Date is required" }),
-    allowedWallets: z.string(),
+    allowedWallets: z.array(z.string()).min(1, "At least one participant is required"),
     maxParticipants: z.number(),
     entityAddress: z.string({ required_error: "Entity address is required" }),
     rewardAmount: z.coerce

@@ -1,5 +1,5 @@
 {
-  "name": "raman",
+  "name": "subgraph",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",

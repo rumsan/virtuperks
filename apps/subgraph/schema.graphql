@@ -79,26 +79,33 @@ type ParticiantApplied @entity(immutable: true) {
   id: Bytes!
   internal_id: Bytes! # bytes32
   participant: Bytes! # address
+  status: String # string
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  taskDetail: TaskDetail 
 }
 
 type TaskAccepted @entity(immutable: true) {
   id: Bytes!
+  participant: Bytes! # address
   internal_id: Bytes! # bytes32
   blockNumber: BigInt!
+  status: String # string
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  taskDetail: TaskDetail
 }
 
 type TaskApproved @entity(immutable: true) {
   id: Bytes!
   internal_id: Bytes! # bytes32
   approver: Bytes! # address
+  status: String # string
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  taskDetail: TaskDetail
 }
 
 type TaskCompleted @entity(immutable: true) {
@@ -106,8 +113,10 @@ type TaskCompleted @entity(immutable: true) {
   internal_id: Bytes! # bytes32
   participant: Bytes! # address
   blockNumber: BigInt!
+  status: String # string
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  taskDetail: TaskDetail
 }
 
 type TaskCreated @entity(immutable: true) {
@@ -130,7 +139,18 @@ type TaskDetail @entity(immutable: false) {
   expiryDate: BigInt! # Expiry date of the task
   owner: Bytes! # Address of the task owner
   isActive: Boolean! # Whether the task is active
+  allowedWallets: [Bytes!] # List of allowed wallets
   task: TaskCreated
 
 
+}
+
+type ParticipantTaskStatus @entity(immutable: false) {
+  id: Bytes! 
+  participant: Bytes! 
+  taskId: Bytes! 
+  status: String! 
+  lastUpdatedBlock: BigInt! 
+  lastUpdatedTimestamp: BigInt!
+  taskDetail: TaskDetail
 }

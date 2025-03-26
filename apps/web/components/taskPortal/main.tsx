@@ -1,7 +1,8 @@
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import TaskPortalMain from "./list";
 
 interface TaskProps {
-  router: any;
+  router: AppRouterInstance;
 }
 
 function TaskPortal({ router }: TaskProps) {

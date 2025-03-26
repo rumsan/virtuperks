@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.20;
 
 import './interfaces/IAccessManagerV2.sol';
 import './interfaces/IEntityTaskManager.sol';
@@ -83,7 +83,7 @@ contract EntityTaskManager is IEntityTaskManager {
         require(tasks[taskId].owner != address(0), 'Task does not exist');
         require(tasks[taskId].isActive, 'Task is not active');
         taskAssignments[taskId][participant] = STATUS.ACCEPTED;
-        emit TaskAccepted(taskId);
+        emit TaskAccepted(taskId, participant);
     }
 
     /// @notice This function will change the status of the task
@@ -103,7 +103,6 @@ contract EntityTaskManager is IEntityTaskManager {
     /// @notice This function will change the status of the task
     /// @param taskId The id of the task
     function verifyCompletion(bytes32 taskId) external {
-        
         require(tasks[taskId].owner == msg.sender, 'not a owner of this task');
         require(tasks[taskId].isActive, 'Task is not active');
 
@@ -140,6 +139,16 @@ contract EntityTaskManager is IEntityTaskManager {
         tasks[taskId].isActive = false;
 
         emit TaskApproved(taskId, msg.sender);
+    }
+
+    /// @notice This function returns the list of allowed wallets for a specific task
+    /// @param taskId The id of the task
+    /// @return allowedWallets Array of allowed wallet addresses
+    function getAllowedWallets(
+        bytes32 taskId
+    ) public view returns (address[] memory allowedWallets) {
+        require(tasks[taskId].owner != address(0), 'Task does not exist');
+        return tasks[taskId].allowedWallets;
     }
 
     function findHash(string memory detailsUrl) public pure returns (bytes32) {

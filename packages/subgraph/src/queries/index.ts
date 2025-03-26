@@ -53,7 +53,7 @@ export const TransferList = `
 
 export const TaskCreatedList = `
   query TaskCreatedList {
-    taskCreateds(first: 15) {
+    taskCreateds(first: 100) {
       id
       createdBy
       blockNumber
@@ -61,6 +61,7 @@ export const TaskCreatedList = `
       transactionHash
     
     taskDetail {
+    allowedWallets
     detailsUrl
     expiryDate
     id
@@ -81,13 +82,31 @@ export const TaskCreatedList = `
 
 export const ParticiantAppliedList = `
   query ParticiantAppliedList {
-    particiantApplieds(first: 10, orderBy: TaskManagement_id) {
+    particiantApplieds(first: 100) {  # Increased limit to make sure we get all data
       id
-      TaskManagement_id
+      internal_id
       participant
+      status
       blockNumber
       blockTimestamp
       transactionHash
+      taskDetail {
+        id   # Make sure this field exists
+        allowedWallets
+        detailsUrl
+        expiryDate
+        isActive
+        maxParticipants
+        owner
+        rewardAmount
+        rewardToken
+        task {
+        entityTaskManager {
+        entityTaskManager
+        
+        }
+        }
+      }
     }
   }
 `;
@@ -103,6 +122,216 @@ export const EntityTaskManagerCreatedList = `
       blockNumber
       blockTimestamp
       transactionHash
+    }
+  }
+`;
+
+export const TaskCompletedList = `
+  query TaskCompletedList {
+    taskCompleteds(first: 100, orderBy: blockTimestamp) {
+      id
+      internal_id
+      participant
+      blockNumber
+      blockTimestamp
+      transactionHash
+      status
+      taskDetail {
+      allowedWallets
+        detailsUrl
+        id
+        isActive
+        maxParticipants
+        owner
+        rewardAmount
+      }
+    }
+  }
+`;
+
+export const TaskAcceptedList = `
+  query TaskAcceptedList {
+    taskAccepteds(first: 100, orderBy: blockTimestamp) {
+      id
+      internal_id
+      participant
+      blockNumber
+      blockTimestamp
+      transactionHash
+      status
+      taskDetail {
+      allowedWallets
+        detailsUrl
+        id
+        isActive
+        maxParticipants
+        owner
+        maxParticipants
+        rewardAmount
+        rewardToken
+      }
+    }
+  }
+`;
+
+export const TaskApprovedList = `
+  query TaskApprovedList {
+    taskApproveds(first: 100, orderBy: blockTimestamp) {
+      id
+      internal_id
+      approver
+      blockNumber
+      blockTimestamp
+      transactionHash
+      status
+      taskDetail {
+       allowedWallets
+        detailsUrl
+        id
+        isActive
+        maxParticipants
+        owner
+        rewardAmount
+        rewardToken
+          task {
+        entityTaskManager {
+        entityTaskManager
+        
+        }
+        }
+      }
+    }
+  }
+`;
+
+export const GetParticipantTaskStatusWithVariables = `
+  query GetParticipantTaskStatus($participant: Bytes!, $taskId: Bytes!) {
+    participantTaskStatuses(where: { participant: $participant, taskId: $taskId }) {
+      id
+      participant
+      taskId
+      status
+      lastUpdatedBlock
+      lastUpdatedTimestamp
+      taskDetail {
+        id
+        detailsUrl
+        rewardToken
+        rewardAmount
+        maxParticipants
+        expiryDate
+        owner
+        isActive
+        allowedWallets
+        task {
+          id
+          internal_id
+          createdBy
+          blockNumber
+          blockTimestamp
+          transactionHash
+          entityTaskManager {
+            id
+            entityTaskManager
+            aclAddress
+            _appId
+            _name
+            blockNumber
+            blockTimestamp
+            transactionHash
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GetTaskParticipantsWithStatus = `
+  query GetTaskParticipantsWithStatus($taskId: Bytes!) {
+    participantTaskStatuses(where: { taskId: $taskId }) {
+      id
+      participant
+      taskId
+      status
+      lastUpdatedBlock
+      lastUpdatedTimestamp
+      taskDetail {
+        id
+        detailsUrl
+        rewardToken
+        rewardAmount
+        maxParticipants
+        expiryDate
+        owner
+        isActive
+        allowedWallets
+        task {
+          id
+          internal_id
+          createdBy
+          blockNumber
+          blockTimestamp
+          transactionHash
+          entityTaskManager {
+            id
+            entityTaskManager
+            aclAddress
+            _appId
+            _name
+            blockNumber
+            blockTimestamp
+            transactionHash
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const  GetTaskApprovedAndCompleted= `
+  query GetTaskApprovedAndCompleted($taskId: Bytes!) {
+    taskApproveds(where: { taskDetail: $taskId }) {
+      id
+      internal_id
+      approver
+      blockNumber
+      blockTimestamp
+      transactionHash
+      status
+      taskDetail {
+        allowedWallets
+        detailsUrl
+        id
+        isActive
+        maxParticipants
+        owner
+        rewardAmount
+        rewardToken
+        task {
+          entityTaskManager {
+            entityTaskManager
+            _name
+          }
+        }
+      }
+    }
+    taskCompleteds(where: { taskDetail: $taskId }) {
+      id
+      internal_id
+      participant
+      blockNumber
+      blockTimestamp
+      transactionHash
+      status
+      taskDetail {
+        allowedWallets
+        detailsUrl
+        id
+        isActive
+        maxParticipants
+        owner
+        rewardAmount
+      }
     }
   }
 `;

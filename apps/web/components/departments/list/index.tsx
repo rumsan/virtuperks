@@ -1,10 +1,12 @@
 "use client";
 
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import DepartmentListCard from "./list.card";
 import ListToolBar from "./list.toolbar";
+//import { TaskCreated } from "@workspace/types/sdk/types/task.type";
 
 interface DepartmentListProps {
-  router: any;
+  router: AppRouterInstance;
 }
 
 export default function DepartmentList({ router }: DepartmentListProps) {

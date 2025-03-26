@@ -1,5 +1,5 @@
-import { Address, Bytes, log } from "@graphprotocol/graph-ts";
-import { TaskDetail } from "../generated/schema";
+import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
+import { ParticipantTaskStatus, TaskDetail } from "../generated/schema";
 import { EntityContract } from "../generated/templates/EntityContract/EntityContract";
 
 
@@ -8,11 +8,11 @@ export function fetchTaskDetails(taskId:Bytes, contractAddress: Address, taskCre
     let taskDetail = TaskDetail.load(taskId);
 
   const contract = EntityContract.bind(contractAddress);
-  log.debug("fetchTaskDetails: {}", [taskId.toHexString()]);
-  log.debug("fetchTaskDetailsTaskcreated: {}", [taskCreatedId.toHexString()]);
+;
     //const taskString = taskId.toString()
   
-    const taskData = contract.try_tasks(taskId);
+  const taskData = contract.try_tasks(taskId);
+   const wallets = contract.try_getAllowedWallets(taskId);
    
 
    if (!taskDetail) {
@@ -22,6 +22,10 @@ export function fetchTaskDetails(taskId:Bytes, contractAddress: Address, taskCre
 
   if (taskData.reverted) {
   
+    return null;
+  }
+   if (taskData.reverted || wallets.reverted) {
+    log.error("Data fetch reverted for taskId: {}", [taskId.toHexString()]);
     return null;
   }
 
@@ -34,6 +38,16 @@ export function fetchTaskDetails(taskId:Bytes, contractAddress: Address, taskCre
   taskDetail.expiryDate = taskData.value.getExpiryDate();
   taskDetail.owner = taskData.value.getOwner();
   taskDetail.isActive = taskData.value.getIsActive();
+
+  if (!wallets.reverted) {
+     const allowedWalletsBytes = wallets.value.map<Bytes>((address: Address) => {
+      return address as Bytes;
+    });
+    taskDetail.allowedWallets = allowedWalletsBytes;
+ 
+  }
+  
+
   
   //taskDetail.createdBy = taskData.value.;
   taskDetail.task = taskCreatedId
@@ -43,4 +57,41 @@ export function fetchTaskDetails(taskId:Bytes, contractAddress: Address, taskCre
 
   return taskDetail;
 
+}
+
+
+export function updateParticipantTaskStatus(
+  participant: Bytes,
+  taskId: Bytes,
+  status: string,
+  blockNumber: BigInt,
+  blockTimestamp: BigInt,
+  taskDetailId:Bytes | null 
+): void {
+  let id = participant.toHexString() + "-" + taskId.toHexString();
+  let idBytes = Bytes.fromUTF8(id);
+  
+  let statusEntity = ParticipantTaskStatus.load(idBytes);
+  if (!statusEntity) {
+    statusEntity = new ParticipantTaskStatus(idBytes);
+    statusEntity.participant = participant;
+    statusEntity.taskId = taskId;
+  }
+ 
+
+  // Convert BigInt values if needed
+  statusEntity.lastUpdatedBlock = blockNumber;
+  statusEntity.lastUpdatedTimestamp = blockTimestamp;
+  statusEntity.status = status;
+  if (taskDetailId) {
+    statusEntity.taskDetail = taskDetailId;
+  }
+ 
+
+  statusEntity.save();
+  log.info("Updated ParticipantTaskStatus: participant={}, taskId={}, status={}", [
+    participant.toHexString(),
+    taskId.toHexString(),
+    status
+  ]);
 }

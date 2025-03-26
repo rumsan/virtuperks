@@ -5,10 +5,16 @@ import {
   //ApprovalList,
   CreatedAppList,
   EntityTaskManagerCreatedList,
+  GetParticipantTaskStatusWithVariables,
+  GetTaskApprovedAndCompleted,
+  GetTaskParticipantsWithStatus,
   ParticiantAppliedList,
   RoleGrantedList,
+  TaskAcceptedList,
+  TaskApprovedList,
+  TaskCompletedList,
   TaskCreatedList,
-  TransferList
+  TransferList,
 } from '../queries';
 
 export class SubgraphService {
@@ -57,11 +63,46 @@ export class SubgraphService {
     );
     return {data, error};
   }
-    async getEntityManagerCreatedList() {
+  async getEntityManagerCreatedList() {
     const {data, error} = await this.subgraphQuery.query(
       EntityTaskManagerCreatedList,
       {},
     );
     return {data, error};
+  }
+
+  async getTaskAcceptedList() {
+    const {data, error} = await this.subgraphQuery.query(TaskAcceptedList, {});
+    return {data, error};
+  }
+
+  async getTaskCompletedList() {
+    const {data, error} = await this.subgraphQuery.query(TaskCompletedList, {});
+    return {data, error};
+  }
+    async getTaskApproveddList() {
+    const {data, error} = await this.subgraphQuery.query(TaskApprovedList, {});
+    return {data, error};
+    }
+  
+  async getParticipantTaskStatus(participant: string, taskId: string) {
+    const { data, error } = await this.subgraphQuery.query(
+      GetParticipantTaskStatusWithVariables,
+      { participant, taskId }
+    );
+    return { data, error };
+  }
+
+  async getTaskParticipantsWithStatus(taskId: string) {
+    const { data, error } = await this.subgraphQuery.query(
+      GetTaskParticipantsWithStatus,
+      { taskId }
+    );
+    return { data, error };
+  }
+
+  async getTaskApprovedAndCompletedList(taskId: string) {
+    const { data, error } = await this.subgraphQuery.query(GetTaskApprovedAndCompleted, {taskId});
+    return { data, error };
   }
 }

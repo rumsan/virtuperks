@@ -1,6 +1,7 @@
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import { ListTable } from "@/components/common/list/list.table";
-import { participantList } from "@/sampleData";
+import { useGetTaskParticipantsWithStatus } from "@/hooks/subgraph/querycall";
+import { shortAddress } from "@/utils/shortAddress";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -11,13 +12,22 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
+import { ParticipantTaskStatus } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Input } from "@workspace/ui/components/input";
 import { Search, User } from "lucide-react";
-import React from "react";
+import React, { useMemo } from "react";
 import { useColumns } from "./details.column";
 
-const TaskParticipant = ({ router }: any) => {
+type Cuid = {
+  id: string;
+};
+
+type TaskParticipantProps = {
+  taskId: Cuid;
+};
+
+const TaskParticipant = ({ taskId }: TaskParticipantProps) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -29,12 +39,28 @@ const TaskParticipant = ({ router }: any) => {
     pageIndex: 0,
     pageSize: 10,
   });
-
-  console.log(participantList, "participantList");
-
   const columns = useColumns();
+
+  const { taskParticipantsWithStatus } = useGetTaskParticipantsWithStatus(taskId.id);
+
+
+  const { tableData, acceptedParticipants } = useMemo(() => {
+    if (!taskParticipantsWithStatus) return { tableData: [], acceptedParticipants: [] };
+
+    return {
+      // For table: show only UNACCEPTED and COMPLETED participants
+      tableData: taskParticipantsWithStatus.filter((participant:ParticipantTaskStatus) => 
+        participant.status === "UNACCEPTED" || participant.status === "COMPLETED"
+      ),
+      // For sidebar: show only ACCEPTED participants
+      acceptedParticipants: taskParticipantsWithStatus.filter((participant:ParticipantTaskStatus) => 
+        participant.status === "ACCEPTED"
+      )
+    };
+  }, [taskParticipantsWithStatus]);
+
   const table = useReactTable({
-    data: participantList || [],
+    data: tableData,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -88,17 +114,23 @@ const TaskParticipant = ({ router }: any) => {
         <CardTitle className="flex flex-col gap-2 w-full">
           <span>Participants</span>
           <span className="text-sm text-gray-500 font-normal">
-            List of all the participants in this task
+            Accepted participants in this task
           </span>
         </CardTitle>
 
         <div className="flex items-center w-full mt-5 mb-5 gap-2 flex-wrap">
-          {participantList.map((participant) => (
+          {acceptedParticipants.map((participant:any) => (
             <div
-              key={participant.walletAddress}
-              className="flex items-center justify-center h-8 w-8 rounded-full bg-[#F1F5F9] gap-4"
+              key={participant.participant}
+              className="flex flex-col items-center gap-1"
+              title={participant.participant}
             >
-              <User color="#64748B" size={20} />
+              <div className="flex items-center justify-center h-8 w-8 rounded-full bg-[#F1F5F9] cursor-pointer">
+                <User color="#64748B" size={20} />
+              </div>
+              <span className="text-xs text-gray-500">
+                {shortAddress(participant.participant)}
+              </span>
             </div>
           ))}
         </div>

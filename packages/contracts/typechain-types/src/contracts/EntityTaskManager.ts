@@ -67,6 +67,7 @@ export interface EntityTaskManagerInterface extends Interface {
       | "completeTask"
       | "createTask"
       | "findHash"
+      | "getAllowedWallets"
       | "name"
       | "participate"
       | "ping"
@@ -108,6 +109,10 @@ export interface EntityTaskManagerInterface extends Interface {
     values: [IEntityTaskManager.TaskStruct]
   ): string;
   encodeFunctionData(functionFragment: "findHash", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "getAllowedWallets",
+    values: [BytesLike]
+  ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "participate",
@@ -144,6 +149,10 @@ export interface EntityTaskManagerInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "createTask", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "findHash", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getAllowedWallets",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "participate",
@@ -188,10 +197,11 @@ export namespace ParticiantAppliedEvent {
 }
 
 export namespace TaskAcceptedEvent {
-  export type InputTuple = [id: BytesLike];
-  export type OutputTuple = [id: string];
+  export type InputTuple = [id: BytesLike, participant: AddressLike];
+  export type OutputTuple = [id: string, participant: string];
   export interface OutputObject {
     id: string;
+    participant: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -305,6 +315,12 @@ export interface EntityTaskManager extends BaseContract {
 
   findHash: TypedContractMethod<[detailsUrl: string], [string], "view">;
 
+  getAllowedWallets: TypedContractMethod<
+    [taskId: BytesLike],
+    [string[]],
+    "view"
+  >;
+
   name: TypedContractMethod<[], [string], "view">;
 
   participate: TypedContractMethod<[taskId: BytesLike], [void], "nonpayable">;
@@ -375,6 +391,9 @@ export interface EntityTaskManager extends BaseContract {
   getFunction(
     nameOrSignature: "findHash"
   ): TypedContractMethod<[detailsUrl: string], [string], "view">;
+  getFunction(
+    nameOrSignature: "getAllowedWallets"
+  ): TypedContractMethod<[taskId: BytesLike], [string[]], "view">;
   getFunction(
     nameOrSignature: "name"
   ): TypedContractMethod<[], [string], "view">;
@@ -478,7 +497,7 @@ export interface EntityTaskManager extends BaseContract {
       ParticiantAppliedEvent.OutputObject
     >;
 
-    "TaskAccepted(bytes32)": TypedContractEvent<
+    "TaskAccepted(bytes32,address)": TypedContractEvent<
       TaskAcceptedEvent.InputTuple,
       TaskAcceptedEvent.OutputTuple,
       TaskAcceptedEvent.OutputObject
