@@ -35,14 +35,13 @@ import { useEntityList } from "@/hooks/subgraph/querycall";
 import { useWriteContract } from "wagmi";
 import { taskSchema } from "./schema";
 
-import { participantList, tokenList } from "@/sampleData";
-import { isAddress } from "viem";
 import { EntityTaskManagementABI } from "@workspace/contracts/abis";
+import { isAddress } from "viem";
 
 const defaultValues: any = {
   detailsUrl: "",
   owner: "",
-  rewardToken: "",
+  rewardToken: process.env.NEXT_PUBLIC_RAHAT_TOKEN || "", // Set default value here
   expiryDate: "",
   allowedWallets: "",
   maxParticipants: 0,
@@ -84,13 +83,14 @@ export default function TaskAdd({ router }: TaskAddProps) {
   });
   const getAllEntity = useEntityList();
   const entityList = getAllEntity?.data?.data?.entityTaskManagerCreateds;
+  const [isLoading, setIsLoading] = useState(false);
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const {
     data: hash,
     writeContract,
     writeContractAsync,
-    context,
+    context
   } = useWriteContract();
 
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>(
@@ -110,7 +110,26 @@ export default function TaskAdd({ router }: TaskAddProps) {
     form.setValue("allowedWallets", filtered);
   };
 
+  const [walletAddresses, setWalletAddresses] = useState<string[]>([]);
+  const [currentWallet, setCurrentWallet] = useState('');
+
+  const handleAddWallet = () => {
+    if (currentWallet && isAddress(currentWallet)) {
+      setWalletAddresses(prev => [...prev, currentWallet]);
+      form.setValue("allowedWallets", [...walletAddresses, currentWallet]);
+      setCurrentWallet('');
+    }
+  };
+
+  const removeWallet = (addressToRemove: string) => {
+    const filtered = walletAddresses.filter(addr => addr !== addressToRemove);
+    setWalletAddresses(filtered);
+    form.setValue("allowedWallets", filtered);
+  };
+
   const handleSubmit = async (data: any) => {
+     setIsLoading(true); 
+  
     if (!isAddress(data.entityAddress)) {
       console.error("Invalid Ethereum address:", data.entityAddress);
       return;
@@ -124,6 +143,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
     const allowedWallets = Array.isArray(data.allowedWallets)
       ? data.allowedWallets
       : [data.allowedWallets]; // Ensure it's an array
+ 
     const rewardAmount = BigInt(data.rewardAmount);
 
     const maxParticipants = BigInt(data.maxParticipants);
@@ -146,9 +166,12 @@ export default function TaskAdd({ router }: TaskAddProps) {
           },
         ],
       });
+      
       router.push(PATHS.TASKPORTAL.HOME);
     } catch (error) {
       console.error("Transaction failed:", error);
+    } finally {
+      setIsLoading(false)
     }
   };
   return (
@@ -237,40 +260,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
                           )}
                         />
 
-                        <FormField
-                          control={form.control}
-                          name="rewardToken"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Select Token</FormLabel>
-                              <FormControl>
-                                <Select
-                                  onValueChange={(value) =>
-                                    field.onChange(value)
-                                  }
-                                  value={field.value}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select reward" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {tokenList?.map(
-                                      (token: RewardTokenType) => (
-                                        <SelectItem
-                                          key={token.name}
-                                          value={token.address}
-                                        >
-                                          {token.name}
-                                        </SelectItem>
-                                      ),
-                                    )}
-                                  </SelectContent>
-                                </Select>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                      
 
                         <FormField
                           control={form.control}
@@ -337,6 +327,44 @@ export default function TaskAdd({ router }: TaskAddProps) {
                             </FormItem>
                           )}
                         />
+
+                        <FormField
+                        control={form.control}
+                        name="rewardToken"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Token</FormLabel>
+                            <FormControl>
+                              <Input
+          value="Rahat Token"
+          disabled
+        />
+                              {/* <Select
+                                onValueChange={(value) => field.onChange(value)}
+                                value={process.env.NEXT_PUBLIC_RAHAT_TOKEN || ""}
+                                disabled // Make it read-only
+                              >
+                                <SelectTrigger>
+                                  <SelectValue>Rahat Token</SelectValue>
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value={process.env.NEXT_PUBLIC_RAHAT_TOKEN || ""}>
+                                    Rahat Token
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select> */}
+                            </FormControl>
+                            {/* Hidden input to maintain the actual address in form state */}
+      <input
+        type="hidden"
+        {...field}
+        value={process.env.NEXT_PUBLIC_RAHAT_TOKEN || ""}
+      />
+      <FormMessage />
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
                         <FormField
                           control={form.control}
@@ -458,22 +486,67 @@ export default function TaskAdd({ router }: TaskAddProps) {
                         name="allowedWallets"
                         render={({ field }) => (
                           <FormItem>
+                            <FormLabel>Add Participant Addresses</FormLabel>
+                            <div className="space-y-4">
+                              <div className="flex gap-2">
+                                <Input
+                                  type="text"
+                                  placeholder="Paste wallet address"
+                                  value={currentWallet}
+                                  onChange={(e) => setCurrentWallet(e.target.value)}
+                                />
+                                <Button 
+                                  type="button"
+                                  onClick={handleAddWallet}
+                                  disabled={!isAddress(currentWallet)}
+                                >
+                                  Add
+                                </Button>
+                              </div>
+
+                              {/* Display added addresses */}
+                              <div className="flex flex-wrap gap-2">
+                                {walletAddresses.map((address) => (
+                                  <div
+                                    key={address}
+                                    className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full"
+                                  >
+                                    <span className="text-sm">{address}</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => removeWallet(address)}
+                                      className="text-gray-500 hover:text-red-500"
+                                    >
+                                      ×
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Original participant selection code - commented out
+                      <FormField
+                        control={form.control}
+                        name="allowedWallets"
+                        render={({ field }) => (
+                          <FormItem>
                             <FormLabel>Select Participants</FormLabel>
                             <div className="space-y-4">
                               <FormControl>
                                 <Select
                                   onValueChange={handleParticipantSelect}
-                                  value={undefined} // Reset after each selection
+                                  value={undefined}
                                 >
                                   <SelectTrigger>
                                     <SelectValue placeholder="Select Participant" />
                                   </SelectTrigger>
                                   <SelectContent>
                                     {participantList?.map((token: any) => (
-                                      // Only show participants that haven't been selected yet
-                                      !selectedParticipants.includes(
-                                        token.walletAddress,
-                                      ) && (
+                                      !selectedParticipants.includes(token.walletAddress) && (
                                         <SelectItem
                                           key={token.walletAddress}
                                           value={token.walletAddress}
@@ -485,8 +558,6 @@ export default function TaskAdd({ router }: TaskAddProps) {
                                   </SelectContent>
                                 </Select>
                               </FormControl>
-
-                              {/* Display selected participants */}
                               <div className="flex flex-wrap gap-2">
                                 {selectedParticipants.map((address) => {
                                   const participant = participantList.find(
@@ -502,9 +573,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
                                       </span>
                                       <button
                                         type="button"
-                                        onClick={() =>
-                                          removeParticipant(address)
-                                        }
+                                        onClick={() => removeParticipant(address)}
                                         className="text-gray-500 hover:text-red-500"
                                       >
                                         ×
@@ -518,6 +587,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
                           </FormItem>
                         )}
                       />
+                      */}
 
                       <div className="w-full flex justify-end gap-4">
                         <Button
@@ -531,13 +601,31 @@ export default function TaskAdd({ router }: TaskAddProps) {
                         >
                           Cancel
                         </Button>
-                        <Button
+                        {/* <Button
                           type="submit"
                           variant="default"
                           className="w-[170px] flex justify-center items-center gap-2"
                         >
                           Create
-                        </Button>
+                        </Button> */}
+                        <Button
+  type="submit"
+  variant="default"
+  className="w-[170px] flex justify-center items-center gap-2"
+  disabled={isLoading}
+>
+  {isLoading ? (
+    <>
+      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Processing...
+    </>
+  ) : (
+    "Create"
+  )}
+</Button>
                       </div>
                     </div>
                   </form>
