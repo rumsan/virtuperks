@@ -39,7 +39,7 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
               key={department.id}
               className="cursor-pointer hover:shadow-lg p-4"
               onClick={() =>
-                router.push(PATHS.DEPARTMENT.DETAILS(department.cuid))
+                router.push(PATHS.DEPARTMENT.DETAILS(department.id))
               }
             >
               <CardTitle className="flex text-base">
