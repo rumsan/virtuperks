@@ -153,8 +153,8 @@ export function handleTaskCreated(event: TaskCreatedEvent): void {
 
   
 
-  //let taskId = event.transaction.hash.concatI32(event.logIndex.toI32());
-  let task = new TaskCreated(event.params.id);
+  let taskId = event.transaction.hash.concatI32(event.logIndex.toI32());
+  let task = new TaskCreated(taskId);
   task.internal_id = event.params.id
   task.createdBy = event.params.createdBy
 
