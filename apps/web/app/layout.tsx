@@ -1,4 +1,3 @@
-import MainLayout from "@/components/layout/main.layout";
 import { Providers } from "@/providers/providers";
 import { GraphQueryProvider } from "@/providers/subgraph-provider";
 import { Wagmi } from "@/providers/wagmi-provider";
@@ -27,9 +26,7 @@ export default function RootLayout({
       >
         <Wagmi>
           <GraphQueryProvider>
-            <Providers>
-              <MainLayout>{children}</MainLayout>
-            </Providers>
+            <Providers>{children}</Providers>
           </GraphQueryProvider>
         </Wagmi>
       </body>

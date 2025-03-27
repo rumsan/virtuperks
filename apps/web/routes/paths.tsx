@@ -1,4 +1,5 @@
 const ROOTS = {
+  DASHBOARD: "/",
   DEPARTMENT: "/departments",
   TREASURY: "/treasury",
   PARTICIPANT: "/participants",
@@ -8,6 +9,8 @@ const ROOTS = {
 };
 
 export const PATHS = {
+  DASHBOARD: `${ROOTS.DASHBOARD}`,
+
   DEPARTMENT: {
     HOME: `${ROOTS.DEPARTMENT}`,
     ADD: `${ROOTS.DEPARTMENT}/add`,
