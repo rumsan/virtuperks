@@ -26,6 +26,19 @@ export const DialogButton = ({
   handleApplyTaskLogic,
   isDisabled
 }: DialogButtonProps) => {
+  const handleSubmit = async () => {
+    if (handleApplyTaskLogic) {
+      try {
+        await handleApplyTaskLogic(); // Execute the async function
+        setIsOpen(false); // Close the dialog on success
+      } catch (error) {
+        console.error("Error in dialog submit:", error);
+        // Optionally keep dialog open on error, or close it anyway
+      }
+    }
+  
+
+  };
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent>
@@ -44,7 +57,7 @@ export const DialogButton = ({
           </Button>
           <Button
             type="submit"
-            onClick={handleApplyTaskLogic}
+            onClick={handleSubmit}
             disabled={isDisabled}
           >
             {buttonName}

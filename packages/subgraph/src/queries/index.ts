@@ -53,7 +53,7 @@ export const TransferList = `
 
 export const TaskCreatedList = `
   query TaskCreatedList {
-    taskCreateds(first: 100) {
+    taskCreateds(first: 100,orderBy: blockTimestamp, orderDirection: desc) {
       id
       createdBy
       blockNumber

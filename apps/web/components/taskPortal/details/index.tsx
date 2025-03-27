@@ -39,9 +39,9 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
     return task?.id === cuid?.id;
   });
 
-  const { writeContractAsync } =
+  const { writeContractAsync,isPending:participatePending, isSuccess:participateSuccess } =
     useWriteEntityTaskManagerParticipate();
-  const { writeContractAsync: writeCompleteTask } =
+  const { writeContractAsync: writeCompleteTask, isPending:completePending, isSuccess:completSucces } =
     useWriteEntityTaskManagerCompleteTask();
 
   const handleApplyTask = () => {
@@ -59,6 +59,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
         args: [taskData?.id],
       });
       if (result) {
+        console.log("Task completed successfully");
         setIsOpen(false);
         setLocalButtonState("COMPLETED"); // Update local button state immediately
       }
@@ -88,7 +89,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   };
 
   const getDialogHandler = () => {
-    switch (participantTaskStatus?.status) {
+    switch (participantTaskStatus[0]?.status) {
       case "COMPLETED":
         return handleCompletedTask;
       case "WAITING":
@@ -103,6 +104,8 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const getButtonContent = () => {
   
     const currentStatus = localButtonState || participantTaskStatus[0]?.status;
+    console.log("participantTaskStatus", participantTaskStatus);
+    console.log("currentStatus", currentStatus);
  
 
     switch (currentStatus) {
@@ -118,12 +121,12 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
           <Button 
             className="bg-[#297AD6]" 
             onClick={handleCompletedTask}
-            disabled={isCompleteLoading}
+            disabled={completePending}
           >
             <span className="text-[#F8FAFC]">
-              {isCompleteLoading ? "Processing..." : "Mark as completed"}
+              {completePending ? "Processing..." : "Mark as completed"}
             </span>
-            {!isCompleteLoading && (
+            {!completePending && (
               <ArrowRight color="#F8FAFC" strokeWidth={2.5} size={20} />
             )}
           </Button>
@@ -141,12 +144,12 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
           <Button 
             className="bg-[#297AD6]" 
             onClick={handleApplyTask}
-            disabled={isApplyLoading}
+            disabled={participatePending}
           >
             <span className="text-[#F8FAFC]">
-              {isApplyLoading ? "Processing..." : "Apply for task"}
+              {participatePending ? "Processing..." : "Apply for task"}
             </span>
-            {!isApplyLoading && (
+            {!participatePending && (
               <ArrowRight color="#F8FAFC" strokeWidth={2.5} size={20} />
             )}
           </Button>
@@ -182,7 +185,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             setAlertDialog={setAlertDialog}
           />
         ) : (
-          getDialogContents(participantTaskStatus?.status) && (
+          getDialogContents(participantTaskStatus?.[0]?.status) && (
             <DialogButton
               isOpen={isOpen}
               setIsOpen={setIsOpen}

@@ -115,7 +115,7 @@ export const useGetTaskParticipantsWithStatus = (taskId: any) => {
 
   const { queryService } = useGraphService();
   const { data, isLoading } = useQuery({
-    queryKey: ["taskParticipantsWithStatus"],
+    queryKey: ["taskParticipantsWithStatus",taskId],
     queryFn: async () => {
       const getAllData = await queryService?.getTaskParticipantsWithStatus(taskId);
       return getAllData;
@@ -133,7 +133,7 @@ export const useGetTaskParticipantsWithStatus = (taskId: any) => {
 export const useGetApprovedAndCompletedList = (taskId: any) => {
   const { queryService } = useGraphService();
   const { data, isLoading } = useQuery({
-    queryKey: ["approvedAndCompleted"],
+    queryKey: ["approvedAndCompleted", taskId],
     queryFn: async () => {
       const getAllData = await queryService?.getTaskApprovedAndCompletedList(taskId);
       return getAllData;
@@ -189,9 +189,11 @@ export const useAcceptParticipantMutation = () => {
       });
       return result;
     },
-    onSuccess: () => {
+    onSuccess: (result, variable) => {
+      console.log(result, 'result')
+      console.log(variable, 'variable')
       // Invalidate both participant and task status queries
-      queryClient.invalidateQueries({ queryKey: ["approvedAndCompleted"] });
+      queryClient.invalidateQueries({ queryKey: ["taskParticipantsWithStatus",variable.taskId] });
     },
   });
 };
