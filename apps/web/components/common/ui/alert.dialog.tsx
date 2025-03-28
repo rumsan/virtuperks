@@ -7,8 +7,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@workspace/ui/components/alert-dialog";
-import { ConnectKitButton } from "connectkit";
-import { Wallet } from "lucide-react";
 
 interface CustomAlertDialogProps {
   alertDialog: boolean;

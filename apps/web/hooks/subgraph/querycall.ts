@@ -77,7 +77,7 @@ export const useGetAllowedWallets = (
 
 
 export const useGetParticipantTaskStatus = (participant: any, taskId: any) => {
-  console.log(participant, taskId, 'participant, taskId')
+
   const { queryService } = useGraphService();
   const { data, isLoading } = useQuery({
     queryKey: ["participantTaskStatus",participant,taskId],
