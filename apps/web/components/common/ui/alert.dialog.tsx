@@ -1,80 +1,48 @@
 import {
   AlertDialog,
-  AlertDialogCancel,
+  AlertDialogAction,
   AlertDialogContent,
+  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@workspace/ui/components/alert-dialog";
 import { ConnectKitButton } from "connectkit";
 import { Wallet } from "lucide-react";
 
 interface CustomAlertDialogProps {
   alertDialog: boolean;
-  setAlertDialog: (open: boolean) => void;
+  setAlertDialog: (value: boolean) => void;
   textData?: string;
   buttonName?: string;
-  onClose: (shouldClose: boolean) => void;
+  onClose?: (shouldClose: boolean) => void;
 }
 
 export function CustomAlertDialog({
   alertDialog,
   setAlertDialog,
-  textData,
-  buttonName,
+  textData = "Access Denied",
+  buttonName = "Ok",
   onClose,
 }: CustomAlertDialogProps) {
+  const handleClose = () => {
+    setAlertDialog(false);
+    onClose?.(true);
+  };
+
   return (
-    <AlertDialog open={alertDialog} onOpenChange={setAlertDialog}>
-      <AlertDialogTrigger asChild></AlertDialogTrigger>
-      <AlertDialogContent className="w-[32%] p-5">
+    <AlertDialog open={alertDialog}>
+      <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle className="flex items-center justify-center text-[#0F172A] text-base font-normal gap-2">
-            <Wallet size={20} strokeWidth={2.5} />
-            <span>{textData ?? "Connect your wallet address first!"}</span>
-          </AlertDialogTitle>
+          <AlertDialogTitle>Alert</AlertDialogTitle>
+          <AlertDialogDescription>
+            {textData}
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel
-            onClick={() => {
-              onClose(false);
-            }}
-          >
-            Cancel
-          </AlertDialogCancel>
-
-          {/* <ConnectKitButton
-            customTheme={{
-              "--ck-accent-color": "#00D54B",
-              "--ck-accent-text-color": "#ffffff",
-              "--ck-overlay-background": "rgba(255, 0, 0, 0.5)",
-            }}
-            showAvatar={false}
-            theme="auto"
-          /> */}
-          {buttonName ? (
-            <AlertDialogCancel
-              onClick={() => {
-                onClose(true);
-              }}
-            >
-              {buttonName}
-            </AlertDialogCancel>
-          ) : (
-            <ConnectKitButton
-              customTheme={{
-                "--ck-accent-color": "#00D54B",
-                "--ck-accent-text-color": "#ffffff",
-                "--ck-overlay-background": "rgba(255, 0, 0, 0.5)",
-              }}
-              showAvatar={false}
-              theme="auto"
-              onClose={() => {
-                onClose(true);
-              }}
-            />
-          )}
+          <AlertDialogAction onClick={handleClose}>
+            {buttonName}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

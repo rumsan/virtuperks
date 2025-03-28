@@ -14,21 +14,26 @@ interface ValidationProps {
 
 const Validation = ({ children, role }: ValidationProps) => {
   const [alertDialog, setAlertDialog] = useState(false);
+  const [isValidating, setIsValidating] = useState(true);
   const router = useRouter();
   const { address } = useAccount();
 
-  const { data } = useReadContract({
-    address: process.env.NEXT_PUBLIC_ACCESSMANAGER || "",
+  const { data, isLoading } = useReadContract({
+    address: (process.env.NEXT_PUBLIC_ACCESSMANAGER?.startsWith("0x") ? process.env.NEXT_PUBLIC_ACCESSMANAGER : "") as `0x${string}`,
     abi: AccessManagerABI,
     functionName: "hasRole",
-    args: [process.env.NEXT_PUBLIC_APPID, role, address],
+    args: [process.env.NEXT_PUBLIC_APP_ID, role, address],
   });
 
   useEffect(() => {
-    if (!data) {
-      setAlertDialog(true);
+    
+    if (!isLoading) {
+      setIsValidating(false);
+      if (data === false) { // Only show dialog if we explicitly get false
+        setAlertDialog(true);
+      }
     }
-  }, [data]);
+  }, [data, isLoading]);
 
   const handleDialogClose = (shouldClose: boolean) => {
     setAlertDialog(false);
@@ -36,19 +41,24 @@ const Validation = ({ children, role }: ValidationProps) => {
       router.push(`${PATHS.DASHBOARD}`);
     }
   };
+
+  if (isValidating || isLoading) {
+    return null; // Show nothing while validating
+  }
+
   return (
     <div>
-      {data
-        ? children
-        : alertDialog && (
-            <CustomAlertDialog
-              alertDialog={alertDialog}
-              setAlertDialog={setAlertDialog}
-              textData="Access Denied"
-              buttonName="Ok"
-              onClose={handleDialogClose}
-            />
-          )}
+      {data ? children : (
+        alertDialog && (
+          <CustomAlertDialog
+            alertDialog={alertDialog}
+            setAlertDialog={setAlertDialog}
+            textData="Access Denied"
+            buttonName="Ok"
+            onClose={handleDialogClose}
+          />
+        )
+      )}
     </div>
   );
 };
