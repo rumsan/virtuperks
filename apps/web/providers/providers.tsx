@@ -13,8 +13,9 @@ export function Providers({ children }: QueryProviderProps) {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        refetchOnWindowFocus: true,
+        refetchOnWindowFocus:false,
         retry: false,
+      
       },
       mutations: {
         retry: false,

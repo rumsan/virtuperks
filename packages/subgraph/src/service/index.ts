@@ -9,11 +9,10 @@ import {
   GetTaskApprovedAndCompleted,
   GetTaskDetailsById,
   GetTaskParticipantsWithStatus,
-  ParticiantAppliedList,
+ 
   RoleGrantedList,
-  TaskAcceptedList,
-  TaskApprovedList,
-  TaskCompletedList,
+
+ 
   TaskCreatedList,
   TransferList,
 } from '../queries';
@@ -24,7 +23,7 @@ export class SubgraphService {
   constructor(graphurl: string) {
     this.subgraphQuery = new Client({
       url: graphurl,
-      exchanges: [cacheExchange, fetchExchange],
+      exchanges: [fetchExchange],
     });
   }
 
@@ -57,13 +56,7 @@ export class SubgraphService {
     return {data, error};
   }
 
-  async getParticiantAppliedList() {
-    const {data, error} = await this.subgraphQuery.query(
-      ParticiantAppliedList,
-      {},
-    );
-    return {data, error};
-  }
+ 
   async getEntityManagerCreatedList() {
     const {data, error} = await this.subgraphQuery.query(
       EntityTaskManagerCreatedList,
@@ -72,21 +65,13 @@ export class SubgraphService {
     return {data, error};
   }
 
-  async getTaskAcceptedList() {
-    const {data, error} = await this.subgraphQuery.query(TaskAcceptedList, {});
-    return {data, error};
-  }
 
-  async getTaskCompletedList() {
-    const {data, error} = await this.subgraphQuery.query(TaskCompletedList, {});
-    return {data, error};
-  }
-    async getTaskApproveddList() {
-    const {data, error} = await this.subgraphQuery.query(TaskApprovedList, {});
-    return {data, error};
-    }
+
+ 
+ 
   
   async getParticipantTaskStatus(participant: string, taskId: string) {
+    
     const { data, error } = await this.subgraphQuery.query(
       GetParticipantTaskStatusWithVariables,
       { participant, taskId }

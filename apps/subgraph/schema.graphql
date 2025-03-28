@@ -153,4 +153,10 @@ type ParticipantTaskStatus @entity(immutable: false) {
   lastUpdatedBlock: BigInt! 
   lastUpdatedTimestamp: BigInt!
   taskDetail: TaskDetail
+  entityTaskManager: EntityTaskManagerCreated
+}
+
+type TaskIdMapping @entity {
+  id: Bytes! # internal_id (event.params.id)
+  taskCreated: TaskCreated!
 }

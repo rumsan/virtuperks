@@ -69,11 +69,11 @@ export const config = createConfig(
       safe(),
     ],
     transports: {
-      [mainnet.id]: http(),
-      [sepolia.id]: http(),
+     // [mainnet.id]: http(),
+      //[sepolia.id]: http(),
       // [arbitrumSepolia.id]: http(),
-      [polygonAmoy.id]: http(),
-      [localChain.id]: http(),
+      //[polygonAmoy.id]: http(),
+      //[localChain.id]: http(),
       [baseSepolia.id]: http(),
     },
     walletConnectProjectId: "",
@@ -86,5 +86,7 @@ export const config = createConfig(
     appUrl: "https://family.co", // your app's url
     appIcon: "https://family.co/logo.png", // your app's icon, no bigger than 1024x1024px (max. 1MB)
   }),
+   
+ 
 );
 

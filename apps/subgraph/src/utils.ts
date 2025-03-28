@@ -1,5 +1,5 @@
 import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
-import { ParticipantTaskStatus, TaskDetail } from "../generated/schema";
+import { ParticipantTaskStatus, TaskCreated, TaskDetail, TaskIdMapping } from "../generated/schema";
 import { EntityContract } from "../generated/templates/EntityContract/EntityContract";
 
 
@@ -77,6 +77,23 @@ export function updateParticipantTaskStatus(
     statusEntity.participant = participant;
     statusEntity.taskId = taskId;
   }
+  //load takcreated via taskIdMaping
+  let mapping = TaskIdMapping.load(taskId)
+  if (mapping) {
+    let taskCreated = TaskCreated.load(mapping.taskCreated);
+    if(taskCreated){
+      statusEntity.entityTaskManager = taskCreated.entityTaskManager
+     
+    } else {
+      log.warning("TaskCreated not found for taskId: {}", [taskId.toHexString()]);
+      
+    }
+
+  }else {
+    log.warning("TaskIdMapping not found for taskId: {}", [taskId.toHexString()]);
+  }
+  
+  
  
 
   // Convert BigInt values if needed

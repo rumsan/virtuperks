@@ -6,7 +6,8 @@ import {
   TaskAccepted,
   TaskApproved,
   TaskCompleted,
-  TaskCreated
+  TaskCreated,
+  TaskIdMapping,
 } from "../generated/schema"
 import {
   PINGED as PINGEDEvent,
@@ -175,8 +176,12 @@ export function handleTaskCreated(event: TaskCreatedEvent): void {
   } else {
     log.info("No EntityTaskManagerCreated found for address: {}", [event.address.toHexString()]);
   }
+  task.save()
+  let mapping = new TaskIdMapping(event.params.id)
+  mapping.taskCreated = taskId;
+  mapping.save();
   
-  let taskDetail = fetchTaskDetails(event.params.id, event.address, event.params.id);
+  let taskDetail = fetchTaskDetails(event.params.id, event.address, taskId);
   if (taskDetail) {
     task.taskDetail = taskDetail.id;
     log.info("TaskDetail saved: {}", [taskDetail.id.toHexString()]);

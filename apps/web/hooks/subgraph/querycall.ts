@@ -41,6 +41,7 @@ export const useEntityList = () => {
 
       return getAllData;
     },
+    refetchOnWindowFocus:true 
   });
 };
 
@@ -76,6 +77,7 @@ export const useGetAllowedWallets = (
 
 
 export const useGetParticipantTaskStatus = (participant: any, taskId: any) => {
+  console.log(participant, taskId, 'participant, taskId')
   const { queryService } = useGraphService();
   const { data, isLoading } = useQuery({
     queryKey: ["participantTaskStatus",participant,taskId],
@@ -193,96 +195,12 @@ const participateInTask = async (
   return result;
 };
 
-// export const  useParticipateTaskMutation = () => {
-//   const queryClient = useQueryClient();
-//   const { writeContractAsync } = useWriteEntityTaskManagerParticipate();
-//   const  {address:participant} = useAccount()
-
-//   const mutation =  useMutation({
-//     mutationFn: async ({ 
-//       taskId, 
-//       entityId 
-//     }: { 
-//       taskId: string; 
-//       entityId: string;
-//     }) => {
-//       const result = await writeContractAsync({
-//         address: (entityId as `0x${string}`) || "0x",
-//         args: [taskId as `0x${string}`],
-//       });
-//       return result;
-//     },
-//     onSuccess: (result, variable) => {
-//       console.log(result, 'result')
-//       console.log(variable, 'variable')
-//       // Invalidate both participant and task status queries
-//       if (participant) {
-//        console.log('inside')
-//         queryClient.invalidateQueries({ 
-//           queryKey: ["participantTaskStatus", participant, variable.taskId] 
-//         });
-//       }
-//     },
-//   });
-//   return {
-//     participateTask: mutation.mutateAsync,
-//     participatePending: mutation.isPending,
-//     participateSuccess: mutation.isSuccess,
-    
-//   }
-// }
-
-export const useParticipateTaskMutation = () => {
+export const  useParticipateTaskMutation = () => {
   const queryClient = useQueryClient();
   const { writeContractAsync } = useWriteEntityTaskManagerParticipate();
-  const { address: participant } = useAccount();
+  const  {address:participant} = useAccount()
 
-  const mutation = useMutation({
-    mutationFn: ({ taskId, entityId }: { taskId: string; entityId: string }) =>
-      participateInTask(writeContractAsync, taskId, entityId),
-    onSuccess: (result, variables) => {
-      console.log("Transaction Success - Result:", result);
-      console.log("Variables:", variables);
-
-      if (participant) {
-        // Invalidate specific queries
-        const participantTaskStatusKey = ["participantTaskStatus", participant, variables.taskId];
-        const taskDetailsKey = ["taskDetails", variables.taskId];
-        // const taskListKey = ["taskList"];
-        // const approvedAndCompletedKey = ["approvedAndCompleted", variables.taskId];
-
-         queryClient.invalidateQueries({ queryKey: participantTaskStatusKey });
-         console.log("Invalidated participantTaskStatus:", participantTaskStatusKey);
-
-        // queryClient.invalidateQueries({ queryKey: taskDetailsKey });
-        // console.log("Invalidated taskDetails:", taskDetailsKey);
-
-        // queryClient.invalidateQueries({ queryKey: taskListKey });
-        // console.log("Invalidated taskList:", taskListKey);
-
-        // queryClient.invalidateQueries({ queryKey: approvedAndCompletedKey });
-        // console.log("Invalidated approvedAndCompleted:", approvedAndCompletedKey);
-      } else {
-        console.warn("No participant address available for invalidation");
-      }
-    },
-    onError: (error) => {
-      console.error("Transaction Error:", error);
-    },
-  });
-
-  return {
-    participateTask: mutation.mutateAsync,
-    participatePending: mutation.isPending,
-    participateSuccess: mutation.isSuccess,
-  };
-};
-
-export const useCompleteTaskMutation = () => {
-  const queryClient = useQueryClient();
-  const { writeContractAsync } = useWriteEntityTaskManagerCompleteTask();
-
-  return useMutation({
+  const mutation =  useMutation({
     mutationFn: async ({ 
       taskId, 
       entityId 
@@ -297,10 +215,61 @@ export const useCompleteTaskMutation = () => {
       return result;
     },
     onSuccess: (result, variable) => {
-      console.log(result, 'result')
-      console.log(variable, 'variable')
-      // Invalidate both participant and task status queries
-      queryClient.invalidateQueries({ queryKey: ["taskParticipantsWithStatus",variable.taskId] });
+     
+      if (participant) {
+    setTimeout(() => {
+          queryClient.invalidateQueries({
+            queryKey: ["participantTaskStatus", participant, variable.taskId],
+          });
+          
+        }, 5000);
+      }
     },
   });
+  return {
+    participateTask: mutation.mutateAsync,
+    participatePending: mutation.isPending,
+    participateSuccess: mutation.isSuccess,
+    
+  }
+}
+
+
+
+export const useCompleteTaskMutation = () => {
+  const queryClient = useQueryClient();
+  const { writeContractAsync } = useWriteEntityTaskManagerCompleteTask();
+    const  {address:participant} = useAccount()
+
+  const mutation = useMutation({
+    mutationFn: async ({ 
+      taskId, 
+      entityId 
+    }: { 
+      taskId: string; 
+      entityId: string;
+    }) => {
+      const result = await writeContractAsync({
+        address: (entityId as `0x${string}`) || "0x",
+        args: [taskId as `0x${string}`],
+      });
+      return result;
+    },
+    onSuccess: (result, variable) => {
+     
+         if (participant) {
+    setTimeout(() => {
+          queryClient.invalidateQueries({
+            queryKey: ["participantTaskStatus", participant, variable.taskId],
+          });
+          
+        }, 5000);
+      }
+    },
+  });
+  return {
+    completeTask: mutation.mutateAsync,
+    completePending: mutation.isPending,
+    completeSuccess: mutation.isSuccess,
+ }
 }

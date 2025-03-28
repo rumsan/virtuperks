@@ -11,7 +11,11 @@ export function useColumns<T>(): ColumnDef<T>[] {
   const acceptParticipantMutation = useAcceptParticipantMutation();
 
   const handleAction = (row: any) => {
-    const entityId = row.original.taskDetail.task.entityTaskManager.entityTaskManager;
+  
+  
+
+  const entityId = row.original.entityTaskManager.id;
+
     const taskId = row.original.taskId;
     const status = row.getValue("status");
     const participant = row.getValue("participant");
@@ -21,7 +25,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
       setIsDialogOpen(true);
     } else if (status === "COMPLETED") {
       setSelectedTask({ id: taskId, participant, status });
-      setIsDialogOpen(true);
+      setIsDialogOpen(true)
     }
   };
 
@@ -87,6 +91,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
       cell: ({ row }) => {
         const status = row.getValue("status");
         const dialogContent = getDialogContent(status as string);
+      
         
        
         if (status === "COMPLETED") {
