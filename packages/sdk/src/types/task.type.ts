@@ -24,6 +24,7 @@ export type TaskCreated = CommonFields & {
   createdBy: string;
   entityTaskManager: EntityTaskManagerCreated;
   id: string;
+  internal_id: string;
   taskDetail: TaskDetail;
 };
 

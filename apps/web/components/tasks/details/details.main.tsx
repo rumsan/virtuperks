@@ -1,6 +1,6 @@
 import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
-import { useGetApprovedAndCompletedList, usegetSingTask } from "@/hooks/subgraph/querycall";
+import { useGetApprovedAndCompletedList} from "@/hooks/subgraph/querycall";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft, CheckCircle, CircleX } from "lucide-react";
@@ -9,6 +9,7 @@ import { useState } from "react";
 import useApproveTask from "./approve.task";
 import TaskParticipant from "./details.participant";
 import TaskDetails from "./details.task";
+import { useGetTaskDetailById } from "@/hooks/subgraph/taskDetail";
 
 type TaskMainProps = {
   cuid: Cuid;
@@ -16,7 +17,12 @@ type TaskMainProps = {
 };
 
 const TaskMain = ({ cuid, router }: TaskMainProps) => {
-  const {taskData} = usegetSingTask(cuid);
+ 
+    const getTaskDetail = useGetTaskDetailById(cuid.id);
+       
+    const taskData = getTaskDetail?.data?.data?.taskCreateds[0]
+  
+ 
   const { completedData, approvedData } = useGetApprovedAndCompletedList(cuid.id);
   const [localStatus, setLocalStatus] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -56,7 +62,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const handleDialogAction = async () => {
     try {
       setIsApproveLoading(true);
-      await handleApproveTask(cuid.id, taskData.entityTaskManager.id);
+      await handleApproveTask(cuid.id, taskData.entityTaskManager.entityTaskManager);
       setIsOpen(false);
       setLocalStatus("VERIFIED"); // Update local status immediately after successful approval
     } catch (error) {

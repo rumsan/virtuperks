@@ -1,6 +1,7 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ConnectKitProvider } from "connectkit";
 import * as React from "react";
 
@@ -12,7 +13,7 @@ export function Providers({ children }: QueryProviderProps) {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        refetchOnWindowFocus: false,
+        refetchOnWindowFocus: true,
         retry: false,
       },
       mutations: {
@@ -23,6 +24,7 @@ export function Providers({ children }: QueryProviderProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <ConnectKitProvider theme="auto">{children}</ConnectKitProvider>
+       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }

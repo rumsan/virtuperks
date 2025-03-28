@@ -55,6 +55,7 @@ export const TaskCreatedList = `
   query TaskCreatedList {
     taskCreateds(first: 100,orderBy: blockTimestamp, orderDirection: desc) {
       id
+      internal_id
       createdBy
       blockNumber
       blockTimestamp
@@ -331,6 +332,35 @@ export const  GetTaskApprovedAndCompleted= `
         maxParticipants
         owner
         rewardAmount
+      }
+    }
+  }
+`;
+
+export const GetTaskDetailsById = `
+  query GetTaskDetailsById($taskId: Bytes!) {
+    taskCreateds(where: { internal_id: $taskId }, first: 1) {
+      id
+      internal_id
+      createdBy
+      blockNumber
+      blockTimestamp
+      transactionHash
+      taskDetail {
+        detailsUrl
+        rewardToken
+        rewardAmount
+        maxParticipants
+        expiryDate
+        owner
+        isActive
+        allowedWallets
+      }
+      entityTaskManager {
+        entityTaskManager
+      _appId
+        _name
+      
       }
     }
   }

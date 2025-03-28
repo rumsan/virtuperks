@@ -2,8 +2,13 @@ import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { EntityTaskManagementABI } from "@workspace/contracts/abis";
 
-import { useReadContract } from "wagmi";
-import { useWriteEntityTaskManagerAcceptParticipant, useWriteEntityTaskManagerVerifyCompletion } from "../wagmi/contracts";
+import { useAccount, useReadContract } from "wagmi";
+import {
+  useWriteEntityTaskManagerAcceptParticipant,
+  useWriteEntityTaskManagerCompleteTask,
+  useWriteEntityTaskManagerParticipate,
+  useWriteEntityTaskManagerVerifyCompletion
+} from "../wagmi/contracts";
 
 // Add these query key constants
 export const QUERY_KEYS = {
@@ -67,35 +72,13 @@ export const useGetAllowedWallets = (
 
 
 
-export const usegetSingTask = (taskId:any) => {
-  const { queryService } = useGraphService();
-
-
- const {data, isLoading}=  useQuery({
-    queryKey: ["singleTask"],
-    queryFn: async () => {
-      const getAllData = await queryService?.getTaskCreatedList();
-      return getAllData;
-    },
- });
-
-  const filterData = data?.data?.taskCreateds.find(
-    (data: any) => data?.id === taskId.id
-  ) || [];
-  return {
-    taskData: filterData,
-    taskLoading: isLoading
-  }
-};
-
-
 
 
 
 export const useGetParticipantTaskStatus = (participant: any, taskId: any) => {
   const { queryService } = useGraphService();
   const { data, isLoading } = useQuery({
-    queryKey: ["participantTaskStatus"],
+    queryKey: ["participantTaskStatus",participant,taskId],
     queryFn: async () => {
       const getAllData = await queryService?.getParticipantTaskStatus(participant, taskId);
      return getAllData
@@ -129,6 +112,7 @@ export const useGetTaskParticipantsWithStatus = (taskId: any) => {
     taskParticipantsWithStatusLoading: isLoading
   };
 }
+
 
 export const useGetApprovedAndCompletedList = (taskId: any) => {
   const { queryService } = useGraphService();
@@ -197,3 +181,126 @@ export const useAcceptParticipantMutation = () => {
     },
   });
 };
+const participateInTask = async (
+  writeContractAsync: (config: any) => Promise<any>,
+  taskId: string,
+  entityId: string
+) => {
+  const result = await writeContractAsync({
+    address: entityId as `0x${string}`,
+    args: [taskId as `0x${string}`],
+  });
+  return result;
+};
+
+// export const  useParticipateTaskMutation = () => {
+//   const queryClient = useQueryClient();
+//   const { writeContractAsync } = useWriteEntityTaskManagerParticipate();
+//   const  {address:participant} = useAccount()
+
+//   const mutation =  useMutation({
+//     mutationFn: async ({ 
+//       taskId, 
+//       entityId 
+//     }: { 
+//       taskId: string; 
+//       entityId: string;
+//     }) => {
+//       const result = await writeContractAsync({
+//         address: (entityId as `0x${string}`) || "0x",
+//         args: [taskId as `0x${string}`],
+//       });
+//       return result;
+//     },
+//     onSuccess: (result, variable) => {
+//       console.log(result, 'result')
+//       console.log(variable, 'variable')
+//       // Invalidate both participant and task status queries
+//       if (participant) {
+//        console.log('inside')
+//         queryClient.invalidateQueries({ 
+//           queryKey: ["participantTaskStatus", participant, variable.taskId] 
+//         });
+//       }
+//     },
+//   });
+//   return {
+//     participateTask: mutation.mutateAsync,
+//     participatePending: mutation.isPending,
+//     participateSuccess: mutation.isSuccess,
+    
+//   }
+// }
+
+export const useParticipateTaskMutation = () => {
+  const queryClient = useQueryClient();
+  const { writeContractAsync } = useWriteEntityTaskManagerParticipate();
+  const { address: participant } = useAccount();
+
+  const mutation = useMutation({
+    mutationFn: ({ taskId, entityId }: { taskId: string; entityId: string }) =>
+      participateInTask(writeContractAsync, taskId, entityId),
+    onSuccess: (result, variables) => {
+      console.log("Transaction Success - Result:", result);
+      console.log("Variables:", variables);
+
+      if (participant) {
+        // Invalidate specific queries
+        const participantTaskStatusKey = ["participantTaskStatus", participant, variables.taskId];
+        const taskDetailsKey = ["taskDetails", variables.taskId];
+        // const taskListKey = ["taskList"];
+        // const approvedAndCompletedKey = ["approvedAndCompleted", variables.taskId];
+
+         queryClient.invalidateQueries({ queryKey: participantTaskStatusKey });
+         console.log("Invalidated participantTaskStatus:", participantTaskStatusKey);
+
+        // queryClient.invalidateQueries({ queryKey: taskDetailsKey });
+        // console.log("Invalidated taskDetails:", taskDetailsKey);
+
+        // queryClient.invalidateQueries({ queryKey: taskListKey });
+        // console.log("Invalidated taskList:", taskListKey);
+
+        // queryClient.invalidateQueries({ queryKey: approvedAndCompletedKey });
+        // console.log("Invalidated approvedAndCompleted:", approvedAndCompletedKey);
+      } else {
+        console.warn("No participant address available for invalidation");
+      }
+    },
+    onError: (error) => {
+      console.error("Transaction Error:", error);
+    },
+  });
+
+  return {
+    participateTask: mutation.mutateAsync,
+    participatePending: mutation.isPending,
+    participateSuccess: mutation.isSuccess,
+  };
+};
+
+export const useCompleteTaskMutation = () => {
+  const queryClient = useQueryClient();
+  const { writeContractAsync } = useWriteEntityTaskManagerCompleteTask();
+
+  return useMutation({
+    mutationFn: async ({ 
+      taskId, 
+      entityId 
+    }: { 
+      taskId: string; 
+      entityId: string;
+    }) => {
+      const result = await writeContractAsync({
+        address: (entityId as `0x${string}`) || "0x",
+        args: [taskId as `0x${string}`],
+      });
+      return result;
+    },
+    onSuccess: (result, variable) => {
+      console.log(result, 'result')
+      console.log(variable, 'variable')
+      // Invalidate both participant and task status queries
+      queryClient.invalidateQueries({ queryKey: ["taskParticipantsWithStatus",variable.taskId] });
+    },
+  });
+}
