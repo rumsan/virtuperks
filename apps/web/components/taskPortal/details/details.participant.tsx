@@ -1,6 +1,7 @@
 import { ListTable } from "@/components/common/list/list.table";
-import { usegetSingTask } from "@/hooks/subgraph/querycall";
+import { useGetTaskDetailById } from "@/hooks/subgraph/taskDetail";
 import { TaskHistory } from "@/sampleData";
+import { shortAddress } from "@/utils/shortAddress";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -21,10 +22,10 @@ import {
 import { User } from "lucide-react";
 import { useState } from "react";
 import { useHistoryColumns } from "./history.column";
-import { shortAddress } from "@/utils/shortAddress";
 type TaskPortalParticipantProps = { taskId: any };
 
-const TaskPortalParticipant = ({taskId }:TaskPortalParticipantProps ) => {
+const TaskPortalParticipant = ({ taskId }: TaskPortalParticipantProps) => {
+
   const [hoveredWallet, setHoveredWallet] = useState<string | null>(null);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -34,8 +35,10 @@ const TaskPortalParticipant = ({taskId }:TaskPortalParticipantProps ) => {
     pageIndex: 0,
     pageSize: 10,
   });
- 
-  const { taskData } = usegetSingTask(taskId);
+    const getTaskDetail = useGetTaskDetailById(taskId.id);
+     
+  const taskData = getTaskDetail?.data?.data?.taskCreateds[0]
+
 
 
 

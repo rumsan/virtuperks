@@ -1,10 +1,11 @@
-import { defineConfig,Config } from "@wagmi/cli";
+import { Config, defineConfig } from "@wagmi/cli";
 import { react } from "@wagmi/cli/plugins";
 import {
   AccessManagerABI,
   EntityTaskManagementABI,
   RewardTokenABI,
 } from "@workspace/contracts/abis";
+
 import { Abi } from "viem";
 
 export default defineConfig({
@@ -25,3 +26,4 @@ export default defineConfig({
   ],
   plugins: [react()],
 }) as Config;
+

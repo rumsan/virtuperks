@@ -1,6 +1,5 @@
 import { Cuid } from "@/components/departments/details/details.main";
-import { useTaskList } from "@/hooks/subgraph/querycall";
-import { TaskCreated } from "@workspace/sdk/type";
+import { useGetTaskDetailById } from "@/hooks/subgraph/taskDetail";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { ExternalLink, Timer, Trophy, UserRoundCog, Users } from "lucide-react";
 
@@ -9,16 +8,13 @@ type TaskDetailsProps = {
 };
 
 const TaskDetails = ({ cuid }: TaskDetailsProps) => {
-  const getAllTask = useTaskList();
-  const taskList = getAllTask?.data?.data?.taskCreateds;
 
-  const filteredTaskList = taskList?.map((task: TaskCreated) => {
-    return task?.taskDetail;
-  });
+ 
+  const getTaskDetail = useGetTaskDetailById(cuid.id);
+ 
+const  taskData = getTaskDetail?.data?.data?.taskCreateds[0]
 
-  const taskData = filteredTaskList?.find(
-    (task:TaskCreated) => task?.id === cuid?.id,
-  );
+
 
   return (
     <>
@@ -40,22 +36,22 @@ const TaskDetails = ({ cuid }: TaskDetailsProps) => {
 
         <div className="mt-3 mb-3 w-full overflow-hidden">
           <p className="text-[#334155] text-sm line-clamp-1">
-            {taskData?.detailsUrl}
+            {taskData?.taskDetail?.detailsUrl}
           </p>
         </div>
 
         <div className="flex flex-col text-gray-500 font-normal gap-1 text-sm">
           <span className="flex items-center gap-2">
             <UserRoundCog color="#64748B" size={20} strokeWidth={2.5} />
-            Task Owner: {taskData?.owner}
+            Task Owner: {taskData?.taskDetail?.owner}
           </span>
           <span className="flex items-center gap-2">
             <Users color="#64748B" size={20} strokeWidth={2.5} />
-            {taskData?.maxParticipants} members participating
+            {taskData?.taskDetail.maxParticipants} members participating
           </span>
           <span className="flex items-center gap-2">
             <Timer color="#64748B" size={20} strokeWidth={2.5} /> Deadline:{" "}
-            {taskData?.expiryDate}
+            {taskData?.taskDetail?.expiryDate}
           </span>
         </div>
       </Card>
@@ -65,7 +61,7 @@ const TaskDetails = ({ cuid }: TaskDetailsProps) => {
           <Trophy color="#297AD6" size={20} />
         </div>
         <span className="text-2xl text-[#297AD6] font-bold">
-          {taskData?.rewardAmount} Tokens
+          {taskData?.taskDetail?.rewardAmount} Tokens
         </span>
       </Card>
     </>

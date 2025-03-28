@@ -1,55 +1,46 @@
 import { DialogButton } from "@/components/common/ui/dialog";
+import { useAcceptParticipantMutation } from "@/hooks/subgraph/querycall";
 import { getDialogContent } from "@/utils/dialog";
 import { ColumnDef } from "@tanstack/react-table";
 import { CircleCheck, CircleX, Copy } from "lucide-react";
 import { useState } from "react";
-import useAcceptParticipant from "./accept.participant";
 
 export function useColumns<T>(): ColumnDef<T>[] {
-  const { handleAcceptParticipant } = useAcceptParticipant();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
-  const [isAcceptLoading, setIsAcceptLoading] = useState(false);
+  const acceptParticipantMutation = useAcceptParticipantMutation();
 
   const handleAction = (row: any) => {
- 
-  
-    const entityId = row.original.taskDetail.task.entityTaskManager.entityTaskManager
-    const taskId = row.original.taskId
- 
-    const status = row.getValue("status");
-  
-    const participant = row.getValue("participant");
   
   
 
+  const entityId = row.original.entityTaskManager.id;
+
+    const taskId = row.original.taskId;
+    const status = row.getValue("status");
+    const participant = row.getValue("participant");
+
     if (status === "UNACCEPTED") {
-    
       setSelectedTask({ id: taskId, participant, status, entityId });
       setIsDialogOpen(true);
     } else if (status === "COMPLETED") {
-     setSelectedTask({ id: taskId, participant, status });
-      setIsDialogOpen(true);
+      setSelectedTask({ id: taskId, participant, status });
+      setIsDialogOpen(true)
     }
   };
 
   const handleDialogAction = async () => {
-    if (selectedTask) {
-      if (selectedTask.status === "UNACCEPTED") {
-        try {
-          setIsAcceptLoading(true);
-          await handleAcceptParticipant(
-            selectedTask.id, 
-            selectedTask.participant, 
-            selectedTask.entityId
-          );
-          setIsDialogOpen(false);
-          setSelectedTask(null);
-        } catch (error) {
-          console.error("Error accepting participant:", error);
-        } finally {
-          setIsAcceptLoading(false);
-        }
+    if (selectedTask && selectedTask.status === "UNACCEPTED") {
+      try {
+        await acceptParticipantMutation.mutateAsync({
+          taskId: selectedTask.id,
+          participant: selectedTask.participant,
+          entityId: selectedTask.entityId
+        });
+        setIsDialogOpen(false);
+        setSelectedTask(null);
+      } catch (error) {
+        console.error("Error accepting participant:", error);
       }
     }
   };
@@ -100,6 +91,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
       cell: ({ row }) => {
         const status = row.getValue("status");
         const dialogContent = getDialogContent(status as string);
+      
         
        
         if (status === "COMPLETED") {
@@ -124,9 +116,9 @@ export function useColumns<T>(): ColumnDef<T>[] {
               setIsOpen={setIsDialogOpen}
               title={dialogContent.title}
               subTitle={dialogContent.subTitle}
-              buttonName={isAcceptLoading ? "Processing..." : dialogContent.buttonName}
+              buttonName={acceptParticipantMutation.isPending ? "Processing..." : dialogContent.buttonName}
               handleApplyTaskLogic={handleDialogAction}
-              isDisabled={isAcceptLoading}
+              isDisabled={acceptParticipantMutation.isPending}
             />
           </>
         );

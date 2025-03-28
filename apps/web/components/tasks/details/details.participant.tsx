@@ -44,6 +44,7 @@ const TaskParticipant = ({ taskId }: TaskParticipantProps) => {
   const { taskParticipantsWithStatus } = useGetTaskParticipantsWithStatus(taskId.id);
 
 
+
   const { tableData, acceptedParticipants } = useMemo(() => {
     if (!taskParticipantsWithStatus) return { tableData: [], acceptedParticipants: [] };
 
@@ -58,6 +59,7 @@ const TaskParticipant = ({ taskId }: TaskParticipantProps) => {
       )
     };
   }, [taskParticipantsWithStatus]);
+ 
 
   const table = useReactTable({
     data: tableData,
