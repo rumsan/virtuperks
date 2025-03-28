@@ -189,6 +189,7 @@ return new Promise<void>((resolve, reject) => {
           <CustomAlertDialog
             alertDialog={alertDialog}
             setAlertDialog={setAlertDialog}
+            textData="Connect your wallet first"
           />
         ) : (!participatePending && isOpen &&
           getDialogContents(participantTaskStatus?.[0]?.status) && (
