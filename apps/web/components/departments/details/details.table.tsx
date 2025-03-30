@@ -22,6 +22,7 @@ const DepartmentDetailsTable = <T, TData>({
   pagination,
   setPagination,
 }: ListTableProps<T, TData>) => {
+
   return (
     <div className="mt-4 mb-4">
       <div className="mb-5">

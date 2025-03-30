@@ -64,8 +64,11 @@ export function ListTable<T, TData>({
           ))
         ) : (
           <TableRow className="h-96">
-            <TableCell colSpan={columns.length} className="text-center">
-              {/* <NoDataPreivew /> */}
+            <TableCell colSpan={columns.length} className="h-24 text-center">
+              <div className="flex flex-col items-center justify-center">
+                <p className="text-sm text-gray-500">No data available</p>
+                <p className="text-xs text-gray-400">No records found</p>
+              </div>
             </TableCell>
           </TableRow>
         )}

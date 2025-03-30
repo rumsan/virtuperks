@@ -43,7 +43,7 @@ export function useColumns<T extends RowData>(): ColumnDef<T>[] {
       ),
 
       cell: ({ row }) => {
-        console.log(row.original, "row");
+       
         const getAmount = row.original.taskDetail.rewardAmount;
         return (
           <p className="text-sm text-gray-700">
@@ -62,7 +62,7 @@ export function useColumns<T extends RowData>(): ColumnDef<T>[] {
         const getData = row.original.taskDetail.expiryDate;
         const expiryTimeStamp = BigInt(getData);
         const expiryInMs = Number(expiryTimeStamp) * 1000;
-        const formattedData = moment(expiryInMs).format("Do MMMM, YYYY");
+        const formattedData = moment(expiryInMs).format("Do MMMM, ");
       
         return (
           <p className="text-sm text-gray-700">
