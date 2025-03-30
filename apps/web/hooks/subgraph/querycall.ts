@@ -157,8 +157,11 @@ export const useApproveTaskMutation = () => {
       });
       return result;
     },
-    onSuccess: () => {
+    onSuccess: async (variable) => {
+    console.log(variable,'from appove function')
       // Invalidate and refetch
+      await new Promise((resolve) => setTimeout(resolve, 9000));
+    
       queryClient.invalidateQueries({ queryKey: ["approvedAndCompleted"] });
     },
   });
@@ -183,10 +186,7 @@ export const useAcceptParticipantMutation = () => {
         address: (entityId as `0x${string}`) || "0x",
         args: [taskId as `0x${string}`, participant as `0x${string}`],
       });
-      // const receipt = await waitForTransactionReceipt(config, {
-      //   hash: result,
-        
-      // })
+     
   
       return  result
     },
