@@ -18,6 +18,7 @@ import React from "react";
 import DepartmentDetailsCard from "./details.card";
 import { useColumns } from "./details.column";
 import DepartmentDetailsTable from "./details.table";
+import { useEntityDetailById } from "@/hooks/subgraph/querycall";
 
 export type Cuid = {
   id: string;
@@ -43,10 +44,13 @@ export default function DepartmentDetails({
     pageIndex: 0,
     pageSize: 10,
   });
+  const getEntity = useEntityDetailById(cuid.id)
+  const EntityData = getEntity?.data?.data?.entityTaskManagerCreateds[0]
+
 
   const columns = useColumns();
   const table = useReactTable({
-    data: Departments || [],
+    data: EntityData?.tasks || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

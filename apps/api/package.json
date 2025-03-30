@@ -20,7 +20,6 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@workspace/sdk": "workspace:*",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.0.1",
@@ -29,7 +28,7 @@
     "@nestjs/platform-fastify": "^11.0.5",
     "@nestjs/swagger": "^11.0.3",
     "@prisma/client": "^6.2.1",
-    "@rumsan/extensions": "^0.1.103",
+    "@workspace/sdk": "workspace:*",
     "nest-winston": "^1.10.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",

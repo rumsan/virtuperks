@@ -5,6 +5,7 @@ import {
 
   CreatedAppList,
   EntityTaskManagerCreatedList,
+  getEntityDetailById,
   GetParticipantTaskStatusWithVariables,
   GetTaskApprovedAndCompleted,
   GetTaskDetailsById,
@@ -67,7 +68,7 @@ export class SubgraphService {
 
   async getEntityDetailById(id:string) {
     const {data, error} = await this.subgraphQuery.query(
-      EntityTaskManagerCreatedList,
+  getEntityDetailById,
       {id},
     );
     return {data, error};
