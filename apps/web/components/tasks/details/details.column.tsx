@@ -8,7 +8,8 @@ import { useState } from "react";
 export function useColumns<T>(): ColumnDef<T>[] {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
-  const acceptParticipantMutation = useAcceptParticipantMutation();
+  const [isRefetching, setIsRefetching] = useState(false);
+  const  acceptParticipantMutation= useAcceptParticipantMutation();
 
   const handleAction = (row: any) => {
   
@@ -32,11 +33,18 @@ export function useColumns<T>(): ColumnDef<T>[] {
   const handleDialogAction = async () => {
     if (selectedTask && selectedTask.status === "UNACCEPTED") {
       try {
+        setIsRefetching(true);
         await acceptParticipantMutation.mutateAsync({
           taskId: selectedTask.id,
           participant: selectedTask.participant,
           entityId: selectedTask.entityId
         });
+        // await new Promise((resolve) =>
+        //   setTimeout(() => {
+        //     resolve();
+        //     setIsRefetching(false); // Stop loading after refetch
+        //   }, 8500) // 8s delay + buffer
+        // );
         setIsDialogOpen(false);
         setSelectedTask(null);
       } catch (error) {
@@ -44,6 +52,11 @@ export function useColumns<T>(): ColumnDef<T>[] {
       }
     }
   };
+
+  const LoadingBar = () =>
+    (acceptParticipantMutation.isPending) ? (
+      <div className="fixed top-0 left-0 w-full h-1 bg-blue-500 animate-pulse" />
+    ) : null;
 
   return [
     {
@@ -120,6 +133,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
               handleApplyTaskLogic={handleDialogAction}
               isDisabled={acceptParticipantMutation.isPending}
             />
+            <LoadingBar/>
           </>
         );
       },

@@ -167,7 +167,7 @@ export const useApproveTaskMutation = () => {
 
 export const useAcceptParticipantMutation = () => {
   const queryClient = useQueryClient();
-  const { writeContractAsync } = useWriteEntityTaskManagerAcceptParticipant();
+  const { writeContractAsync , isPending, isSuccess} = useWriteEntityTaskManagerAcceptParticipant();
 
   return useMutation({
     mutationFn: async ({ 
@@ -183,13 +183,21 @@ export const useAcceptParticipantMutation = () => {
         address: (entityId as `0x${string}`) || "0x",
         args: [taskId as `0x${string}`, participant as `0x${string}`],
       });
-      return result;
+      // const receipt = await waitForTransactionReceipt(config, {
+      //   hash: result,
+        
+      // })
+  
+      return  result
     },
-    onSuccess: (result, variable) => {
-      console.log(result, 'result')
-      console.log(variable, 'variable')
-      // Invalidate both participant and task status queries
-      queryClient.invalidateQueries({ queryKey: ["taskParticipantsWithStatus",variable.taskId] });
+ 
+    onSuccess: async (result, variable) => {
+  
+    
+  await new Promise((resolve) => setTimeout(resolve, 9000));
+      await queryClient.invalidateQueries({
+        queryKey: ["taskParticipantsWithStatus", variable.taskId],
+      });
     },
   });
 };

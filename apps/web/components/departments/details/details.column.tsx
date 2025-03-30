@@ -1,3 +1,4 @@
+import { formatDate } from "@/utils/formatDate";
 import { ColumnDef } from "@tanstack/react-table";
 import moment from "moment";
 
@@ -60,9 +61,7 @@ export function useColumns<T extends RowData>(): ColumnDef<T>[] {
 
       cell: ({ row}) => {
         const getData = row.original.taskDetail.expiryDate;
-        const expiryTimeStamp = BigInt(getData);
-        const expiryInMs = Number(expiryTimeStamp) * 1000;
-        const formattedData = moment(expiryInMs).format("Do MMMM, ");
+       const formattedData = formatDate(getData);
       
         return (
           <p className="text-sm text-gray-700">
