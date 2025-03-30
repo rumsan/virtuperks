@@ -41,10 +41,20 @@ export const useEntityList = () => {
 
       return getAllData;
     },
-    refetchOnWindowFocus:true 
+  
   });
 };
-
+ export const useEntityDetailById = (id: string) => {
+  const { queryService } = useGraphService();
+  return useQuery({
+    queryKey: ["entityDetail", id],
+    queryFn: async () => {
+      const getAllData = await queryService?.getEntityDetailById(id);
+      return getAllData;
+    },
+    
+  });
+};
 export const useTaskList = () => {
   const { queryService } = useGraphService();
 
