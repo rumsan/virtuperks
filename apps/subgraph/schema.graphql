@@ -178,17 +178,3 @@ type TaskIdMapping @entity {
   taskCreated: TaskCreated!
 }
 
-type EntityTokenSummary {
-  totalMinted: BigInt!
-  allocated: BigInt!
-  distributed: BigInt!
-  remaining: BigInt!
-  mintEvents: [TokenMint!]! @derivedFrom(field: "entity")
-}
-
-type TaskTokenAllocation {
-  task: TaskCreated!
-  rewardAmount: BigInt!
-  distributedAmount: BigInt!
-  remainingAllocation: BigInt!
-}
