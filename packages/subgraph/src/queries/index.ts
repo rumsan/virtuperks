@@ -238,3 +238,35 @@ export const GetTaskDetailsById = `
     }
   }
 `;
+
+export const GetAllTasksForParticipant = `
+  query GetAllTasksForParticipant($participant: Bytes!) {
+    participantTaskStatuses(where: { participant: $participant }) {
+      id
+      participant
+      taskId
+      status
+      lastUpdatedBlock
+      lastUpdatedTimestamp
+      taskDetail {
+        id
+        detailsUrl
+        rewardToken
+        rewardAmount
+        maxParticipants
+        expiryDate
+        owner
+        isActive
+        allowedWallets
+   
+      }
+        entityTaskManager {
+        id
+        entityTaskManager
+        _appId
+        _name
+        
+        }
+    }
+  }
+`;

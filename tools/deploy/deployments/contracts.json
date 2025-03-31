@@ -1,22 +1,22 @@
 {
   "rumsanForwarder": {
-    "address": "0x47fa4938cF9f8bD9452ACd78bCF74B6e11bEd6eE",
-    "startBlock": 23333235
+    "address": "0x6e87e62364D37cd7bEa9631f38992C7B35bd3eE2",
+    "startBlock": 23833010
   },
   "accessManagerV2": {
-    "address": "0x48a90E9486314A8efDCd20d1927b013333a3cE9a",
-    "startBlock": 23333238
+    "address": "0x079983B5B56Ba8576B4C8312a287f920DF759c34",
+    "startBlock": 23833013
   },
   "rewardToken": {
-    "address": "0xB556cF0D7A001d59182b8DCdAcFd4cc08c6cD1a4",
-    "startBlock": 23333267
+    "address": "0x3408E6Bf74157271BC9220f080074bF9E991086C",
+    "startBlock": 23833081
   },
   "entity": {
-    "address": "0x7473827C45B9a6E3847Ea1A9791a4926c8464Ee4",
-    "startBlock": 23333272
+    "address": "0x99C6c2490F856C0A50D0D0143Fff76073265f000",
+    "startBlock": 23833085
   },
   "entityFactory": {
-    "address": "0x3370d3C6260DFFafc238f8C1C292B8ba436c8ADd",
-    "startBlock": 23333276
+    "address": "0x6C358DA5E9E674b1C03e102371b7E76E0a36b754",
+    "startBlock": 23833090
   }
 }

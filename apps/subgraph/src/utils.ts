@@ -31,6 +31,8 @@ export function fetchTaskDetails(taskId:Bytes, contractAddress: Address, taskCre
 
  
   taskDetail.detailsUrl = taskData.value.getDetailsUrl()
+  taskDetail.taskName = taskData.value.getTaskName()
+  
   taskDetail.rewardToken = taskData.value.getRewardToken()
   taskDetail.rewardAmount = taskData.value.getRewardAmount();
   
@@ -38,6 +40,7 @@ export function fetchTaskDetails(taskId:Bytes, contractAddress: Address, taskCre
   taskDetail.expiryDate = taskData.value.getExpiryDate();
   taskDetail.owner = taskData.value.getOwner();
   taskDetail.isActive = taskData.value.getIsActive();
+  
 
   if (!wallets.reverted) {
      const allowedWalletsBytes = wallets.value.map<Bytes>((address: Address) => {

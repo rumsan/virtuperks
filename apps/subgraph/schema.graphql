@@ -133,6 +133,7 @@ type TaskCreated @entity(immutable: true) {
 type TaskDetail @entity(immutable: false) {
   id: Bytes! # Task ID (e.g., detailsUrl)
   detailsUrl: String! # URL to the task details
+  taskName: String! # Name of the task
   rewardToken: Bytes! # Address of the reward token
   rewardAmount: BigInt! # Amount of the reward
   maxParticipants: BigInt! # Maximum number of participants
