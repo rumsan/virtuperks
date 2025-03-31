@@ -1,15 +1,14 @@
 import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
-import { useGetApprovedAndCompletedList} from "@/hooks/subgraph/querycall";
+import { useApproveTaskMutation, useGetApprovedAndCompletedList } from "@/hooks/subgraph/querycall";
+import { useGetTaskDetailById } from "@/hooks/subgraph/taskDetail";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { ArrowLeft, CheckCircle, CircleX } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
-import useApproveTask from "./approve.task";
 import TaskParticipant from "./details.participant";
 import TaskDetails from "./details.task";
-import { useGetTaskDetailById } from "@/hooks/subgraph/taskDetail";
 
 type TaskMainProps = {
   cuid: Cuid;
@@ -26,12 +25,13 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const { completedData, approvedData } = useGetApprovedAndCompletedList(cuid.id);
   const [localStatus, setLocalStatus] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const { handleApproveTask } = useApproveTask();
-  const [isApproveLoading, setIsApproveLoading] = useState(false);
+
+  const approveTask = useApproveTaskMutation()
+ 
 
   const getApproveButtonState = () => {
     // If approved data exists, show approved state
-    if (approvedData && approvedData.length > 0) {
+    if (approvedData && approvedData.length > 0 || localStatus === "VERIFIED") {
       return {
         className: "border border-[#03AB65] bg-[#03AB65]",
         text: "Verified",
@@ -44,8 +44,8 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     if (completedData && completedData.length > 0) {
       return {
         className: "border border-[#03AB65]",
-        text: isApproveLoading ? "Processing..." : "Approve",
-        disabled: isApproveLoading,
+        text: approveTask.isPending ? "Processing..." : "Approve",
+        disabled: approveTask.isPending,
         onClick: () => setIsOpen(true)
       };
     }
@@ -61,15 +61,19 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
 
   const handleDialogAction = async () => {
     try {
-      setIsApproveLoading(true);
-      await handleApproveTask(cuid.id, taskData.entityTaskManager.entityTaskManager);
+     
+      
+      await approveTask.mutateAsync({
+        taskId: cuid.id,
+        entityId: taskData.entityTaskManager.entityTaskManager
+      })
       setIsOpen(false);
       setLocalStatus("VERIFIED"); // Update local status immediately after successful approval
     } catch (error) {
       console.error("Error approving task:", error);
-    } finally {
-      setIsApproveLoading(false);
-    }
+    } 
+      
+    
   };
 
   return (
@@ -110,8 +114,10 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
               <span className="text-[#E44134]">Close</span>{" "}
               <CircleX color="#E44134" strokeWidth={2.5} size={20} />
             </Button>
+            {!approveTask.isPending && isOpen && (
+              
 
-            <DialogButton
+                  <DialogButton
               isOpen={isOpen}
               setIsOpen={setIsOpen}
               title="Are you sure you want to approve this task?"
@@ -119,6 +125,8 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
               buttonName="Approve"
               handleApplyTaskLogic={handleDialogAction}
             />
+)}
+        
           </div>
         </div>
 

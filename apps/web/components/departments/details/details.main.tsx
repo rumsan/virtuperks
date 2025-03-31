@@ -1,7 +1,7 @@
 "use client";
 
+import { useEntityDetailById } from "@/hooks/subgraph/querycall";
 import { PATHS } from "@/routes/paths";
-import { Departments } from "@/sampleData";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -43,10 +43,13 @@ export default function DepartmentDetails({
     pageIndex: 0,
     pageSize: 10,
   });
+  const getEntity = useEntityDetailById(cuid.id)
+  const EntityData = getEntity?.data?.data?.entityTaskManagerCreateds[0]
+  const taskData = EntityData?.tasks || [];
 
   const columns = useColumns();
   const table = useReactTable({
-    data: Departments || [],
+    data: taskData,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -73,12 +76,7 @@ export default function DepartmentDetails({
         <ArrowLeft size={24} strokeWidth={2} />
         <span className="font-base text-gray-700">Back</span>
       </div>
-      <div className="flex flex-col gap-1 my-2">
-        <h1 className="font-bold text-4xl">Rahat Consulting</h1>
-        <h3 className="text-gray-500 font-normal text-sm">
-          Detailed view of the selected department
-        </h3>
-      </div>
+     
 
       <DepartmentDetailsCard cuid={cuid} />
 
