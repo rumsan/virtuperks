@@ -26,6 +26,7 @@ import type {
 export declare namespace IEntityTaskManager {
   export type TaskStruct = {
     detailsUrl: string;
+    taskName: string;
     rewardToken: AddressLike;
     rewardAmount: BigNumberish;
     allowedWallets: AddressLike[];
@@ -37,6 +38,7 @@ export declare namespace IEntityTaskManager {
 
   export type TaskStructOutput = [
     detailsUrl: string,
+    taskName: string,
     rewardToken: string,
     rewardAmount: bigint,
     allowedWallets: string[],
@@ -46,6 +48,7 @@ export declare namespace IEntityTaskManager {
     isActive: boolean
   ] & {
     detailsUrl: string;
+    taskName: string;
     rewardToken: string;
     rewardAmount: bigint;
     allowedWallets: string[];
@@ -336,8 +339,9 @@ export interface EntityTaskManager extends BaseContract {
   tasks: TypedContractMethod<
     [arg0: BytesLike],
     [
-      [string, string, bigint, bigint, bigint, string, boolean] & {
+      [string, string, string, bigint, bigint, bigint, string, boolean] & {
         detailsUrl: string;
+        taskName: string;
         rewardToken: string;
         rewardAmount: bigint;
         maxParticipants: bigint;
@@ -415,8 +419,9 @@ export interface EntityTaskManager extends BaseContract {
   ): TypedContractMethod<
     [arg0: BytesLike],
     [
-      [string, string, bigint, bigint, bigint, string, boolean] & {
+      [string, string, string, bigint, bigint, bigint, string, boolean] & {
         detailsUrl: string;
+        taskName: string;
         rewardToken: string;
         rewardAmount: bigint;
         maxParticipants: bigint;

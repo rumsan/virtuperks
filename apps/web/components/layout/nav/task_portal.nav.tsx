@@ -6,7 +6,7 @@ import {
   AvatarImage,
 } from "@workspace/ui/components/avatar";
 import { ConnectKitButton } from "connectkit";
-import { LayoutList, Wallet } from "lucide-react";
+import { LayoutList, Wallet, Layers, Coins } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { PropsWithChildren, useState } from "react";
@@ -38,16 +38,45 @@ export default function TaskPortalNav({ children }: PropsWithChildren) {
           </Link>
         </nav>
 
+         <nav className="flex items-center gap-6 h-full">
+               
+                  <Link
+                    href="/departments"
+                    onClick={() => handleNavClick("departments")}
+                    className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("treasurer")}`}
+                  >
+                    <Coins
+                      size={18}
+                      strokeWidth={2.65}
+                      color={`${activeNavBar === "treasurer" ? "#297AD6" : "#334155"}`}
+                    />
+                    Departments
+                  </Link>
+                  <Link
+                    href="/tasks"
+                    onClick={() => handleNavClick("tasks")}
+                    className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("departments")}`}
+                  >
+                    <Layers
+                      size={18}
+                      strokeWidth={2.65}
+                      color={`${activeNavBar === "departments" ? "#297AD6" : "#334155"}`}
+                    />
+                    Task Management
+                  </Link>
+                
+                </nav>
+
         <div className="ml-auto flex items-center gap-4 h-full">
           <Link
-            href="/tasks"
-            onClick={() => handleNavClick("tasks")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("tasks")}`}
+            href="/task_portal/mine"
+            onClick={() => handleNavClick("my-tasks")}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("my-tasks")}`}
           >
             <LayoutList
               size={18}
               strokeWidth={2.65}
-              color={`${activeNavBar === "tasks" ? "#297AD6" : "#334155"}`}
+              color={`${activeNavBar === "my-tasks" ? "#297AD6" : "#334155"}`}
             />
             My Tasks
           </Link>

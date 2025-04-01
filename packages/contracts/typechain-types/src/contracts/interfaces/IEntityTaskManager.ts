@@ -26,6 +26,7 @@ import type {
 export declare namespace IEntityTaskManager {
   export type TaskStruct = {
     detailsUrl: string;
+    taskName: string;
     rewardToken: AddressLike;
     rewardAmount: BigNumberish;
     allowedWallets: AddressLike[];
@@ -37,6 +38,7 @@ export declare namespace IEntityTaskManager {
 
   export type TaskStructOutput = [
     detailsUrl: string,
+    taskName: string,
     rewardToken: string,
     rewardAmount: bigint,
     allowedWallets: string[],
@@ -46,6 +48,7 @@ export declare namespace IEntityTaskManager {
     isActive: boolean
   ] & {
     detailsUrl: string;
+    taskName: string;
     rewardToken: string;
     rewardAmount: bigint;
     allowedWallets: string[];

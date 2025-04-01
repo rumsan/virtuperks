@@ -44,7 +44,7 @@ export default function SuperAdminNav({ children }: PropsWithChildren) {
           </Link>
         </nav>
         <nav className="flex items-center gap-6 h-full">
-          <Link
+          {/* <Link
             href="/participants"
             onClick={() => handleNavClick("participants")}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("dashboard")}`}
@@ -55,8 +55,8 @@ export default function SuperAdminNav({ children }: PropsWithChildren) {
               color={`${activeNavBar === "dashboard" ? "#297AD6" : "#334155"}`}
             />
             Participants
-          </Link>
-          <Link
+          </Link> */}
+          {/* <Link
             href="/treasurer"
             onClick={() => handleNavClick("treasurer")}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("treasurer")}`}
@@ -67,6 +67,19 @@ export default function SuperAdminNav({ children }: PropsWithChildren) {
               color={`${activeNavBar === "treasurer" ? "#297AD6" : "#334155"}`}
             />
             Treasurer
+          </Link> */}
+
+             <Link
+            href="/tasks"
+            onClick={() => handleNavClick("tasks")}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("tasks")}`}
+          >
+            <Layers
+              size={18}
+              strokeWidth={2.65}
+              color={`${activeNavBar === "tasks" ? "#297AD6" : "#334155"}`}
+            />
+            Task Management
           </Link>
           <Link
             href="/departments"

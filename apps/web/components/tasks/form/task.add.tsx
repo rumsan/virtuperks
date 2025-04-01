@@ -2,18 +2,19 @@
 
 import { PATHS } from "@/routes/paths";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { EntityTaskManagementABI } from "@workspace/contracts/abis";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { ArrowLeft } from "lucide-react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { isAddress } from "viem";
 import { useWriteContract } from "wagmi";
 import { taskSchema } from "./schema";
 import TaskBaseForm from "./task.form";
-import { EntityTaskManagementABI } from "@workspace/contracts/abis";
-import { isAddress } from "viem";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 const defaultValues: any = {
+  taskName: "",
   detailsUrl: "",
   owner: "",
   rewardToken: process.env.NEXT_PUBLIC_RAHAT_TOKEN || "",
@@ -61,12 +62,12 @@ export default function TaskAdd({ router }: TaskAddProps) {
       return;
     }
 
-    const { detailsUrl, rewardToken, owner, isActive } = data;
+    const { detailsUrl, rewardToken, owner, isActive , taskName} = data;
     const expiryDate = BigInt(Math.floor(new Date(data.expiryDate).getTime() / 1000));
     const allowedWallets = Array.isArray(data.allowedWallets) ? data.allowedWallets : [data.allowedWallets];
     const rewardAmount = BigInt(data.rewardAmount);
     const maxParticipants = BigInt(data.maxParticipants);
-    console.log({ detailsUrl, rewardToken, owner, isActive, expiryDate, allowedWallets, rewardAmount, maxParticipants },'data from create');
+   
 
     try {
       await writeContractAsync({
@@ -74,6 +75,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
         abi: EntityTaskManagementABI,
         functionName: "createTask",
         args: [{
+          taskName,
           detailsUrl,
           rewardToken,
           rewardAmount,

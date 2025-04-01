@@ -62,6 +62,7 @@ export const TaskCreatedList = `
       transactionHash
     
     taskDetail {
+    taskName
     allowedWallets
     detailsUrl
     expiryDate
@@ -148,6 +149,7 @@ export const GetParticipantTaskStatusWithVariables = `
       taskDetail {
         id
         detailsUrl
+        taskName
         rewardToken
         rewardAmount
         maxParticipants
@@ -179,6 +181,7 @@ export const GetTaskParticipantsWithStatus = `
       lastUpdatedTimestamp
       taskDetail {
         id
+        taskName
         detailsUrl
         rewardToken
         rewardAmount
@@ -212,6 +215,7 @@ export const  GetTaskApprovedAndCompleted= `
       status
       taskDetail {
         allowedWallets
+        taskName
         detailsUrl
         id
         isActive
@@ -236,6 +240,7 @@ export const  GetTaskApprovedAndCompleted= `
       transactionHash
       status
       taskDetail {
+      taskName
         allowedWallets
         detailsUrl
         id
@@ -258,6 +263,7 @@ export const GetTaskDetailsById = `
       blockTimestamp
       transactionHash
       taskDetail {
+      taskName
         detailsUrl
         rewardToken
         rewardAmount
@@ -273,6 +279,39 @@ export const GetTaskDetailsById = `
         _name
       
       }
+    }
+  }
+`;
+
+export const GetAllTasksForParticipant = `
+  query GetAllTasksForParticipant($participant: Bytes!) {
+    participantTaskStatuses(where: { participant: $participant }) {
+      id
+      participant
+      taskId
+      status
+      lastUpdatedBlock
+      lastUpdatedTimestamp
+      taskDetail {
+        id
+        taskName
+        detailsUrl
+        rewardToken
+        rewardAmount
+        maxParticipants
+        expiryDate
+        owner
+        isActive
+        allowedWallets
+   
+      }
+        entityTaskManager {
+        id
+        entityTaskManager
+        _appId
+        _name
+        
+        }
     }
   }
 `;

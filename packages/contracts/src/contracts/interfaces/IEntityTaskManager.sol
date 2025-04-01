@@ -16,6 +16,7 @@ interface IEntityTaskManager {
 
     struct Task {
         string detailsUrl;
+        string taskName;
         address rewardToken;
         uint256 rewardAmount;
         address[] allowedWallets; //who can participate
