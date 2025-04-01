@@ -82,5 +82,6 @@ apps/subgraph/node_modules/
 
 #Sample Data
 apps/web/sampleData.ts
+wallet.ts
 
 tools/deploy/deployments/wallets.ts

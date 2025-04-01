@@ -62,6 +62,7 @@ export const TaskCreatedList = `
       transactionHash
     
     taskDetail {
+    taskName
     allowedWallets
     detailsUrl
     expiryDate
@@ -110,6 +111,7 @@ export const GetParticipantTaskStatusWithVariables = `
       taskDetail {
         id
         detailsUrl
+        taskName
         rewardToken
         rewardAmount
         maxParticipants
@@ -141,6 +143,7 @@ export const GetTaskParticipantsWithStatus = `
       lastUpdatedTimestamp
       taskDetail {
         id
+        taskName
         detailsUrl
         rewardToken
         rewardAmount
@@ -174,6 +177,7 @@ export const  GetTaskApprovedAndCompleted= `
       status
       taskDetail {
         allowedWallets
+        taskName
         detailsUrl
         id
         isActive
@@ -198,6 +202,7 @@ export const  GetTaskApprovedAndCompleted= `
       transactionHash
       status
       taskDetail {
+      taskName
         allowedWallets
         detailsUrl
         id
@@ -220,6 +225,7 @@ export const GetTaskDetailsById = `
       blockTimestamp
       transactionHash
       taskDetail {
+      taskName
         detailsUrl
         rewardToken
         rewardAmount
@@ -250,6 +256,7 @@ export const GetAllTasksForParticipant = `
       lastUpdatedTimestamp
       taskDetail {
         id
+        taskName
         detailsUrl
         rewardToken
         rewardAmount

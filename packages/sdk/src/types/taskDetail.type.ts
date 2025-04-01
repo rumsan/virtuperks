@@ -1,5 +1,6 @@
 export type TaskDetail = {
   allowedWallets: string[];
+  taskName: string;
   detailsUrl: string;
   expiryDate: string;
   id: string;

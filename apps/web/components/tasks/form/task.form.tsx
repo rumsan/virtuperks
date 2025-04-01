@@ -86,7 +86,35 @@ export default function TaskBaseForm({
                   <Form {...form}>
                           <form onSubmit={form.handleSubmit(handleSubmit)}>
                             <div className="p-6">
-                              <div className="flex flex-col w-full gap-4 mb-5">
+            <div className="flex flex-col w-full gap-4 mb-5">
+              
+               <FormField
+                                  control={form.control}
+                                  name="taskName"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>Task Title</FormLabel>
+                                      <FormControl>
+                                        <div className="relative flex items-center bg-gray-200 rounded-md">
+                                          <Input
+                                            placeholder="Write title for the task"
+                                            {...field}
+                                            value={field.value ?? ""}
+                                          />
+        
+                                          <div className="absolute right-2 flex items-center">
+                                            <Copy
+                                              size={20}
+                                              strokeWidth={2.5}
+                                              color="#334155"
+                                            />
+                                          </div>
+                                        </div>
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
                                 <FormField
                                   control={form.control}
                                   name="detailsUrl"
@@ -96,7 +124,7 @@ export default function TaskBaseForm({
                                       <FormControl>
                                         <div className="relative flex items-center bg-gray-200 rounded-md">
                                           <Input
-                                            placeholder="Write title for the task"
+                                            placeholder="Write title Url"
                                             {...field}
                                             value={field.value ?? ""}
                                           />

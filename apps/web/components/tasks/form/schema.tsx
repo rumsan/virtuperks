@@ -19,7 +19,7 @@ export type Task = Omit<TaskBase, "participants" | "tokens"> & {
 
 export const taskSchema = () => {
   const _schema = {
-    //title: z.string().min(1, "Task title is required"),
+    taskName: z.string().min(1, "Task title is required"),
     detailsUrl: z.string().min(1, "Task url name is required"),
     //status: z.string().min(1, "Task status is required"),
    // description: z.string().min(1, "Task description is required"),
