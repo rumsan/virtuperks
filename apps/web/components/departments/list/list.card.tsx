@@ -1,10 +1,8 @@
 import { useEntityList } from "@/hooks/subgraph/querycall";
 import { PATHS } from "@/routes/paths";
-import {
-  Card,
-  CardDescription,
-  CardTitle,
-} from "@workspace/ui/components/card";
+import hasRole from "@/utils/role";
+import { DepartmentDetails } from "@workspace/sdk/type";
+import { Card, CardDescription, CardTitle } from "@workspace/ui/components/card";
 import { ArrowRight, Coins, Plus, User } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
@@ -12,26 +10,24 @@ interface DepartmentListCardProps {
   router: AppRouterInstance;
 }
 
-interface DepartmentDetails {
-  id: string;
-  cuid: string;
-  _name: string;
-  eName: string;
-}
-
 const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
   const getAllEntity = useEntityList();
   const entityList = getAllEntity?.data?.data?.entityTaskManagerCreateds;
+  const hasEntityOwnerRole = hasRole({ 
+    role: process.env.NEXT_PUBLIC_ENTITY_OWNER_ROLE || "" 
+  });
 
   return (
     <div className="grid grid-cols-4 gap-4 w-full p-4">
-      <Card
-        className="w-full flex items-center justify-center text-blue-500 bg-blue-50 border-sm border-primary border-dashed cursor-pointer hover:shadow-lg hover:text-blue-400"
-        onClick={() => router.push(PATHS.DEPARTMENT.ADD)}
-      >
-        <span className="text-center text-base">Add Department</span>
-        <Plus size={24} />
-      </Card>
+      {hasEntityOwnerRole && (
+        <Card
+          className="w-full flex items-center justify-center text-blue-500 bg-blue-50 border-sm border-primary border-dashed cursor-pointer hover:shadow-lg hover:text-blue-400"
+          onClick={() => router.push(PATHS.DEPARTMENT.ADD)}
+        >
+          <span className="text-center text-base">Add Department</span>
+          <Plus size={24} />
+        </Card>
+      )}
       {entityList &&
         entityList.map((department: DepartmentDetails) => {
           return (
@@ -51,7 +47,7 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
               </CardTitle>
               <CardDescription className="flex gap-2 text-sm">
                 <User size={20} strokeWidth={2.75} />
-                <span>{department.eName}</span>
+                <span>{department._name}</span>
               </CardDescription>
               <div className="flex flex-col mr-auto gap-2 p-0 font-normal">
                 <span className="flex text-[#64748B] mt-5">
@@ -60,7 +56,7 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
                 <div className="flex items-center justify-start">
                   <div className="flex items-center text-[#297AD6] gap-2">
                     <Coins size={20} strokeWidth={2.5} color="#297AD6" />
-                    <span className="text-2xl font-bold">10,000</span>
+                    <span className="text-2xl font-bold">{department.remainingBalance}</span>
                   </div>
                   <div className="flex items-center ml-auto gap-2">
                     <span className="text-[#297AD6]">View details</span>

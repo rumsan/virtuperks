@@ -41,10 +41,20 @@ export const useEntityList = () => {
 
       return getAllData;
     },
-    refetchOnWindowFocus:true 
+  
   });
 };
-
+ export const useEntityDetailById = (id: string) => {
+  const { queryService } = useGraphService();
+  return useQuery({
+    queryKey: ["entityDetail", id],
+    queryFn: async () => {
+      const getAllData = await queryService?.getEntityDetailById(id);
+      return getAllData;
+    },
+    
+  });
+};
 export const useTaskList = () => {
   const { queryService } = useGraphService();
 
@@ -147,8 +157,11 @@ export const useApproveTaskMutation = () => {
       });
       return result;
     },
-    onSuccess: () => {
+    onSuccess: async (variable) => {
+    console.log(variable,'from appove function')
       // Invalidate and refetch
+      await new Promise((resolve) => setTimeout(resolve, 9000));
+    
       queryClient.invalidateQueries({ queryKey: ["approvedAndCompleted"] });
     },
   });
@@ -157,7 +170,7 @@ export const useApproveTaskMutation = () => {
 
 export const useAcceptParticipantMutation = () => {
   const queryClient = useQueryClient();
-  const { writeContractAsync } = useWriteEntityTaskManagerAcceptParticipant();
+  const { writeContractAsync , isPending, isSuccess} = useWriteEntityTaskManagerAcceptParticipant();
 
   return useMutation({
     mutationFn: async ({ 
@@ -173,13 +186,18 @@ export const useAcceptParticipantMutation = () => {
         address: (entityId as `0x${string}`) || "0x",
         args: [taskId as `0x${string}`, participant as `0x${string}`],
       });
-      return result;
+     
+  
+      return  result
     },
-    onSuccess: (result, variable) => {
-      console.log(result, 'result')
-      console.log(variable, 'variable')
-      // Invalidate both participant and task status queries
-      queryClient.invalidateQueries({ queryKey: ["taskParticipantsWithStatus",variable.taskId] });
+ 
+    onSuccess: async (result, variable) => {
+  
+    
+  await new Promise((resolve) => setTimeout(resolve, 9000));
+      await queryClient.invalidateQueries({
+        queryKey: ["taskParticipantsWithStatus", variable.taskId],
+      });
     },
   });
 };

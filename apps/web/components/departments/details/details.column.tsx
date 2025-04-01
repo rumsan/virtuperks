@@ -1,61 +1,106 @@
+import { formatDate } from "@/utils/formatDate";
 import { ColumnDef } from "@tanstack/react-table";
-import { Eye } from "lucide-react";
+import moment from "moment";
 
-export function useColumns<T>(): ColumnDef<T>[] {
+interface RowData {
+  taskDetail: {
+    detailsUrl: string;
+    rewardAmount: number;
+    isActive: boolean;
+    expiryDate: number
+  };
+  createdBy: string;
+  tresurerName: string;
+  date: string;
+  tokens: number;
+}
+
+export function useColumns<T extends RowData>(): ColumnDef<T>[] {
   return [
     {
-      accessorKey: "topic",
+      accessorKey: "createdBy",
       header: () => (
-        <div className="text-left text-gray-600 font-bold">Topic</div>
+        <div className="text-left text-gray-600 font-bold">Title</div>
       ),
 
-      cell: () => {
-        return <p>Token Allocation</p>;
+      cell: ({ row }) => {
+        const getTaskName = row.original.taskDetail.detailsUrl;
+        
+        return (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-700">
+              {getTaskName}
+            </span>
+          </div>
+
+
+        );
       },
     },
     {
-      accessorKey: "tresurerName",
+      accessorKey: "Reward Amount",
       header: () => (
-        <div className="text-left text-gray-600 font-bold">Treasurer Name</div>
+        <div className="text-left text-gray-600 font-bold">Reward Amount</div>
       ),
 
-      cell: () => {
-        return <p>Ram Thapa Magar</p>;
+      cell: ({ row }) => {
+       
+        const getAmount = row.original.taskDetail.rewardAmount;
+        return (
+          <p className="text-sm text-gray-700">
+            {getAmount} RTH
+          </p>
+        )
       },
     },
     {
       accessorKey: "date",
       header: () => (
-        <div className="text-left text-gray-600 font-bold">Date</div>
+        <div className="text-left text-gray-600 font-bold">Expire Date</div>
       ),
 
-      cell: () => {
-        return <p>January 28th, 2025</p>;
+      cell: ({ row}) => {
+        const getData = row.original.taskDetail.expiryDate;
+       const formattedData = formatDate(getData);
+      
+        return (
+          <p className="text-sm text-gray-700">
+            {formattedData}
+          </p>)
       },
     },
     {
       accessorKey: "tokens",
       header: () => (
-        <div className="text-left text-gray-600 font-bold">Tokens</div>
+        <div className="text-left text-gray-600 font-bold">Status</div>
       ),
-
-      cell: () => {
-        return <p>100</p>;
-      },
+cell: ({ row }) => {
+  const getStatus = row.original.taskDetail.isActive;
+  return (
+    <p
+      className={`text-sm ${
+        getStatus ? "text-green-600" : "text-red-800"
+      }`}
+    >
+      {getStatus ? "Active" : "Inactive"}
+    </p>
+  );
+},
+     
     },
-    {
-      id: "actions",
-      header: () => (
-        <div className="text-left text-gray-600 font-bold">Action</div>
-      ),
-      enableHiding: false,
-      cell: () => {
-        return (
-          <p>
-            <Eye />
-          </p>
-        );
-      },
-    },
+    // {
+    //   id: "actions",
+    //   header: () => (
+    //     <div className="text-left text-gray-600 font-bold">Action</div>
+    //   ),
+    //   enableHiding: false,
+    //   cell: () => {
+    //     return (
+    //       <p>
+    //         <Eye />
+    //       </p>
+    //     );
+    //   },
+    // },
   ];
 }

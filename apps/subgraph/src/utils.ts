@@ -2,29 +2,17 @@ import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
 import { ParticipantTaskStatus, TaskCreated, TaskDetail, TaskIdMapping } from "../generated/schema";
 import { EntityContract } from "../generated/templates/EntityContract/EntityContract";
 
-
-export function fetchTaskDetails(taskId:Bytes, contractAddress: Address, taskCreatedId:Bytes): TaskDetail | null {
-   
-    let taskDetail = TaskDetail.load(taskId);
-
+export function fetchTaskDetails(taskId: Bytes, contractAddress: Address, taskCreatedId: Bytes): TaskDetail | null {
+  let taskDetail = TaskDetail.load(taskId);
   const contract = EntityContract.bind(contractAddress);
-;
-    //const taskString = taskId.toString()
-  
   const taskData = contract.try_tasks(taskId);
-   const wallets = contract.try_getAllowedWallets(taskId);
-   
+  const wallets = contract.try_getAllowedWallets(taskId);
 
-   if (!taskDetail) {
-  
+  if (!taskDetail) {
     taskDetail = new TaskDetail(taskId);
   }
 
-  if (taskData.reverted) {
-  
-    return null;
-  }
-   if (taskData.reverted || wallets.reverted) {
+  if (taskData.reverted || wallets.reverted) {
     log.error("Data fetch reverted for taskId: {}", [taskId.toHexString()]);
     return null;
   }
@@ -35,33 +23,24 @@ export function fetchTaskDetails(taskId:Bytes, contractAddress: Address, taskCre
   
   taskDetail.rewardToken = taskData.value.getRewardToken()
   taskDetail.rewardAmount = taskData.value.getRewardAmount();
-  
-  taskDetail.maxParticipants = taskData.value.getMaxParticipants()
+  taskDetail.maxParticipants = taskData.value.getMaxParticipants();
   taskDetail.expiryDate = taskData.value.getExpiryDate();
   taskDetail.owner = taskData.value.getOwner();
   taskDetail.isActive = taskData.value.getIsActive();
   
 
   if (!wallets.reverted) {
-     const allowedWalletsBytes = wallets.value.map<Bytes>((address: Address) => {
+    const allowedWalletsBytes = wallets.value.map<Bytes>((address: Address) => {
       return address as Bytes;
     });
     taskDetail.allowedWallets = allowedWalletsBytes;
- 
   }
-  
 
-  
-  //taskDetail.createdBy = taskData.value.;
-  taskDetail.task = taskCreatedId
-
- 
+  taskDetail.task = taskCreatedId;
   taskDetail.save();
 
   return taskDetail;
-
 }
-
 
 export function updateParticipantTaskStatus(
   participant: Bytes,

@@ -82,10 +82,13 @@ export const TaskCreatedList = `
   }
 `;
 
-
 export const EntityTaskManagerCreatedList = `
-  query EntityTaskManagerCreatedList {
-    entityTaskManagerCreateds(first: 10, orderBy: blockTimestamp) {
+  query EntityTaskManagerCreatedList{
+    entityTaskManagerCreateds(
+      first: 20, 
+      orderBy: blockTimestamp, 
+     
+    ) {
       id
       entityTaskManager
       aclAddress
@@ -94,9 +97,44 @@ export const EntityTaskManagerCreatedList = `
       blockNumber
       blockTimestamp
       transactionHash
+      totalTokenBalance
+      remainingBalance
+     
     }
   }
 `;
+
+export const getEntityDetailById = `
+  query getEntityDetailById($id: Bytes) {
+    entityTaskManagerCreateds(
+      where: { entityTaskManager: $id },first: 1
+    ) {
+      id
+      entityTaskManager
+      aclAddress
+      _appId
+      _name
+      blockNumber
+      blockTimestamp
+      transactionHash
+      totalTokenBalance
+      remainingBalance
+      tasks {
+        internal_id
+        createdBy
+        taskDetail {
+          detailsUrl
+          rewardAmount
+          expiryDate
+          owner
+          isActive
+        }
+      }
+    }
+  }
+`;
+
+
 
 
 export const GetParticipantTaskStatusWithVariables = `

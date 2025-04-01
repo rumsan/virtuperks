@@ -1,4 +1,5 @@
-import { Departments } from "@/sampleData";
+
+import { useEntityDetailById } from "@/hooks/subgraph/querycall";
 import {
   Card,
   CardDescription,
@@ -13,12 +14,27 @@ type DepartmentDetailsCardProps = {
   cuid: Cuid;
 };
 
+
+
 export default function DepartmentDetailsCard({
   cuid,
 }: DepartmentDetailsCardProps) {
-  const data = Departments.find((department) => department.cuid === cuid.id);
+ 
+    const getEntity = useEntityDetailById(cuid.id)
+  const data = getEntity?.data?.data?.entityTaskManagerCreateds[0]
+
   return (
+    <>
+          <div className="flex flex-col gap-1 my-2">
+        <h1 className="font-bold text-4xl">{data?._name}</h1>
+        <h3 className="text-gray-500 font-normal text-sm">
+          Detailed view of the selected department
+        </h3>
+      </div>
+      
+      
     <div className="grid grid-cols-4 mt-4 gap-4 w-full">
+      
       <Card className="font-normal text-base h-40 flex flex-col p-4">
         <CardTitle className="flex items-center gap-3">
           <div className="rounded-full flex p-3 bg-[#475263] mb-auto">
@@ -28,16 +44,16 @@ export default function DepartmentDetailsCard({
           <CardDescription className="flex flex-col gap-2">
             <div className="flex flex-col items-start gap-2">
               <div className="flex flex-start text-[#334155] text-xl justify-start">
-                {data?.eName}
+                {data?._name}
               </div>
               <div className="flex flex-start text-[#64748B] text-base font-normal">
-                <span>Department Owner</span>
+                {/* <span>Department Owner</span> */}
               </div>
 
               <div className="flex items-center gap-1">
-                <span className="text-[#64748B] font-normal text-base">
+                {/* <span className="text-[#64748B] font-normal text-base">
                   xx778x9873398738x9
-                </span>{" "}
+                </span>{" "} */}
                 <Copy size={16} strokeWidth={3} color="#94A3B8" />
               </div>
             </div>
@@ -56,7 +72,7 @@ export default function DepartmentDetailsCard({
         </CardHeader>
 
         <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-          23,000
+          {data?.totalTokenBalance}
         </CardFooter>
       </Card>
 
@@ -71,7 +87,7 @@ export default function DepartmentDetailsCard({
         </CardHeader>
 
         <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-          5,000
+         {data?.remainingBalance}
         </CardFooter>
       </Card>
 
@@ -86,9 +102,10 @@ export default function DepartmentDetailsCard({
         </CardHeader>
 
         <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-          10,000
+          -
         </CardFooter>
       </Card>
-    </div>
+      </div>
+      </>
   );
 }

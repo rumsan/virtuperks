@@ -1,4 +1,4 @@
-import { log } from "@graphprotocol/graph-ts"
+import { BigInt, log } from "@graphprotocol/graph-ts"
 import {
   EntityTaskManagerCreated,
   PINGED,
@@ -45,12 +45,6 @@ export function handleParticiantApplied(event: ParticiantAppliedEvent): void {
   participant.transactionHash = event.transaction.hash
   participant.status = 'UNACCEPTED'
   
-  
-
-
-  //  let entity = EntityTaskManagerCreated.load(event.address);
- 
-  
   let taskDetail = fetchTaskDetails(event.params.id, event.address, event.params.id);
   if (taskDetail) {
     participant.taskDetail = taskDetail.id;
@@ -58,11 +52,16 @@ export function handleParticiantApplied(event: ParticiantAppliedEvent): void {
   } else {
     log.error("Failed to fetch TaskDetail for task ID: {}", [event.params.id.toHexString()]);
   }
-  participant.save()
+  participant.save();
   
-    updateParticipantTaskStatus(event.params.participant, event.params.id, 'UNACCEPTED', event.block.number, event.block.timestamp, taskDetail? taskDetail.id:null);
-  
-  
+  updateParticipantTaskStatus(
+    event.params.participant, 
+    event.params.id, 
+    'UNACCEPTED', 
+    event.block.number, 
+    event.block.timestamp, 
+    taskDetail ? taskDetail.id : null
+  );
 }
 
 export function handleTaskAccepted(event: TaskAcceptedEvent): void {
@@ -84,12 +83,19 @@ export function handleTaskAccepted(event: TaskAcceptedEvent): void {
     entity.taskDetail = taskDetail.id;
     log.info("TaskDetail saved from handleTaskaccepted: {}", [taskDetail.id.toHexString()]);
   } else {
-    log.error("Failed to fetch TaskDetail for task ID: {}", [event.params.id.toHexString()]);
+    log.error("TaskDetail is null for task ID: {}", [event.params.id.toHexString()]);
   }
 
-
-  entity.save()
-  updateParticipantTaskStatus(event.params.participant, event.params.id, 'ACCEPTED', event.block.number, event.block.timestamp, taskDetail? taskDetail.id:null);
+  entity.save();
+  
+  updateParticipantTaskStatus(
+    event.params.participant, 
+    event.params.id, 
+    'ACCEPTED', 
+    event.block.number, 
+    event.block.timestamp, 
+    taskDetail ? taskDetail.id : null
+  );
 }
 
 export function handleTaskApproved(event: TaskApprovedEvent): void {
@@ -103,7 +109,7 @@ export function handleTaskApproved(event: TaskApprovedEvent): void {
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
   entity.status = 'VERIFIED'
-   let taskDetail = fetchTaskDetails(event.params.id, event.address, event.params.id);
+  let taskDetail = fetchTaskDetails(event.params.id, event.address, event.params.id);
   if (taskDetail) {
     entity.taskDetail = taskDetail.id;
     log.info("TaskDetail saved: {}", [taskDetail.id.toHexString()]);
@@ -111,12 +117,31 @@ export function handleTaskApproved(event: TaskApprovedEvent): void {
     log.error("Failed to fetch TaskDetail for task ID: {}", [event.params.id.toHexString()]);
   }
 
-
-  entity.save()
+  entity.save();
   
-    updateParticipantTaskStatus(event.params.approver, event.params.id, 'VERIFIED', event.block.number, event.block.timestamp, taskDetail?taskDetail.id:null);
-
+  updateParticipantTaskStatus(
+    event.params.approver, 
+    event.params.id, 
+    'VERIFIED', 
+    event.block.number, 
+    event.block.timestamp, 
+    taskDetail ? taskDetail.id : null
+  );
   
+  let taskManager = EntityTaskManagerCreated.load(event.address);
+  if (taskManager && taskDetail && taskDetail.rewardAmount) { 
+    if (!taskManager.allocatedToTasks) taskManager.allocatedToTasks = BigInt.zero();
+    if (!taskManager.distributed) taskManager.distributed = BigInt.zero();
+    if (!taskManager.totalTokenBalance) taskManager.totalTokenBalance = BigInt.zero();
+     // Update balances
+    taskManager.allocatedToTasks = taskManager.allocatedToTasks.minus(taskDetail.rewardAmount);
+    taskManager.distributed = taskManager.distributed.plus(taskDetail.rewardAmount);
+    taskManager.remainingBalance = taskManager.totalTokenBalance
+      .minus(taskManager.allocatedToTasks)
+      .minus(taskManager.distributed);
+     taskManager.save();
+    log.info("Updated EntityTaskManager balances for task approval", []);
+  }
 }
 
 export function handleTaskCompleted(event: TaskCompletedEvent): void {
@@ -131,7 +156,7 @@ export function handleTaskCompleted(event: TaskCompletedEvent): void {
   entity.transactionHash = event.transaction.hash
   entity.status = 'COMPLETED'
 
-   let taskDetail = fetchTaskDetails(event.params.id, event.address, event.params.id);
+  let taskDetail = fetchTaskDetails(event.params.id, event.address, event.params.id);
   if (taskDetail) {
     entity.taskDetail = taskDetail.id;
     log.info("TaskDetail saved: {}", [taskDetail.id.toHexString()]);
@@ -139,20 +164,20 @@ export function handleTaskCompleted(event: TaskCompletedEvent): void {
     log.error("Failed to fetch TaskDetail for task ID: {}", [event.params.id.toHexString()]);
   }
 
-  entity.save()
+  entity.save();
   
-    updateParticipantTaskStatus(event.params.participant, event.params.id, 'COMPLETED', event.block.number, event.block.timestamp, taskDetail?taskDetail.id:null);
- 
-  
+  updateParticipantTaskStatus(
+    event.params.participant, 
+    event.params.id, 
+    'COMPLETED', 
+    event.block.number, 
+    event.block.timestamp, 
+    taskDetail ? taskDetail.id : null
+  );
 }
 
 export function handleTaskCreated(event: TaskCreatedEvent): void {
-  
-
-
   log.info('TaskCreated event fired: {}', [event.address.toHexString()]);
-
-  
 
   let taskId = event.transaction.hash.concatI32(event.logIndex.toI32());
   let task = new TaskCreated(taskId);
@@ -162,21 +187,17 @@ export function handleTaskCreated(event: TaskCreatedEvent): void {
   task.blockNumber = event.block.number
   task.blockTimestamp = event.block.timestamp
   task.transactionHash = event.transaction.hash
-  // task.entityTaskManager = event.address;
 
-  
-
-  // Optionally link the task to an EntityTaskManagerCreated entity
   let entity = EntityTaskManagerCreated.load(event.address);
  
   if (entity) {
-    
     task.entityTaskManager = entity.id
     log.info("Linked TaskCreated to EntityTaskManagerCreated: {}", [entity.id.toHexString()]);
   } else {
     log.info("No EntityTaskManagerCreated found for address: {}", [event.address.toHexString()]);
   }
   task.save()
+  
   let mapping = new TaskIdMapping(event.params.id)
   mapping.taskCreated = taskId;
   mapping.save();
@@ -184,15 +205,19 @@ export function handleTaskCreated(event: TaskCreatedEvent): void {
   let taskDetail = fetchTaskDetails(event.params.id, event.address, taskId);
   if (taskDetail) {
     task.taskDetail = taskDetail.id;
-    log.info("TaskDetail saved: {}", [taskDetail.id.toHexString()]);
   } else {
-    log.error("Failed to fetch TaskDetail for task ID: {}", [event.params.id.toHexString()]);
+    log.error("TaskDetail is null for task ID: {}", [event.params.id.toHexString()]);
   }
-  task.save()
-
   
-
-
+  if (entity && taskDetail && taskDetail.rewardAmount) {
+    entity.allocatedToTasks = (entity.allocatedToTasks || BigInt.zero()).plus(taskDetail.rewardAmount);
+    if (entity.totalTokenBalance) {
+      entity.remainingBalance = entity.totalTokenBalance.minus(entity.allocatedToTasks || BigInt.zero()).minus(entity.distributed || BigInt.zero());
+    } else {
+      log.error("totalTokenBalance is null for entity: {}", [entity.id.toHexString()]);
+    }
+    entity.save();
+  }
   
-
+  task.save();
 }
