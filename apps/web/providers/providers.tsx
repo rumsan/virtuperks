@@ -25,7 +25,7 @@ export function Providers({ children }: QueryProviderProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <WalletProvider>
-      <ConnectKitProvider theme="auto" mode="auto">{children}</ConnectKitProvider>
+      <ConnectKitProvider >{children}</ConnectKitProvider>
      
         </WalletProvider>
     </QueryClientProvider>

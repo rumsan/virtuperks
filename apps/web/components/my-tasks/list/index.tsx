@@ -29,7 +29,7 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
-  // const { address } = useAccount()
+ 
   const { address, isConnected } = useWallet()
   const {connect}= useConnect()
  
@@ -38,9 +38,7 @@ const getMyTaskList = useGetTaskListByParticipant(
     !isConnected || !address // Skip query if not connected
   );
   
-  //const getMyTaskList =  useGetTaskListByParticipant(address as `0x${string}`) 
-    
-  console.log(getMyTaskList?.data?.data?.participantTaskStatuses, 'myowndata')
+ 
   const myTaskList = getMyTaskList?.data?.data?.participantTaskStatuses || [];
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -52,7 +50,7 @@ const getMyTaskList = useGetTaskListByParticipant(
 
   const columns = useColumns();
 
-  const getAllTask = useTaskList();
+
 
   const table = useReactTable({
     data: myTaskList,
