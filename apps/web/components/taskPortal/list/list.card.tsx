@@ -5,6 +5,7 @@ import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Coins, Dot, ExternalLink, Timer, Users } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import NoTask from "./no.task";
+import { formatDate } from "@/utils/formatDate";
 
 interface TaskPortalCardProps<TData> {
   table: Table<TData>;
@@ -53,7 +54,7 @@ const TaskPortalCard = <TData,>({
                   <span>{task?.maxParticipants} members participating</span>
                   <Dot color="#94A3B8" />
                   <Timer size={18} strokeWidth={2.5} color="#64748B" />
-                  <span>Deadline: {task?.expiryDate}</span>
+                  <span>Deadline: {formatDate(task?.expiryDate)}</span>
                 </div>
                 <div className="flex justify-end ml-auto items-center gap-2">
                   <Coins color="#297AD6" />
