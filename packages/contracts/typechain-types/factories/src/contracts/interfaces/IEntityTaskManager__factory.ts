@@ -145,6 +145,11 @@ const _abi = [
             type: "string",
           },
           {
+            internalType: "string",
+            name: "taskName",
+            type: "string",
+          },
+          {
             internalType: "address",
             name: "rewardToken",
             type: "address",

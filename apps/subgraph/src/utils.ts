@@ -17,13 +17,17 @@ export function fetchTaskDetails(taskId: Bytes, contractAddress: Address, taskCr
     return null;
   }
 
-  taskDetail.detailsUrl = taskData.value.getDetailsUrl();
-  taskDetail.rewardToken = taskData.value.getRewardToken();
+ 
+  taskDetail.detailsUrl = taskData.value.getDetailsUrl()
+  taskDetail.taskName = taskData.value.getTaskName()
+  
+  taskDetail.rewardToken = taskData.value.getRewardToken()
   taskDetail.rewardAmount = taskData.value.getRewardAmount();
   taskDetail.maxParticipants = taskData.value.getMaxParticipants();
   taskDetail.expiryDate = taskData.value.getExpiryDate();
   taskDetail.owner = taskData.value.getOwner();
   taskDetail.isActive = taskData.value.getIsActive();
+  
 
   if (!wallets.reverted) {
     const allowedWalletsBytes = wallets.value.map<Bytes>((address: Address) => {

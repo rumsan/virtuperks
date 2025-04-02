@@ -1,7 +1,5 @@
 [
 
-
-
  {
       "inputs": [
         {
@@ -230,6 +228,11 @@
               "type": "string"
             },
             {
+              "internalType": "string",
+              "name": "taskName",
+              "type": "string"
+            },
+            {
               "internalType": "address",
               "name": "rewardToken",
               "type": "address"
@@ -386,6 +389,11 @@
           "type": "string"
         },
         {
+          "internalType": "string",
+          "name": "taskName",
+          "type": "string"
+        },
+        {
           "internalType": "address",
           "name": "rewardToken",
           "type": "address"
@@ -432,5 +440,12 @@
       "stateMutability": "nonpayable",
       "type": "function"
     }
+
+
+
+
+
+
+
 
 ]

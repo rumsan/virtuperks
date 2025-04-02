@@ -1,9 +1,9 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ConnectKitProvider } from "connectkit";
 import * as React from "react";
+import { WalletProvider } from "./walletProvider";
 
 interface QueryProviderProps {
   children: React.ReactNode;
@@ -24,8 +24,10 @@ export function Providers({ children }: QueryProviderProps) {
   });
   return (
     <QueryClientProvider client={queryClient}>
-      <ConnectKitProvider theme="auto">{children}</ConnectKitProvider>
-       <ReactQueryDevtools initialIsOpen={false} />
+      <WalletProvider>
+      <ConnectKitProvider >{children}</ConnectKitProvider>
+     
+        </WalletProvider>
     </QueryClientProvider>
   );
 }

@@ -25,9 +25,12 @@ export default function RootLayout({
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
       >
         <Wagmi>
+          
           <GraphQueryProvider>
-            <Providers>{children}</Providers>
-          </GraphQueryProvider>
+              <Providers>{children}</Providers>
+             
+            </GraphQueryProvider>
+             
         </Wagmi>
       </body>
     </html>

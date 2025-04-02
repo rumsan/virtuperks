@@ -22,7 +22,8 @@ const TaskPortalCard = <TData,>({
     ?.filter((task) => {
       return (task as TaskCreated)?.taskDetail;
     })
-    .map((task) => (task as TaskCreated)?.taskDetail);
+      .map((task) => (task as TaskCreated)?.taskDetail);
+  
 
   return (
     <>
@@ -37,7 +38,7 @@ const TaskPortalCard = <TData,>({
           >
             <CardTitle className="flex flex-col gap-1 w-full">
               <div className="flex items-center gap-2">
-                <span>Organize a blood donation campaign</span>
+                        <span>{ task?.taskName}</span>
                 <span className="w-20 h-6 flex items-center justify-center bg-green-50 rounded-full text-green-700 p-1 text-sm font-normal">
                   {task?.isActive === true ? `active` : `expired`}
                 </span>

@@ -44,7 +44,7 @@ export default function EntityOwnerNav({ children }: PropsWithChildren) {
           </Link>
         </nav>
         <nav className="flex items-center gap-6 h-full">
-          <Link
+          {/* <Link
             href="/participants"
             onClick={() => handleNavClick("participants")}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("dashboard")}`}
@@ -55,7 +55,7 @@ export default function EntityOwnerNav({ children }: PropsWithChildren) {
               color={`${activeNavBar === "dashboard" ? "#297AD6" : "#334155"}`}
             />
             Participants
-          </Link>
+          </Link> */}
           <Link
             href="/departments"
             onClick={() => handleNavClick("departments")}
@@ -80,7 +80,7 @@ export default function EntityOwnerNav({ children }: PropsWithChildren) {
             />
             Task Management
           </Link>
-          <Link
+          {/* <Link
             href="/history"
             onClick={() => handleNavClick("history")}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("departments")}`}
@@ -91,19 +91,19 @@ export default function EntityOwnerNav({ children }: PropsWithChildren) {
               color={`${activeNavBar === "departments" ? "#297AD6" : "#334155"}`}
             />
             History
-          </Link>
+          </Link> */}
         </nav>
 
         <div className="ml-auto flex items-center gap-4 h-full">
           <Link
-            href="/tasks"
-            onClick={() => handleNavClick("tasks")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("tasks")}`}
+            href="/task_portal/mine"
+            onClick={() => handleNavClick("my-tasks")}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("my-tasks")}`}
           >
             <LayoutList
               size={18}
               strokeWidth={2.65}
-              color={`${activeNavBar === "tasks" ? "#297AD6" : "#334155"}`}
+              color={`${activeNavBar === "my-tasks" ? "#297AD6" : "#334155"}`}
             />
             My Tasks
           </Link>
