@@ -11,7 +11,8 @@ interface IEntityTaskManager {
         UNACCEPTED,
         ACCEPTED,
         COMPLETED,
-        VERIFIED
+        VERIFIED,
+        NONE
     }
 
     struct Task {

@@ -73,9 +73,10 @@ export interface EntityTaskManagerInterface extends Interface {
       | "getAllowedWallets"
       | "name"
       | "participate"
-      | "ping"
       | "taskAssignments"
+      | "taskParticipantCount"
       | "tasks"
+      | "totalAllocatedRewards"
       | "verifyCompletion"
   ): FunctionFragment;
 
@@ -121,12 +122,19 @@ export interface EntityTaskManagerInterface extends Interface {
     functionFragment: "participate",
     values: [BytesLike]
   ): string;
-  encodeFunctionData(functionFragment: "ping", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "taskAssignments",
     values: [BytesLike, AddressLike]
   ): string;
+  encodeFunctionData(
+    functionFragment: "taskParticipantCount",
+    values: [BytesLike]
+  ): string;
   encodeFunctionData(functionFragment: "tasks", values: [BytesLike]): string;
+  encodeFunctionData(
+    functionFragment: "totalAllocatedRewards",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "verifyCompletion",
     values: [BytesLike]
@@ -161,12 +169,19 @@ export interface EntityTaskManagerInterface extends Interface {
     functionFragment: "participate",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "ping", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "taskAssignments",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "taskParticipantCount",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "tasks", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "totalAllocatedRewards",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "verifyCompletion",
     data: BytesLike
@@ -328,10 +343,14 @@ export interface EntityTaskManager extends BaseContract {
 
   participate: TypedContractMethod<[taskId: BytesLike], [void], "nonpayable">;
 
-  ping: TypedContractMethod<[], [void], "nonpayable">;
-
   taskAssignments: TypedContractMethod<
     [arg0: BytesLike, arg1: AddressLike],
+    [bigint],
+    "view"
+  >;
+
+  taskParticipantCount: TypedContractMethod<
+    [arg0: BytesLike],
     [bigint],
     "view"
   >;
@@ -352,6 +371,8 @@ export interface EntityTaskManager extends BaseContract {
     ],
     "view"
   >;
+
+  totalAllocatedRewards: TypedContractMethod<[], [bigint], "view">;
 
   verifyCompletion: TypedContractMethod<
     [taskId: BytesLike],
@@ -405,15 +426,15 @@ export interface EntityTaskManager extends BaseContract {
     nameOrSignature: "participate"
   ): TypedContractMethod<[taskId: BytesLike], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "ping"
-  ): TypedContractMethod<[], [void], "nonpayable">;
-  getFunction(
     nameOrSignature: "taskAssignments"
   ): TypedContractMethod<
     [arg0: BytesLike, arg1: AddressLike],
     [bigint],
     "view"
   >;
+  getFunction(
+    nameOrSignature: "taskParticipantCount"
+  ): TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "tasks"
   ): TypedContractMethod<
@@ -432,6 +453,9 @@ export interface EntityTaskManager extends BaseContract {
     ],
     "view"
   >;
+  getFunction(
+    nameOrSignature: "totalAllocatedRewards"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "verifyCompletion"
   ): TypedContractMethod<[taskId: BytesLike], [void], "nonpayable">;

@@ -16,8 +16,6 @@ contract EntityTaskManager is IEntityTaskManager {
 
     mapping(bytes32 => Task) public tasks;
     mapping(bytes32 => mapping(address => STATUS)) public taskAssignments;
-    // mapping(address => uint256) public allocatedRewards;
-    // New mapping to store participants when whitelist is false
 
     bytes32 public appId;
 
@@ -150,39 +148,64 @@ contract EntityTaskManager is IEntityTaskManager {
         address[] memory verifiedTaskParticipant = new address[](
             tasks[taskId].maxParticipants
         );
-        if (tasks[taskId].allowedWallets.length == 0) return;
-        for (uint i = 0; i < tasks[taskId].allowedWallets.length; i++) {
-            if (
-                taskAssignments[taskId][tasks[taskId].allowedWallets[i]] ==
-                STATUS.COMPLETED
-            ) {
-                taskAssignments[taskId][
-                    tasks[taskId].allowedWallets[i]
-                ] = STATUS.VERIFIED;
-                verifiedTaskParticipant[verifiedCount] = tasks[taskId]
-                    .allowedWallets[i];
-                verifiedCount++;
+
+        // Get list of all participants for open tasks
+        address[] memory participantsToCheck = tasks[taskId].allowedWallets;
+       
+
+        if (tasks[taskId].allowedWallets.length == 0) {
+            // For open tasks, we need to iterate through all participants who joined
+            // We can get this from taskAssignments mapping using taskParticipantCount
+            participantsToCheck = new address[](taskParticipantCount[taskId]);
+            for (uint i = 0; i < taskParticipantCount[taskId]; i++) {
+                if (
+                    taskAssignments[taskId][participantsToCheck[i]] ==
+                    STATUS.COMPLETED
+                ) {
+                    verifiedTaskParticipant[
+                        verifiedCount
+                    ] = participantsToCheck[i];
+                    taskAssignments[taskId][participantsToCheck[i]] = STATUS
+                        .VERIFIED;
+                    verifiedCount++;
+                }
+            }
+        } else {
+            // For closed tasks, use existing logic with allowedWallets
+            for (uint i = 0; i < tasks[taskId].allowedWallets.length; i++) {
+                if (
+                    taskAssignments[taskId][tasks[taskId].allowedWallets[i]] ==
+                    STATUS.COMPLETED
+                ) {
+                    verifiedTaskParticipant[verifiedCount] = tasks[taskId]
+                        .allowedWallets[i];
+                    taskAssignments[taskId][
+                        tasks[taskId].allowedWallets[i]
+                    ] = STATUS.VERIFIED;
+                    verifiedCount++;
+                }
             }
         }
-        if (verifiedCount == 0) return;
 
-        uint256 rewardsPerParticiapant = tasks[taskId].rewardAmount /
+        require(verifiedCount > 0, 'No completed tasks to verify');
+
+        // Calculate and distribute rewards
+        uint256 rewardsPerParticipant = tasks[taskId].rewardAmount /
             verifiedCount;
         for (uint i = 0; i < verifiedCount; i++) {
-            // allocatedRewards[verifiedTaskParticipant[i]] += rewardsPerParticiapant;
             IERC20(tasks[taskId].rewardToken).transfer(
                 verifiedTaskParticipant[i],
-                rewardsPerParticiapant
+                rewardsPerParticipant
             );
         }
 
-        uint256 actualRewardsUsed = rewardsPerParticiapant * verifiedCount;
+        // Update allocated rewards
+        uint256 actualRewardsUsed = rewardsPerParticipant * verifiedCount;
         totalAllocatedRewards -= (tasks[taskId].rewardAmount *
             tasks[taskId].maxParticipants);
         totalAllocatedRewards += actualRewardsUsed;
 
         tasks[taskId].isActive = false;
-
         emit TaskApproved(taskId, msg.sender);
     }
 
