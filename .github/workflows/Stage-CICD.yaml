@@ -10,6 +10,8 @@ on:
 
 env:
   CI: false
+  MANIFEST_FILE: "K8s-Manifest/Rumsan/VirtuPerks/argo-rollout.yaml"
+
 
 jobs:
   deploy:
@@ -17,6 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Get short SHA
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Import Secrets
         uses: hashicorp/vault-action@v2.4.0
@@ -51,4 +57,46 @@ jobs:
           context: .
           file: Dockerfile.web
           push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-          tags: rumsan/virtuperks-web:stage
+          tags: |
+            rumsan/virtuperks-web:stage
+            rumsan/virtuperks-web:stage-${{ steps.vars.outputs.sha_short }}
+
+    outputs:
+      sha_short: ${{ steps.vars.outputs.sha_short }}
+
+  update-manifest:
+    name: Update Kubernetes Manifest
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Import Secrets
+        uses: hashicorp/vault-action@v2.4.0
+        with:
+          url: ${{ secrets.VAULT_URL }}
+          token: ${{ secrets.VAULT_TOKEN }}
+          secrets: |
+            github/data/general/Stage-Manifest repo | MANIFEST_REPO ;
+            github/data/general/Stage-Manifest ssh-key | SSH_KEY ;
+
+
+      # Checkout the manifest repository using SSH
+      - name: Checkout Stage Manifest Repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.MANIFEST_REPO }}
+          ssh-key: ${{ env.SSH_KEY }}
+
+      # Update the image tag in the manifest
+      - name: Update Image Tag in Manifest
+        run: |
+          sed -i "s|image: rumsan/virtuperks-web:.*|image: rumsan/virtuperks-web:stage-${{ needs.deploy.outputs.sha_short }}|" ${{ env.MANIFEST_FILE }}
+
+      # Commit and push changes using SSH
+      - name: Commit and Push Changes
+        run: |
+          git config user.name "sandab-rumsan"
+          git config user.email "sandab@rumsan.net"
+          git add ${{ env.MANIFEST_FILE }}
+          git commit -m "runner: Update virtual-app image tag to stage-${{ needs.deploy.outputs.sha_short }}"
+          git push origin main  
