@@ -1,5 +1,6 @@
 import { Providers } from "@/providers/providers";
 import { GraphQueryProvider } from "@/providers/subgraph-provider";
+import Validation from "@/providers/validation";
 import { Wagmi } from "@/providers/wagmi-provider";
 import "@workspace/ui/globals.css";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -25,12 +26,11 @@ export default function RootLayout({
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
       >
         <Wagmi>
-          
           <GraphQueryProvider>
-              <Providers>{children}</Providers>
-             
-            </GraphQueryProvider>
-             
+            <Providers>
+              <Validation>{children}</Validation>
+            </Providers>
+          </GraphQueryProvider>
         </Wagmi>
       </body>
     </html>

@@ -38,7 +38,7 @@ export default function TaskPortalNav({ children }: PropsWithChildren) {
           </Link>
         </nav>
 
-         <nav className="flex items-center gap-6 h-full">
+         {/* <nav className="flex items-center gap-6 h-full">
                
                   <Link
                     href="/departments"
@@ -65,7 +65,7 @@ export default function TaskPortalNav({ children }: PropsWithChildren) {
                     Task Management
                   </Link>
                 
-                </nav>
+                </nav> */}
 
         <div className="ml-auto flex items-center gap-4 h-full">
           <Link
