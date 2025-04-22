@@ -38,36 +38,24 @@ export default function TaskPortalNav({ children }: PropsWithChildren) {
           </Link>
         </nav>
 
-         {/* <nav className="flex items-center gap-6 h-full">
-               
-                  <Link
-                    href="/departments"
-                    onClick={() => handleNavClick("departments")}
-                    className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("treasurer")}`}
-                  >
-                    <Coins
-                      size={18}
-                      strokeWidth={2.65}
-                      color={`${activeNavBar === "treasurer" ? "#297AD6" : "#334155"}`}
-                    />
-                    Departments
-                  </Link>
-                  <Link
-                    href="/tasks"
-                    onClick={() => handleNavClick("tasks")}
-                    className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("departments")}`}
-                  >
-                    <Layers
-                      size={18}
-                      strokeWidth={2.65}
-                      color={`${activeNavBar === "departments" ? "#297AD6" : "#334155"}`}
-                    />
-                    Task Management
-                  </Link>
-                
-                </nav> */}
+       
 
         <div className="ml-auto flex items-center gap-4 h-full">
+
+ <Link
+            href="/task_portal"
+            onClick={() => handleNavClick("task_portal")}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("task_portal")}`}
+          >
+            <LayoutList
+              size={18}
+              strokeWidth={2.65}
+              color={`${activeNavBar === "task_portal" ? "#297AD6" : "#334155"}`}
+            />
+            Tasks Portal
+          </Link>
+
+
           <Link
             href="/task_portal/mine"
             onClick={() => handleNavClick("my-tasks")}
