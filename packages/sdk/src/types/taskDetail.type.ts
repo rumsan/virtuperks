@@ -4,6 +4,7 @@ export type TaskDetail = {
   detailsUrl: string;
   expiryDate: number;
   id: string;
+  internal_id: string;
   isActive: boolean;
   maxParticipants: string;
   owner: string;

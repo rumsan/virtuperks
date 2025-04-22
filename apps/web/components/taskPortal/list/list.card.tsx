@@ -23,13 +23,14 @@ const TaskPortalCard = <TData,>({
       return (task as TaskCreated)?.taskDetail;
     })
     .map((task) => (task as TaskCreated)?.taskDetail);
+console.log("filteredTasks", filteredTasks);
 
   return (
     <>
       {filteredTasks.length > 0 ? (
         filteredTasks.map((task) => (
           <Card
-            key={task.id}
+            key={task.internal_id}
             className="w-full cursor-pointer p-4"
             onClick={() =>
               task.id && router.push(PATHS.TASKPORTAL.DETAILS(task.id))
