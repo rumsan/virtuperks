@@ -1,4 +1,5 @@
 import { PATHS } from "@/routes/paths";
+import { formatDate } from "@/utils/formatDate";
 import { TaskCreated } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Coins, Dot, ExternalLink } from "lucide-react";
@@ -70,7 +71,7 @@ const ListCardDetails = ({
                   <div className="flex items-center font-normal text-[#64748B]">
                     <span>{task?.taskDetail?.owner}</span>
                     <Dot />
-                    <span>Deadline: {task?.taskDetail?.expiryDate}</span>
+                    <span>Deadline: {formatDate(task?.taskDetail?.expiryDate)}</span>
                     <Dot />
                     <span>
                       {task?.taskDetail?.maxParticipants} members participating
