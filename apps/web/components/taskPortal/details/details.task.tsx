@@ -1,3 +1,4 @@
+import { formatDate } from "@/utils/formatDate";
 import { TaskCreated } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { ExternalLink, Timer, Trophy, UserRoundCog, Users } from "lucide-react";
@@ -52,7 +53,7 @@ const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
           </span>
           <span className="flex items-center gap-2">
             <Timer color="#64748B" size={20} strokeWidth={2.5} /> Deadline:{" "}
-            {taskData?.taskDetail?.expiryDate}
+            {formatDate(taskData?.taskDetail?.expiryDate)}
           </span>
         </div>
       </Card>
