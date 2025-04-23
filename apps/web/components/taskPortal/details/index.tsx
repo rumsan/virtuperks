@@ -1,3 +1,5 @@
+"use client";
+
 import { CustomAlertDialog } from "@/components/common/ui/alert.dialog";
 import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
@@ -6,6 +8,7 @@ import { useGetTaskDetailById } from "@/hooks/subgraph/taskDetail";
 import { PATHS } from "@/routes/paths";
 import { getDialogContents } from "@/utils/dialog";
 import { Button } from "@workspace/ui/components/button";
+import { Skeleton } from "@workspace/ui/components/skeleton";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
@@ -25,30 +28,27 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   
   const { isConnected, address } = useAccount();
 
-const { participantTaskStatus } = useGetParticipantTaskStatus(address, cuid.id);
+  const { participantTaskStatus } = useGetParticipantTaskStatus(address, cuid.id);
 
+  const { data: taskData, isLoading } = useGetTaskDetailById(cuid.id);
+  const taskInfo = taskData?.data?.data?.taskCreateds[0]
+  
 
-
-  const getTaskDetail = useGetTaskDetailById(cuid.id);
-   
-  const taskData = getTaskDetail?.data?.data?.taskCreateds[0]
-
-
-  const { participateTask, participatePending, participateSuccess} = useParticipateTaskMutation()
-  const {completeTask, completePending, completeSuccess} = useCompleteTaskMutation()
+  const { participateTask, participatePending, participateSuccess } = useParticipateTaskMutation();
+  const { completeTask, completePending, completeSuccess } = useCompleteTaskMutation();
 
   const handleApplyTask = () => {
-    if (isConnected ) {
+    if (isConnected) {
       setIsOpen(true);
     } else {
       setAlertDialog(true);
     }
   };
 
-  const handleCompletedTask = async () => { 
-return new Promise<void>((resolve, reject) => {
+  const handleCompletedTask = async () => {
+    return new Promise<void>((resolve, reject) => {
       completeTask(
-        { taskId: cuid.id, entityId: taskData?.entityTaskManager?.entityTaskManager || "0x" },
+        { taskId: cuid.id, entityId: taskInfo?.entityTaskManager?.entityTaskManager || "0x" },
         {
           onSuccess: () => {
             setIsOpen(false);
@@ -61,21 +61,13 @@ return new Promise<void>((resolve, reject) => {
           },
         }
       );
-    }
-  );
-
-
-
-
-
-
-  }
-  
+    });
+  };
 
   const handleApplyTaskLogic = async () => {
     return new Promise<void>((resolve, reject) => {
       participateTask(
-        { taskId: cuid.id, entityId: taskData?.entityTaskManager?.entityTaskManager || "0x" },
+        { taskId: cuid.id, entityId: taskInfo?.entityTaskManager?.entityTaskManager || "0x" },
         {
           onSuccess: () => {
             setIsOpen(false);
@@ -91,8 +83,6 @@ return new Promise<void>((resolve, reject) => {
     });
   };
 
-
-
   const getDialogHandler = () => {
     switch (participantTaskStatus[0]?.status) {
       case "COMPLETED":
@@ -107,11 +97,9 @@ return new Promise<void>((resolve, reject) => {
   };
 
   const getButtonContent = () => {
-  
     const currentStatus = localButtonState || participantTaskStatus[0]?.status;
     console.log("participantTaskStatus", participantTaskStatus);
     console.log("currentStatus", currentStatus);
- 
 
     switch (currentStatus) {
       case "COMPLETED":
@@ -161,7 +149,33 @@ return new Promise<void>((resolve, reject) => {
         );
     }
   };
-  
+
+  if (isLoading) {
+    return (
+      <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
+        <div className="space-y-6">
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-8 w-32" /> {/* Back button skeleton */}
+            <Skeleton className="h-10 w-48" /> {/* Title skeleton */}
+            <Skeleton className="h-4 w-64" /> {/* Subtitle skeleton */}
+          </div>
+
+          <div className="flex w-full gap-4">
+            <div className="w-[80%]">
+              <Skeleton className="h-64 w-full rounded-lg" /> {/* Task details skeleton */}
+            </div>
+            <div className="w-[20%]">
+              <Skeleton className="h-64 w-full rounded-lg" /> {/* Rewards card skeleton */}
+            </div>
+          </div>
+
+          <div className="w-full">
+            <Skeleton className="h-48 w-full rounded-lg" /> {/* Participants section skeleton */}
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
@@ -205,11 +219,11 @@ return new Promise<void>((resolve, reject) => {
         )}
 
         <div className="flex w-full gap-4">
-          <TaskPortalDetails taskData={taskData} />
+          <TaskPortalDetails taskData={taskInfo} />
         </div>
 
         <div className="flex w-full gap-4">
-          <TaskPortalParticipant taskId={ cuid} />
+          <TaskPortalParticipant taskId={cuid} />
         </div>
       </div>
     </main>
