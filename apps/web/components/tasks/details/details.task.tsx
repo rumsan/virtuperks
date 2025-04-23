@@ -16,6 +16,13 @@ const TaskDetails = ({ cuid }: TaskDetailsProps) => {
   const taskData = getTaskDetail?.data?.data?.taskCreateds[0]
   const formattedDate = formatDate(taskData?.taskDetail?.expiryDate);
 
+   const handleUrlClick = (e: React.MouseEvent<HTMLDivElement>, url: string) => {
+    e.preventDefault();
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
 
 
 
@@ -29,7 +36,11 @@ const TaskDetails = ({ cuid }: TaskDetailsProps) => {
               {}
             </span>
           </div>
-          <div className="flex items-center gap-2 cursor-pointer hover:text-blue-400">
+          <div className="flex items-center gap-2 cursor-pointer hover:text-blue-400"
+          
+           onClick={(e) => handleUrlClick(e, taskData?.taskDetail?.detailsUrl)}
+          
+          >
             <span className="text-[#297AD6] text-sm font-normal">
               View Github repository
             </span>

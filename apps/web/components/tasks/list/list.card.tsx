@@ -33,6 +33,11 @@ const ListCardDetails = ({
     return taskList;
   };
 
+    const handleUrlClick = (e: React.MouseEvent, url: string) => {
+    e.stopPropagation();
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <div className="grid grid-cols-2 gap-4">
       {filteredTaskList().map(
@@ -66,6 +71,8 @@ const ListCardDetails = ({
                       size={16}
                       color="#297AD6"
                       strokeWidth={2.75}
+
+                        onClick={(e) => handleUrlClick(e, task?.taskDetail?.detailsUrl)}
                     />
                   </div>
                   <div className="flex items-center font-normal text-[#64748B]">
