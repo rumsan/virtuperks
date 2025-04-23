@@ -109,8 +109,7 @@ return new Promise<void>((resolve, reject) => {
   const getButtonContent = () => {
   
     const currentStatus = localButtonState || participantTaskStatus[0]?.status;
-    console.log("participantTaskStatus", participantTaskStatus);
-    console.log("currentStatus", currentStatus);
+  
  
 
     switch (currentStatus) {

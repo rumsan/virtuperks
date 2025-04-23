@@ -1,4 +1,5 @@
 import { PATHS } from "@/routes/paths";
+import { formatDate } from "@/utils/formatDate";
 import { TaskCreated } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Coins, Dot, ExternalLink } from "lucide-react";
@@ -30,6 +31,11 @@ const ListCardDetails = ({
       return taskList?.filter((task) => task?.taskDetail?.isActive === false);
     }
     return taskList;
+  };
+
+    const handleUrlClick = (e: React.MouseEvent, url: string) => {
+    e.stopPropagation();
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -65,12 +71,14 @@ const ListCardDetails = ({
                       size={16}
                       color="#297AD6"
                       strokeWidth={2.75}
+
+                        onClick={(e) => handleUrlClick(e, task?.taskDetail?.detailsUrl)}
                     />
                   </div>
                   <div className="flex items-center font-normal text-[#64748B]">
                     <span>{task?.taskDetail?.owner}</span>
                     <Dot />
-                    <span>Deadline: {task?.taskDetail?.expiryDate}</span>
+                    <span>Deadline: {formatDate(task?.taskDetail?.expiryDate)}</span>
                     <Dot />
                     <span>
                       {task?.taskDetail?.maxParticipants} members participating
