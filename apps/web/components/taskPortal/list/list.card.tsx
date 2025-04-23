@@ -25,7 +25,7 @@ const TaskPortalCard = <TData,>({
     .map((task) => (task as TaskCreated)?.taskDetail);
 
 
-  const handleUrlClick = (e: React.MouseEvent<HTMLDivElement>, url: string) => {
+  const handleUrlClick = (e: React.MouseEvent, url: string) => {
     e.stopPropagation(); // Prevent card click event
     window.open(url, '_blank', 'noopener,noreferrer');
   };
@@ -50,12 +50,16 @@ const TaskPortalCard = <TData,>({
               </div>
               <div 
                 className="flex items-center gap-2 cursor-pointer hover:text-blue-400"
-                onClick={(e) => handleUrlClick(e, task?.detailsUrl)}
+                
               >
                 <span className="text-[#297AD6] text-sm font-normal">
                   {task?.detailsUrl}
                 </span>
-                <ExternalLink size={16} color="#297AD6" strokeWidth={2.75} />
+                <ExternalLink size={16} color="#297AD6" strokeWidth={2.75} 
+                onClick={(e) => handleUrlClick(e, task?.detailsUrl)}
+                
+                
+                />
               </div>
               <div className="flex items-center gap-1 text-sm">
                 <div className="flex items-center font-normal text-[#64748B] gap-1">
