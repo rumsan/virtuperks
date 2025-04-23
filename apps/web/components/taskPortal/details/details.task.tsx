@@ -7,27 +7,37 @@ type TaskPortalDetailsProps = {
 };
 
 const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
+  const handleUrlClick = (e: React.MouseEvent<HTMLDivElement>, url: string) => {
+    e.preventDefault();
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <>
       <Card className="w-[80%] h-full p-4">
         <CardTitle className="flex flex-col gap-1 w-full">
           <div className="flex items-center gap-2">
-            <span>Organize a blood donation campaign</span>
+            <span>{taskData?.taskDetail?.taskName}</span>
             <span className="w-20 h-6 flex items-center justify-center bg-green-50 rounded-full text-green-700 p-1 text-sm font-normal">
               {taskData?.taskDetail?.isActive === true ? `active` : `expired`}
             </span>
           </div>
-          <div className="flex items-center gap-2 cursor-pointer hover:text-blue-400">
+          <div 
+            className="flex items-center gap-2 cursor-pointer hover:text-blue-400"
+            onClick={(e) => handleUrlClick(e, taskData?.taskDetail?.detailsUrl)}
+            role="link"
+            tabIndex={0}
+          >
             <span className="text-[#297AD6] text-sm font-normal">
               View Github repository
             </span>
             <ExternalLink size={16} color="#297AD6" strokeWidth={2.75} />
           </div>
 
-          <div className="w-full overflow-hidden">
-            <p className="text-[#334155] text-sm line-clamp-1 font-normal">
-              {taskData?.taskDetail?.detailsUrl}
-            </p>
+          <div className="w-full overflow-hidden text-[#334155] text-sm">
+            <p className="line-clamp-1 font-normal">{taskData?.taskDetail?.detailsUrl}</p>
           </div>
         </CardTitle>
 

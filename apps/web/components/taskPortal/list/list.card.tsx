@@ -1,11 +1,11 @@
 import { PATHS } from "@/routes/paths";
+import { formatDate } from "@/utils/formatDate";
 import { Table } from "@tanstack/react-table";
 import { TaskCreated } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Coins, Dot, ExternalLink, Timer, Users } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import NoTask from "./no.task";
-import { formatDate } from "@/utils/formatDate";
 
 interface TaskPortalCardProps<TData> {
   table: Table<TData>;
@@ -24,6 +24,12 @@ const TaskPortalCard = <TData,>({
     })
     .map((task) => (task as TaskCreated)?.taskDetail);
 
+
+  const handleUrlClick = (e: React.MouseEvent<HTMLDivElement>, url: string) => {
+    e.stopPropagation(); // Prevent card click event
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <>
       {filteredTasks.length > 0 ? (
@@ -37,12 +43,15 @@ const TaskPortalCard = <TData,>({
           >
             <CardTitle className="flex flex-col gap-1 w-full">
               <div className="flex items-center gap-2">
-                <span>Organize a blood donation campaign</span>
+                <span>{task.taskName}</span>
                 <span className="w-20 h-6 flex items-center justify-center bg-green-50 rounded-full text-green-700 p-1 text-sm font-normal">
                   {task?.isActive === true ? `active` : `expired`}
                 </span>
               </div>
-              <div className="flex items-center gap-2 cursor-pointer hover:text-blue-400">
+              <div 
+                className="flex items-center gap-2 cursor-pointer hover:text-blue-400"
+                onClick={(e) => handleUrlClick(e, task?.detailsUrl)}
+              >
                 <span className="text-[#297AD6] text-sm font-normal">
                   {task?.detailsUrl}
                 </span>
