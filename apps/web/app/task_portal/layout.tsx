@@ -4,7 +4,7 @@ import { PropsWithChildren } from "react";
 const layout = ({ children }: PropsWithChildren) => {
   return (
     <div>
-      <TaskPortalNav>{children}</TaskPortalNav>
+      {children}
     </div>
   );
 };

@@ -26,7 +26,7 @@ const TaskPortalCard = <TData,>({
 
 
   const handleUrlClick = (e: React.MouseEvent, url: string) => {
-    e.stopPropagation(); // Prevent card click event
+    e.stopPropagation();
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 

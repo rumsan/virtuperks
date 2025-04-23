@@ -1,65 +1,41 @@
 "use client";
 
-import { CustomAlertDialog } from "@/components/common/ui/alert.dialog";
-import { PATHS } from "@/routes/paths";
+import EntityOwnerNav from "@/components/layout/nav/entity_owner.nav";
+import TaskPortalNav from "@/components/layout/nav/task_portal.nav";
 import { AccessManagerABI } from "@workspace/contracts/abis";
-import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { useAccount, useReadContract } from "wagmi";
 
 interface ValidationProps {
   children: ReactNode;
-  role: string;
 }
 
-const Validation = ({ children, role }: ValidationProps) => {
-  const [alertDialog, setAlertDialog] = useState(false);
-  const [isValidating, setIsValidating] = useState(true);
-  const router = useRouter();
-  const { address } = useAccount();
+const Validation = ({ children }: ValidationProps) => {
+  const [isEntityOwner, setIsEntityOwner] = useState(false);
+  const { address, isConnected } = useAccount();
 
-  const { data, isLoading } = useReadContract({
+  const { data: hasEntityOwnerRole } = useReadContract({
     address: (process.env.NEXT_PUBLIC_ACCESSMANAGER?.startsWith("0x") ? process.env.NEXT_PUBLIC_ACCESSMANAGER : "") as `0x${string}`,
     abi: AccessManagerABI,
     functionName: "hasRole",
-    args: [process.env.NEXT_PUBLIC_APP_ID, role, address],
+    args: [process.env.NEXT_PUBLIC_APP_ID, process.env.NEXT_PUBLIC_ENTITY_OWNER_ROLE, address],
+    
   });
 
   useEffect(() => {
-    
-    if (!isLoading) {
-      setIsValidating(false);
-      if (data === false) { // Only show dialog if we explicitly get false
-        setAlertDialog(true);
-      }
-    }
-  }, [data, isLoading]);
+    setIsEntityOwner(!!hasEntityOwnerRole);
+  }, [hasEntityOwnerRole]);
 
-  const handleDialogClose = (shouldClose: boolean) => {
-    setAlertDialog(false);
-    if (shouldClose) {
-      router.push(`${PATHS.DASHBOARD}`);
-    }
-  };
-
-  if (isValidating || isLoading) {
-    return null; // Show nothing while validating
+ 
+  if (!isConnected) {
+    return <TaskPortalNav>{children}</TaskPortalNav>;
   }
 
-  return (
-    <div>
-      {data ? children : (
-        alertDialog && (
-          <CustomAlertDialog
-            alertDialog={alertDialog}
-            setAlertDialog={setAlertDialog}
-            textData="Access Denied"
-            buttonName="Ok"
-            onClose={handleDialogClose}
-          />
-        )
-      )}
-    </div>
+ 
+  return isEntityOwner ? (
+    <EntityOwnerNav>{children}</EntityOwnerNav>
+  ) : (
+    <TaskPortalNav>{children}</TaskPortalNav>
   );
 };
 

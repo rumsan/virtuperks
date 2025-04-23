@@ -1,5 +1,6 @@
 import { Providers } from "@/providers/providers";
 import { GraphQueryProvider } from "@/providers/subgraph-provider";
+import Validation from "@/providers/validation";
 import { Wagmi } from "@/providers/wagmi-provider";
 import "@workspace/ui/globals.css";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -27,7 +28,13 @@ export default function RootLayout({
         <Wagmi>
           
           <GraphQueryProvider>
-              <Providers>{children}</Providers>
+            <Providers>
+              
+
+  <Validation>{children}</Validation>
+
+
+              </Providers>
              
             </GraphQueryProvider>
              
