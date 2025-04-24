@@ -14,8 +14,9 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
   const getAllEntity = useEntityList();
   const entityList = getAllEntity?.data?.data?.entityTaskManagerCreateds;
   const hasEntityOwnerRole = hasRole({ 
-    role: process.env.NEXT_PUBLIC_ENTITY_OWNER_ROLE || "" 
+    role: process.env.NEXT_PUBLIC_MINTER_ROLE || "" 
   });
+
 
   return (
     <div className="grid grid-cols-4 gap-4 w-full p-4">
