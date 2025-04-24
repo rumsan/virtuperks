@@ -53,7 +53,7 @@ const ListCardDetails = ({
             >
               <CardTitle className="flex flex-col p-4 gap-2">
                 <div className="flex items-center gap-2 text-[#334155]">
-                  <span>Default Title</span>
+                  <span>{task?.taskDetail?.rewardToken}</span>
                   <span
                     className={`w-20 h-5 flex items-center justify-center font-normal rounded-full p-3 text-sm 
                   `}

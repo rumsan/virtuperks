@@ -77,12 +77,7 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
            <p className="mb-6 text-gray-600 text-lg">
              Please connect your MetaMask wallet to view your tasks.
            </p>
-           {/* <button
-             onClick={() => connect({ connector: injected() })}
-             className="bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 transition-colors duration-200"
-           >
-             Connect MetaMask
-           </button> */}
+      
          </div>
        </main>
      );
