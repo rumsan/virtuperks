@@ -14,7 +14,6 @@ import { useWriteContract } from "wagmi";
 import { taskSchema } from "./schema";
 import TaskBaseForm from "./task.form";
 
-
 const defaultValues: any = {
   taskName: "",
   detailsUrl: "",
@@ -39,13 +38,8 @@ export default function TaskAdd({ router }: TaskAddProps) {
   });
   const { toast } = useToast();
 
-  const { 
-    writeContractAsync, 
-    isPending, 
-    isSuccess, 
-    isError,
-    error 
-  } = useWriteContract();
+  const { writeContractAsync, isPending, isSuccess, isError, error } =
+    useWriteContract();
 
   useEffect(() => {
     if (isSuccess) {
@@ -55,55 +49,56 @@ export default function TaskAdd({ router }: TaskAddProps) {
 
   useEffect(() => {
     if (isError && error) {
-      console.error('Transaction failed:', error);
+      console.error("Transaction failed:", error);
     }
   }, [isError, error]);
 
   const createTask = async (data: any) => {
-  
     if (!isAddress(data.entityAddress)) {
       console.error("Invalid Ethereum address:", data.entityAddress);
       return;
     }
-    
-   
-    const { detailsUrl, rewardToken, owner, isActive , taskName} = data;
-    const expiryDate = BigInt(Math.floor(new Date(data.expiryDate).getTime() / 1000));
-    const allowedWallets = Array.isArray(data.allowedWallets) ? data.allowedWallets : [data.allowedWallets];
+
+    const { detailsUrl, rewardToken, owner, isActive, taskName } = data;
+    const expiryDate = BigInt(
+      Math.floor(new Date(data.expiryDate).getTime() / 1000),
+    );
+    const allowedWallets = Array.isArray(data.allowedWallets)
+      ? data.allowedWallets
+      : [data.allowedWallets];
     const rewardAmount = BigInt(data.rewardAmount);
     const maxParticipants = BigInt(data.maxParticipants);
-   
 
     try {
-
       await writeContractAsync({
         address: data.entityAddress,
         abi: EntityTaskManagementABI,
         functionName: "createTask",
-        args: [{
-          taskName,
-          detailsUrl,
-          rewardToken,
-          rewardAmount,
-          allowedWallets,
-          maxParticipants,
-          expiryDate,
-          owner,
-          isActive,
-        }],
+        args: [
+          {
+            taskName,
+            detailsUrl,
+            rewardToken,
+            rewardAmount,
+            allowedWallets,
+            maxParticipants,
+            expiryDate,
+            owner,
+            isActive,
+          },
+        ],
       });
-      //add toast for success
+      // Success Toast
       toast({
-      variant: 'default', 
-      description: 'Task created successfully',
-    });
-
+        title: "Task Created Successfully!",
+        variant: "success",
+      });
     } catch (err) {
-      console.error('Failed to create task:', err);
-      //add toast for error
+      console.error("Failed to create task:", err);
+      // Error Toast
       toast({
-        variant: 'destructive',
-        description: 'Failed to create task',
+        title: "Task Creation Failed",
+        variant: "destructive",
       });
     }
   };
