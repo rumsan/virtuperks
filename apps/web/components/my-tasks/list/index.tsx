@@ -1,7 +1,9 @@
 "use client";
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
+import { useGetTaskListByParticipant } from "@/hooks/subgraph/participant";
 import { useTaskList } from "@/hooks/subgraph/querycall";
+import { useWallet } from "@/providers/walletProvider";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -14,10 +16,9 @@ import {
 } from "@tanstack/react-table";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import React from "react";
+import { injected, useConnect } from "wagmi";
 import { useColumns } from "../details/details.column";
 import TaskPortalCard from "./list.card";
-import { useGetTaskListByParticipant } from "@/hooks/subgraph/participant";
-import { useAccount } from "wagmi";
 
 interface TaskPortalMainProps {
   router: AppRouterInstance;
@@ -28,7 +29,10 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
-  const {address} = useAccount()
+ // const { address } = useAccount()
+  
+   const { address, isConnected } = useWallet()
+   const {connect}= useConnect()
 
   const getMyTaskList = useGetTaskListByParticipant(address as `0x${string}`);
  
@@ -63,6 +67,26 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
       rowSelection,
     },
   });
+
+
+   if (!isConnected || !address) {
+     return (
+       <main className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
+         <h1 className="font-bold text-4xl mb-6 text-gray-800">My Tasks</h1>
+         <div className="bg-white p-8 rounded-xl shadow-lg text-center max-w-md w-full border border-gray-200">
+           <p className="mb-6 text-gray-600 text-lg">
+             Please connect your MetaMask wallet to view your tasks.
+           </p>
+           {/* <button
+             onClick={() => connect({ connector: injected() })}
+             className="bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 transition-colors duration-200"
+           >
+             Connect MetaMask
+           </button> */}
+         </div>
+       </main>
+     );
+   }
 
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full flex flex-col">
