@@ -4,6 +4,7 @@ import { PATHS } from "@/routes/paths";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EntityTaskManagementABI } from "@workspace/contracts/abis";
 import { Card, CardContent } from "@workspace/ui/components/card";
+import { useToast } from "@workspace/ui/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useEffect } from "react";
@@ -12,6 +13,7 @@ import { isAddress } from "viem";
 import { useWriteContract } from "wagmi";
 import { taskSchema } from "./schema";
 import TaskBaseForm from "./task.form";
+
 
 const defaultValues: any = {
   taskName: "",
@@ -35,6 +37,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
     resolver: zodResolver(taskSchema()),
     defaultValues: defaultValues,
   });
+  const { toast } = useToast();
 
   const { 
     writeContractAsync, 
@@ -57,11 +60,13 @@ export default function TaskAdd({ router }: TaskAddProps) {
   }, [isError, error]);
 
   const createTask = async (data: any) => {
+  
     if (!isAddress(data.entityAddress)) {
       console.error("Invalid Ethereum address:", data.entityAddress);
       return;
     }
-
+    
+   
     const { detailsUrl, rewardToken, owner, isActive , taskName} = data;
     const expiryDate = BigInt(Math.floor(new Date(data.expiryDate).getTime() / 1000));
     const allowedWallets = Array.isArray(data.allowedWallets) ? data.allowedWallets : [data.allowedWallets];
@@ -70,6 +75,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
    
 
     try {
+
       await writeContractAsync({
         address: data.entityAddress,
         abi: EntityTaskManagementABI,
@@ -86,8 +92,19 @@ export default function TaskAdd({ router }: TaskAddProps) {
           isActive,
         }],
       });
+      //add toast for success
+      toast({
+      variant: 'default', 
+      description: 'Task created successfully',
+    });
+
     } catch (err) {
       console.error('Failed to create task:', err);
+      //add toast for error
+      toast({
+        variant: 'destructive',
+        description: 'Failed to create task',
+      });
     }
   };
 
