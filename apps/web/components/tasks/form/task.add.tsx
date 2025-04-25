@@ -4,6 +4,7 @@ import { PATHS } from "@/routes/paths";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EntityTaskManagementABI } from "@workspace/contracts/abis";
 import { Card, CardContent } from "@workspace/ui/components/card";
+import { useToast } from "@workspace/ui/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useEffect } from "react";
@@ -35,14 +36,10 @@ export default function TaskAdd({ router }: TaskAddProps) {
     resolver: zodResolver(taskSchema()),
     defaultValues: defaultValues,
   });
+  const { toast } = useToast();
 
-  const { 
-    writeContractAsync, 
-    isPending, 
-    isSuccess, 
-    isError,
-    error 
-  } = useWriteContract();
+  const { writeContractAsync, isPending, isSuccess, isError, error } =
+    useWriteContract();
 
   useEffect(() => {
     if (isSuccess) {
@@ -52,7 +49,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
 
   useEffect(() => {
     if (isError && error) {
-      console.error('Transaction failed:', error);
+      console.error("Transaction failed:", error);
     }
   }, [isError, error]);
 
@@ -62,32 +59,47 @@ export default function TaskAdd({ router }: TaskAddProps) {
       return;
     }
 
-    const { detailsUrl, rewardToken, owner, isActive , taskName} = data;
-    const expiryDate = BigInt(Math.floor(new Date(data.expiryDate).getTime() / 1000));
-    const allowedWallets = Array.isArray(data.allowedWallets) ? data.allowedWallets : [data.allowedWallets];
+    const { detailsUrl, rewardToken, owner, isActive, taskName } = data;
+    const expiryDate = BigInt(
+      Math.floor(new Date(data.expiryDate).getTime() / 1000),
+    );
+    const allowedWallets = Array.isArray(data.allowedWallets)
+      ? data.allowedWallets
+      : [data.allowedWallets];
     const rewardAmount = BigInt(data.rewardAmount);
     const maxParticipants = BigInt(data.maxParticipants);
-   
 
     try {
       await writeContractAsync({
         address: data.entityAddress,
         abi: EntityTaskManagementABI,
         functionName: "createTask",
-        args: [{
-          taskName,
-          detailsUrl,
-          rewardToken,
-          rewardAmount,
-          allowedWallets,
-          maxParticipants,
-          expiryDate,
-          owner,
-          isActive,
-        }],
+        args: [
+          {
+            taskName,
+            detailsUrl,
+            rewardToken,
+            rewardAmount,
+            allowedWallets,
+            maxParticipants,
+            expiryDate,
+            owner,
+            isActive,
+          },
+        ],
+      });
+      // Success Toast
+      toast({
+        title: "Task Created Successfully!",
+        variant: "success",
       });
     } catch (err) {
-      console.error('Failed to create task:', err);
+      console.error("Failed to create task:", err);
+      // Error Toast
+      toast({
+        title: "Task Creation Failed",
+        variant: "destructive",
+      });
     }
   };
 
