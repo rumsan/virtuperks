@@ -64,15 +64,15 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             setIsOpen(false);
             setLocalButtonState("COMPLETED");
             toast({
-              title: "Task marked as completed!",
-              variant: "default", // optionally, use 'destructive' or custom
+              title: "Task Marked As Completed!",
+              variant: "success",
             });
             resolve();
           },
           onError: (error) => {
             console.error("Error completing task:", error);
             toast({
-              title: "Failed to complete task. Please try again.",
+              title: "Failed To Complete Task. Please Try Again.",
               variant: "destructive",
             });
             reject(error);
@@ -94,15 +94,15 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             setIsOpen(false);
             setLocalButtonState("UNACCEPTED");
             toast({
-              title: "Task application submitted successfully!",
-              variant: "default",
+              title: "Task Application Submitted Successfully!",
+              variant: "success",
             });
             resolve();
           },
           onError: (error) => {
             console.error("Error applying for task:", error);
             toast({
-              title: "Failed to apply for task. Please try again.",
+              title: "Failed To Apply For Task. Please Try Again.",
               variant: "destructive",
             });
             reject(error);
