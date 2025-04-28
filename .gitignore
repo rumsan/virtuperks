@@ -85,3 +85,4 @@ apps/web/sampleData.ts
 wallet.ts
 
 tools/deploy/deployments/wallets.ts
+.qodo

@@ -21,10 +21,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select";
+import { useToast } from "@workspace/ui/hooks/use-toast";
 import { ArrowLeft, Wallet } from "lucide-react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useForm } from "react-hook-form";
 import { Participant, participantSchema } from "./schema";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 const defaultValues: Participant = {
   name: "",
@@ -44,6 +45,8 @@ export default function ParticipantAdd({ router }: ParticipantAddProps) {
     resolver: zodResolver(participantSchema()),
     defaultValues: defaultValues,
   });
+
+  const { toast } = useToast();
 
   const handleSubmit = async (data: Participant) => {
     console.log(data, "data");

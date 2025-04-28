@@ -2,6 +2,7 @@ import { DialogButton } from "@/components/common/ui/dialog";
 import { useAcceptParticipantMutation } from "@/hooks/subgraph/querycall";
 import { getDialogContent } from "@/utils/dialog";
 import { ColumnDef } from "@tanstack/react-table";
+import { useToast } from "@workspace/ui/hooks/use-toast";
 import { CircleCheck, CircleX, Copy } from "lucide-react";
 import { useState } from "react";
 
@@ -9,13 +10,11 @@ export function useColumns<T>(): ColumnDef<T>[] {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [isRefetching, setIsRefetching] = useState(false);
-  const  acceptParticipantMutation= useAcceptParticipantMutation();
+  const acceptParticipantMutation = useAcceptParticipantMutation();
+  const { toast } = useToast();
 
   const handleAction = (row: any) => {
-  
-  
-
-  const entityId = row.original.entityTaskManager.id;
+    const entityId = row.original.entityTaskManager.id;
 
     const taskId = row.original.taskId;
     const status = row.getValue("status");
@@ -26,7 +25,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
       setIsDialogOpen(true);
     } else if (status === "COMPLETED") {
       setSelectedTask({ id: taskId, participant, status });
-      setIsDialogOpen(true)
+      setIsDialogOpen(true);
     }
   };
 
@@ -37,7 +36,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
         await acceptParticipantMutation.mutateAsync({
           taskId: selectedTask.id,
           participant: selectedTask.participant,
-          entityId: selectedTask.entityId
+          entityId: selectedTask.entityId,
         });
         // await new Promise((resolve) =>
         //   setTimeout(() => {
@@ -45,16 +44,27 @@ export function useColumns<T>(): ColumnDef<T>[] {
         //     setIsRefetching(false); // Stop loading after refetch
         //   }, 8500) // 8s delay + buffer
         // );
+
+        // Success Toast
+        toast({
+          title: "Participant accepted successfully!",
+          variant: "success",
+        });
         setIsDialogOpen(false);
         setSelectedTask(null);
       } catch (error) {
         console.error("Error accepting participant:", error);
+        // Error Toast
+        toast({
+          title: "Failed to accept participant.",
+          variant: "destructive",
+        });
       }
     }
   };
 
   const LoadingBar = () =>
-    (acceptParticipantMutation.isPending) ? (
+    acceptParticipantMutation.isPending ? (
       <div className="fixed top-0 left-0 w-full h-1 bg-blue-500 animate-pulse" />
     ) : null;
 
@@ -77,19 +87,24 @@ export function useColumns<T>(): ColumnDef<T>[] {
       },
     },
 
-
     {
       accessorKey: "status",
-      header: () => <div className="text-left text-gray-600 font-bold">Status</div>,
+      header: () => (
+        <div className="text-left text-gray-600 font-bold">Status</div>
+      ),
       cell: ({ row }) => {
         const status = row.getValue("status");
         return (
-          <span className={`text-sm ${
-            status === "COMPLETED" ? "text-green-600" : 
-            status === "UNACCEPTED" ? "text-yellow-600" : 
-            "text-gray-700"
-          }`}>
-          {row.getValue("status")}
+          <span
+            className={`text-sm ${
+              status === "COMPLETED"
+                ? "text-green-600"
+                : status === "UNACCEPTED"
+                  ? "text-yellow-600"
+                  : "text-gray-700"
+            }`}
+          >
+            {row.getValue("status")}
           </span>
         );
       },
@@ -104,13 +119,11 @@ export function useColumns<T>(): ColumnDef<T>[] {
       cell: ({ row }) => {
         const status = row.getValue("status");
         const dialogContent = getDialogContent(status as string);
-      
-        
-       
+
         if (status === "COMPLETED") {
-          return null; 
+          return null;
         }
-        
+
         return (
           <>
             <span className="flex items-center gap-1">
@@ -129,11 +142,15 @@ export function useColumns<T>(): ColumnDef<T>[] {
               setIsOpen={setIsDialogOpen}
               title={dialogContent.title}
               subTitle={dialogContent.subTitle}
-              buttonName={acceptParticipantMutation.isPending ? "Processing..." : dialogContent.buttonName}
+              buttonName={
+                acceptParticipantMutation.isPending
+                  ? "Processing..."
+                  : dialogContent.buttonName
+              }
               handleApplyTaskLogic={handleDialogAction}
               isDisabled={acceptParticipantMutation.isPending}
             />
-            <LoadingBar/>
+            <LoadingBar />
           </>
         );
       },

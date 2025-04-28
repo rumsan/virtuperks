@@ -1,11 +1,16 @@
 import { CustomAlertDialog } from "@/components/common/ui/alert.dialog";
 import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
-import { useCompleteTaskMutation, useGetParticipantTaskStatus, useParticipateTaskMutation } from "@/hooks/subgraph/querycall";
+import {
+  useCompleteTaskMutation,
+  useGetParticipantTaskStatus,
+  useParticipateTaskMutation,
+} from "@/hooks/subgraph/querycall";
 import { useGetTaskDetailById } from "@/hooks/subgraph/taskDetail";
 import { PATHS } from "@/routes/paths";
 import { getDialogContents } from "@/utils/dialog";
 import { Button } from "@workspace/ui/components/button";
+import { useToast } from "@workspace/ui/hooks/use-toast";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
@@ -22,76 +27,90 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [alertDialog, setAlertDialog] = useState(false);
   const [localButtonState, setLocalButtonState] = useState<string | null>(null);
-  
+
   const { isConnected, address } = useAccount();
 
-const { participantTaskStatus } = useGetParticipantTaskStatus(address, cuid.id);
-
-
+  const { participantTaskStatus } = useGetParticipantTaskStatus(
+    address,
+    cuid.id,
+  );
 
   const getTaskDetail = useGetTaskDetailById(cuid.id);
-   
-  const taskData = getTaskDetail?.data?.data?.taskCreateds[0]
+  const { toast } = useToast();
+  const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
 
-
-  const { participateTask, participatePending, participateSuccess} = useParticipateTaskMutation()
-  const {completeTask, completePending, completeSuccess} = useCompleteTaskMutation()
+  const { participateTask, participatePending, participateSuccess } =
+    useParticipateTaskMutation();
+  const { completeTask, completePending, completeSuccess } =
+    useCompleteTaskMutation();
 
   const handleApplyTask = () => {
-    if (isConnected ) {
+    if (isConnected) {
       setIsOpen(true);
     } else {
       setAlertDialog(true);
     }
   };
 
-  const handleCompletedTask = async () => { 
-return new Promise<void>((resolve, reject) => {
+  const handleCompletedTask = async () => {
+    return new Promise<void>((resolve, reject) => {
       completeTask(
-        { taskId: cuid.id, entityId: taskData?.entityTaskManager?.entityTaskManager || "0x" },
+        {
+          taskId: cuid.id,
+          entityId: taskData?.entityTaskManager?.entityTaskManager || "0x",
+        },
         {
           onSuccess: () => {
             setIsOpen(false);
             setLocalButtonState("COMPLETED");
+            toast({
+              title: "Task Marked As Completed!",
+              variant: "success",
+            });
             resolve();
           },
           onError: (error) => {
             console.error("Error completing task:", error);
+            toast({
+              title: "Failed To Complete Task. Please Try Again.",
+              variant: "destructive",
+            });
             reject(error);
           },
-        }
-      );
-    }
-  );
-
-
-
-
-
-
-  }
-  
-
-  const handleApplyTaskLogic = async () => {
-    return new Promise<void>((resolve, reject) => {
-      participateTask(
-        { taskId: cuid.id, entityId: taskData?.entityTaskManager?.entityTaskManager || "0x" },
-        {
-          onSuccess: () => {
-            setIsOpen(false);
-            setLocalButtonState("UNACCEPTED");
-            resolve();
-          },
-          onError: (error) => {
-            console.error("Error applying for task:", error);
-            reject(error);
-          },
-        }
+        },
       );
     });
   };
 
-
+  const handleApplyTaskLogic = async () => {
+    return new Promise<void>((resolve, reject) => {
+      participateTask(
+        {
+          taskId: cuid.id,
+          entityId: taskData?.entityTaskManager?.entityTaskManager || "0x",
+        },
+        {
+          onSuccess: () => {
+            setIsOpen(false);
+            setLocalButtonState("UNACCEPTED");
+            toast({
+              title: "Task Application Submitted Successfully!",
+              variant: "success",
+            });
+            resolve();
+          },
+          onError: (error) => {
+            console.error("Error applying for task:", error);
+            toast({
+              title: "Failed To Apply For Task. Please Try Again.",
+              variant: "destructive",
+            });
+            reject(error);
+          },
+        },
+      );
+    });
+  };
 
   const getDialogHandler = () => {
     switch (participantTaskStatus[0]?.status) {
@@ -107,10 +126,7 @@ return new Promise<void>((resolve, reject) => {
   };
 
   const getButtonContent = () => {
-  
     const currentStatus = localButtonState || participantTaskStatus[0]?.status;
-  
- 
 
     switch (currentStatus) {
       case "COMPLETED":
@@ -122,8 +138,8 @@ return new Promise<void>((resolve, reject) => {
 
       case "ACCEPTED":
         return (
-          <Button 
-            className="bg-[#297AD6]" 
+          <Button
+            className="bg-[#297AD6]"
             onClick={handleCompletedTask}
             disabled={completePending}
           >
@@ -145,8 +161,8 @@ return new Promise<void>((resolve, reject) => {
 
       default:
         return (
-          <Button 
-            className="bg-[#297AD6]" 
+          <Button
+            className="bg-[#297AD6]"
             onClick={handleApplyTask}
             disabled={participatePending}
           >
@@ -160,7 +176,6 @@ return new Promise<void>((resolve, reject) => {
         );
     }
   };
-  
 
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
@@ -190,14 +205,23 @@ return new Promise<void>((resolve, reject) => {
             setAlertDialog={setAlertDialog}
             textData="Connect your wallet first"
           />
-        ) : (!participatePending && isOpen &&
+        ) : (
+          !participatePending &&
+          isOpen &&
           getDialogContents(participantTaskStatus?.[0]?.status) && (
             <DialogButton
               isOpen={isOpen}
               setIsOpen={setIsOpen}
-              title={getDialogContents(participantTaskStatus?.status)?.title || ""}
-              subTitle={getDialogContents(participantTaskStatus?.status)?.subTitle || ""}
-              buttonName={getDialogContents(participantTaskStatus?.status)?.buttonName || ""}
+              title={
+                getDialogContents(participantTaskStatus?.status)?.title || ""
+              }
+              subTitle={
+                getDialogContents(participantTaskStatus?.status)?.subTitle || ""
+              }
+              buttonName={
+                getDialogContents(participantTaskStatus?.status)?.buttonName ||
+                ""
+              }
               handleApplyTaskLogic={handleApplyTaskLogic}
             />
           )
@@ -208,7 +232,7 @@ return new Promise<void>((resolve, reject) => {
         </div>
 
         <div className="flex w-full gap-4">
-          <TaskPortalParticipant taskId={ cuid} />
+          <TaskPortalParticipant taskId={cuid} />
         </div>
       </div>
     </main>
