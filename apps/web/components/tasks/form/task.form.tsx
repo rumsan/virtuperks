@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select";
 import { format } from "date-fns";
-import { CalendarIcon, Copy } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 
 import { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -97,10 +97,6 @@ export default function TaskBaseForm({
                         {...field}
                         value={field.value ?? ""}
                       />
-
-                      <div className="absolute right-2 flex items-center">
-                        <Copy size={20} strokeWidth={2.5} color="#334155" />
-                      </div>
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -120,10 +116,6 @@ export default function TaskBaseForm({
                         {...field}
                         value={field.value ?? ""}
                       />
-
-                      <div className="absolute right-2 flex items-center">
-                        <Copy size={20} strokeWidth={2.5} color="#334155" />
-                      </div>
                     </div>
                   </FormControl>
                   <FormMessage />
