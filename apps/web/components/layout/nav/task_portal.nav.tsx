@@ -12,7 +12,7 @@ import Link from "next/link";
 import { PropsWithChildren, useState } from "react";
 
 export default function TaskPortalNav({ children }: PropsWithChildren) {
-  const [activeNavBar, setActiveNavBar] = useState("dashboard");
+  const [activeNavBar, setActiveNavBar] = useState("task_portal");
 
   const handleNavClick = (nav: string) => {
     setActiveNavBar(nav);
@@ -38,13 +38,8 @@ export default function TaskPortalNav({ children }: PropsWithChildren) {
           </Link>
         </nav>
 
-     
-
         <div className="ml-auto flex items-center gap-4 h-full">
-
-
-
- <Link
+          <Link
             href="/task_portal"
             onClick={() => handleNavClick("task_portal")}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("task_portal")}`}

@@ -8,7 +8,6 @@ import {
 import { ConnectKitButton } from "connectkit";
 import {
   Briefcase,
-  Coins,
   Layers,
   LayoutDashboard,
   LayoutList,
@@ -19,13 +18,14 @@ import Link from "next/link";
 import { useState } from "react";
 
 export default function DesktopNav() {
-  const [activeNavBar, setActiveNavBar] = useState("dashboard");
+  const [activeNavBar, setActiveNavBar] = useState("task_portal");
 
   const handleNavClick = (nav: string) => {
     setActiveNavBar(nav);
   };
 
   const getNavItemClasses = (nav: string) => {
+    console.log(nav);
     return activeNavBar === nav
       ? "text-[#297AD6] border-b-2 border-[#297AD6]"
       : "text-[#1E293B] hover:text-[#1e293b]";
@@ -48,13 +48,13 @@ export default function DesktopNav() {
         <nav className="flex items-center gap-6 h-full">
           <Link
             href="/"
-            onClick={() => handleNavClick("dashboard")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("dashboard")}`}
+            onClick={() => handleNavClick("task_portal")}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("task_portal")}`}
           >
             <LayoutDashboard
               size={18}
               strokeWidth={2.65}
-              color={`${activeNavBar === "dashboard" ? "#297AD6" : "#334155"}`}
+              color={`${activeNavBar === "task_portal" ? "#297AD6" : "#334155"}`}
             />
             Dashboard
           </Link>
@@ -97,7 +97,7 @@ export default function DesktopNav() {
         </nav>
         <div className="ml-auto flex items-center gap-4 h-full">
           <Link
-            href="/task_portal"
+            href="/task_portal" // Changed href to "/task_portal"
             onClick={() => handleNavClick("task_portal")}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("task_portal")}`}
           >

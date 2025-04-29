@@ -18,7 +18,7 @@ import Link from "next/link";
 import { PropsWithChildren, useState } from "react";
 
 export default function TreasurerNav({ children }: PropsWithChildren) {
-  const [activeNavBar, setActiveNavBar] = useState("dashboard");
+  const [activeNavBar, setActiveNavBar] = useState("task_portal");
 
   const handleNavClick = (nav: string) => {
     setActiveNavBar(nav);

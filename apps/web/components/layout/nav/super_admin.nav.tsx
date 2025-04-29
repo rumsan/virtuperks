@@ -6,19 +6,13 @@ import {
   AvatarImage,
 } from "@workspace/ui/components/avatar";
 import { ConnectKitButton } from "connectkit";
-import {
-  Coins,
-  Layers,
-  LayoutDashboard,
-  LayoutList,
-  Wallet,
-} from "lucide-react";
+import { Layers, LayoutList, Wallet } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { PropsWithChildren, useState } from "react";
 
 export default function SuperAdminNav({ children }: PropsWithChildren) {
-  const [activeNavBar, setActiveNavBar] = useState("dashboard");
+  const [activeNavBar, setActiveNavBar] = useState("task_portal");
 
   const handleNavClick = (nav: string) => {
     setActiveNavBar(nav);
@@ -69,7 +63,7 @@ export default function SuperAdminNav({ children }: PropsWithChildren) {
             Treasurer
           </Link> */}
 
-             <Link
+          <Link
             href="/tasks"
             onClick={() => handleNavClick("tasks")}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("tasks")}`}
