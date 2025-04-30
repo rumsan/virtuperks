@@ -10,15 +10,18 @@ import { Coins, Layers, LayoutList, Wallet } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { PropsWithChildren, useState } from "react";
+import { NavItem } from "../../../type/nav.types";
 
 export default function EntityOwnerNav({ children }: PropsWithChildren) {
-  const [activeNavBar, setActiveNavBar] = useState("task_portal");
+  const [activeNavBar, setActiveNavBar] = useState<NavItem>(
+    NavItem.TASK_PORTAL,
+  );
 
-  const handleNavClick = (nav: string) => {
+  const handleNavClick = (nav: NavItem) => {
     setActiveNavBar(nav);
   };
 
-  const getNavItemClasses = (nav: string) => {
+  const getNavItemClasses = (nav: NavItem) => {
     return activeNavBar === nav
       ? "text-[#297AD6] border-b-2 border-[#297AD6]"
       : "text-[#1E293B] hover:text-[#1e293b]";
@@ -52,26 +55,18 @@ export default function EntityOwnerNav({ children }: PropsWithChildren) {
           </Link> */}
           <Link
             href="/departments"
-            onClick={() => handleNavClick("departments")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("departments")}`}
+            onClick={() => handleNavClick(NavItem.DEPARTMENTS)}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.DEPARTMENTS)}`}
           >
-            <Coins
-              size={18}
-              strokeWidth={2.65}
-              color={`${activeNavBar === "departments" ? "#297AD6" : "#334155"}`}
-            />
-            Departments
+            <Coins size={18} strokeWidth={2.65} />
+            Department
           </Link>
           <Link
             href="/tasks"
-            onClick={() => handleNavClick("tasks")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("tasks")}`}
+            onClick={() => handleNavClick(NavItem.TASKS)}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASKS)}`}
           >
-            <Layers
-              size={18}
-              strokeWidth={2.65}
-              color={`${activeNavBar === "tasks" ? "#297AD6" : "#334155"}`}
-            />
+            <Layers size={18} strokeWidth={2.65} />
             Task Management
           </Link>
           {/* <Link
@@ -91,27 +86,19 @@ export default function EntityOwnerNav({ children }: PropsWithChildren) {
         <div className="ml-auto flex items-center gap-4 h-full">
           <Link
             href="/task_portal"
-            onClick={() => handleNavClick("task_portal")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("task_portal")}`}
+            onClick={() => handleNavClick(NavItem.TASK_PORTAL)}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASK_PORTAL)}`}
           >
-            <LayoutList
-              size={18}
-              strokeWidth={2.65}
-              color={`${activeNavBar === "task_portal" ? "#297AD6" : "#334155"}`}
-            />
+            <LayoutList size={18} strokeWidth={2.65} />
             Tasks Portal
           </Link>
 
           <Link
             href="/task_portal/mine"
-            onClick={() => handleNavClick("my-tasks")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("my-tasks")}`}
+            onClick={() => handleNavClick(NavItem.MY_TASKS)}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.MY_TASKS)}`}
           >
-            <LayoutList
-              size={18}
-              strokeWidth={2.65}
-              color={`${activeNavBar === "my-tasks" ? "#297AD6" : "#334155"}`}
-            />
+            <LayoutList size={18} strokeWidth={2.65} />
             My Tasks
           </Link>
           <div className="flex items-center h-10 p-2 bg-[#F1F5F9] rounded-md p-2">
@@ -125,8 +112,6 @@ export default function EntityOwnerNav({ children }: PropsWithChildren) {
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         </div>
-
-        {/* )} */}
       </div>
       <div className="h-[calc(100dvh-60px)] overflow-auto">{children}</div>
     </header>
