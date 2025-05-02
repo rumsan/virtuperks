@@ -132,7 +132,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
       case "COMPLETED":
         return (
           <Button className="bg-[#03AB65]" disabled>
-            <span className="text-[#F8FAFC]">Task Completed</span>
+            <span className="text-[#F8FAFC]">Task Closed</span>
           </Button>
         );
 

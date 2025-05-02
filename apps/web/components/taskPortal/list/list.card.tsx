@@ -24,10 +24,9 @@ const TaskPortalCard = <TData,>({
     })
     .map((task) => (task as TaskCreated)?.taskDetail);
 
-
   const handleUrlClick = (e: React.MouseEvent, url: string) => {
     e.stopPropagation();
-    window.open(url, '_blank', 'noopener,noreferrer');
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -45,20 +44,18 @@ const TaskPortalCard = <TData,>({
               <div className="flex items-center gap-2">
                 <span>{task.taskName}</span>
                 <span className="w-20 h-6 flex items-center justify-center bg-green-50 rounded-full text-green-700 p-1 text-sm font-normal">
-                  {task?.isActive === true ? `active` : `expired`}
+                  {task?.isActive === true ? `active` : `closed`}
                 </span>
               </div>
-              <div 
-                className="flex items-center gap-2 cursor-pointer hover:text-blue-400"
-                
-              >
+              <div className="flex items-center gap-2 cursor-pointer hover:text-blue-400">
                 <span className="text-[#297AD6] text-sm font-normal">
                   {task?.detailsUrl}
                 </span>
-                <ExternalLink size={16} color="#297AD6" strokeWidth={2.75} 
-                onClick={(e) => handleUrlClick(e, task?.detailsUrl)}
-                
-                
+                <ExternalLink
+                  size={16}
+                  color="#297AD6"
+                  strokeWidth={2.75}
+                  onClick={(e) => handleUrlClick(e, task?.detailsUrl)}
                 />
               </div>
               <div className="flex items-center gap-1 text-sm">
