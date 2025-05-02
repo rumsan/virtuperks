@@ -1,7 +1,7 @@
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import { ListTable } from "@/components/common/list/list.table";
+import { useGetAllParticipantsByRole } from "@/hooks/subgraph/participant";
 import { PATHS } from "@/routes/paths";
-import { Participants } from "@/sampleData";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -40,8 +40,14 @@ const ParticipantList = ({ router }: ParticipantListProps) => {
 
   const columns = useColumns();
 
+  const role =
+    "0xcd121b0f12ad3ac664bfec4c6cdef2ec02345000d81f4e9e651075fc22d1b9b5";
+  const getAllParticipants = useGetAllParticipantsByRole(role);
+  const AllParticipants = getAllParticipants?.data?.data?.roleGranteds || [];
+
+  console.log(AllParticipants);
   const table = useReactTable({
-    data: Participants || [],
+    data: AllParticipants || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

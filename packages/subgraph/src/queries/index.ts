@@ -134,9 +134,6 @@ export const getEntityDetailById = `
   }
 `;
 
-
-
-
 export const GetParticipantTaskStatusWithVariables = `
   query GetParticipantTaskStatus($participant: Bytes!, $taskId: Bytes!) {
     participantTaskStatuses(where: { participant: $participant, taskId: $taskId }) {
@@ -203,7 +200,7 @@ export const GetTaskParticipantsWithStatus = `
   }
 `;
 
-export const  GetTaskApprovedAndCompleted= `
+export const GetTaskApprovedAndCompleted = `
   query GetTaskApprovedAndCompleted($taskId: Bytes!) {
     taskApproveds(where: { taskDetail: $taskId }) {
       id
@@ -312,6 +309,17 @@ export const GetAllTasksForParticipant = `
         _name
         
         }
+    }
+  }
+`;
+
+export const getAllParticipantsByRole = `
+  query FilterByRole($role: Bytes!) {
+    roleGranteds(where: { role: $role }) {
+      account
+      appId
+      id
+      role
     }
   }
 `;

@@ -38,13 +38,8 @@ export default function TaskPortalNav({ children }: PropsWithChildren) {
           </Link>
         </nav>
 
-     
-
         <div className="ml-auto flex items-center gap-4 h-full">
-
-
-
- <Link
+          <Link
             href="/task_portal"
             onClick={() => handleNavClick("task_portal")}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("task_portal")}`}
@@ -68,6 +63,7 @@ export default function TaskPortalNav({ children }: PropsWithChildren) {
             />
             My Tasks
           </Link>
+
           <div className="flex items-center h-10 p-2 bg-[#F1F5F9] rounded-md p-2">
             <span className="flex items-center gap-2 font-normal text-[#1E293B] text-sm middle-ellipsis">
               <Wallet size={18} strokeWidth={2.65} color="#334155" />

@@ -6,13 +6,7 @@ import {
   AvatarImage,
 } from "@workspace/ui/components/avatar";
 import { ConnectKitButton } from "connectkit";
-import {
-  Coins,
-  Layers,
-  LayoutDashboard,
-  LayoutList,
-  Wallet,
-} from "lucide-react";
+import { Coins, Layers, LayoutList, Wallet } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { PropsWithChildren, useState } from "react";
@@ -95,9 +89,7 @@ export default function EntityOwnerNav({ children }: PropsWithChildren) {
         </nav>
 
         <div className="ml-auto flex items-center gap-4 h-full">
-
-
-           <Link
+          <Link
             href="/task_portal"
             onClick={() => handleNavClick("task_portal")}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("task_portal")}`}
@@ -121,6 +113,18 @@ export default function EntityOwnerNav({ children }: PropsWithChildren) {
               color={`${activeNavBar === "my-tasks" ? "#297AD6" : "#334155"}`}
             />
             My Tasks
+          </Link>
+          <Link
+            href="/participants"
+            onClick={() => handleNavClick("participants")}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("participants")}`}
+          >
+            <LayoutList
+              size={18}
+              strokeWidth={2.65}
+              color={`${activeNavBar === "tasks" ? "#297AD6" : "#334155"}`}
+            />
+            Participant List
           </Link>
           <div className="flex items-center h-10 p-2 bg-[#F1F5F9] rounded-md p-2">
             <span className="flex items-center gap-2 font-normal text-[#1E293B] text-sm middle-ellipsis">

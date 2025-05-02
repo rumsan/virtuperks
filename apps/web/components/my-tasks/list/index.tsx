@@ -16,7 +16,7 @@ import {
 } from "@tanstack/react-table";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import React from "react";
-import { injected, useConnect } from "wagmi";
+import { useConnect } from "wagmi";
 import { useColumns } from "../details/details.column";
 import TaskPortalCard from "./list.card";
 
@@ -29,13 +29,13 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
- // const { address } = useAccount()
-  
-   const { address, isConnected } = useWallet()
-   const {connect}= useConnect()
+  // const { address } = useAccount()
+
+  const { address, isConnected } = useWallet();
+  const { connect } = useConnect();
 
   const getMyTaskList = useGetTaskListByParticipant(address as `0x${string}`);
- 
+
   const myTaskList = getMyTaskList?.data?.data?.participantTaskStatuses || [];
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -68,20 +68,18 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
     },
   });
 
-
-   if (!isConnected || !address) {
-     return (
-       <main className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
-         <h1 className="font-bold text-4xl mb-6 text-gray-800">My Tasks</h1>
-         <div className="bg-white p-8 rounded-xl shadow-lg text-center max-w-md w-full border border-gray-200">
-           <p className="mb-6 text-gray-600 text-lg">
-             Please connect your MetaMask wallet to view your tasks.
-           </p>
-      
-         </div>
-       </main>
-     );
-   }
+  if (!isConnected || !address) {
+    return (
+      <main className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
+        <h1 className="font-bold text-4xl mb-6 text-gray-800">My Tasks</h1>
+        <div className="bg-white p-8 rounded-xl shadow-lg text-center max-w-md w-full border border-gray-200">
+          <p className="mb-6 text-gray-600 text-lg">
+            Please connect your MetaMask wallet to view your tasks.
+          </p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full flex flex-col">

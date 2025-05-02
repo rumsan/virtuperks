@@ -8,7 +8,6 @@ import {
 import { ConnectKitButton } from "connectkit";
 import {
   Briefcase,
-  Coins,
   Layers,
   LayoutDashboard,
   LayoutList,
@@ -82,6 +81,7 @@ export default function DesktopNav() {
             />
             Task Management
           </Link>
+
           {/* <Link
             href="/treasurer"
             onClick={() => handleNavClick("treasurer")}
