@@ -18,7 +18,7 @@ const TokenCreateMain = ({ router }: TokenCreateMainProps) => {
   return (
     <main className="gap-2 p-4 sm:px-8 md:gap-8 w-full">
       <div
-        onClick={() => router.push(PATHS.TREASURER.TOKEN.HOME)}
+        onClick={() => router.push(PATHS.TREASURER.HOME)}
         className="flex items-center gap-2 cursor-pointer hover:text-gray-400 "
       >
         <ArrowLeft size={24} strokeWidth={2} />
