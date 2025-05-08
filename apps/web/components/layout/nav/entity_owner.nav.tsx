@@ -38,18 +38,18 @@ export default function EntityOwnerNav({ children }: PropsWithChildren) {
           </Link>
         </nav>
         <nav className="flex items-center gap-6 h-full">
-          {/* <Link
+          <Link
             href="/participants"
             onClick={() => handleNavClick("participants")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("dashboard")}`}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("participants")}`}
           >
-            <LayoutDashboard
+            <LayoutList
               size={18}
               strokeWidth={2.65}
-              color={`${activeNavBar === "dashboard" ? "#297AD6" : "#334155"}`}
+              color={`${activeNavBar === "tasks" ? "#297AD6" : "#334155"}`}
             />
-            Participants
-          </Link> */}
+            Participant List
+          </Link>
           <Link
             href="/departments"
             onClick={() => handleNavClick("departments")}
@@ -114,18 +114,7 @@ export default function EntityOwnerNav({ children }: PropsWithChildren) {
             />
             My Tasks
           </Link>
-          <Link
-            href="/participants"
-            onClick={() => handleNavClick("participants")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("participants")}`}
-          >
-            <LayoutList
-              size={18}
-              strokeWidth={2.65}
-              color={`${activeNavBar === "tasks" ? "#297AD6" : "#334155"}`}
-            />
-            Participant List
-          </Link>
+
           <div className="flex items-center h-10 p-2 bg-[#F1F5F9] rounded-md p-2">
             <span className="flex items-center gap-2 font-normal text-[#1E293B] text-sm middle-ellipsis">
               <Wallet size={18} strokeWidth={2.65} color="#334155" />

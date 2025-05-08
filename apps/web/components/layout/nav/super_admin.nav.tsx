@@ -38,18 +38,18 @@ export default function SuperAdminNav({ children }: PropsWithChildren) {
           </Link>
         </nav>
         <nav className="flex items-center gap-6 h-full">
-          {/* <Link
+          <Link
             href="/participants"
             onClick={() => handleNavClick("participants")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("dashboard")}`}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("participants")}`}
           >
-            <LayoutDashboard
+            <LayoutList
               size={18}
               strokeWidth={2.65}
-              color={`${activeNavBar === "dashboard" ? "#297AD6" : "#334155"}`}
+              color={`${activeNavBar === "tasks" ? "#297AD6" : "#334155"}`}
             />
-            Participants
-          </Link> */}
+            Participant List
+          </Link>
           {/* <Link
             href="/treasurer"
             onClick={() => handleNavClick("treasurer")}
