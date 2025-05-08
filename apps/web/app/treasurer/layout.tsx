@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react";
 
 const layout = ({ children }: PropsWithChildren) => {
-  return <div>{/* <TreasurerNav>{children}</TreasurerNav> */}</div>;
+  return <div>{children}</div>;
 };
 
 export default layout;
