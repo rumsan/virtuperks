@@ -49,8 +49,8 @@ export default function UnifiedNav({ children }: PropsWithChildren) {
         <nav className="flex items-center gap-6 h-full">
           <Link
             href="/participants"
-            onClick={() => handleNavClick(NavItem.PARTICIPANTS)}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.PARTICIPANTS)}`}
+            onClick={() => handleNavClick(NavItem.PARTICIPANTs)}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.PARTICIPANTs)}`}
           >
             <LayoutDashboard size={18} strokeWidth={2.65} />
             Participants
