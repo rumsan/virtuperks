@@ -15,7 +15,6 @@ import { useState } from "react";
 import ListCardDetails from "./list.card";
 import { DatePickerWithRange } from "./list.date";
 
-
 interface TaskListMainProps {
   router: AppRouterInstance;
 }
@@ -23,12 +22,10 @@ interface TaskListMainProps {
 export default function TaskListMain({ router }: TaskListMainProps) {
   const [tabStatus, setTabStatus] = useState("active");
   const getAllTask = useTaskList();
-  const taskList = getAllTask?.data?.data?.taskCreateds 
+  const taskList = getAllTask?.data?.data?.taskCreateds;
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
       <div className="space-y-4">
-     
-
         <div className="flex items-center">
           <div className="flex flex-col w-[80%] gap-1">
             <h1 className="font-bold text-xl">Task List</h1>
