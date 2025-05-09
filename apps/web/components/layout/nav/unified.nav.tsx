@@ -16,19 +16,22 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { PropsWithChildren, useState } from "react";
+import { NavItem } from "../../../type/nav.types";
 
 export default function UnifiedNav({ children }: PropsWithChildren) {
-  const [activeNavBar, setActiveNavBar] = useState("dashboard");
+  const [activeNavBar, setActiveNavBar] = useState<NavItem>(
+    NavItem.TASK_PORTAL,
+  );
 
-  const handleNavClick = (nav: string) => {
+  const handleNavClick = (nav: NavItem) => {
     setActiveNavBar(nav);
   };
 
-  const getNavItemClasses = (nav: string) =>
-    activeNavBar === nav
+  const getNavItemClasses = (nav: NavItem) => {
+    return activeNavBar === nav
       ? "text-[#297AD6] border-b-2 border-[#297AD6]"
       : "text-[#1E293B] hover:text-[#1e293b]";
-
+  };
   return (
     <header className="border-b bg-white">
       <div className="flex h-14 items-center px-4 gap-8 border-b-2 border-[#E2E8F0]">
@@ -46,8 +49,8 @@ export default function UnifiedNav({ children }: PropsWithChildren) {
         <nav className="flex items-center gap-6 h-full">
           <Link
             href="/participants"
-            onClick={() => handleNavClick("participants")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("participants")}`}
+            onClick={() => handleNavClick(NavItem.PARTICIPANTS)}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.PARTICIPANTS)}`}
           >
             <LayoutDashboard size={18} strokeWidth={2.65} />
             Participants
@@ -55,21 +58,17 @@ export default function UnifiedNav({ children }: PropsWithChildren) {
 
           <Link
             href="/departments"
-            onClick={() => handleNavClick("treasurer-dept")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("treasurer-dept")}`}
+            onClick={() => handleNavClick(NavItem.DEPARTMENTS)}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.DEPARTMENTS)}`}
           >
-            <Coins
-              size={18}
-              strokeWidth={2.65}
-              color={activeNavBar === "treasurer-dept" ? "#297AD6" : "#334155"}
-            />
+            <Coins size={18} strokeWidth={2.65} />
             Department
           </Link>
 
           <Link
             href="/tasks"
-            onClick={() => handleNavClick("task-mgmt")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("task-mgmt")}`}
+            onClick={() => handleNavClick(NavItem.TASKS)}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASKS)}`}
           >
             <Layers size={18} strokeWidth={2.65} />
             Task Management
@@ -79,8 +78,8 @@ export default function UnifiedNav({ children }: PropsWithChildren) {
         <div className="ml-auto flex items-center gap-4 h-full">
           <Link
             href="/task_portal"
-            onClick={() => handleNavClick("task_portal")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("task_portal")}`}
+            onClick={() => handleNavClick(NavItem.TASK_PORTAL)}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASK_PORTAL)}`}
           >
             <LayoutList size={18} strokeWidth={2.65} />
             Tasks Portal
@@ -88,8 +87,8 @@ export default function UnifiedNav({ children }: PropsWithChildren) {
 
           <Link
             href="/task_portal/mine"
-            onClick={() => handleNavClick("my-tasks")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("my-tasks")}`}
+            onClick={() => handleNavClick(NavItem.MY_TASKS)}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.MY_TASKS)}`}
           >
             <LayoutList size={18} strokeWidth={2.65} />
             My Tasks
