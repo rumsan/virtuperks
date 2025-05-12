@@ -1,20 +1,17 @@
-import { Client, fetchExchange } from '@urql/core';
+import {Client, fetchExchange} from '@urql/core';
 
 import {
   ApprovalList,
-
   CreatedAppList,
   EntityTaskManagerCreatedList,
+  getAllParticipantsByRole,
   GetAllTasksForParticipant,
   getEntityDetailById,
   GetParticipantTaskStatusWithVariables,
   GetTaskApprovedAndCompleted,
   GetTaskDetailsById,
   GetTaskParticipantsWithStatus,
-
   RoleGrantedList,
-
-
   TaskCreatedList,
   TransferList,
 } from '../queries';
@@ -58,7 +55,6 @@ export class SubgraphService {
     return {data, error};
   }
 
- 
   async getEntityManagerCreatedList() {
     const {data, error} = await this.subgraphQuery.query(
       EntityTaskManagerCreatedList,
@@ -67,50 +63,63 @@ export class SubgraphService {
     return {data, error};
   }
 
-  async getEntityDetailById(id:string) {
+  async getEntityDetailById(id: string) {
+    const {data, error} = await this.subgraphQuery.query(getEntityDetailById, {
+      id,
+    });
+    return {data, error};
+  }
+
+  async getParticipantTaskStatus(participant: string, taskId: string) {
     const {data, error} = await this.subgraphQuery.query(
-  getEntityDetailById,
-      {id},
+      GetParticipantTaskStatusWithVariables,
+      {participant, taskId},
     );
     return {data, error};
   }
 
-
- 
- 
-  
-  async getParticipantTaskStatus(participant: string, taskId: string) {
-    
-    const { data, error } = await this.subgraphQuery.query(
-      GetParticipantTaskStatusWithVariables,
-      { participant, taskId }
-    );
-    return { data, error };
-  }
-
   async getTaskParticipantsWithStatus(taskId: string) {
-    const { data, error } = await this.subgraphQuery.query(
+    const {data, error} = await this.subgraphQuery.query(
       GetTaskParticipantsWithStatus,
-      { taskId }
+      {taskId},
     );
-    return { data, error };
+    return {data, error};
   }
 
   async getTaskApprovedAndCompletedList(taskId: string) {
-    const { data, error } = await this.subgraphQuery.query(GetTaskApprovedAndCompleted, {taskId});
-    return { data, error };
+    const {data, error} = await this.subgraphQuery.query(
+      GetTaskApprovedAndCompleted,
+      {taskId},
+    );
+    return {data, error};
   }
 
- async getTaskDetails(taskId: string) {
-    const { data, error } = await this.subgraphQuery.query(GetTaskDetailsById, {taskId});
-    return { data, error };
- }
-  
+  async getTaskDetails(taskId: string) {
+    const {data, error} = await this.subgraphQuery.query(GetTaskDetailsById, {
+      taskId,
+    });
+    return {data, error};
+  }
+
+  async getAllParticipantsByRole(role: string) {
+    try {
+      const result = await this.subgraphQuery.query(getAllParticipantsByRole, {
+        role,
+      });
+
+      const {data, error} = result;
+      return {data, error};
+    } catch (error) {
+      console.error('Error fetching participants by role:', error);
+      return {data: null, error};
+    }
+  }
+
   async getAllTaskByParticipant(participant: string) {
-    const { data, error } = await this.subgraphQuery.query(
+    const {data, error} = await this.subgraphQuery.query(
       GetAllTasksForParticipant,
-      { participant }
+      {participant},
     );
-    return { data, error };
+    return {data, error};
   }
 }

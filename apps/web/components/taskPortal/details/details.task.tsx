@@ -8,13 +8,10 @@ type TaskPortalDetailsProps = {
 };
 
 const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
-  const handleUrlClick = (e: React.MouseEvent<HTMLDivElement>, url: string) => {
-    e.preventDefault();
-    if (url) {
-      window.open(url, "_blank", "noopener,noreferrer");
-    }
+  const handleUrlClick = (e: React.MouseEvent, url: string) => {
+    e.stopPropagation();
+    window.open(url, "_blank", "noopener,noreferrer");
   };
-
   return (
     <>
       <Card className="w-[80%] h-full p-4">
@@ -25,22 +22,19 @@ const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
               {taskData?.taskDetail?.isActive === true ? `active` : `closed`}
             </span>
           </div>
-          <div
-            className="flex items-center gap-2 cursor-pointer hover:text-blue-400"
-            onClick={(e) => handleUrlClick(e, taskData?.taskDetail?.detailsUrl)}
-            role="link"
-            tabIndex={0}
-          >
-            <span className="text-[#297AD6] text-sm font-normal">
-              View Github repository
-            </span>
-            <ExternalLink size={16} color="#297AD6" strokeWidth={2.75} />
-          </div>
 
-          <div className="w-full overflow-hidden text-[#334155] text-sm">
-            <p className="line-clamp-1 font-normal">
+          <div className="flex items-center gap-2 cursor-pointer hover:text-blue-400">
+            <p className="line-clamp-1 font-normal text-[#297AD6] text-sm">
               {taskData?.taskDetail?.detailsUrl}
             </p>
+            <ExternalLink
+              size={16}
+              color="#297AD6"
+              strokeWidth={2.75}
+              onClick={(e) =>
+                handleUrlClick(e, taskData?.taskDetail?.detailsUrl)
+              }
+            />
           </div>
         </CardTitle>
 

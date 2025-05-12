@@ -1,28 +1,39 @@
 import { ColumnDef } from "@tanstack/react-table";
 
-export function useColumns<T>(): ColumnDef<T>[] {
+type Participant = {
+  account: string;
+  role: string;
+};
+
+export function useColumns(): ColumnDef<Participant>[] {
   return [
     {
-      accessorKey: "name",
+      accessorKey: "account",
       header: () => (
-        <div className="text-left text-gray-600 font-bold">Name</div>
-      ),
-
-      cell: () => {
-        return <p>Ram Thapa Magar</p>;
-      },
-    },
-    {
-      accessorKey: "walletAddress",
-      header: () => (
-        <div className="text-center text-gray-600 font-bold">
+        <div className="text-left text-xs font-semibold uppercase text-gray-500 tracking-wider">
           Wallet Address
         </div>
       ),
-
-      cell: () => {
-        return <p className="text-center">0x0ej394nf94jf04mo4</p>;
-      },
+      cell: ({ row }) => (
+        <div className="mb-1">
+          <p className="text-sm font-mono text-gray-800 break-all">
+            {row.original.account}
+          </p>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "role",
+      header: () => (
+        <div className="text-left text-xs font-semibold uppercase text-gray-500 tracking-wider">
+          Role
+        </div>
+      ),
+      cell: () => (
+        <div className="mt-1">
+          <p className="text-sm font-mono text-gray-700">{"Participant"}</p>
+        </div>
+      ),
     },
   ];
 }
