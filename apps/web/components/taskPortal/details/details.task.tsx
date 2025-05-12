@@ -8,7 +8,10 @@ type TaskPortalDetailsProps = {
 };
 
 const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
-  const handleUrlClick = (e: React.MouseEvent<HTMLDivElement>, url: string) => {
+  const handleUrlClick = (
+    e: React.MouseEvent<SVGElement | HTMLDivElement, MouseEvent>,
+    url: string,
+  ) => {
     e.preventDefault();
     if (url) {
       window.open(url, "_blank", "noopener,noreferrer");
