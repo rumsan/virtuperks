@@ -127,12 +127,14 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
   const getButtonContent = () => {
     const currentStatus = localButtonState || participantTaskStatus[0]?.status;
+    console.log("INdexed : ", participantTaskStatus[0]);
+    console.log("Current Status: ", currentStatus);
 
     switch (currentStatus) {
       case "COMPLETED":
         return (
           <Button className="bg-[#03AB65]" disabled>
-            <span className="text-[#F8FAFC]">Task Closed</span>
+            <span className="text-[#F8FAFC]">Task Completed</span>
           </Button>
         );
 
