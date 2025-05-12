@@ -39,6 +39,7 @@ export default function UnifiedNav({ children }: PropsWithChildren) {
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/bg/rumsan-logo.png"
+              onClick={() => handleNavClick(NavItem.TASK_PORTAL)}
               width={50}
               height={50}
               alt="Logo"

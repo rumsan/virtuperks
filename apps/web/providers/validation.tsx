@@ -56,7 +56,6 @@ const Validation = ({ children }: ValidationProps) => {
       setCurrentRole("PARTICIPANT");
     }
   }, [isConnected, hasEntityOwnerRole, hasTreasurerRole]);
-  console.log("currentRole", currentRole);
 
   const renderNav = () => {
     switch (currentRole) {

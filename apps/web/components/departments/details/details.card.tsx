@@ -1,5 +1,6 @@
 import { useEntityDetailById } from "@/hooks/subgraph/querycall";
 import { PATHS } from "@/routes/paths";
+import hasRole from "@/utils/role";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -24,6 +25,11 @@ export default function DepartmentDetailsCard({
   const getEntity = useEntityDetailById(cuid.id);
   const data = getEntity?.data?.data?.entityTaskManagerCreateds[0];
 
+  const roleCheck = hasRole({
+    role: process.env.NEXT_PUBLIC_TREASURER_ROLE || "",
+  });
+  const hasTreasurerRole = typeof roleCheck === "boolean" ? roleCheck : false;
+
   return (
     <>
       <div className="flex flex-col gap-1 my-2">
@@ -34,15 +40,17 @@ export default function DepartmentDetailsCard({
               Detailed view of the selected department
             </h3>
           </div>
-          <Button
-            className="min-w-[10rem] fw-[600] h-10 ml-auto"
-            variant="default"
-            type="submit"
-            onClick={() => router.push(PATHS.TREASURER.CREATE)}
-          >
-            <Plus size={22} strokeWidth={2.75} />
-            <span>Allocate Token</span>
-          </Button>
+          {hasTreasurerRole && (
+            <Button
+              className="min-w-[10rem] fw-[600] h-10 ml-auto"
+              variant="default"
+              type="button"
+              onClick={() => router.push(PATHS.TREASURER.CREATE)}
+            >
+              <Plus size={22} strokeWidth={2.75} />
+              <span>Allocate Token</span>
+            </Button>
+          )}
         </div>
       </div>
 
