@@ -6,13 +6,7 @@ import {
   AvatarImage,
 } from "@workspace/ui/components/avatar";
 import { ConnectKitButton } from "connectkit";
-import {
-  Coins,
-  Layers,
-  LayoutDashboard,
-  LayoutList,
-  Wallet,
-} from "lucide-react";
+import { Coins, Layers, LayoutList, Wallet } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { PropsWithChildren, useState } from "react";
@@ -53,7 +47,6 @@ export default function EntityOwnerNav({ children }: PropsWithChildren) {
             onClick={() => handleNavClick(NavItem.PARTICIPANTs)}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.PARTICIPANTs)}`}
           >
-            <LayoutDashboard size={18} strokeWidth={2.65} />
             Participants
           </Link>
           <Link
