@@ -8,13 +8,10 @@ type TaskPortalDetailsProps = {
 };
 
 const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
-  const handleUrlClick = (e: React.MouseEvent<HTMLDivElement>, url: string) => {
-    e.preventDefault();
-    if (url) {
-      window.open(url, "_blank", "noopener,noreferrer");
-    }
+  const handleUrlClick = (e: React.MouseEvent, url: string) => {
+    e.stopPropagation();
+    window.open(url, "_blank", "noopener,noreferrer");
   };
-
   return (
     <>
       <Card className="w-[80%] h-full p-4">
