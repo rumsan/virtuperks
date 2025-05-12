@@ -1,7 +1,7 @@
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import { ListTable } from "@/components/common/list/list.table";
+import { useGetAllParticipantsByRole } from "@/hooks/subgraph/participant";
 import { PATHS } from "@/routes/paths";
-import { Participants } from "@/sampleData";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -40,8 +40,13 @@ const ParticipantList = ({ router }: ParticipantListProps) => {
 
   const columns = useColumns();
 
+  const role = process.env.NEXT_PUBLIC_PARTICIPANT_ROLE || "";
+
+  const getAllParticipants = useGetAllParticipantsByRole(role);
+  const AllParticipants = getAllParticipants?.data?.data?.roleGranteds || [];
+
   const table = useReactTable({
-    data: Participants || [],
+    data: AllParticipants || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -59,11 +64,11 @@ const ParticipantList = ({ router }: ParticipantListProps) => {
     },
   });
 
-  const handleRowClick = (row: any) => {
-    if (row.original.cuid) {
-      router.push(PATHS.PARTICIPANT.DETAILS(row.original.cuid));
-    }
-  };
+  // const handleRowClick = (row: any) => {
+  //   if (row.original.cuid) {
+  //     router.push(PATHS.PARTICIPANT.DETAILS(row.original.cuid));
+  //   }
+  // };
 
   return (
     <main className="gap-2 p-4 sm:px-8 sm:py-10 md:gap-8 w-full">
@@ -83,11 +88,7 @@ const ParticipantList = ({ router }: ParticipantListProps) => {
 
       <Card className="p-4">
         <ListToolBar />
-        <ListTable
-          table={table}
-          columns={columns}
-          handleRowClick={handleRowClick}
-        />
+        <ListTable table={table} columns={columns} />
         <DataTablePagination
           table={table}
           setPagination={setPagination}
