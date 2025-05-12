@@ -127,8 +127,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
   const getButtonContent = () => {
     const currentStatus = localButtonState || participantTaskStatus[0]?.status;
-    console.log("INdexed : ", participantTaskStatus[0]);
-    console.log("Current Status: ", currentStatus);
 
     switch (currentStatus) {
       case "COMPLETED":
