@@ -20,7 +20,6 @@ const TreasurerListCard = ({ router }: TreasurerListCardProps) => {
       </Card>
       {Treasurers &&
         Treasurers.map((treasurer) => {
-          console.log(treasurer, "treasurer");
           return (
             <Card
               key={treasurer.id}

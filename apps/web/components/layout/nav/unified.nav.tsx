@@ -39,6 +39,7 @@ export default function UnifiedNav({ children }: PropsWithChildren) {
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/bg/rumsan-logo.png"
+              onClick={() => handleNavClick(NavItem.TASK_PORTAL)}
               width={50}
               height={50}
               alt="Logo"
@@ -72,6 +73,14 @@ export default function UnifiedNav({ children }: PropsWithChildren) {
           >
             <Layers size={18} strokeWidth={2.65} />
             Task Management
+          </Link>
+          <Link
+            href="/token"
+            onClick={() => handleNavClick(NavItem.TREASURER_TOKEN)}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TREASURER_TOKEN)}`}
+          >
+            <Layers size={18} strokeWidth={2.65} />
+            Token Management
           </Link>
         </nav>
 
