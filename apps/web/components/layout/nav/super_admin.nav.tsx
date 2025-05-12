@@ -46,25 +46,9 @@ export default function SuperAdminNav({ children }: PropsWithChildren) {
             onClick={() => handleNavClick(NavItem.PARTICIPANTs)}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.PARTICIPANTs)}`}
           >
-            <LayoutList
-              size={18}
-              strokeWidth={2.65}
-              color={`${activeNavBar === "tasks" ? "#297AD6" : "#334155"}`}
-            />
-            Participant List
+            <LayoutList size={18} strokeWidth={2.65} />
+            Participant
           </Link>
-          {/* <Link
-            href="/treasurer"
-            onClick={() => handleNavClick("treasurer")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("treasurer")}`}
-          >
-            <Coins
-              size={18}
-              strokeWidth={2.65}
-              color={`${activeNavBar === "treasurer" ? "#297AD6" : "#334155"}`}
-            />
-            Treasurer
-          </Link> */}
 
           <Link
             href="/tasks"

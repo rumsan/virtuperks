@@ -40,12 +40,11 @@ const ParticipantList = ({ router }: ParticipantListProps) => {
 
   const columns = useColumns();
 
-  const role =
-    "0xcd121b0f12ad3ac664bfec4c6cdef2ec02345000d81f4e9e651075fc22d1b9b5";
+  const role = process.env.NEXT_PUBLIC_PARTICIPANT_ROLE || "";
+
   const getAllParticipants = useGetAllParticipantsByRole(role);
   const AllParticipants = getAllParticipants?.data?.data?.roleGranteds || [];
 
-  console.log(AllParticipants);
   const table = useReactTable({
     data: AllParticipants || [],
     columns,
