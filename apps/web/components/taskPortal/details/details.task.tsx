@@ -19,7 +19,7 @@ const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
           <div className="flex items-center gap-2">
             <span>{taskData?.taskDetail?.taskName}</span>
             <span className="w-20 h-6 flex items-center justify-center bg-green-50 rounded-full text-green-700 p-1 text-sm font-normal">
-              {taskData?.taskDetail?.isActive === true ? `active` : `expired`}
+              {taskData?.taskDetail?.isActive === true ? `active` : `closed`}
             </span>
           </div>
 
