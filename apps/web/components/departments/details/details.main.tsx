@@ -43,8 +43,8 @@ export default function DepartmentDetails({
     pageIndex: 0,
     pageSize: 10,
   });
-  const getEntity = useEntityDetailById(cuid.id)
-  const EntityData = getEntity?.data?.data?.entityTaskManagerCreateds[0]
+  const getEntity = useEntityDetailById(cuid.id);
+  const EntityData = getEntity?.data?.data?.entityTaskManagerCreateds[0];
   const taskData = EntityData?.tasks || [];
 
   const columns = useColumns();
@@ -76,9 +76,8 @@ export default function DepartmentDetails({
         <ArrowLeft size={24} strokeWidth={2} />
         <span className="font-base text-gray-700">Back</span>
       </div>
-     
 
-      <DepartmentDetailsCard cuid={cuid} />
+      <DepartmentDetailsCard cuid={cuid} router={router} />
 
       <DepartmentDetailsTable
         table={table}
