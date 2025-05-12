@@ -64,11 +64,11 @@ const ParticipantList = ({ router }: ParticipantListProps) => {
     },
   });
 
-  const handleRowClick = (row: any) => {
-    if (row.original.cuid) {
-      router.push(PATHS.PARTICIPANT.DETAILS(row.original.cuid));
-    }
-  };
+  // const handleRowClick = (row: any) => {
+  //   if (row.original.cuid) {
+  //     router.push(PATHS.PARTICIPANT.DETAILS(row.original.cuid));
+  //   }
+  // };
 
   return (
     <main className="gap-2 p-4 sm:px-8 sm:py-10 md:gap-8 w-full">
@@ -88,11 +88,7 @@ const ParticipantList = ({ router }: ParticipantListProps) => {
 
       <Card className="p-4">
         <ListToolBar />
-        <ListTable
-          table={table}
-          columns={columns}
-          handleRowClick={handleRowClick}
-        />
+        <ListTable table={table} columns={columns} />
         <DataTablePagination
           table={table}
           setPagination={setPagination}
