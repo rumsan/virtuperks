@@ -2,41 +2,77 @@
 
 import EntityOwnerNav from "@/components/layout/nav/entity_owner.nav";
 import TaskPortalNav from "@/components/layout/nav/task_portal.nav";
+import TreasurerNav from "@/components/layout/nav/treasurer.nav";
+import UnifiedNav from "@/components/layout/nav/unified.nav";
 import { AccessManagerABI } from "@workspace/contracts/abis";
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAccount, useReadContract } from "wagmi";
 
+type Role = "ENTITY_OWNER" | "TREASURER" | "PARTICIPANT" | "NONE" | "BOTH";
+
 interface ValidationProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 const Validation = ({ children }: ValidationProps) => {
-  const [isEntityOwner, setIsEntityOwner] = useState(false);
+  const [currentRole, setCurrentRole] = useState<Role>("NONE");
   const { address, isConnected } = useAccount();
 
   const { data: hasEntityOwnerRole } = useReadContract({
-    address: (process.env.NEXT_PUBLIC_ACCESSMANAGER?.startsWith("0x") ? process.env.NEXT_PUBLIC_ACCESSMANAGER : "") as `0x${string}`,
+    address: process.env.NEXT_PUBLIC_ACCESSMANAGER as `0x${string}`,
     abi: AccessManagerABI,
     functionName: "hasRole",
-    args: [process.env.NEXT_PUBLIC_APP_ID, process.env.NEXT_PUBLIC_ENTITY_OWNER_ROLE, address],
-    
+    args: [
+      process.env.NEXT_PUBLIC_APP_ID,
+      process.env.NEXT_PUBLIC_ENTITY_OWNER_ROLE,
+      address,
+    ],
+  });
+
+  const { data: hasTreasurerRole } = useReadContract({
+    address: process.env.NEXT_PUBLIC_ACCESSMANAGER as `0x${string}`,
+    abi: AccessManagerABI,
+    functionName: "hasRole",
+    args: [
+      process.env.NEXT_PUBLIC_APP_ID,
+      process.env.NEXT_PUBLIC_MINTER_ROLE,
+      address,
+    ],
   });
 
   useEffect(() => {
-    setIsEntityOwner(!!hasEntityOwnerRole);
-  }, [hasEntityOwnerRole]);
+    if (!isConnected) {
+      setCurrentRole("NONE");
+      return;
+    }
 
- 
-  if (!isConnected) {
-    return <TaskPortalNav>{children}</TaskPortalNav>;
-  }
+    if (hasEntityOwnerRole && hasTreasurerRole) {
+      setCurrentRole("BOTH");
+    } else if (hasEntityOwnerRole) {
+      setCurrentRole("ENTITY_OWNER");
+    } else if (hasTreasurerRole) {
+      setCurrentRole("TREASURER");
+    } else {
+      setCurrentRole("PARTICIPANT");
+    }
+  }, [isConnected, hasEntityOwnerRole, hasTreasurerRole]);
 
- 
-  return isEntityOwner ? (
-    <EntityOwnerNav>{children}</EntityOwnerNav>
-  ) : (
-    <TaskPortalNav>{children}</TaskPortalNav>
-  );
+  const renderNav = () => {
+    switch (currentRole) {
+      case "BOTH":
+        return <UnifiedNav>{children}</UnifiedNav>;
+      case "ENTITY_OWNER":
+        return <EntityOwnerNav>{children}</EntityOwnerNav>;
+      case "TREASURER":
+        return <TreasurerNav>{children}</TreasurerNav>;
+      case "PARTICIPANT":
+      case "NONE":
+      default:
+        return <TaskPortalNav>{children}</TaskPortalNav>;
+    }
+  };
+
+  return renderNav();
 };
 
 export default Validation;
