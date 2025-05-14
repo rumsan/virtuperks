@@ -1,5 +1,4 @@
 import { useEntityDetailById } from "@/hooks/subgraph/querycall";
-import { PATHS } from "@/routes/paths";
 import hasRole from "@/utils/role";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -45,7 +44,7 @@ export default function DepartmentDetailsCard({
               className="min-w-[10rem] fw-[600] h-10 ml-auto"
               variant="default"
               type="button"
-              onClick={() => router.push(PATHS.TREASURER.CREATE)}
+              onClick={() => router.push(`/treasurer/token/${data.id}/create`)}
             >
               <Plus size={22} strokeWidth={2.75} />
               <span>Allocate Token</span>

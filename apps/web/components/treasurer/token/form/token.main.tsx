@@ -12,9 +12,11 @@ import TokenCreateForm from "./token.create";
 
 interface TokenCreateMainProps {
   router: AppRouterInstance;
+  id: { id: string };
 }
 
-const TokenCreateMain = ({ router }: TokenCreateMainProps) => {
+const TokenCreateMain = ({ router, id }: TokenCreateMainProps) => {
+  console.log("ID: ", id);
   return (
     <main className="gap-2 p-4 sm:px-8 md:gap-8 w-full">
       <div
@@ -50,7 +52,7 @@ const TokenCreateMain = ({ router }: TokenCreateMainProps) => {
         </Card>
       </div>
 
-      <TokenCreateForm />
+      <TokenCreateForm router={router} id={id} />
     </main>
   );
 };

@@ -1,3 +1,7 @@
+"use client";
+
+import { useTokenMint } from "@/hooks/subgraph/querycall";
+import { PATHS } from "@/routes/paths";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
@@ -10,21 +14,60 @@ import {
   FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { parseEther } from "viem";
+import { useAccount } from "wagmi";
 import { Token, tokenSchema } from "./schema";
 
 const defaultValues: Token = {
   amount: "",
 };
 
-const TokenCreateForm = () => {
+interface TokenAllocateMainProps {
+  router: AppRouterInstance;
+  id: { id: string };
+}
+
+const TokenCreateForm = ({ router, id }: TokenAllocateMainProps) => {
   const form = useForm({
     resolver: zodResolver(tokenSchema()),
-    defaultValues: defaultValues,
+    defaultValues,
   });
 
+  const { address } = useAccount(); // Getting the connected wallet address from wagmi
+
+  const { tokenMint, mintPending, mintSuccess, mintError } = useTokenMint();
+
+  useEffect(() => {
+    if (mintSuccess) {
+      router.push(PATHS.TREASURER.HOME);
+    }
+  }, [mintSuccess, router]);
+
+  // useEffect(() => {
+  //   if (mint && error) {
+  //     console.error("Token allocation failed:", error);
+  //   }
+  // }, [isError, error]);
+
   const handleSubmit = async (data: Token) => {
-    console.log(data, "data");
+    try {
+      const amount = parseEther(data.amount); // Convert to BigInt (Hex string)
+
+      if (!address) {
+        throw new Error("No connected wallet address");
+      }
+
+      await tokenMint({
+        address: id.id,
+        amount: amount.toString(),
+      });
+      console.log("Token minted successfully.");
+    } catch (err) {
+      console.error("Minting failed:", err);
+    }
   };
 
   return (
@@ -40,10 +83,10 @@ const TokenCreateForm = () => {
                     name="amount"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Token</FormLabel>
+                        <FormLabel>Token Amount</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Write token amount"
+                            placeholder="Enter token amount"
                             {...field}
                             value={field.value ?? ""}
                           />
@@ -70,8 +113,9 @@ const TokenCreateForm = () => {
                     type="submit"
                     variant="default"
                     className="w-[170px] flex justify-center items-center gap-2"
+                    disabled={mintPending}
                   >
-                    Create
+                    {mintPending ? "Minting..." : "Create"}
                   </Button>
                 </div>
               </div>

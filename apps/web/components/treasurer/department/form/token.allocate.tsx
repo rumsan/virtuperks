@@ -11,6 +11,7 @@ import {
   FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Token, tokenSchema } from "../../token/form/schema";
@@ -18,8 +19,12 @@ import { Token, tokenSchema } from "../../token/form/schema";
 const defaultValues: Token = {
   amount: "",
 };
+interface DepartmentListProps {
+  router: AppRouterInstance;
+}
 
-const DepartmentTokenAllocate = () => {
+const DepartmentTokenAllocate = ({ router }: DepartmentListProps) => {
+  console.log("Router: ", router);
   const [isOpen, setIsOpen] = useState(false);
 
   const form = useForm({

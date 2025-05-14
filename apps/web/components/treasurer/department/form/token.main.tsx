@@ -27,7 +27,7 @@ const TokenAllocateMain = ({ router }: TokenAllocateMainProps) => {
 
       <TokenAllocateCard />
 
-      <DepartmentTokenAllocate />
+      <DepartmentTokenAllocate router={router} />
     </main>
   );
 };
