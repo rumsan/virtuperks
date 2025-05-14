@@ -2,7 +2,11 @@ import { useEntityList } from "@/hooks/subgraph/querycall";
 import { PATHS } from "@/routes/paths";
 import hasRole from "@/utils/role";
 import { DepartmentDetails } from "@workspace/sdk/type";
-import { Card, CardDescription, CardTitle } from "@workspace/ui/components/card";
+import {
+  Card,
+  CardDescription,
+  CardTitle,
+} from "@workspace/ui/components/card";
 import { ArrowRight, Coins, Plus, User } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
@@ -13,10 +17,9 @@ interface DepartmentListCardProps {
 const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
   const getAllEntity = useEntityList();
   const entityList = getAllEntity?.data?.data?.entityTaskManagerCreateds;
-  const hasEntityOwnerRole = hasRole({ 
-    role: process.env.NEXT_PUBLIC_MINTER_ROLE || "" 
+  const hasEntityOwnerRole = hasRole({
+    role: process.env.NEXT_PUBLIC_MINTER_ROLE || "",
   });
-
 
   return (
     <div className="grid grid-cols-4 gap-4 w-full p-4">
@@ -57,7 +60,9 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
                 <div className="flex items-center justify-start">
                   <div className="flex items-center text-[#297AD6] gap-2">
                     <Coins size={20} strokeWidth={2.5} color="#297AD6" />
-                    <span className="text-2xl font-bold">{department.remainingBalance}</span>
+                    <span className="text-2xl font-bold">
+                      {department.remainingBalance}
+                    </span>
                   </div>
                   <div className="flex items-center ml-auto gap-2">
                     <span className="text-[#297AD6]">View details</span>

@@ -1,4 +1,6 @@
+import { useEntityList } from "@/hooks/subgraph/querycall";
 import { PATHS } from "@/routes/paths";
+import { DepartmentDetails } from "@workspace/sdk/type";
 import {
   Card,
   CardDescription,
@@ -6,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Coins, Folders, User } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import TokenCreateForm from "./token.create";
 
@@ -16,7 +18,15 @@ interface TokenCreateMainProps {
 }
 
 const TokenCreateMain = ({ router, id }: TokenCreateMainProps) => {
-  console.log("ID: ", id);
+  const getAllEntity = useEntityList();
+  const departmentList =
+    getAllEntity?.data?.data?.entityTaskManagerCreateds || [];
+
+  // Find the department by id
+  const department: DepartmentDetails | undefined = departmentList.find(
+    (dept: DepartmentDetails) => dept.id === id.id,
+  );
+
   return (
     <main className="gap-2 p-4 sm:px-8 md:gap-8 w-full">
       <div
@@ -33,13 +43,33 @@ const TokenCreateMain = ({ router, id }: TokenCreateMainProps) => {
         </h3>
       </div>
 
-      <div className="w-[400px] h-[150px] mt-4">
+      <div className="grid grid-cols-4 mt-4 gap-4 w-full">
         <Card className="font-normal text-base h-40 flex flex-col w-full h-full">
           <CardHeader className="flex-grow">
             <CardTitle className="flex items-center p-0 mb-4">
               <span className="text-[#0F172A] tracking-wide">
-                Available number of tokens
+                Department Owner
               </span>
+              <User className="ml-auto" />
+            </CardTitle>
+            <CardDescription className="flex items-center text-sm">
+              <div className="h-4"></div>
+            </CardDescription>
+          </CardHeader>
+          <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
+            {department?.entityTaskManager
+              ? `${department.entityTaskManager.slice(0, 10)} . . . ${department.entityTaskManager.slice(-6)}`
+              : ""}
+          </CardFooter>
+        </Card>
+
+        <Card className="font-normal text-base h-40 flex flex-col w-full h-full">
+          <CardHeader className="flex-grow">
+            <CardTitle className="flex items-center justify-between p-0 mb-4">
+              <span className="text-[#0F172A] tracking-wide">
+                Overall tokens allocated
+              </span>
+              <Coins />
             </CardTitle>
             <CardDescription className="flex items-center text-sm">
               <div className="h-4"></div>
@@ -47,7 +77,41 @@ const TokenCreateMain = ({ router, id }: TokenCreateMainProps) => {
           </CardHeader>
 
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            23,000
+            {department?.totalTokenBalance}
+          </CardFooter>
+        </Card>
+
+        <Card className="font-normal text-base h-40 flex flex-col w-full h-full">
+          <CardHeader className="flex-grow">
+            <CardTitle className="flex items-center justify-between p-0 mb-4">
+              <span className="text-[#0F172A] tracking-wide">
+                Available tokens
+              </span>
+              <Coins />
+            </CardTitle>
+            <CardDescription className="flex items-center text-sm">
+              <div className="h-4"></div>
+            </CardDescription>
+          </CardHeader>
+
+          <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
+            {department?.remainingBalance}
+          </CardFooter>
+        </Card>
+
+        <Card className="font-normal text-base h-40 flex flex-col w-full h-full">
+          <CardHeader className="flex-grow">
+            <CardTitle className="flex items-center justify-between p-0 mb-4">
+              <span className="text-[#0F172A] tracking-wide">Group</span>
+              <Folders />
+            </CardTitle>
+            <CardDescription className="flex items-center text-sm">
+              <div className="h-4"></div>
+            </CardDescription>
+          </CardHeader>
+
+          <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
+            {department?._name}
           </CardFooter>
         </Card>
       </div>

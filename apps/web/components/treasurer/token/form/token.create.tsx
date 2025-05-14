@@ -17,12 +17,12 @@ import { Input } from "@workspace/ui/components/input";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { parseEther } from "viem";
+import { parseUnits } from "viem";
 import { useAccount } from "wagmi";
 import { Token, tokenSchema } from "./schema";
 
 const defaultValues: Token = {
-  amount: "",
+  amount: 0,
 };
 
 interface TokenAllocateMainProps {
@@ -54,7 +54,8 @@ const TokenCreateForm = ({ router, id }: TokenAllocateMainProps) => {
 
   const handleSubmit = async (data: Token) => {
     try {
-      const amount = parseEther(data.amount); // Convert to BigInt (Hex string)
+      console.log("Data: ", data);
+      const amount = parseUnits(data.amount.toString(), 0);
 
       if (!address) {
         throw new Error("No connected wallet address");
@@ -86,9 +87,12 @@ const TokenCreateForm = ({ router, id }: TokenAllocateMainProps) => {
                         <FormLabel>Token Amount</FormLabel>
                         <FormControl>
                           <Input
+                            type="number"
                             placeholder="Enter token amount"
                             {...field}
-                            value={field.value ?? ""}
+                            onChange={(e) =>
+                              field.onChange(e.target.valueAsNumber)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
