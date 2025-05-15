@@ -1,7 +1,6 @@
 "use client";
 
 import { useTokenMint } from "@/hooks/subgraph/querycall";
-import { PATHS } from "@/routes/paths";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
@@ -41,9 +40,9 @@ const TokenCreateForm = ({ router, id }: TokenAllocateMainProps) => {
 
   useEffect(() => {
     if (mintSuccess) {
-      router.push(PATHS.TREASURER.HOME);
+      history.back(); // Go to the previous page in browser history
     }
-  }, [mintSuccess, router]);
+  }, [mintSuccess]);
 
   // useEffect(() => {
   //   if (mint && error) {
@@ -53,9 +52,7 @@ const TokenCreateForm = ({ router, id }: TokenAllocateMainProps) => {
 
   const handleSubmit = async (data: Token) => {
     try {
-     
-   
-      const amount = data.amount
+      const amount = data.amount;
 
       if (!address) {
         throw new Error("No connected wallet address");
@@ -65,7 +62,6 @@ const TokenCreateForm = ({ router, id }: TokenAllocateMainProps) => {
         address: id.id,
         amount: amount,
       });
-      
     } catch (err) {
       console.error("Minting failed:", err);
     }

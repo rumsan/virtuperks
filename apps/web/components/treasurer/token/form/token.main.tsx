@@ -1,5 +1,4 @@
 import { useEntityList } from "@/hooks/subgraph/querycall";
-import { PATHS } from "@/routes/paths";
 import { DepartmentDetails } from "@workspace/sdk/type";
 import {
   Card,
@@ -30,12 +29,23 @@ const TokenCreateMain = ({ router, id }: TokenCreateMainProps) => {
   return (
     <main className="gap-2 p-4 sm:px-8 md:gap-8 w-full">
       <div
+        className="w-[170px] flex justify-center items-center gap-2 cursor-pointer"
+        onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+          e.preventDefault();
+          history.back();
+        }}
+      >
+        <ArrowLeft size={24} strokeWidth={2} />
+        <span className="font-base text-gray-700">Back</span>
+      </div>
+
+      {/* <div
         onClick={() => router.push(PATHS.TREASURER.HOME)}
         className="flex items-center gap-2 cursor-pointer hover:text-gray-400 "
       >
         <ArrowLeft size={24} strokeWidth={2} />
         <span className="font-base text-gray-700">Back</span>
-      </div>
+      </div> */}
       <div className="flex flex-col gap-1 my-2">
         <h1 className="font-bold text-4xl">Create Token</h1>
         <h3 className="text-gray-500 font-normal text-sm">
@@ -57,8 +67,8 @@ const TokenCreateMain = ({ router, id }: TokenCreateMainProps) => {
             </CardDescription>
           </CardHeader>
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {department?.entityTaskManager
-              ? `${department.entityTaskManager.slice(0, 10)} . . . ${department.entityTaskManager.slice(-6)}`
+            {department?.entityTaskManager?.entityTaskManager
+              ? `${department.entityTaskManager.entityTaskManager.slice(0, 10)} . . . ${department.entityTaskManager.entityTaskManager.slice(-6)}`
               : ""}
           </CardFooter>
         </Card>
