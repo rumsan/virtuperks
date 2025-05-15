@@ -2,7 +2,6 @@ import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { EntityTaskManagementABI } from "@workspace/contracts/abis";
 
-import { parseEther } from "viem";
 import { useAccount, useReadContract } from "wagmi";
 import {
   useWriteEntityTaskManagerAcceptParticipant,
@@ -295,13 +294,13 @@ export const useTokenMint = () => {
       amount,
     }: {
       address: string;
-      amount: string;
+      amount: number;
     }) => {
-      const parsedAmount = parseEther(amount); // this returns a bigint
+      
 
       const result = await writeContractAsync({
         address: token,
-        args: [address as `0x${string}`, parsedAmount], // ✅ correct types and count
+        args: [address as `0x${string}`, BigInt(amount)], 
       });
 
       return result;

@@ -17,7 +17,6 @@ import { Input } from "@workspace/ui/components/input";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { parseUnits } from "viem";
 import { useAccount } from "wagmi";
 import { Token, tokenSchema } from "./schema";
 
@@ -54,8 +53,9 @@ const TokenCreateForm = ({ router, id }: TokenAllocateMainProps) => {
 
   const handleSubmit = async (data: Token) => {
     try {
-      console.log("Data: ", data);
-      const amount = parseUnits(data.amount.toString(), 0);
+     
+   
+      const amount = data.amount
 
       if (!address) {
         throw new Error("No connected wallet address");
@@ -63,9 +63,9 @@ const TokenCreateForm = ({ router, id }: TokenAllocateMainProps) => {
 
       await tokenMint({
         address: id.id,
-        amount: amount.toString(),
+        amount: amount,
       });
-      console.log("Token minted successfully.");
+      
     } catch (err) {
       console.error("Minting failed:", err);
     }

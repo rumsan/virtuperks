@@ -25,7 +25,7 @@ export default function DepartmentDetailsCard({
   const data = getEntity?.data?.data?.entityTaskManagerCreateds[0];
 
   const roleCheck = hasRole({
-    role: process.env.NEXT_PUBLIC_TREASURER_ROLE || "",
+    role: process.env.NEXT_PUBLIC_MINTER_ROLE || "",
   });
   const hasTreasurerRole = typeof roleCheck === "boolean" ? roleCheck : false;
 
