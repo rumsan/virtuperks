@@ -1,66 +1,78 @@
 "use client";
 
-import { CustomAlertDialog } from "@/components/common/ui/alert.dialog";
-import { PATHS } from "@/routes/paths";
+import EntityOwnerNav from "@/components/layout/nav/entity_owner.nav";
+import TaskPortalNav from "@/components/layout/nav/task_portal.nav";
+import TreasurerNav from "@/components/layout/nav/treasurer.nav";
+import UnifiedNav from "@/components/layout/nav/unified.nav";
 import { AccessManagerABI } from "@workspace/contracts/abis";
-import { useRouter } from "next/navigation";
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAccount, useReadContract } from "wagmi";
 
+type Role = "ENTITY_OWNER" | "TREASURER" | "PARTICIPANT" | "NONE" | "BOTH";
+
 interface ValidationProps {
-  children: ReactNode;
-  role: string;
+  children: React.ReactNode;
 }
 
-const Validation = ({ children, role }: ValidationProps) => {
-  const [alertDialog, setAlertDialog] = useState(false);
-  const [isValidating, setIsValidating] = useState(true);
-  const router = useRouter();
-  const { address } = useAccount();
+const Validation = ({ children }: ValidationProps) => {
+  const [currentRole, setCurrentRole] = useState<Role>("NONE");
+  const { address, isConnected } = useAccount();
 
-  const { data, isLoading } = useReadContract({
-    address: (process.env.NEXT_PUBLIC_ACCESSMANAGER?.startsWith("0x") ? process.env.NEXT_PUBLIC_ACCESSMANAGER : "") as `0x${string}`,
+  const { data: hasEntityOwnerRole } = useReadContract({
+    address: process.env.NEXT_PUBLIC_ACCESSMANAGER as `0x${string}`,
     abi: AccessManagerABI,
     functionName: "hasRole",
-    args: [process.env.NEXT_PUBLIC_APP_ID, role, address],
+    args: [
+      process.env.NEXT_PUBLIC_APP_ID,
+      process.env.NEXT_PUBLIC_ENTITY_OWNER_ROLE,
+      address,
+    ],
+  });
+
+  const { data: hasTreasurerRole } = useReadContract({
+    address: process.env.NEXT_PUBLIC_ACCESSMANAGER as `0x${string}`,
+    abi: AccessManagerABI,
+    functionName: "hasRole",
+    args: [
+      process.env.NEXT_PUBLIC_APP_ID,
+      process.env.NEXT_PUBLIC_MINTER_ROLE,
+      address,
+    ],
   });
 
   useEffect(() => {
-    
-    if (!isLoading) {
-      setIsValidating(false);
-      if (data === false) { // Only show dialog if we explicitly get false
-        setAlertDialog(true);
-      }
+    if (!isConnected) {
+      setCurrentRole("NONE");
+      return;
     }
-  }, [data, isLoading]);
 
-  const handleDialogClose = (shouldClose: boolean) => {
-    setAlertDialog(false);
-    if (shouldClose) {
-      router.push(`${PATHS.DASHBOARD}`);
+    if (hasEntityOwnerRole && hasTreasurerRole) {
+      setCurrentRole("BOTH");
+    } else if (hasEntityOwnerRole) {
+      setCurrentRole("ENTITY_OWNER");
+    } else if (hasTreasurerRole) {
+      setCurrentRole("TREASURER");
+    } else {
+      setCurrentRole("PARTICIPANT");
+    }
+  }, [isConnected, hasEntityOwnerRole, hasTreasurerRole]);
+
+  const renderNav = () => {
+    switch (currentRole) {
+      case "BOTH":
+        return <UnifiedNav>{children}</UnifiedNav>;
+      case "ENTITY_OWNER":
+        return <EntityOwnerNav>{children}</EntityOwnerNav>;
+      case "TREASURER":
+        return <TreasurerNav>{children}</TreasurerNav>;
+      case "PARTICIPANT":
+      case "NONE":
+      default:
+        return <TaskPortalNav>{children}</TaskPortalNav>;
     }
   };
 
-  if (isValidating || isLoading) {
-    return null; // Show nothing while validating
-  }
-
-  return (
-    <div>
-      {data ? children : (
-        alertDialog && (
-          <CustomAlertDialog
-            alertDialog={alertDialog}
-            setAlertDialog={setAlertDialog}
-            textData="Access Denied"
-            buttonName="Ok"
-            onClose={handleDialogClose}
-          />
-        )
-      )}
-    </div>
-  );
+  return renderNav();
 };
 
 export default Validation;

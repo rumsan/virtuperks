@@ -1,9 +1,13 @@
 import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
-import { useApproveTaskMutation, useGetApprovedAndCompletedList } from "@/hooks/subgraph/querycall";
+import {
+  useApproveTaskMutation,
+  useGetApprovedAndCompletedList,
+} from "@/hooks/subgraph/querycall";
 import { useGetTaskDetailById } from "@/hooks/subgraph/taskDetail";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
+import { useToast } from "@workspace/ui/hooks/use-toast";
 import { ArrowLeft, CheckCircle, CircleX } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
@@ -16,27 +20,30 @@ type TaskMainProps = {
 };
 
 const TaskMain = ({ cuid, router }: TaskMainProps) => {
- 
-    const getTaskDetail = useGetTaskDetailById(cuid.id);
-       
-    const taskData = getTaskDetail?.data?.data?.taskCreateds[0]
-  
- 
-  const { completedData, approvedData } = useGetApprovedAndCompletedList(cuid.id);
+  const getTaskDetail = useGetTaskDetailById(cuid.id);
+
+  const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
+
+  const { toast } = useToast();
+  const { completedData, approvedData } = useGetApprovedAndCompletedList(
+    cuid.id,
+  );
   const [localStatus, setLocalStatus] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  const approveTask = useApproveTaskMutation()
- 
+  const approveTask = useApproveTaskMutation();
 
   const getApproveButtonState = () => {
     // If approved data exists, show approved state
-    if (approvedData && approvedData.length > 0 || localStatus === "VERIFIED") {
+    if (
+      (approvedData && approvedData.length > 0) ||
+      localStatus === "VERIFIED"
+    ) {
       return {
         className: "border border-[#03AB65] bg-[#03AB65]",
         text: "Verified",
         disabled: true,
-        onClick: undefined
+        onClick: undefined,
       };
     }
 
@@ -46,7 +53,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
         className: "border border-[#03AB65]",
         text: approveTask.isPending ? "Processing..." : "Approve",
         disabled: approveTask.isPending,
-        onClick: () => setIsOpen(true)
+        onClick: () => setIsOpen(true),
       };
     }
 
@@ -55,25 +62,29 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
       className: "border border-[#03AB65]",
       text: "Approve",
       disabled: true,
-      onClick: undefined
+      onClick: undefined,
     };
   };
 
   const handleDialogAction = async () => {
     try {
-     
-      
       await approveTask.mutateAsync({
         taskId: cuid.id,
-        entityId: taskData.entityTaskManager.entityTaskManager
-      })
+        entityId: taskData.entityTaskManager.entityTaskManager,
+      });
       setIsOpen(false);
       setLocalStatus("VERIFIED"); // Update local status immediately after successful approval
+      toast({
+        title: "Task Approved Successfully!.",
+        variant: "success",
+      });
     } catch (error) {
       console.error("Error approving task:", error);
-    } 
-      
-    
+      toast({
+        title: "Failed To Approve Task. Please Try Again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -94,19 +105,29 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
             </h3>
           </div>
           <div className="flex items-center ml-auto gap-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className={getApproveButtonState().className}
               onClick={getApproveButtonState().onClick}
               disabled={getApproveButtonState().disabled}
             >
-              <span className={approvedData && approvedData.length > 0 ? "text-white" : "text-[#03AB65]"}>
+              <span
+                className={
+                  approvedData && approvedData.length > 0
+                    ? "text-white"
+                    : "text-[#03AB65]"
+                }
+              >
                 {getApproveButtonState().text}
               </span>
-              <CheckCircle 
-                color={approvedData && approvedData.length > 0 ? "#ffffff" : "#03AB65"} 
-                strokeWidth={2.5} 
-                size={20} 
+              <CheckCircle
+                color={
+                  approvedData && approvedData.length > 0
+                    ? "#ffffff"
+                    : "#03AB65"
+                }
+                strokeWidth={2.5}
+                size={20}
               />
             </Button>
 
@@ -115,18 +136,15 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
               <CircleX color="#E44134" strokeWidth={2.5} size={20} />
             </Button>
             {!approveTask.isPending && isOpen && (
-              
-
-                  <DialogButton
-              isOpen={isOpen}
-              setIsOpen={setIsOpen}
-              title="Are you sure you want to approve this task?"
-              subTitle="This action cannot be undone"
-              buttonName="Approve"
-              handleApplyTaskLogic={handleDialogAction}
-            />
-)}
-        
+              <DialogButton
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+                title="Are you sure you want to approve this task?"
+                subTitle="This action cannot be undone"
+                buttonName="Approve"
+                handleApplyTaskLogic={handleDialogAction}
+              />
+            )}
           </div>
         </div>
 

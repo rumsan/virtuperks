@@ -7,8 +7,6 @@ import {Logger, ValidationPipe} from '@nestjs/common';
 import {NestFactory} from '@nestjs/core';
 import {NestFastifyApplication} from '@nestjs/platform-fastify';
 import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
-import {RsExceptionFilter} from '@rumsan/extensions/exceptions';
-import {ResponseTransformInterceptor} from '@rumsan/extensions/interceptors';
 import {WinstonModule} from 'nest-winston';
 import {AppModule} from './app/app.module';
 import {loggerInstance} from './helpers/logger/winston.logger';
@@ -30,8 +28,8 @@ async function bootstrap() {
       transformOptions: {enableImplicitConversion: true},
     }),
   );
-  app.useGlobalFilters(new RsExceptionFilter());
-  app.useGlobalInterceptors(new ResponseTransformInterceptor());
+  // app.useGlobalFilters(new RsExceptionFilter());
+  // app.useGlobalInterceptors(new ResponseTransformInterceptor());
   app.setGlobalPrefix(globalPrefix);
 
   const port = process.env.PORT || 3333;

@@ -1,3 +1,4 @@
+import { formatDate } from "@/utils/formatDate";
 import { TaskCreated } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { ExternalLink, Timer, Trophy, UserRoundCog, Users } from "lucide-react";
@@ -7,27 +8,33 @@ type TaskPortalDetailsProps = {
 };
 
 const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
+  const handleUrlClick = (e: React.MouseEvent, url: string) => {
+    e.stopPropagation();
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
   return (
     <>
       <Card className="w-[80%] h-full p-4">
         <CardTitle className="flex flex-col gap-1 w-full">
           <div className="flex items-center gap-2">
-            <span>Organize a blood donation campaign</span>
+            <span>{taskData?.taskDetail?.taskName}</span>
             <span className="w-20 h-6 flex items-center justify-center bg-green-50 rounded-full text-green-700 p-1 text-sm font-normal">
-              {taskData?.taskDetail?.isActive === true ? `active` : `expired`}
+              {taskData?.taskDetail?.isActive === true ? `active` : `closed`}
             </span>
-          </div>
-          <div className="flex items-center gap-2 cursor-pointer hover:text-blue-400">
-            <span className="text-[#297AD6] text-sm font-normal">
-              View Github repository
-            </span>
-            <ExternalLink size={16} color="#297AD6" strokeWidth={2.75} />
           </div>
 
-          <div className="w-full overflow-hidden">
-            <p className="text-[#334155] text-sm line-clamp-1 font-normal">
+          <div className="flex items-center gap-2 cursor-pointer hover:text-blue-400">
+            <p className="line-clamp-1 font-normal text-[#297AD6] text-sm">
               {taskData?.taskDetail?.detailsUrl}
             </p>
+            <ExternalLink
+              size={16}
+              color="#297AD6"
+              strokeWidth={2.75}
+              onClick={(e) =>
+                handleUrlClick(e, taskData?.taskDetail?.detailsUrl)
+              }
+            />
           </div>
         </CardTitle>
 
@@ -42,7 +49,7 @@ const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
           </span>
           <span className="flex items-center gap-2">
             <Timer color="#64748B" size={20} strokeWidth={2.5} /> Deadline:{" "}
-            {taskData?.taskDetail?.expiryDate}
+            {formatDate(taskData?.taskDetail?.expiryDate)}
           </span>
         </div>
       </Card>
