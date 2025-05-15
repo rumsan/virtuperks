@@ -11,7 +11,8 @@ interface IEntityTaskManager {
         UNACCEPTED,
         ACCEPTED,
         COMPLETED,
-        VERIFIED
+        VERIFIED,
+        NONE
     }
 
     struct Task {
@@ -19,7 +20,7 @@ interface IEntityTaskManager {
         string taskName;
         address rewardToken;
         uint256 rewardAmount;
-        address[] allowedWallets; //who can participate
+        address[] allowedWallets; // Empty array means task is open for all
         uint256 maxParticipants;
         uint256 expiryDate;
         address owner;
