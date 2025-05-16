@@ -1,6 +1,5 @@
 "use client";
 
-import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { Plus } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
@@ -16,7 +15,7 @@ export default function ListToolBar({ router }: ListToolBar) {
         className="min-w-[12rem] fw-[600] h-10"
         variant="default"
         type="submit"
-        onClick={() => router.push(PATHS.TREASURER.CREATE)}
+        // onClick={() => router.push(PATHS.TREASURER.CREATE(cuid))}
       >
         <Plus size={22} strokeWidth={2.75} />
         <span>Create Token</span>
