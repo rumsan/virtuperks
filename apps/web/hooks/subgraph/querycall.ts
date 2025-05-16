@@ -160,7 +160,6 @@ export const useApproveTaskMutation = () => {
       return result;
     },
     onSuccess: async (variable) => {
-      console.log(variable, "from appove function");
       // Invalidate and refetch
       await new Promise((resolve) => setTimeout(resolve, 9000));
 
@@ -296,11 +295,9 @@ export const useTokenMint = () => {
       address: string;
       amount: number;
     }) => {
-      
-
       const result = await writeContractAsync({
         address: token,
-        args: [address as `0x${string}`, BigInt(amount)], 
+        args: [address as `0x${string}`, BigInt(amount)],
       });
 
       return result;

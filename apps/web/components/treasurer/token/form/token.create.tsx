@@ -30,14 +30,10 @@ export default function TokenCreate({ router, id }: TokenCreateProps) {
   useEffect(() => {
     if (mintSuccess) {
       history.back();
-    }
-  }, [mintSuccess]);
-
-  useEffect(() => {
-    if (mintError) {
+    } else if (mintError) {
       console.error("Token minting failed:", mintError);
     }
-  }, [mintError]);
+  }, [mintSuccess, mintError]);
 
   const handleMintToken = async (data: Token) => {
     try {
