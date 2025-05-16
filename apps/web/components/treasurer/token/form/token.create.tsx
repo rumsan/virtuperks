@@ -16,8 +16,7 @@ import { Input } from "@workspace/ui/components/input";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useAccount } from "wagmi";
-import { Token, tokenSchema } from "./schema";
+import { Token, tokenSchema } from "../../department/form/schema";
 
 const defaultValues: Token = {
   amount: 0,
@@ -33,8 +32,6 @@ const TokenCreateForm = ({ router, id }: TokenAllocateMainProps) => {
     resolver: zodResolver(tokenSchema()),
     defaultValues,
   });
-
-  const { address } = useAccount(); // Getting the connected wallet address from wagmi
 
   const { tokenMint, mintPending, mintSuccess, mintError } = useTokenMint();
 
@@ -53,10 +50,6 @@ const TokenCreateForm = ({ router, id }: TokenAllocateMainProps) => {
   const handleSubmit = async (data: Token) => {
     try {
       const amount = data.amount;
-
-      if (!address) {
-        throw new Error("No connected wallet address");
-      }
 
       await tokenMint({
         address: id.id,

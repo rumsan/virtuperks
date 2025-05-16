@@ -1,4 +1,6 @@
-import { DialogButton } from "@/components/common/ui/dialog";
+"use client";
+
+import { useTokenMint } from "@/hooks/subgraph/querycall";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
@@ -12,33 +14,50 @@ import {
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Token, tokenSchema } from "../../token/form/schema";
+import { Token, tokenSchema } from "./schema";
 
 const defaultValues: Token = {
-  amount: "",
+  amount: 0,
 };
-interface DepartmentListProps {
+
+interface TokenAllocateMainProps {
   router: AppRouterInstance;
+  id: { id: string };
 }
 
-const DepartmentTokenAllocate = ({ router }: DepartmentListProps) => {
-  console.log("Router: ", router);
-  const [isOpen, setIsOpen] = useState(false);
-
+const TokenAllocateForm = ({ router, id }: TokenAllocateMainProps) => {
   const form = useForm({
     resolver: zodResolver(tokenSchema()),
-    defaultValues: defaultValues,
+    defaultValues,
   });
 
-  const handleSubmit = async (data: Token) => {
-    console.log(data, "data");
-  };
+  const { tokenMint, mintPending, mintSuccess, mintError } = useTokenMint();
 
-  const handleDialogButton = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setIsOpen(true);
+  useEffect(() => {
+    if (mintSuccess) {
+      history.back(); // Go to the previous page in browser history
+    }
+  }, [mintSuccess]);
+
+  // useEffect(() => {
+  //   if (mint && error) {
+  //     console.error("Token allocation failed:", error);
+  //   }
+  // }, [isError, error]);
+
+  const handleSubmit = async (data: Token) => {
+    try {
+      const amount = data.amount;
+
+      await tokenMint({
+        address: id.id,
+        amount: amount,
+      });
+    } catch (err) {
+      console.error("Minting failed:", err);
+    }
   };
 
   return (
@@ -54,14 +73,15 @@ const DepartmentTokenAllocate = ({ router }: DepartmentListProps) => {
                     name="amount"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-base">
-                          Token Amount
-                        </FormLabel>
+                        <FormLabel>Token Amount</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Write token amount"
+                            type="number"
+                            placeholder="Enter token amount"
                             {...field}
-                            value={field.value ?? ""}
+                            onChange={(e) =>
+                              field.onChange(e.target.valueAsNumber)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -86,22 +106,10 @@ const DepartmentTokenAllocate = ({ router }: DepartmentListProps) => {
                     type="submit"
                     variant="default"
                     className="w-[170px] flex justify-center items-center gap-2"
-                    onClick={(e) => handleDialogButton(e)}
+                    disabled={mintPending}
                   >
-                    Allocate
+                    {mintPending ? "Minting..." : "Create"}
                   </Button>
-
-                  {isOpen && (
-                    <DialogButton
-                      isOpen={isOpen}
-                      setIsOpen={setIsOpen}
-                      title={"Allocate Token"}
-                      subTitle={
-                        "Are you sure you want to confirm this token alloation?"
-                      }
-                      buttonName={"Confirm"}
-                    />
-                  )}
                 </div>
               </div>
             </form>
@@ -112,4 +120,4 @@ const DepartmentTokenAllocate = ({ router }: DepartmentListProps) => {
   );
 };
 
-export default DepartmentTokenAllocate;
+export default TokenAllocateForm;
