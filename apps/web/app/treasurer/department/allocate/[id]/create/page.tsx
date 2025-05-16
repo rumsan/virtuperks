@@ -1,6 +1,6 @@
 "use client";
 
-import TokenCreateMain from "@/components/treasurer/department/form/token.main";
+import TokenCreateMain from "@/components/treasurer/department/details/token.main";
 import dynamic from "next/dynamic";
 import { useParams, useRouter } from "next/navigation";
 

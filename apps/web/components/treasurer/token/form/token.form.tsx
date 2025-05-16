@@ -9,6 +9,7 @@ import {
   FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Token } from "./schema";
@@ -17,6 +18,8 @@ interface TokenBaseFormProps {
   form: UseFormReturn<Token>;
   saveForm: (data: Token) => void;
   children: React.ReactNode;
+  router: AppRouterInstance;
+  id: { id: string };
 }
 
 export default function TokenBaseForm({

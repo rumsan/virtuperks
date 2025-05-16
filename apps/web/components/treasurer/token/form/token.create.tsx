@@ -54,7 +54,12 @@ export default function TokenCreate({ router, id }: TokenCreateProps) {
     <div className="my-6">
       <Card className="rounded-lg w-full">
         <CardContent className="p-0">
-          <TokenBaseForm form={form} saveForm={handleMintToken}>
+          <TokenBaseForm
+            form={form}
+            saveForm={handleMintToken}
+            router={router}
+            id={id}
+          >
             <Button
               variant="outline"
               type="button"
