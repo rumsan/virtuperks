@@ -75,7 +75,7 @@ export default function UnifiedNav({ children }: PropsWithChildren) {
             Task Management
           </Link>
           <Link
-            href="/token"
+            href="/treasurer/token"
             onClick={() => handleNavClick(NavItem.TREASURER_TOKEN)}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TREASURER_TOKEN)}`}
           >
