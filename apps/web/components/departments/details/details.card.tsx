@@ -26,7 +26,7 @@ export default function DepartmentDetailsCard({
   const data = getEntity?.data?.data?.entityTaskManagerCreateds[0];
 
   const roleCheck = hasRole({
-    role: process.env.NEXT_PUBLIC_TREASURER_ROLE || "",
+    role: process.env.NEXT_PUBLIC_MINTER_ROLE || "",
   });
   const hasTreasurerRole = typeof roleCheck === "boolean" ? roleCheck : false;
 
@@ -45,7 +45,7 @@ export default function DepartmentDetailsCard({
               className="min-w-[10rem] fw-[600] h-10 ml-auto"
               variant="default"
               type="button"
-              onClick={() => router.push(PATHS.TREASURER.CREATE)}
+              onClick={() => router.push(PATHS.TREASURER.CREATE(data.id))}
             >
               <Plus size={22} strokeWidth={2.75} />
               <span>Allocate Token</span>
