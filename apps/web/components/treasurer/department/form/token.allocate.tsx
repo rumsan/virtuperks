@@ -37,15 +37,11 @@ const TokenAllocateForm = ({ router, id }: TokenAllocateMainProps) => {
 
   useEffect(() => {
     if (mintSuccess) {
-      history.back(); // Go to the previous page in browser history
+      history.back();
+    } else if (mintError) {
+      console.error("Token minting failed:", mintError);
     }
-  }, [mintSuccess]);
-
-  // useEffect(() => {
-  //   if (mint && error) {
-  //     console.error("Token allocation failed:", error);
-  //   }
-  // }, [isError, error]);
+  }, [mintSuccess, mintError]);
 
   const handleSubmit = async (data: Token) => {
     try {
