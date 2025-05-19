@@ -22,7 +22,11 @@ contract AppRegistry is IAppRegistry, Context, ERC165, ReentrancyGuard {
      * with an {AccessControlUnauthorizedAccount} error including the required role.
      */
     modifier onlyRoleAdmin(bytes32 appId, bytes32 role) {
-        _checkRoleAdmin(appId, role, _msgSender());
+        require(
+            isRoleAdmin(appId, role, _msgSender()) || isAppAdmin(appId, _msgSender()),
+            "AppRegistry: Not a role admin"
+        );
+        //_checkRoleAdmin(appId, role, _msgSender());
         _;
     }
 
@@ -390,11 +394,18 @@ contract AppRegistry is IAppRegistry, Context, ERC165, ReentrancyGuard {
      * @notice Retrieves the details of an application
      * @param appId The unique identifier for the application
      * @return name The name of the application
-     * @return isPrivate Whether the application is private or public
+     * @return isPrivateApp Whether the application is private or public
      */
     function getAppDetails(
         bytes32 appId
-    ) public view virtual override appExists(appId) returns (string memory name, bool isPrivate) {
+    )
+        public
+        view
+        virtual
+        override
+        appExists(appId)
+        returns (string memory name, bool isPrivateApp)
+    {
         return (_apps[appId].name, _apps[appId].isPrivate);
     }
 
