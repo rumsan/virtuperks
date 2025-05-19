@@ -1,5 +1,6 @@
 "use client";
 
+import { NavItem } from "@/type/nav.types";
 import {
   Avatar,
   AvatarFallback,
@@ -22,11 +23,10 @@ export default function UnifiedNav({ children }: PropsWithChildren) {
   const pathname = usePathname(); // ✅ Get current path
 
   // ✅ Active class based on route match
-  const getNavItemClasses = (path: string) => {
-    return pathname.startsWith(path)
+  const getNavItemClasses = (path: string) =>
+    pathname === path || pathname.startsWith(`${path}/`)
       ? "text-[#297AD6] border-b-2 border-[#297AD6]"
       : "text-[#1E293B] hover:text-[#1e293b]";
-  };
 
   return (
     <header className="border-b bg-white">
@@ -58,8 +58,8 @@ export default function UnifiedNav({ children }: PropsWithChildren) {
             Department
           </Link>
           <Link
-            href="/token"
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("/token")}`}
+            href="/treasurer/token"
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TREASURER_TOKEN)}`}
           >
             <Layers size={18} strokeWidth={2.65} />
             Token Management
