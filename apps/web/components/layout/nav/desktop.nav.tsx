@@ -8,20 +8,31 @@ import {
 import { ConnectKitButton } from "connectkit";
 import { Briefcase, Layers, LayoutList, Wallet } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { NavItem } from "../../../type/nav.types";
 
 export default function DesktopNav() {
-  const [activeNavBar, setActiveNavBar] = useState<NavItem>(
-    NavItem.TASK_PORTAL,
-  );
+  const pathname = usePathname();
 
-  const handleNavClick = (nav: NavItem) => {
-    setActiveNavBar(nav);
+  const navItemPaths: Record<NavItem, string[]> = {
+    [NavItem.PARTICIPANTs]: ["/participants"],
+    [NavItem.DEPARTMENTS]: [
+      "/departments",
+      "/treasurer/department/allocate", // Used for highlighting nested treasury routes
+    ],
+    [NavItem.TREASURER_TOKEN]: ["/treasurer/token"],
+    [NavItem.TASK_PORTAL]: ["/task_portal"],
+    [NavItem.MY_TASKS]: ["/task_portal/mine"],
+    [NavItem.TASKS]: ["/tasks"],
+    [NavItem.TOKEN]: [],
+    [NavItem.TREASURER_DEPARTMENT]: [],
   };
 
-  const getNavItemClasses = (nav: NavItem) => {
-    return activeNavBar === nav
+  const getNavItemClasses = (navItem: NavItem) => {
+    const paths = navItemPaths[navItem];
+    return paths.some(
+      (path) => pathname === path || pathname.startsWith(`${path}/`),
+    )
       ? "text-[#297AD6] border-b-2 border-[#297AD6]"
       : "text-[#1E293B] hover:text-[#1e293b]";
   };
@@ -31,16 +42,14 @@ export default function DesktopNav() {
       <div className="flex h-14 items-center px-4 gap-8">
         <nav className="flex items-center justify-center w-[50px] h-full">
           <Link
-            href="/departments"
-            onClick={() => handleNavClick(NavItem.DEPARTMENTS)}
+            href={navItemPaths[NavItem.DEPARTMENTS][0] ?? "/"}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.DEPARTMENTS)}`}
           >
             <Layers size={18} strokeWidth={2.65} />
             Department
           </Link>
           <Link
-            href="/tasks"
-            onClick={() => handleNavClick(NavItem.TASKS)}
+            href={navItemPaths[NavItem.TASKS][0] ?? "/"}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASKS)}`}
           >
             <Briefcase size={18} strokeWidth={2.65} />
@@ -50,8 +59,7 @@ export default function DesktopNav() {
 
         <div className="ml-auto flex items-center gap-4 h-full">
           <Link
-            href="/task_portal"
-            onClick={() => handleNavClick(NavItem.TASK_PORTAL)}
+            href={navItemPaths[NavItem.TASK_PORTAL][0] ?? "/"}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASK_PORTAL)}`}
           >
             <LayoutList size={18} strokeWidth={2.65} />

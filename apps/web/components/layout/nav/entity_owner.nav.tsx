@@ -9,20 +9,29 @@ import { ConnectKitButton } from "connectkit";
 import { Coins, Layers, LayoutList, Wallet } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { PropsWithChildren, useState } from "react";
+import { usePathname } from "next/navigation";
+import { PropsWithChildren } from "react";
 import { NavItem } from "../../../type/nav.types";
 
 export default function EntityOwnerNav({ children }: PropsWithChildren) {
-  const [activeNavBar, setActiveNavBar] = useState<NavItem>(
-    NavItem.TASK_PORTAL,
-  );
+  const pathname = usePathname();
 
-  const handleNavClick = (nav: NavItem) => {
-    setActiveNavBar(nav);
+  const navItemPaths: Record<NavItem, string[]> = {
+    [NavItem.PARTICIPANTs]: ["/participants"],
+    [NavItem.DEPARTMENTS]: ["/departments"],
+    [NavItem.TASKS]: ["/tasks"],
+    [NavItem.TASK_PORTAL]: ["/task_portal"],
+    [NavItem.MY_TASKS]: ["/task_portal/mine"],
+    [NavItem.TOKEN]: [],
+    [NavItem.TREASURER_TOKEN]: [],
+    [NavItem.TREASURER_DEPARTMENT]: [],
   };
 
-  const getNavItemClasses = (nav: NavItem) => {
-    return activeNavBar === nav
+  const getNavItemClasses = (navItem: NavItem) => {
+    const paths = navItemPaths[navItem];
+    return paths.some(
+      (path) => pathname === path || pathname.startsWith(`${path}/`),
+    )
       ? "text-[#297AD6] border-b-2 border-[#297AD6]"
       : "text-[#1E293B] hover:text-[#1e293b]";
   };
@@ -34,7 +43,6 @@ export default function EntityOwnerNav({ children }: PropsWithChildren) {
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/bg/rumsan-logo.png"
-              onClick={() => handleNavClick(NavItem.TASK_PORTAL)}
               width={50}
               height={50}
               alt="Logo"
@@ -43,46 +51,30 @@ export default function EntityOwnerNav({ children }: PropsWithChildren) {
         </nav>
         <nav className="flex items-center gap-6 h-full">
           <Link
-            href="/participants"
-            onClick={() => handleNavClick(NavItem.PARTICIPANTs)}
+            href={navItemPaths[NavItem.PARTICIPANTs][0] ?? "/"}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.PARTICIPANTs)}`}
           >
             Participants
           </Link>
           <Link
-            href="/departments"
-            onClick={() => handleNavClick(NavItem.DEPARTMENTS)}
+            href={navItemPaths[NavItem.DEPARTMENTS][0] ?? "/"}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.DEPARTMENTS)}`}
           >
             <Coins size={18} strokeWidth={2.65} />
             Department
           </Link>
           <Link
-            href="/tasks"
-            onClick={() => handleNavClick(NavItem.TASKS)}
+            href={navItemPaths[NavItem.TASKS][0] ?? "/"}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASKS)}`}
           >
             <Layers size={18} strokeWidth={2.65} />
             Task Management
           </Link>
-          {/* <Link
-            href="/history"
-            onClick={() => handleNavClick("history")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("departments")}`}
-          >
-            <Layers
-              size={18}
-              strokeWidth={2.65}
-              color={`${activeNavBar === "departments" ? "#297AD6" : "#334155"}`}
-            />
-            History
-          </Link> */}
         </nav>
 
         <div className="ml-auto flex items-center gap-4 h-full">
           <Link
-            href="/task_portal"
-            onClick={() => handleNavClick(NavItem.TASK_PORTAL)}
+            href={navItemPaths[NavItem.TASK_PORTAL][0] ?? "/"}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASK_PORTAL)}`}
           >
             <LayoutList size={18} strokeWidth={2.65} />
@@ -90,8 +82,7 @@ export default function EntityOwnerNav({ children }: PropsWithChildren) {
           </Link>
 
           <Link
-            href="/task_portal/mine"
-            onClick={() => handleNavClick(NavItem.MY_TASKS)}
+            href={navItemPaths[NavItem.MY_TASKS][0] ?? "/"}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.MY_TASKS)}`}
           >
             <LayoutList size={18} strokeWidth={2.65} />
