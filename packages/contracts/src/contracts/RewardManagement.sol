@@ -27,13 +27,11 @@ contract RewardManagement is IRewardManagement, Multicall, ReentrancyGuard {
 
     mapping(address => uint256) public totalAllocatedTokens;
 
-    constructor(bytes32 _appId, string memory _name, address _registry, address _owner) {
+    constructor(bytes32 _appId, string memory _name, address _registry) {
         appId = _appId;
         name = _name;
         app = IAppRegistry(_registry);
         OWNER = keccak256(abi.encodePacked(address(this)));
-        app.grantRole(appId, OWNER, _owner);
-        app.grantRoleAdmin(appId, PARTICIPANT, _owner);
     }
 
     modifier whenNotPaused() {
@@ -276,8 +274,6 @@ contract RewardManagement is IRewardManagement, Multicall, ReentrancyGuard {
     /// @notice Internal implementation for closing a task
     /// @param taskId The unique identifier of the task to close
     function _closeTask(bytes32 taskId) internal {
-        _isTaskOpen(taskId);
-
         // Remove from openTasks array
         uint256 openTasksLength = openTasks.length;
         for (uint256 i = 0; i < openTasksLength; i++) {

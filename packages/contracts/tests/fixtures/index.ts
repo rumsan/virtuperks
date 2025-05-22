@@ -1,2 +1,6 @@
-export * from './tokenFixture';
-export * from './taskManagementFixture';
+
+export * from './RewardTokenFixture';
+
+export * from './AppRegistryFixture';
+export * from './RewardManagementFixture';
+

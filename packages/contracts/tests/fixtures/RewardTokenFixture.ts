@@ -1,6 +1,6 @@
-import { ethers} from "hardhat";
+import { ethers } from "hardhat";
 interface Fixture {
-    accessManagerV2: any;
+    _appRegistry: any;
     rumsanForwarder: any;
     rewardToken: any;
     deployer: any;
@@ -9,16 +9,24 @@ interface Fixture {
 export const deployRahatTokenFixture = async function (): Promise<Fixture> {
     console.log("deploying fixtures");
     const [deployer, ...signers] = await ethers.getSigners();
-    const tokenAppId = ethers.id('TOKEN_APP');
+    const appId = ethers.id('TOKEN_APP');
+    const name = 'Rahat';
     const rumsanForwarder = await ethers.deployContract("ERC2771Forwarder", ['rumsanForwarder']);
-    const accessManagerV2 = await ethers.deployContract("AccessManagerV2", []);
+
+    const _appRegistry = await ethers.deployContract("AppRegistry", []);
+    
+ 
     const rewardToken = await ethers.deployContract("RewardToken",
-        [tokenAppId, "Rahat", "RTH", 0, accessManagerV2.target, rumsanForwarder.target]);
-    await accessManagerV2.connect(deployer).createApp(tokenAppId, deployer.address);
+        ["Rahat", "RTH", 0,appId, _appRegistry.target, rumsanForwarder.target]);
+  console.log(rewardToken,'rewardToken')
+    if (!deployer) {
+        throw new Error("Deployer is undefined");
+    }
+    await _appRegistry.connect(deployer).createApp(appId, name, deployer.address, false);
     console.log('fixtures deployed')
     return {
         rumsanForwarder,
-        accessManagerV2,
+        _appRegistry,
         rewardToken,
         deployer,
         signers

@@ -17,14 +17,14 @@
       "cache": false,
       "persistent": true
     },
-     "test": {
+    "test": {
       "cache": false,
       "dependsOn": ["^build"],
       "inputs": [
-        "packages/contracts/src/**/*.sol",
-        "packages/contracts/tests/**/*.ts"
+        "src/**/*.sol",
+        "tests/**/*.ts"
       ],
-      "outputs": ["packages/contracts/artifacts/**"]
+      "outputs": ["artifacts/**", "coverage/**"]
     }
   }
 }

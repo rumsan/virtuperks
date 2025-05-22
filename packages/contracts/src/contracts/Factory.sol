@@ -17,11 +17,11 @@ contract RewardManagementFactory {
     function createRewardManagement(
         bytes32 appId,
         string memory name,
-        address registry,
-        address owner
+        address registry
+     
     ) public {
         // Deploy a new instance of RewardManagement
-        RewardManagement newRewardManagement = new RewardManagement(appId, name, registry, owner);
+        RewardManagement newRewardManagement = new RewardManagement(appId, name, registry);
 
         // Track the deployed contract
         deployedContracts.push(address(newRewardManagement));
