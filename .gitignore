@@ -84,5 +84,10 @@ apps/subgraph/node_modules/
 apps/web/sampleData.ts
 wallet.ts
 
+#typechain
+packages/contracts/typechain-types/*
+packages/contracts/typechain-types/**/*
+
+
 tools/deploy/deployments/wallets.ts
 .qodo
