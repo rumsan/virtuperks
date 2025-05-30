@@ -8,9 +8,9 @@ import {
 } from "matchstick-as/assembly/index"
 import { Bytes, Address } from "@graphprotocol/graph-ts"
 import { AppCreated } from "../generated/schema"
-import { AppCreated as AppCreatedEvent } from "../generated/AccessManager/AccessManager"
-import { handleAppCreated } from "../src/access-manager"
-import { createAppCreatedEvent } from "./access-manager-utils"
+import { AppCreated as AppCreatedEvent } from "../generated/AppRegistry/AppRegistry"
+import { handleAppCreated } from "../src/app-registry"
+import { createAppCreatedEvent } from "./app-registry-utils"
 
 // Tests structure (matchstick-as >=0.5.0)
 // https://thegraph.com/docs/en/developer/matchstick/#tests-structure-0-5-0
@@ -18,10 +18,11 @@ import { createAppCreatedEvent } from "./access-manager-utils"
 describe("Describe entity assertions", () => {
   beforeAll(() => {
     let appId = Bytes.fromI32(1234567890)
-    let account = Address.fromString(
+    let admin = Address.fromString("0x0000000000000000000000000000000000000001")
+    let sender = Address.fromString(
       "0x0000000000000000000000000000000000000001"
     )
-    let newAppCreatedEvent = createAppCreatedEvent(appId, account)
+    let newAppCreatedEvent = createAppCreatedEvent(appId, admin, sender)
     handleAppCreated(newAppCreatedEvent)
   })
 
@@ -45,7 +46,13 @@ describe("Describe entity assertions", () => {
     assert.fieldEquals(
       "AppCreated",
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
-      "account",
+      "admin",
+      "0x0000000000000000000000000000000000000001"
+    )
+    assert.fieldEquals(
+      "AppCreated",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "sender",
       "0x0000000000000000000000000000000000000001"
     )
 

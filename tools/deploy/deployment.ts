@@ -2,7 +2,6 @@ import { randomBytes } from 'crypto';
 import * as dotenv from 'dotenv';
 import { Addressable, ethers, uuidV4 } from 'ethers';
 import { commonLib } from './_common';
-import { entityOwnerWallet, participantsWallet } from './deployments/wallets';
 dotenv.config();
 
 interface DeployedContract {
@@ -37,50 +36,50 @@ class SeedProject extends commonLib {
     };
     console.log('rumsan forwarder deployed', rumsanForwarder.contract.target);
  
-    const accessManagerV2 = await this.deployContract('AccessManagerV2', []);
+    const accessManagerV2 = await this.deployContract('AppRegistry', []);
     this.contracts['accessManagerV2'] = {
       address: accessManagerV2.contract.target as string,
       startBlock: accessManagerV2.blockNumber,
     };
-    console.log('acessManager deployed', accessManagerV2.contract.target);
-  
+    console.log('AppRegistry deployed', accessManagerV2.contract.target);
+    const name = 'Rumsan App';
     // Create app
-    await this.createApp(accessManagerV2.contract.target as string, appId, "0x127359CD56487f76307b186651ddbf684B9c2dFE");
+    await this.createApp(accessManagerV2.contract.target as string, appId,name, "0x127359CD56487f76307b186651ddbf684B9c2dFE", false);
 
     // Assign MINTER role
-    await this.assignRole(
-      accessManagerV2.contract.target as string,
-      appId,
-      'MINTER',
-         '0x127359CD56487f76307b186651ddbf684B9c2dFE',
+    // await this.assignRole(
+    //   accessManagerV2.contract.target as string,
+    //   appId,
+    //   'MINTER',
+    //      '0x127359CD56487f76307b186651ddbf684B9c2dFE',
 
-    );
+    // );
 
     // Assign ENTITY_OWNER role to all entity owners
-    for (const owner of entityOwnerWallet) {
-      await this.assignRole(
-        accessManagerV2.contract.target as string,
-        appId,
-        'ENTITY_OWNER',
-        owner.address
-      );
-    }
+    // for (const owner of entityOwnerWallet) {
+    //   await this.assignRole(
+    //     accessManagerV2.contract.target as string,
+    //     appId,
+    //     'ENTITY_OWNER',
+    //     owner.address
+    //   );
+    // }
 
     // Assign PARTICIPANT role to all participants
-    for (const participant of participantsWallet) {
-      await this.assignRole(
-        accessManagerV2.contract.target as string,
-        appId,
-        'PARTICIPANT',
-        participant.address
-      );
-    }
+    // for (const participant of participantsWallet) {
+    //   await this.assignRole(
+    //     accessManagerV2.contract.target as string,
+    //     appId,
+    //     'PARTICIPANT',
+    //     participant.address
+    //   );
+    // }
 
     const rewardToken = await this.deployContract('RewardToken', [
-      appId,
-      'Rahat',
+        'Rahat',
       'RTH',
-      0,
+        0,
+       appId,
       accessManagerV2.contract.target,
       rumsanForwarder.contract.target,
     ]);
@@ -95,34 +94,36 @@ class SeedProject extends commonLib {
   }
 
   public async deployEntityContract(
-    accessManagerContract: Addressable | string,
+  
     appId: string,
-    name:string
+    name: string,
+    accessManagerContract: Addressable | string,
   ) {
-    const entity = await this.deployContract('EntityTaskManager', [
-      accessManagerContract,
+    const entity = await this.deployContract('RewardManagement', [
+     
       appId,
       name,
+       accessManagerContract,
     ]);
     this.contracts['entity'] = {
       address: entity.contract.target as string,
       startBlock: entity.blockNumber,
     };
-    console.log('Entity Contract deployed', entity.contract.target);
+    console.log('RewardManagement Contract deployed', entity.contract.target);
     return {entity};
   }
 
    public async deployEntityContractFactory(
     
   ) {
-    const entityFactory = await this.deployContract('EntityTaskManagerFactory', [
+    const entityFactory = await this.deployContract('RewardManagementFactory', [
    
     ]);
     this.contracts['entityFactory'] = {
       address: entityFactory.contract.target as string,
       startBlock: entityFactory.blockNumber,
     };
-    console.log('EntityFactroy Contract deployed', entityFactory.contract.target);
+    console.log('RewardManagementFactory Contract deployed', entityFactory.contract.target);
     return {entityFactory};
   }
 }
@@ -135,9 +136,10 @@ async function main() {
    await seedProject.deployCommonContracts(RUMSAN_APP_ID);
   console.log('Common contracts deployed');
   await seedProject.deployEntityContract(
-    accessManagerV2.contract.target as string,
+    
     ethers.id('RUMSAN_APP'),
-    name
+    name,
+    accessManagerV2.contract.target as string,
   );
   await seedProject.deployEntityContractFactory();
 console.log('deploy factory contract')

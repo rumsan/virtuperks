@@ -1,12 +1,12 @@
 import { ethers } from "hardhat";
-import { AppRegistry } from "../../typechain-types";
+
 
 /**
  * Interface for the test fixture that defines all components needed for AppRegistry testing
  * @interface AppRegistryFixture
  */
 export interface AppRegistryFixture {
-  appRegistry: AppRegistry;
+  appRegistry: any;
   deployer: any;    // Account that deploys contracts
   admin1: any;      // Primary admin account
   admin2: any;      // Secondary admin account
