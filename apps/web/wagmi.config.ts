@@ -3,7 +3,8 @@ import { react } from "@wagmi/cli/plugins";
 import {
   AppRegistryABI,
   RewardManagementABI,
-  RewardTokenABI,
+  RewardManagementFactoryABI,
+  RewardTokenABI
 } from "@workspace/contracts/abis";
 
 import { Abi } from "viem";
@@ -22,6 +23,10 @@ export default defineConfig({
     {
       name: "Reward Token",
       abi: RewardTokenABI as Abi,
+    },
+     {
+      name: "RewardManagementFactory",
+      abi: RewardManagementFactoryABI as Abi,
     },
   ],
   plugins: [react()],

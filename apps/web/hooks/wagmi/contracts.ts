@@ -1231,6 +1231,59 @@ export const rewardManagementAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// RewardManagementFactory
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const rewardManagementFactoryAbi = [
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'rewardManagement',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: 'aclAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      {name: 'appId', internalType: 'bytes32', type: 'bytes32', indexed: false},
+      {name: 'name', internalType: 'string', type: 'string', indexed: false},
+    ],
+    name: 'RewardManagementCreated',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {name: 'appId', internalType: 'bytes32', type: 'bytes32'},
+      {name: 'name', internalType: 'string', type: 'string'},
+      {name: 'registry', internalType: 'address', type: 'address'},
+    ],
+    name: 'createRewardManagement',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{name: '', internalType: 'uint256', type: 'uint256'}],
+    name: 'deployedContracts',
+    outputs: [{name: '', internalType: 'address', type: 'address'}],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getDeployedContracts',
+    outputs: [{name: '', internalType: 'address[]', type: 'address[]'}],
+    stateMutability: 'view',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // React
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2455,4 +2508,73 @@ export const useWatchRewardManagementTokenTransferredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: rewardManagementAbi,
     eventName: 'TokenTransferred',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardManagementFactoryAbi}__
+ */
+export const useReadRewardManagementFactory =
+  /*#__PURE__*/ createUseReadContract({abi: rewardManagementFactoryAbi})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardManagementFactoryAbi}__ and `functionName` set to `"deployedContracts"`
+ */
+export const useReadRewardManagementFactoryDeployedContracts =
+  /*#__PURE__*/ createUseReadContract({
+    abi: rewardManagementFactoryAbi,
+    functionName: 'deployedContracts',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardManagementFactoryAbi}__ and `functionName` set to `"getDeployedContracts"`
+ */
+export const useReadRewardManagementFactoryGetDeployedContracts =
+  /*#__PURE__*/ createUseReadContract({
+    abi: rewardManagementFactoryAbi,
+    functionName: 'getDeployedContracts',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementFactoryAbi}__
+ */
+export const useWriteRewardManagementFactory =
+  /*#__PURE__*/ createUseWriteContract({abi: rewardManagementFactoryAbi})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementFactoryAbi}__ and `functionName` set to `"createRewardManagement"`
+ */
+export const useWriteRewardManagementFactoryCreateRewardManagement =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: rewardManagementFactoryAbi,
+    functionName: 'createRewardManagement',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardManagementFactoryAbi}__
+ */
+export const useSimulateRewardManagementFactory =
+  /*#__PURE__*/ createUseSimulateContract({abi: rewardManagementFactoryAbi})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardManagementFactoryAbi}__ and `functionName` set to `"createRewardManagement"`
+ */
+export const useSimulateRewardManagementFactoryCreateRewardManagement =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: rewardManagementFactoryAbi,
+    functionName: 'createRewardManagement',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementFactoryAbi}__
+ */
+export const useWatchRewardManagementFactoryEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({abi: rewardManagementFactoryAbi})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementFactoryAbi}__ and `eventName` set to `"RewardManagementCreated"`
+ */
+export const useWatchRewardManagementFactoryRewardManagementCreatedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: rewardManagementFactoryAbi,
+    eventName: 'RewardManagementCreated',
   })
