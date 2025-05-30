@@ -1,0 +1,27 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useWriteRewardManagementFactoryCreateRewardManagement } from "../wagmi/contracts";
+export const useDepartmentAdd = () => {
+  const queryClient = useQueryClient();
+  const { writeContractAsync } =
+    useWriteRewardManagementFactoryCreateRewardManagement();
+
+    const appId = process.env.NEXT_PUBLIC_APP_ID as `0x${string}` || "0x";
+    
+  const mutation = useMutation({
+    mutationFn: async ({ name }: { name: string }) => {
+      const result = await writeContractAsync({
+        address: process.env.NEXT_PUBLIC_FACTORY_ADDRES as `0x${string}`,
+          args: [appId, name, process.env.NEXT_PUBLIC_APPREGISTRY as `0x${string}`],
+      });
+      return result;
+    },
+    onSuccess: (result, variable) => {
+    
+    },
+  });
+  return {
+    departmentAdd: mutation.mutateAsync,
+    departmentPending: mutation.isPending,
+    departmentSuccess: mutation.isSuccess,
+  };
+};
