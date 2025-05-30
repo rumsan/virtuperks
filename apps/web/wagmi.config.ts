@@ -1,8 +1,8 @@
 import { Config, defineConfig } from "@wagmi/cli";
 import { react } from "@wagmi/cli/plugins";
 import {
-  AccessManagerABI,
-  EntityTaskManagementABI,
+  AppRegistryABI,
+  RewardManagementABI,
   RewardTokenABI,
 } from "@workspace/contracts/abis";
 
@@ -12,12 +12,12 @@ export default defineConfig({
   out: "hooks/wagmi/contracts.ts",
   contracts: [
     {
-      name: "Access Manager",
-      abi: AccessManagerABI as Abi,
+      name: "AppRegistry",
+      abi:  AppRegistryABI as Abi,
     },
     {
-      name: "EntityTaskManager",
-      abi: EntityTaskManagementABI as Abi,
+      name: "RewardManagement",
+      abi: RewardManagementABI as Abi,
     },
     {
       name: "Reward Token",
