@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.20;
 
 import { Context } from "@openzeppelin/contracts/utils/Context.sol";
 import { ERC165 } from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
@@ -50,7 +50,7 @@ contract AppRegistry is IAppRegistry, Context, ERC165, ReentrancyGuard {
     }
 
     /**
-     * @dev See {IERC165-supportsInterface}.
+     * @dev See {IERC165-supportsInterface}
      */
     function supportsInterface(
         bytes4 interfaceId

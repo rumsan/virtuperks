@@ -108,16 +108,16 @@ export class commonLib {
     console.log('completed writing to deployment file');
   }
 
-  public async createApp(accessManagerAddress:string,appId:string,address:string) {
+  public async createApp(accessManagerAddress:string,appId:string, name:string, address:string, _isPrivate:boolean = false) {
     const signer = this.getDeployerWallet();
-    const { abi } = await this.getContractArtifacts('AccessManagerV2');
+    const { abi } = await this.getContractArtifacts('AppRegistry');
     const accessManager = new ethers.Contract(
       accessManagerAddress,
       abi,
       signer,
     );
     if (accessManager.createApp) {
-      const tx = await accessManager.createApp(appId, address);
+      const tx = await accessManager.createApp(appId,name, address, _isPrivate);
       await tx.wait();
       
       console.log(`App "${appId}" created`);
@@ -137,7 +137,7 @@ export class commonLib {
     const signer = this.getDeployerWallet();
 
     
-    const { abi } = await this.getContractArtifacts('AccessManagerV2');
+    const { abi } = await this.getContractArtifacts('AppRegistry');
 
    
     const accessManager = new ethers.Contract(
