@@ -1,6 +1,6 @@
 "use client";
 
-import { useTaskList } from "@/hooks/subgraph/querycall";
+// import { useTaskList } from "@/hooks/subgraph/querycall";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -21,8 +21,8 @@ interface TaskListMainProps {
 
 export default function TaskListMain({ router }: TaskListMainProps) {
   const [tabStatus, setTabStatus] = useState("active");
-  const getAllTask = useTaskList();
-  const taskList = getAllTask?.data?.data?.taskCreateds;
+  // const getAllTask = useTaskList();
+  // const taskList = getAllTask?.data?.data?.taskCreateds;
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
       <div className="space-y-4">
@@ -75,18 +75,18 @@ export default function TaskListMain({ router }: TaskListMainProps) {
 
           <div className="w-full mt-5 mb-5">
             <TabsContent className="w-full" value="active">
-              <ListCardDetails
+              {/* <ListCardDetails
                 taskList={taskList}
                 router={router}
                 tabStatus={tabStatus}
-              />
+              /> */}
             </TabsContent>
             <TabsContent className="w-full" value="completed">
-              <ListCardDetails
+              {/* <ListCardDetails
                 taskList={taskList}
                 router={router}
                 tabStatus={tabStatus}
-              />
+              /> */}
             </TabsContent>
           </div>
         </Tabs>

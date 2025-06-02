@@ -1,4 +1,4 @@
-import { AccessManagerABI } from "@workspace/contracts/abis";
+import { AppRegistryABI } from "@workspace/contracts/abis";
 import { useAccount, useReadContract } from "wagmi";
 
 interface HasRoleProps {
@@ -10,8 +10,8 @@ export default function hasRole({ role }: HasRoleProps) {
   console.log(role,'role')
 
   const { data } = useReadContract({
-    address: (process.env.NEXT_PUBLIC_ACCESSMANAGER?.startsWith("0x") ? process.env.NEXT_PUBLIC_ACCESSMANAGER : "") as `0x${string}`,
-    abi: AccessManagerABI,
+    address: (process.env.NEXT_PUBLIC_APPREGISTRY?.startsWith("0x") ? process.env.NEXT_PUBLIC_ACCESSMANAGER : "") as `0x${string}`,
+    abi: AppRegistryABI,
     functionName: "hasRole",
     args: [process.env.NEXT_PUBLIC_APP_ID, role, address],
   });

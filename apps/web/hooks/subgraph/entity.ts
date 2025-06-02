@@ -1,5 +1,23 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useGraphService } from "@/providers/subgraph-provider";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useWriteRewardManagementFactoryCreateRewardManagement } from "../wagmi/contracts";
+
+export const useGetAllEntity = (
+ 
+) => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["entityList"],
+    queryFn: async () => {
+      const taskDetail =
+        await queryService?.getDeployments()
+      return taskDetail;
+    },
+   
+  });
+};
+
 export const useDepartmentAdd = () => {
   const queryClient = useQueryClient();
   const { writeContractAsync } =
@@ -9,8 +27,9 @@ export const useDepartmentAdd = () => {
     
   const mutation = useMutation({
     mutationFn: async ({ name }: { name: string }) => {
+   
       const result = await writeContractAsync({
-        address: process.env.NEXT_PUBLIC_FACTORY_ADDRES as `0x${string}`,
+        address: process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}`,
           args: [appId, name, process.env.NEXT_PUBLIC_APPREGISTRY as `0x${string}`],
       });
       return result;

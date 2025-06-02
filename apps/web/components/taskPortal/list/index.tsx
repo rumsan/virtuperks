@@ -1,7 +1,7 @@
 "use client";
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
-import { useTaskList } from "@/hooks/subgraph/querycall";
+//import { useTaskList } from "@/hooks/subgraph/querycall";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -37,10 +37,10 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
 
   const columns = useColumns();
 
-  const { data, isLoading } = useTaskList();
+//  const { data, isLoading } = useTaskList();
 
   const table = useReactTable({
-    data: data?.data?.taskCreateds || [],
+    data: [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -58,28 +58,28 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
     },
   });
 
-  if (isLoading) {
-    return (
-      <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full flex flex-col">
-        <div className="space-y-4 flex-grow">
-          <div className="flex flex-col gap-1 my-3">
-            <Skeleton className="h-10 w-48" /> {/* Title skeleton */}
-            <Skeleton className="h-4 w-64" /> {/* Subtitle skeleton */}
-          </div>
+  // if (isLoading) {
+  //   return (
+  //     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full flex flex-col">
+  //       <div className="space-y-4 flex-grow">
+  //         <div className="flex flex-col gap-1 my-3">
+  //           <Skeleton className="h-10 w-48" /> {/* Title skeleton */}
+  //           <Skeleton className="h-4 w-64" /> {/* Subtitle skeleton */}
+  //         </div>
 
-          <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-32 w-full rounded-lg" /> // Task card skeleton
-            ))}
-          </div>
+  //         <div className="space-y-4">
+  //           {[...Array(3)].map((_, i) => (
+  //             <Skeleton key={i} className="h-32 w-full rounded-lg" /> // Task card skeleton
+  //           ))}
+  //         </div>
 
-          <div className="mt-5 mb-5">
-            <Skeleton className="h-10 w-full" /> {/* Pagination skeleton */}
-          </div>
-        </div>
-      </main>
-    );
-  }
+  //         <div className="mt-5 mb-5">
+  //           <Skeleton className="h-10 w-full" /> {/* Pagination skeleton */}
+  //         </div>
+  //       </div>
+  //     </main>
+  //   );
+  // }
 
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full flex flex-col">
