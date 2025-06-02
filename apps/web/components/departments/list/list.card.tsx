@@ -1,13 +1,11 @@
-import { useEntityList } from "@/hooks/subgraph/querycall";
+// import { useEntityList } from "@/hooks/subgraph/querycall";
+import { useGetAllEntity } from "@/hooks/subgraph/entity";
 import { PATHS } from "@/routes/paths";
 import hasRole from "@/utils/role";
-import { DepartmentDetails } from "@workspace/sdk/type";
 import {
-  Card,
-  CardDescription,
-  CardTitle,
+  Card
 } from "@workspace/ui/components/card";
-import { ArrowRight, Coins, Plus, User } from "lucide-react";
+import { Plus } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 interface DepartmentListCardProps {
@@ -15,15 +13,17 @@ interface DepartmentListCardProps {
 }
 
 const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
-  const getAllEntity = useEntityList();
-  const entityList = getAllEntity?.data?.data?.entityTaskManagerCreateds;
+  const getAllEntity = useGetAllEntity();
+ 
+  const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
+
   const hasEntityOwnerRole = hasRole({
-    role: process.env.NEXT_PUBLIC_MINTER_ROLE || "",
+    role: process.env.NEXT_PUBLIC_DEFAULT_ROLE|| "",
   });
 
   return (
     <div className="grid grid-cols-4 gap-4 w-full p-4">
-      {hasEntityOwnerRole && (
+      
         <Card
           className="w-full flex items-center justify-center text-blue-500 bg-blue-50 border-sm border-primary border-dashed cursor-pointer hover:shadow-lg hover:text-blue-400"
           onClick={() => router.push(PATHS.DEPARTMENT.ADD)}
@@ -31,8 +31,8 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
           <span className="text-center text-base">Add Department</span>
           <Plus size={24} />
         </Card>
-      )}
-      {entityList &&
+    
+      {/* {entityList &&
         entityList.map((department: DepartmentDetails) => {
           return (
             <Card
@@ -72,7 +72,7 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
               </div>
             </Card>
           );
-        })}
+        })} */}
     </div>
   );
 };

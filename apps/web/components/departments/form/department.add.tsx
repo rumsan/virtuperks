@@ -5,7 +5,7 @@ import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
 
 import { PATHS } from "@/routes/paths";
-import { EntityFactoryABI } from "@workspace/contracts/abis";
+// import { EntityFactoryABI } from "@workspace/contracts/abis";
 import { ArrowLeft } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useEffect } from "react";
@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form";
 import { useWriteContract } from "wagmi";
 import DepartmentBaseForm from "./department.form";
 import { Department, departmentSchema } from "./schema";
+import { useDepartmentAdd } from "@/hooks/subgraph/entity";
 
 const defaultValues: Department = {
   name: "",
@@ -49,16 +50,11 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
       console.error('Transaction failed:', error);
     }
   }, [isError, error]);
+  const {departmentAdd, departmentPending, departmentSuccess} = useDepartmentAdd()
 
   const createEntityButton = async (data: Department) => {
     try {
-      const appId = process.env.NEXT_PUBLIC_APP_ID;
-      await writeContractAsync({
-        address: (process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}`) || "0x",
-        abi: EntityFactoryABI,
-        functionName: "createEntityTaskManager",
-        args: [process.env.NEXT_PUBLIC_ACCESSMANAGER, appId, data.name],
-      });
+       departmentAdd({ name: data.name || "" });
     } catch (err) {
       console.error('Failed to create entity:', err);
     }

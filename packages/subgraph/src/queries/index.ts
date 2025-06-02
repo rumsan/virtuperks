@@ -1,325 +1,220 @@
-export const CreatedAppList = `query 
-  CreatedAppList
-  {
-    appCreateds(first:10){
-    appId
-    blockNumber
-    blockTimestamp
-    account
-  }
-  }`;
-
-export const RoleGrantedList = `
-  query RoleGrantedList {
-    roleGranteds(first: 10, orderBy: appId) {
-      id
-      appId
-      role
-      account
-      blockNumber
-      blockTimestamp
-      transactionHash
+// AppRegistry Queries
+export const AppRegistryQueries = {
+  getAppCreated: `
+    query GetAppCreated {
+      appCreateds(first: 10, orderBy: blockTimestamp, orderDirection: desc) {
+        id
+        appId
+        admin
+        sender
+        blockNumber
+        blockTimestamp
+        transactionHash
+      }
     }
-  }
-`;
+  `,
 
-export const ApprovalList = `
-  query ApprovalList {
-    approvals(first: 10, orderBy: owner) {
-      id
-      owner
-      spender
-      value
-      blockNumber
-      blockTimestamp
-      transactionHash
+  getRoleManagement: `
+    query GetRoleManagement {
+      roleGranteds(first: 10) {
+        id
+        appId
+        role
+        account
+        sender
+        blockNumber
+        blockTimestamp
+      }
+      roleRevokeds(first: 10) {
+        id
+        appId
+        role
+        account
+        sender
+        blockNumber
+      }
+      roleAdminGranteds(first: 10) {
+        id
+        appId
+        role
+        account
+        sender
+        blockNumber
+      }
+      roleAdminRevokeds(first: 10) {
+        id
+        appId
+        role
+        account
+        sender
+        blockNumber
+      }
     }
-  }
-`;
+  `,
+};
 
-export const TransferList = `
-  query TransferList {
-    transfers(first: 10, orderBy: from) {
-      id
-      from
-      to
-      value
-      blockNumber
-      blockTimestamp
-      transactionHash
+// RewardToken Queries
+export const TokenQueries = {
+  getTransfers: `
+    query GetTransfers {
+      transfers(first: 10, orderBy: blockTimestamp, orderDirection: desc) {
+        id
+        from
+        to
+        value
+        blockNumber
+        blockTimestamp
+        transactionHash
+      }
     }
-  }
-`;
+  `,
 
-export const TaskCreatedList = `
-  query TaskCreatedList {
-    taskCreateds(first: 100,orderBy: blockTimestamp, orderDirection: desc) {
-      id
-      internal_id
-      createdBy
-      blockNumber
-      blockTimestamp
-      transactionHash
-    
-    taskDetail {
-    taskName
-    allowedWallets
-    detailsUrl
-    expiryDate
-    id
-    isActive
-    maxParticipants
-    owner
-    rewardAmount
-    rewardToken
+  getApprovals: `
+    query GetApprovals {
+      approvals(first: 10, orderBy: blockTimestamp, orderDirection: desc) {
+        id
+        owner
+        spender
+        value
+        blockNumber
+        blockTimestamp
+        transactionHash
+      }
     }
-    entityTaskManager {
-    _appId
-    _name
-    id
-    }
-}
-  }
-`;
+  `,
+};
 
-export const EntityTaskManagerCreatedList = `
-  query EntityTaskManagerCreatedList{
-    entityTaskManagerCreateds(
-      first: 20, 
-      orderBy: blockTimestamp, 
-     
-    ) {
-      id
-      entityTaskManager
-      aclAddress
-      _appId
-      _name
-      blockNumber
-      blockTimestamp
-      transactionHash
-      totalTokenBalance
-      remainingBalance
-     
-    }
-  }
-`;
-
-export const getEntityDetailById = `
-  query getEntityDetailById($id: Bytes) {
-    entityTaskManagerCreateds(
-      where: { entityTaskManager: $id },first: 1
-    ) {
-      id
-      entityTaskManager
-      aclAddress
-      _appId
-      _name
-      blockNumber
-      blockTimestamp
-      transactionHash
-      totalTokenBalance
-      remainingBalance
-      tasks {
+// RewardManagement Queries
+export const RewardManagementQueries = {
+  getTaskCreation: `
+    query GetTaskCreation {
+      taskCreateds(first: 10, orderBy: blockTimestamp, orderDirection: desc) {
+        id
         internal_id
         createdBy
-        taskDetail {
-          detailsUrl
-          rewardAmount
-          expiryDate
-          owner
-          isActive
-        }
+        blockNumber
+        blockTimestamp
+        transactionHash
       }
-    }
-  }
-`;
-
-export const GetParticipantTaskStatusWithVariables = `
-  query GetParticipantTaskStatus($participant: Bytes!, $taskId: Bytes!) {
-    participantTaskStatuses(where: { participant: $participant, taskId: $taskId }) {
-      id
-      participant
-      taskId
-      status
-      lastUpdatedBlock
-      lastUpdatedTimestamp
-      taskDetail {
+      taskDetailsUpdateds(first: 10) {
         id
-        detailsUrl
-        taskName
-        rewardToken
-        rewardAmount
-        maxParticipants
-        expiryDate
-        owner
-        isActive
-        allowedWallets
-    
-    }
-      entityTaskManager {
-      id
-      entityTaskManager
-      _appId
-        _name
-      
+        internal_id
+        updatedBy
+        blockNumber
+        blockTimestamp
       }
-}
-  }
-`;
+    }
+  `,
 
-export const GetTaskParticipantsWithStatus = `
-  query GetTaskParticipantsWithStatus($taskId: Bytes!) {
-    participantTaskStatuses(where: { taskId: $taskId }) {
-      id
-      participant
-      taskId
-      status
-      lastUpdatedBlock
-      lastUpdatedTimestamp
-      taskDetail {
+  getParticipationStatus: `
+    query GetParticipationStatus($taskId: Bytes!) {
+      participantApplieds(where: { internal_id: $taskId }) {
         id
-        taskName
-        detailsUrl
-        rewardToken
-        rewardAmount
-        maxParticipants
-        expiryDate
-        owner
-        isActive
-        allowedWallets
-      
+        internal_id
+        participant
+        blockNumber
+        blockTimestamp
       }
-         entityTaskManager {
-         id
-        entityTaskManager
-        _appId
-        _name
-       
-}
+      taskAccepteds(where: { internal_id: $taskId }) {
+        id
+        internal_id
+        participant
+        blockNumber
+        blockTimestamp
+      }
+      taskCompleteds(where: { internal_id: $taskId }) {
+        id
+        internal_id
+        participant
+        blockNumber
+        blockTimestamp
+      }
+      taskVerifieds(where: { internal_id: $taskId }) {
+        id
+        internal_id
+        participant
+        verifier
+        blockNumber
+        blockTimestamp
+      }
     }
-  }
-`;
+  `,
 
-export const GetTaskApprovedAndCompleted = `
-  query GetTaskApprovedAndCompleted($taskId: Bytes!) {
-    taskApproveds(where: { taskDetail: $taskId }) {
-      id
-      internal_id
-      approver
-      blockNumber
-      blockTimestamp
-      transactionHash
-      status
-      taskDetail {
-        allowedWallets
-        taskName
-        detailsUrl
+  getWhitelistStatus: `
+    query GetWhitelistStatus($taskId: Bytes!) {
+      participantWhitelisteds(where: { taskId: $taskId }) {
         id
-        isActive
-        maxParticipants
-        owner
-        rewardAmount
-        rewardToken
-        task {
-          entityTaskManager {
-            entityTaskManager
-            _name
-          }
-        }
+        taskId
+        participant
+        by
+        blockNumber
+        blockTimestamp
+      }
+      participantRemovedFromWhitelists(where: { taskId: $taskId }) {
+        id
+        taskId
+        participant
+        by
+        blockNumber
+        blockTimestamp
       }
     }
-    taskCompleteds(where: { taskDetail: $taskId }) {
-      id
-      internal_id
-      participant
-      blockNumber
-      blockTimestamp
-      transactionHash
-      status
-      taskDetail {
-      taskName
-        allowedWallets
-        detailsUrl
-        id
-        isActive
-        maxParticipants
-        owner
-        rewardAmount
-      }
-    }
-  }
-`;
+  `,
 
-export const GetTaskDetailsById = `
-  query GetTaskDetailsById($taskId: Bytes!) {
-    taskCreateds(where: { internal_id: $taskId }, first: 1) {
-      id
-      internal_id
-      createdBy
-      blockNumber
-      blockTimestamp
-      transactionHash
-      taskDetail {
-      taskName
-        detailsUrl
-        rewardToken
-        rewardAmount
-        maxParticipants
-        expiryDate
-        owner
-        isActive
-        allowedWallets
-      }
-      entityTaskManager {
-        entityTaskManager
-      _appId
-        _name
-      
-      }
-    }
-  }
-`;
-
-export const GetAllTasksForParticipant = `
-  query GetAllTasksForParticipant($participant: Bytes!) {
-    participantTaskStatuses(where: { participant: $participant }) {
-      id
-      participant
-      taskId
-      status
-      lastUpdatedBlock
-      lastUpdatedTimestamp
-      taskDetail {
+  getDisbursements: `
+    query GetDisbursements($taskId: Bytes!) {
+      disbursementToTasks(where: { taskId: $taskId }) {
         id
-        taskName
-        detailsUrl
-        rewardToken
-        rewardAmount
-        maxParticipants
-        expiryDate
-        owner
-        isActive
-        allowedWallets
-   
+        taskId
+        amount
+        disbursedBy
+        blockNumber
+        blockTimestamp
       }
-        entityTaskManager {
+      additionalDisbursementToTasks(where: { taskId: $taskId }) {
         id
-        entityTaskManager
-        _appId
-        _name
-        
-        }
+        taskId
+        amount
+        remarks
+        disbursedBy
+        blockNumber
+        blockTimestamp
+      }
     }
-  }
-`;
+  `,
 
-export const getAllParticipantsByRole = `
-  query FilterByRole($role: Bytes!) {
-    roleGranteds(where: { role: $role }) {
-      account
-      appId
-      id
-      role
+  getContractState: `
+    query GetContractState {
+      contractPauseds(first: 1, orderBy: blockTimestamp, orderDirection: desc) {
+        id
+        by
+        blockNumber
+        blockTimestamp
+      }
+      contractUnpauseds(first: 1, orderBy: blockTimestamp, orderDirection: desc) {
+        id
+        by
+        blockNumber
+        blockTimestamp
+      }
     }
-  }
-`;
+  `,
+};
+
+// Factory Queries
+export const FactoryQueries = {
+  getDeployments: `
+    query GetDeployments {
+      rewardManagementCreateds(first: 10, orderBy: blockTimestamp, orderDirection: desc) {
+        id
+        rewardManagement
+        aclAddress
+        appId
+        name
+        blockNumber
+        blockTimestamp
+        transactionHash
+      }
+    }
+  `,
+};

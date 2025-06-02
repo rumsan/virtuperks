@@ -1,19 +1,9 @@
-import {Client, fetchExchange} from '@urql/core';
-
+import { Client, fetchExchange } from '@urql/core';
 import {
-  ApprovalList,
-  CreatedAppList,
-  EntityTaskManagerCreatedList,
-  getAllParticipantsByRole,
-  GetAllTasksForParticipant,
-  getEntityDetailById,
-  GetParticipantTaskStatusWithVariables,
-  GetTaskApprovedAndCompleted,
-  GetTaskDetailsById,
-  GetTaskParticipantsWithStatus,
-  RoleGrantedList,
-  TaskCreatedList,
-  TransferList,
+  AppRegistryQueries,
+  FactoryQueries,
+  RewardManagementQueries,
+  TokenQueries
 } from '../queries';
 
 export class SubgraphService {
@@ -26,100 +16,85 @@ export class SubgraphService {
     });
   }
 
-  async getAppCreatedlist() {
+  // AppRegistry Related Services
+  async getAppRegistryData() {
     try {
-      const data = await this.subgraphQuery.query(CreatedAppList, {});
-
-      return {data};
+      const appCreated = await this.subgraphQuery.query(AppRegistryQueries.getAppCreated, {});
+      const roleManagement = await this.subgraphQuery.query(AppRegistryQueries.getRoleManagement, {});
+      return { appCreated: appCreated.data, roleManagement: roleManagement.data };
     } catch (error) {
-      console.log(error, 'error');
+      console.error('Error fetching AppRegistry data:', error);
+      return { error };
     }
   }
 
-  async getRoleGrantedList() {
-    const {data, error} = await this.subgraphQuery.query(RoleGrantedList, {});
-    return {data, error};
-  }
-
-  async getApprovalList() {
-    const {data, error} = await this.subgraphQuery.query(ApprovalList, {});
-    return {data, error};
-  }
-  async getTransferList() {
-    const {data, error} = await this.subgraphQuery.query(TransferList, {});
-    return {data, error};
-  }
-
-  async getTaskCreatedList() {
-    const {data, error} = await this.subgraphQuery.query(TaskCreatedList, {});
-    return {data, error};
-  }
-
-  async getEntityManagerCreatedList() {
-    const {data, error} = await this.subgraphQuery.query(
-      EntityTaskManagerCreatedList,
-      {},
-    );
-    return {data, error};
-  }
-
-  async getEntityDetailById(id: string) {
-    const {data, error} = await this.subgraphQuery.query(getEntityDetailById, {
-      id,
-    });
-    return {data, error};
-  }
-
-  async getParticipantTaskStatus(participant: string, taskId: string) {
-    const {data, error} = await this.subgraphQuery.query(
-      GetParticipantTaskStatusWithVariables,
-      {participant, taskId},
-    );
-    return {data, error};
-  }
-
-  async getTaskParticipantsWithStatus(taskId: string) {
-    const {data, error} = await this.subgraphQuery.query(
-      GetTaskParticipantsWithStatus,
-      {taskId},
-    );
-    return {data, error};
-  }
-
-  async getTaskApprovedAndCompletedList(taskId: string) {
-    const {data, error} = await this.subgraphQuery.query(
-      GetTaskApprovedAndCompleted,
-      {taskId},
-    );
-    return {data, error};
-  }
-
-  async getTaskDetails(taskId: string) {
-    const {data, error} = await this.subgraphQuery.query(GetTaskDetailsById, {
-      taskId,
-    });
-    return {data, error};
-  }
-
-  async getAllParticipantsByRole(role: string) {
+  // Token Related Services
+  async getTokenData() {
     try {
-      const result = await this.subgraphQuery.query(getAllParticipantsByRole, {
-        role,
-      });
-
-      const {data, error} = result;
-      return {data, error};
+      const transfers = await this.subgraphQuery.query(TokenQueries.getTransfers, {});
+      const approvals = await this.subgraphQuery.query(TokenQueries.getApprovals, {});
+      return { transfers: transfers.data, approvals: approvals.data };
     } catch (error) {
-      console.error('Error fetching participants by role:', error);
-      return {data: null, error};
+      console.error('Error fetching token data:', error);
+      return { error };
     }
   }
 
-  async getAllTaskByParticipant(participant: string) {
-    const {data, error} = await this.subgraphQuery.query(
-      GetAllTasksForParticipant,
-      {participant},
-    );
-    return {data, error};
+  // RewardManagement Related Services
+  async getTaskManagementData(taskId?: string) {
+    try {
+      const taskCreation = await this.subgraphQuery.query(RewardManagementQueries.getTaskCreation, {});
+      
+      if (taskId) {
+        const participationStatus = await this.subgraphQuery.query(
+          RewardManagementQueries.getParticipationStatus, 
+          { taskId }
+        );
+        const whitelistStatus = await this.subgraphQuery.query(
+          RewardManagementQueries.getWhitelistStatus, 
+          { taskId }
+        );
+        const disbursements = await this.subgraphQuery.query(
+          RewardManagementQueries.getDisbursements, 
+          { taskId }
+        );
+
+        return {
+          taskCreation: taskCreation.data,
+          participationStatus: participationStatus.data,
+          whitelistStatus: whitelistStatus.data,
+          disbursements: disbursements.data
+        };
+      }
+
+      return { taskCreation: taskCreation.data };
+    } catch (error) {
+      console.error('Error fetching task management data:', error);
+      return { error };
+    }
+  }
+
+  async getContractState() {
+    try {
+      const { data, error } = await this.subgraphQuery.query(
+        RewardManagementQueries.getContractState, 
+        {}
+      );
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching contract state:', error);
+      return { error };
+    }
+  }
+
+  // Factory Related Services
+  async getDeployments() {
+    try {
+      const { data, error } = await this.subgraphQuery.query(FactoryQueries.getDeployments, {});
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching deployments:', error);
+      return { error };
+    }
   }
 }
