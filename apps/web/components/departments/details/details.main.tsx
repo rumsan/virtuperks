@@ -1,6 +1,6 @@
 "use client";
 
-import { useEntityDetailById } from "@/hooks/subgraph/querycall";
+import { useGetEntityById } from "@/hooks/subgraph/entity";
 import { PATHS } from "@/routes/paths";
 import {
   ColumnFiltersState,
@@ -43,8 +43,26 @@ export default function DepartmentDetails({
     pageIndex: 0,
     pageSize: 10,
   });
-  const getEntity = useEntityDetailById(cuid.id);
-  const EntityData = getEntity?.data?.data?.entityTaskManagerCreateds[0];
+
+  const { data, isLoading, isError, error } = useGetEntityById(cuid.id);
+
+  if (isLoading) {
+    return (
+      <main className="p-4 sm:px-8">
+        <p className="text-gray-600">Loading entity details...</p>
+      </main>
+    );
+  }
+
+  if (isError) {
+    return (
+      <main className="p-4 sm:px-8">
+        <p className="text-red-600">Error loading entity: {error.message}</p>
+      </main>
+    );
+  }
+
+  const EntityData = data?.data?.entityTaskManagerCreateds?.[0];
   const taskData = EntityData?.tasks || [];
 
   const columns = useColumns();
@@ -77,7 +95,7 @@ export default function DepartmentDetails({
         <span className="font-base text-gray-700">Back</span>
       </div>
 
-      <DepartmentDetailsCard cuid={cuid} router={router} />
+      <DepartmentDetailsCard cuid={cuid} router={router} entity={EntityData} />
 
       <DepartmentDetailsTable
         table={table}

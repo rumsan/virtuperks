@@ -13,7 +13,19 @@ export const AppRegistryQueries = {
       }
     }
   `,
-
+  getAppCreatedById: `
+  query GetAppCreatedById($id: ID!) {
+    appCreated(id: $id) {
+      id
+      appId
+      admin
+      sender
+      blockNumber
+      blockTimestamp
+      transactionHash
+    }
+  }
+`,
   getRoleManagement: `
     query GetRoleManagement {
       roleGranteds(first: 10) {
@@ -51,6 +63,57 @@ export const AppRegistryQueries = {
       }
     }
   `,
+
+  getRoleGrantedById: `
+  query GetRoleGrantedById($id: ID!) {
+    roleGranted(id: $id) {
+      id
+      appId
+      role
+      account
+      sender
+      blockNumber
+      blockTimestamp
+    }
+  }
+`,
+getRoleRevokedById: `
+query GetRoleRevokedById($id: ID!) {
+  roleRevoked(id: $id) {
+    id
+    appId
+    role
+    account
+    sender
+    blockNumber
+  }
+}
+`,
+getRoleAdminGrantedById: `
+  query GetRoleAdminGrantedById($id: ID!) {
+    roleAdminGranted(id: $id) {
+      id
+      appId
+      role
+      account
+      sender
+      blockNumber
+    }
+  }
+`,
+getRoleAdminRevokedById: `
+  query GetRoleAdminRevokedById($id: ID!) {
+    roleAdminRevoked(id: $id) {
+      id
+      appId
+      role
+      account
+      sender
+      blockNumber
+    }
+  }
+`,
+  
 };
 
 // RewardToken Queries
@@ -68,6 +131,19 @@ export const TokenQueries = {
       }
     }
   `,
+  getTransferById: `
+  query GetTransferById($id: ID!) {
+    transfer(id: $id) {
+      id
+      from
+      to
+      value
+      blockNumber
+      blockTimestamp
+      transactionHash
+    }
+  }
+`,
 
   getApprovals: `
     query GetApprovals {
@@ -82,6 +158,20 @@ export const TokenQueries = {
       }
     }
   `,
+
+  getApprovalById: `
+  query GetApprovalById($id: ID!) {
+    approval(id: $id) {
+      id
+      owner
+      spender
+      value
+      blockNumber
+      blockTimestamp
+      transactionHash
+    }
+  }
+`,
 };
 
 // RewardManagement Queries
@@ -105,6 +195,143 @@ export const RewardManagementQueries = {
       }
     }
   `,
+  getTaskCreatedById: `
+  query GetTaskCreatedById($id: ID!) {
+    taskCreated(id: $id) {
+      id
+      internal_id
+      createdBy
+      blockNumber
+      blockTimestamp
+      transactionHash
+    }
+  }
+`,
+getTaskDetailsUpdatedById: `
+  query GetTaskDetailsUpdatedById($id: ID!) {
+    taskDetailsUpdated(id: $id) {
+      id
+      internal_id
+      updatedBy
+      blockNumber
+      blockTimestamp
+    }
+  }
+`,
+getParticipantAppliedById: `
+  query GetParticipantAppliedById($id: ID!) {
+    participantApplied(id: $id) {
+      id
+      internal_id
+      participant
+      blockNumber
+      blockTimestamp
+    }
+  }
+`,
+getTaskAcceptedById: `
+  query GetTaskAcceptedById($id: ID!) {
+    taskAccepted(id: $id) {
+      id
+      internal_id
+      participant
+      blockNumber
+      blockTimestamp
+    }
+  }
+`,
+getTaskCompletedById: `
+  query GetTaskCompletedById($id: ID!) {
+    taskCompleted(id: $id) {
+      id
+      internal_id
+      participant
+      blockNumber
+      blockTimestamp
+    }
+  }
+`,
+getTaskVerifiedById: `
+  query GetTaskVerifiedById($id: ID!) {
+    taskVerified(id: $id) {
+      id
+      internal_id
+      participant
+      verifier
+      blockNumber
+      blockTimestamp
+    }
+  }
+`,
+getParticipantWhitelistedById: `
+  query GetParticipantWhitelistedById($id: ID!) {
+    participantWhitelisted(id: $id) {
+      id
+      taskId
+      participant
+      by
+      blockNumber
+      blockTimestamp
+    }
+  }
+`,
+getParticipantRemovedFromWhitelistById: `
+  query GetParticipantRemovedFromWhitelistById($id: ID!) {
+    participantRemovedFromWhitelist(id: $id) {
+      id
+      taskId
+      participant
+      by
+      blockNumber
+      blockTimestamp
+    }
+  }
+`,
+getDisbursementToTaskById: `
+  query GetDisbursementToTaskById($id: ID!) {
+    disbursementToTask(id: $id) {
+      id
+      taskId
+      amount
+      disbursedBy
+      blockNumber
+      blockTimestamp
+    }
+  }
+`,
+getAdditionalDisbursementToTaskById: `
+  query GetAdditionalDisbursementToTaskById($id: ID!) {
+    additionalDisbursementToTask(id: $id) {
+      id
+      taskId
+      amount
+      remarks
+      disbursedBy
+      blockNumber
+      blockTimestamp
+    }
+  }
+`,
+getContractPausedById: `
+  query GetContractPausedById($id: ID!) {
+    contractPaused(id: $id) {
+      id
+      by
+      blockNumber
+      blockTimestamp
+    }
+  }
+`,
+getContractUnpausedById: `
+  query GetContractUnpausedById($id: ID!) {
+    contractUnpaused(id: $id) {
+      id
+      by
+      blockNumber
+      blockTimestamp
+    }
+  }
+`,
 
   getParticipationStatus: `
     query GetParticipationStatus($taskId: Bytes!) {
@@ -217,4 +444,18 @@ export const FactoryQueries = {
       }
     }
   `,
+  getRewardManagementCreatedById: `
+  query GetRewardManagementCreatedById($id: ID!) {
+    rewardManagementCreated(id: $id) {
+      id
+      rewardManagement
+      aclAddress
+      appId
+      name
+      blockNumber
+      blockTimestamp
+      transactionHash
+    }
+  }
+`,
 };

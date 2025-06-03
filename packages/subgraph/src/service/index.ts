@@ -6,6 +6,9 @@ import {
   TokenQueries
 } from '../queries';
 
+
+const SUBGRAPH_URL = process.env.NEXT_PUBLIC_SUBGRAPH_URL!; 
+
 export class SubgraphService {
   private subgraphQuery: Client;
 
@@ -97,4 +100,27 @@ export class SubgraphService {
       return { error };
     }
   }
+
+  async getRewardManagementCreatedById(id: string) {
+    try {
+      const { data, error } = await this.subgraphQuery.query(
+        FactoryQueries.getRewardManagementCreatedById,
+        { id }
+      );
+  
+      if (error) {
+        throw error;
+      }
+  
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error fetching rewardManagementCreated by ID:', error);
+      return { data: null, error };
+    }
+  }
+
+  
 }
+
+
+

@@ -1,13 +1,12 @@
 import { formatDate } from "@/utils/formatDate";
 import { ColumnDef } from "@tanstack/react-table";
-import moment from "moment";
 
 interface RowData {
   taskDetail: {
     detailsUrl: string;
     rewardAmount: number;
     isActive: boolean;
-    expiryDate: number
+    expiryDate: number;
   };
   createdBy: string;
   tresurerName: string;
@@ -25,15 +24,11 @@ export function useColumns<T extends RowData>(): ColumnDef<T>[] {
 
       cell: ({ row }) => {
         const getTaskName = row.original.taskDetail.detailsUrl;
-        
+
         return (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-700">
-              {getTaskName}
-            </span>
+            <span className="text-sm text-gray-700">{getTaskName}</span>
           </div>
-
-
         );
       },
     },
@@ -44,13 +39,8 @@ export function useColumns<T extends RowData>(): ColumnDef<T>[] {
       ),
 
       cell: ({ row }) => {
-       
         const getAmount = row.original.taskDetail.rewardAmount;
-        return (
-          <p className="text-sm text-gray-700">
-            {getAmount} RTH
-          </p>
-        )
+        return <p className="text-sm text-gray-700">{getAmount} RTH</p>;
       },
     },
     {
@@ -59,14 +49,11 @@ export function useColumns<T extends RowData>(): ColumnDef<T>[] {
         <div className="text-left text-gray-600 font-bold">Expire Date</div>
       ),
 
-      cell: ({ row}) => {
+      cell: ({ row }) => {
         const getData = row.original.taskDetail.expiryDate;
-       const formattedData = formatDate(getData);
-      
-        return (
-          <p className="text-sm text-gray-700">
-            {formattedData}
-          </p>)
+        const formattedData = formatDate(getData);
+
+        return <p className="text-sm text-gray-700">{formattedData}</p>;
       },
     },
     {
@@ -74,19 +61,18 @@ export function useColumns<T extends RowData>(): ColumnDef<T>[] {
       header: () => (
         <div className="text-left text-gray-600 font-bold">Status</div>
       ),
-cell: ({ row }) => {
-  const getStatus = row.original.taskDetail.isActive;
-  return (
-    <p
-      className={`text-sm ${
-        getStatus ? "text-green-600" : "text-red-800"
-      }`}
-    >
-      {getStatus ? "Active" : "Inactive"}
-    </p>
-  );
-},
-     
+      cell: ({ row }) => {
+        const getStatus = row.original.taskDetail.isActive;
+        return (
+          <p
+            className={`text-sm ${
+              getStatus ? "text-green-600" : "text-red-800"
+            }`}
+          >
+            {getStatus ? "Active" : "Inactive"}
+          </p>
+        );
+      },
     },
     // {
     //   id: "actions",
