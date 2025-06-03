@@ -49,6 +49,7 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
     useDepartmentAdd();
 
   const createEntityButton = async (data: Department) => {
+    if (departmentPending) return;
     try {
       departmentAdd({ name: data.name || "" });
     } catch (err) {
