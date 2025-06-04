@@ -438,6 +438,7 @@ export const FactoryQueries = {
         aclAddress
         appId
         name
+        remainingTokenBalance
         blockNumber
         blockTimestamp
         transactionHash
@@ -447,15 +448,17 @@ export const FactoryQueries = {
   getRewardManagementCreatedById: `
   query GetRewardManagementCreatedById($id: ID!) {
     rewardManagementCreated(id: $id) {
-      id
-      rewardManagement
       aclAddress
-      appId
+      allocatedToTasks
+      id
       name
-      blockNumber
-      blockTimestamp
-      transactionHash
+      remainingTokenBalance
+      totalTokenBalance
+      mintedTokens {
+        id
+      }
     }
   }
 `,
+
 };

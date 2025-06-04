@@ -7,9 +7,9 @@ export interface DepartmentDetails {
   id: string;
   transactionHash: string;
   totalTokenBalance: string;
-  remainingBalance: string;
+  remainingTokenBalance: string;
   __typename: string;
   _appId: string;
-  _name: string;
+  name: string;
   tasks:TaskCreated[]
 }

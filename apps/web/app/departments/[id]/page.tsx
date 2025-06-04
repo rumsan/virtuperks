@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 
 function Page() {
   const id = useParams() as { id: string };
-  
+
   const router = useRouter();
   return (
     <div>

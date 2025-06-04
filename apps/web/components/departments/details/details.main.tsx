@@ -46,22 +46,6 @@ export default function DepartmentDetails({
 
   const { data, isLoading, isError, error } = useGetEntityById(cuid.id);
 
-  if (isLoading) {
-    return (
-      <main className="p-4 sm:px-8">
-        <p className="text-gray-600">Loading entity details...</p>
-      </main>
-    );
-  }
-
-  if (isError) {
-    return (
-      <main className="p-4 sm:px-8">
-        <p className="text-red-600">Error loading entity: {error.message}</p>
-      </main>
-    );
-  }
-
   const EntityData = data?.data?.entityTaskManagerCreateds?.[0];
   const taskData = EntityData?.tasks || [];
 
@@ -95,14 +79,23 @@ export default function DepartmentDetails({
         <span className="font-base text-gray-700">Back</span>
       </div>
 
-      <DepartmentDetailsCard cuid={cuid} router={router} entity={EntityData} />
+      {isLoading && <p className="text-gray-600">Loading entity details...</p>}
 
-      <DepartmentDetailsTable
-        table={table}
-        columns={columns}
-        pagination={pagination}
-        setPagination={setPagination}
-      />
+      {isError && (
+        <p className="text-red-600">Error loading entity: {error.message}</p>
+      )}
+
+      {!isLoading && !isError && (
+        <>
+          <DepartmentDetailsCard cuid={cuid} router={router} />
+          <DepartmentDetailsTable
+            table={table}
+            columns={columns}
+            pagination={pagination}
+            setPagination={setPagination}
+          />
+        </>
+      )}
     </main>
   );
 }
