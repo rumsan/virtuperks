@@ -10,8 +10,6 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { Copy, Plus, User } from "lucide-react";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { Cuid } from "./details.main";
 
 type DepartmentDetailsCardProps = {
   cuid: Cuid;

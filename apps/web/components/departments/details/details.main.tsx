@@ -78,13 +78,10 @@ export default function DepartmentDetails({
         <ArrowLeft size={24} strokeWidth={2} />
         <span className="font-base text-gray-700">Back</span>
       </div>
-
-      {isLoading && <p className="text-gray-600">Loading entity details...</p>}
-
+      s{isLoading && <p className="text-gray-600">Loading entity details...</p>}
       {isError && (
         <p className="text-red-600">Error loading entity: {error.message}</p>
       )}
-
       {!isLoading && !isError && (
         <>
           <DepartmentDetailsCard cuid={cuid} router={router} />
