@@ -432,7 +432,7 @@ getContractUnpausedById: `
 export const FactoryQueries = {
   getDeployments: `
     query GetDeployments {
-      rewardManagementCreateds(first: 10, orderBy: blockTimestamp, orderDirection: desc) {
+      rewardManagementCreateds(first: 100, orderBy: blockTimestamp, orderDirection: desc) {
         id
         rewardManagement
         aclAddress
