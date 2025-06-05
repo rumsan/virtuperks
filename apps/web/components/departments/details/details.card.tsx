@@ -34,7 +34,7 @@ export default function DepartmentDetailsCard({
     );
   }
 
-  const entity = data?.data?.rewardManagementCreated;
+  const entity = data;
 
   console.log("Entity: ", entity);
   const roleCheck = hasRole({
@@ -75,7 +75,7 @@ export default function DepartmentDetailsCard({
             <CardDescription className="flex flex-col gap-2">
               <div className="flex flex-col items-start gap-2">
                 <div className="flex flex-start text-[#334155] text-xl justify-start">
-                  {entity?.name}
+                  {/* {entity?.name} */}
                 </div>
                 <div className="flex items-center gap-1">
                   <Copy size={16} strokeWidth={3} color="#94A3B8" />
@@ -102,7 +102,7 @@ export default function DepartmentDetailsCard({
             </CardTitle>
           </CardHeader>
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {entity?.remainingTotalBalance ?? "-"}
+            {entity?.remainingTokenBalance ?? "-"}
           </CardFooter>
         </Card>
         <Card className="font-normal text-base h-40 flex flex-col">
