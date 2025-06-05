@@ -1,45 +1,58 @@
 import { z } from "zod";
 
-type TaskBase = {
-  cuid?: string;
-  title: string;
-  url: string;
-  status: string;
-  description: string;
-  owner: string;
-  date: string;
-  participants: number;
-  tokens: number;
-};
-
-export type Task = Omit<TaskBase, "participants" | "tokens"> & {
-  participants?: string | null;
-  tokens?: string | null;
-};
 
 export const taskSchema = () => {
-  const _schema = {
-    taskName: z.string().min(1, "Task title is required"),
-    detailsUrl: z.string().min(1, "Task url name is required"),
-    //status: z.string().min(1, "Task status is required"),
-   // description: z.string().min(1, "Task description is required"),
+  return z.object({
+    // taskId: z.string().min(1, "Task ID is required"),
+    name: z.string().min(1, "Task name is required"),
+    detailsUrl: z.string().min(1, "Task details URL is required"),
     owner: z.string().min(1, "Task owner is required"),
+    entityAddress: z.string()
+      .min(1, "Entity address is required"),
+    expiryDate: z.date({ required_error: "Expiry date is required" }),
     rewardToken: z.string()
-      .min(1, "Task reward token is required")
+      .min(1, "Reward token address is required")
       .default(process.env.NEXT_PUBLIC_RAHAT_TOKEN || ""),
-    expiryDate: z.date({ required_error: "Date is required" }),
-    allowedWallets: z.array(z.string()).min(1, "At least one participant is required"),
-    maxParticipants: z.number(),
-    entityAddress: z.string({ required_error: "Entity address is required" }),
-    rewardAmount: z.coerce
-      .number({
-        required_error: "Token is required",
-        invalid_type_error: "Token must be a number",
+    totalRewardAmount: z.coerce
+      .string({
+        required_error: "Reward amount is required",
+        invalid_type_error: "Reward amount must be a number",
       })
+      .refine(val => !isNaN(Number(val)) && Number(val) > 0, {
+        message: "Reward amount must be a positive number"
+      }),
+    isOpen: z.boolean().default(true),
+    isTokenDisbursed: z.boolean().default(false),
+    acceptedParticipantCount: z.number(). optional().default(0),
+    verifiedParticipants: z.array(z.string().regex(/^0x[a-fA-F0-9]{40}$/, "Must be a valid Ethereum address")).optional().default([]),
+    requireApproval: z.boolean().default(true),
+    isWhitelisted: z.boolean().default(true),
+    maxParticipants: z.number()
+      .int()
       .positive()
-      .min(1, { message: "Token should be at least 1" }),
-    isActive: z.boolean(),
-  };
-
-  return z.object(_schema);
+      .min(1, "At least one participant must be allowed"),
+    whitelistedParticipants: z.array(z.string().regex(/^0x[a-fA-F0-9]{40}$/, "Must be a valid Ethereum address"))
+      .optional()
+      .default([])
+  });
 };
+
+// Type for the form data that will be validated by the schema
+export type TaskFormData = z.infer<ReturnType<typeof taskSchema>>;
+
+// Helper function to convert from form data to TaskCreateParams
+// export function formDataToTaskCreateParams(data: TaskFormData): TaskCreateParams {
+//   return {
+//     taskId: data.taskId,
+//     name: data.name,
+//     detailsUrl: data.detailsUrl,
+//     owner: data.owner,
+//     expiryDate: data.expiryDate, // Already converted to timestamp in the schema
+//     rewardToken: data.rewardToken,
+//     totalRewardAmount: data.totalRewardAmount,
+//     requireApproval: data.requireApproval,
+//     isWhitelisted: data.isWhitelisted,
+//     maxParticipants: data.maxParticipants,
+//     whitelistedParticipants: data.whitelistedParticipants || []
+//   };
+// }

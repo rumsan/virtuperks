@@ -2,6 +2,7 @@ import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useWriteRewardManagementFactoryCreateRewardManagement } from "../wagmi/contracts";
 
+
 export const useGetAllEntity = (
  
 ) => {
@@ -23,7 +24,8 @@ export const useDepartmentAdd = () => {
   const { writeContractAsync } =
     useWriteRewardManagementFactoryCreateRewardManagement();
 
-    const appId = process.env.NEXT_PUBLIC_APP_ID as `0x${string}` || "0x";
+  const appId = process.env.NEXT_PUBLIC_APP_ID as `0x${string}` || "0x";
+
     
   const mutation = useMutation({
     mutationFn: async ({ name }: { name: string }) => {
@@ -44,3 +46,4 @@ export const useDepartmentAdd = () => {
     departmentSuccess: mutation.isSuccess,
   };
 };
+

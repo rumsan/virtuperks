@@ -1,4 +1,4 @@
-import { log } from "@graphprotocol/graph-ts"
+import { BigInt, log } from "@graphprotocol/graph-ts"
 import { RewardManagementCreated as RewardManagementCreatedEvent } from "../generated/RewardManagementFactory/RewardManagementFactory"
 
 import { RewardManagementCreated } from "../generated/schema"
@@ -14,6 +14,11 @@ export function handleRewardManagementCreated(
   entity.aclAddress = event.params.aclAddress
   entity.appId = event.params.appId
   entity.name = event.params.name
+   entity.totalTokenBalance = BigInt.fromI32(0);
+  entity.allocatedToTasks = BigInt.fromI32(0);
+  entity.distributed = BigInt.fromI32(0);
+  entity.remainingTokenBalance = BigInt.fromI32(0);
+  
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp

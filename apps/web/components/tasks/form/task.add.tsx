@@ -2,29 +2,35 @@
 
 import { PATHS } from "@/routes/paths";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { EntityTaskManagementABI } from "@workspace/contracts/abis";
+
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { useToast } from "@workspace/ui/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { isAddress } from "viem";
 import { useWriteContract } from "wagmi";
-import { taskSchema } from "./schema";
+import { TaskFormData, taskSchema } from "./schema";
 import TaskBaseForm from "./task.form";
+import { isAddress, keccak256 } from "viem";
+import { useTaskAdd } from "@/hooks/subgraph/task";
 
-const defaultValues: any = {
-  taskName: "",
-  detailsUrl: "",
+const defaultValues = {
+
+      name: "",
+      detailsUrl: "",
   owner: "",
-  rewardToken: process.env.NEXT_PUBLIC_RAHAT_TOKEN || "",
-  expiryDate: "",
-  allowedWallets: "",
-  maxParticipants: 0,
-  rewardAmount: 0,
-  isActive: false,
-  entityAddress: "",
+      entityAddress: "",
+      expiryDate: new Date(),
+      rewardToken: process.env.NEXT_PUBLIC_RAHAT_TOKEN || "",
+      totalRewardAmount: "",
+      isOpen: true,
+      isTokenDisbursed: false,
+      requireApproval: true,
+      isWhitelisted: true,
+      maxParticipants: 0,
+      whitelistedParticipants: [],
+
 };
 
 type TaskAddProps = {
@@ -32,7 +38,7 @@ type TaskAddProps = {
 };
 
 export default function TaskAdd({ router }: TaskAddProps) {
-  const form = useForm({
+  const form = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema()),
     defaultValues: defaultValues,
   });
@@ -52,42 +58,66 @@ export default function TaskAdd({ router }: TaskAddProps) {
       console.error("Transaction failed:", error);
     }
   }, [isError, error]);
+  const { taskAdd, taskPending, taskSuccess}= useTaskAdd()
 
   const createTask = async (data: any) => {
+    console.log("Creating task with data:", data);
     if (!isAddress(data.entityAddress)) {
       console.error("Invalid Ethereum address:", data.entityAddress);
       return;
     }
+    const taskId = keccak256(data.name)
+    console.log("Generated task ID:", taskId);
+    
 
-    const { detailsUrl, rewardToken, owner, isActive, taskName } = data;
+    const { detailsUrl, rewardToken, owner, isOpen, name} = data;
     const expiryDate = BigInt(
       Math.floor(new Date(data.expiryDate).getTime() / 1000),
     );
-    const allowedWallets = Array.isArray(data.allowedWallets)
-      ? data.allowedWallets
-      : [data.allowedWallets];
-    const rewardAmount = BigInt(data.rewardAmount);
+    const whitelistedParticipants = Array.isArray(data.whitelistedParticipants)
+      ? data.whitelistedParticipants
+      : [data.whitelistedParticipants];
+    const totalRewardAmount = BigInt(data.totalRewardAmount);
     const maxParticipants = BigInt(data.maxParticipants);
 
     try {
-      await writeContractAsync({
-        address: data.entityAddress,
-        abi: EntityTaskManagementABI,
-        functionName: "createTask",
-        args: [
-          {
-            taskName,
-            detailsUrl,
-            rewardToken,
-            rewardAmount,
-            allowedWallets,
-            maxParticipants,
-            expiryDate,
-            owner,
-            isActive,
-          },
-        ],
+      // await writeContractAsync({
+      //   address: data.entityAddress,
+      //   abi: EntityTaskManagementABI,
+      //   functionName: "createTask",
+      //   args: [
+      //     {
+      //       taskName,
+      //       detailsUrl,
+      //       rewardToken,
+      //       rewardAmount,
+      //       allowedWallets,
+      //       maxParticipants,
+      //       expiryDate,
+      //       owner,
+      //       isActive,
+      //     },
+      //   ],
+      // });
+      await taskAdd({
+        taskId,
+        name,
+        detailsUrl,
+        owner,
+        entityAddress: data.entityAddress,
+        expiryDate,
+        rewardToken,
+        totalRewardAmount: totalRewardAmount.toString(),
+        isOpen,
+        isTokenDisbursed: data.isTokenDisbursed,
+        requireApproval: data.requireApproval,
+        isWhitelisted: data.isWhitelisted,
+        maxParticipants: maxParticipants.toString(),
+        acceptedParticipantCount: 0, // Default to 0
+        whitelistedParticipants: whitelistedParticipants || [],
+         verfiedParticipants: [], // Default to empty array
       });
+      
       // Success Toast
       toast({
         title: "Task Created Successfully!",

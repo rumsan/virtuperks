@@ -96,10 +96,26 @@ type RewardManagementCreated @entity(immutable: true) {
   aclAddress: Bytes! # address
   appId: Bytes! # bytes32
   name: String! # string
+  mintedTokens: [TokenMinted!]! @derivedFrom(field: "rewardManagement")
+  totalTokenBalance: BigInt! # uint256
+  remainingTokenBalance: BigInt! # uint256
+  allocatedToTasks: BigInt! # uint256
+  distributed: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+type TokenMinted @entity(immutable: true) {
+  id: Bytes!
+  rewardManagement: RewardManagementCreated! 
+  tokenAddress: Bytes!
+  amount: BigInt! 
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
 type AdditionalDisbursementToTask @entity(immutable: true) {
   id: Bytes!
   taskId: Bytes! # bytes32

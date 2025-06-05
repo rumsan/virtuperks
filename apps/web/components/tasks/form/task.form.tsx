@@ -1,6 +1,6 @@
 "use client";
 
-import { useEntityList } from "@/hooks/subgraph/querycall";
+import { useGetAllEntity } from "@/hooks/subgraph/entity";
 import { Button } from "@workspace/ui/components/button";
 
 import { Calendar } from "@workspace/ui/components/calendar";
@@ -44,12 +44,12 @@ type EntityType = {
   aclAddress: string;
   blockNumber: string;
   blockTimeStamp: string;
-  entityTaskManager: string;
+  rewardManagement: string;
   id: string;
   transactionHash: string;
   __typename: string;
   _appId: string;
-  _name: string;
+  name: string;
 };
 
 export default function TaskBaseForm({
@@ -60,21 +60,22 @@ export default function TaskBaseForm({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [currentWallet, setCurrentWallet] = useState("");
   const [walletAddresses, setWalletAddresses] = useState<string[]>([]);
-  const getAllEntity = useEntityList();
-  const entityList = getAllEntity?.data?.data?.entityTaskManagerCreateds;
+  const getAllEntity = useGetAllEntity();
+  const entityList = getAllEntity?.data?.data?.rewardManagementCreateds
 
   const handleAddWallet = () => {
     if (currentWallet && isAddress(currentWallet)) {
       setWalletAddresses((prev) => [...prev, currentWallet]);
-      form.setValue("allowedWallets", [...walletAddresses, currentWallet]);
+      form.setValue("whitelistedParticipants", [...walletAddresses, currentWallet]);
       setCurrentWallet("");
     }
   };
+  console.log(currentWallet, "currentWallet");
 
   const removeWallet = (addressToRemove: string) => {
     const filtered = walletAddresses.filter((addr) => addr !== addressToRemove);
     setWalletAddresses(filtered);
-    form.setValue("allowedWallets", filtered);
+    form.setValue("whitelistedParticipants", filtered);
   };
 
   const handleSubmit = form.handleSubmit(saveForm);
@@ -86,14 +87,14 @@ export default function TaskBaseForm({
           <div className="flex flex-col w-full gap-4 mb-5">
             <FormField
               control={form.control}
-              name="taskName"
+              name="name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Task Title</FormLabel>
                   <FormControl>
                     <div className="relative flex items-center bg-white rounded-md">
                       <Input
-                        placeholder="Write title for the task"
+                        placeholder="Write name for the task"
                         {...field}
                         value={field.value ?? ""}
                       />
@@ -140,9 +141,9 @@ export default function TaskBaseForm({
                         {entityList?.map((entity: EntityType) => (
                           <SelectItem
                             key={entity.id}
-                            value={entity.entityTaskManager}
+                            value={entity.rewardManagement}
                           >
-                            {entity._name}
+                            {entity.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -185,7 +186,7 @@ export default function TaskBaseForm({
           <div className="grid grid-cols-2 gap-4 mb-5">
             <FormField
               control={form.control}
-              name="rewardAmount"
+              name="totalRewardAmount"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Reward Amount</FormLabel>
@@ -244,7 +245,7 @@ export default function TaskBaseForm({
 
             <FormField
               control={form.control}
-              name="isActive"
+              name="isOpen"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Event status </FormLabel>
@@ -352,7 +353,7 @@ export default function TaskBaseForm({
 
           <FormField
             control={form.control}
-            name="allowedWallets"
+            name="whitelistedParticipants"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Add Participant Addresses</FormLabel>
