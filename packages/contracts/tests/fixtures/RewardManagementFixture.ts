@@ -14,6 +14,7 @@ export interface RewardManagementFixture {
   owner: any;
   App: any;
   user1: any;
+  admin1: any;
   user2: any;
   OwnerRole?: any;
   participant1: any;
@@ -69,7 +70,7 @@ export async function deployRewardManagementFixture(): Promise<RewardManagementF
 
   // Deploy reward management system
   const RewardManagement = await ethers.getContractFactory('RewardManagement');
-  const rewardManagement = await RewardManagement.connect(admin1).deploy(
+  const rewardManagement = await RewardManagement.deploy(
     APP_ID,
     "Test Reward Management",
     appRegistry.target
@@ -78,15 +79,17 @@ export async function deployRewardManagementFixture(): Promise<RewardManagementF
 
   // Setup roles for reward management
   const ownerRole = await rewardManagement.OWNER();
+ console.log(ownerRole, 'intial owner role');
   const participantRole = await rewardManagement.PARTICIPANT();
   const rewardAppId = await rewardManagement.appId();
 
   // Grant necessary roles
-  appRegistry.connect(admin1).grantRoleAdmin(rewardAppId, ownerRole, user2.address);
+  appRegistry.connect(admin1).grantRoleAdmin(rewardAppId, ownerRole, admin1.address);
   appRegistry.connect(admin1).grantRoleAdmin(rewardAppId, participantRole, participant1.address);
   appRegistry.connect(admin1).grantRoleAdmin(rewardAppId, MINTER, user2.address);
 
   // Log role assignments for verification
+  console.log(await appRegistry.getRoleAdmins(APP_ID, ownerRole), 'owner role');
   console.log(await appRegistry.getRoleAdmins(APP_ID, participantRole), 'participant role');
   console.log(await appRegistry.getRoleAdmins(APP_ID, MINTER), 'MINTER role');
 
@@ -115,6 +118,7 @@ export async function deployRewardManagementFixture(): Promise<RewardManagementF
     taskOwner,
     APP_ID,
     user1,
+    admin1,
     user2,
     OWNER_ROLE: "OWNER",
     PARTICIPANT_ROLE: "PARTICIPANT"
