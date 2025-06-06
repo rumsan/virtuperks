@@ -46,8 +46,7 @@ export default function DepartmentDetails({
 
   const { data, isLoading, isError, error } = useGetEntityById(cuid.id);
 
-  const EntityData = data?.data?.entityTaskManagerCreateds?.[0];
-  const taskData = EntityData?.tasks || [];
+  const taskData = data?.tasks ?? [];
 
   const columns = useColumns();
   const table = useReactTable({

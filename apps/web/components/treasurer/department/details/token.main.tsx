@@ -1,4 +1,4 @@
-import { useEntityList } from "@/hooks/subgraph/querycall";
+import { useGetAllEntity } from "@/hooks/subgraph/entity";
 import { DepartmentDetails } from "@workspace/sdk/type";
 import {
   Card,
@@ -17,7 +17,7 @@ interface TokenCreateMainProps {
 }
 
 const TokenCreateMain = ({ router, id }: TokenCreateMainProps) => {
-  const getAllEntity = useEntityList();
+  const getAllEntity = useGetAllEntity();
   const departmentList =
     getAllEntity?.data?.data?.entityTaskManagerCreateds || [];
 
@@ -105,7 +105,7 @@ const TokenCreateMain = ({ router, id }: TokenCreateMainProps) => {
           </CardHeader>
 
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {department?.remainingBalance}
+            {department?.remainingTokenBalance}
           </CardFooter>
         </Card>
 
@@ -121,7 +121,7 @@ const TokenCreateMain = ({ router, id }: TokenCreateMainProps) => {
           </CardHeader>
 
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {department?._name}
+            {department?.name}
           </CardFooter>
         </Card>
       </div>
