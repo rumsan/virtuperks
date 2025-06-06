@@ -8,7 +8,7 @@ import {
   RoleAdminRevoked,
   RoleGranted,
   RoleRevoked
-} from "../generated/AppRegistry/AppRegistry"
+} from "../generated/Contract/Contract"
 
 export function createAppCreatedEvent(
   appId: Bytes,

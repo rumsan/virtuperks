@@ -14,12 +14,7 @@ contract RewardManagementFactory {
         string name
     );
 
-    function createRewardManagement(
-        bytes32 appId,
-        string memory name,
-        address registry
-     
-    ) public {
+    function createRewardManagement(bytes32 appId, string memory name, address registry) public {
         // Deploy a new instance of RewardManagement
         RewardManagement newRewardManagement = new RewardManagement(appId, name, registry);
 

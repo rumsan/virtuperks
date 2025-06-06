@@ -78,8 +78,11 @@ export async function deployRewardManagementFixture(): Promise<RewardManagementF
 
   // Setup roles for deployed instance
   const ownerRole = await rewardManagement.OWNER();
-  console.log(ownerRole, ' default owner role');
+
   const participantRole = await rewardManagement.PARTICIPANT();
+  const appId = await rewardManagement.appId();
+  console.log(appId, 'appId');
+  
 
   await appRegistry.connect(admin1).grantRoleAdmin(APP_ID, ownerRole, user2.address);
   await appRegistry.connect(admin1).grantRoleAdmin(APP_ID, participantRole, participant1.address);
@@ -89,6 +92,7 @@ export async function deployRewardManagementFixture(): Promise<RewardManagementF
    console.log(await appRegistry.getRoleAdmins(APP_ID, ownerRole), 'owner role');
   console.log(await appRegistry.getRoleAdmins(APP_ID, participantRole), 'participant role');
   console.log(await appRegistry.getRoleAdmins(APP_ID, MINTER), 'MINTER role');
+  console.log(await appRegistry.hasRole(appId, ownerRole,rewardManagementAddress), 'entity-contract has owner role');
 
 
   // Mint tokens to deployed instance

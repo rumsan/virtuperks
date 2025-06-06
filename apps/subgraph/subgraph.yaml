@@ -5,12 +5,12 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: AppRegistry
+    name: Contract
     network: base-sepolia
     source:
-      address: "0x804EE7B4B41cAadf5851633498111A7995fEA2D8"
-      abi: AppRegistry
-      startBlock: 26398182
+      address: "0xC587dbf102afaE9F0632b04D6d74d9E95B409EC7"
+      abi: Contract
+      startBlock: 26715013
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -24,8 +24,8 @@ dataSources:
         - RoleGranted
         - RoleRevoked
       abis:
-        - name: AppRegistry
-          file: ./abis/AppRegistry.json
+        - name: Contract
+          file: ./abis/Contract.json
       eventHandlers:
         - event: AppCreated(indexed bytes32,indexed address,indexed address)
           handler: handleAppCreated
@@ -41,111 +41,4 @@ dataSources:
           handler: handleRoleGranted
         - event: RoleRevoked(indexed bytes32,indexed bytes32,indexed address,address)
           handler: handleRoleRevoked
-      file: ./src/app-registry.ts
-  - kind: ethereum
-    name: RewardToken
-    network: base-sepolia
-    source:
-      address: "0x35770A3ac7c859A887Ec43b76bA4c9C96fE4cA62"
-      abi: RewardToken
-      startBlock: 26398189
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.9
-      language: wasm/assemblyscript
-      entities:
-        - Approval
-        - Transfer
-      abis:
-        - name: RewardToken
-          file: ./abis/RewardToken.json
-      eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      file: ./src/reward-token.ts
-  - kind: ethereum
-    name: RewardManagementFactory
-    network: base-sepolia
-    source:
-      address: "0xDde6769C7a921Be8c656A2CBF384a7886C653509"
-      abi: RewardManagementFactory
-      startBlock: 26398197
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.9
-      language: wasm/assemblyscript
-      entities:
-        - RewardManagementCreated
-      abis:
-        - name: RewardManagementFactory
-          file: ./abis/RewardManagementFactory.json
-      eventHandlers:
-        - event: RewardManagementCreated(address,address,bytes32,string)
-          handler: handleRewardManagementCreated
-      file: ./src/reward-management-factory.ts
-templates:
-  - kind: ethereum
-    name: RewardManagement
-    network: base-sepolia
-    source:
-      abi: RewardManagement
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.9
-      language: wasm/assemblyscript
-      entities:
-        - AdditionalDisbursementToTask
-        - ContractPaused
-        - ContractUnpaused
-        - DisbursementToTask
-        - EtherWithdrawn
-        - ParticipantApplied
-        - ParticipantRemovedFromWhitelist
-        - ParticipantWhitelisted
-        - TaskAccepted
-        - TaskApproved
-        - TaskClosed
-        - TaskCompleted
-        - TaskCreated
-        - TaskDetailsUpdated
-        - TaskVerified
-        - TokenTransferred
-      abis:
-        - name: RewardManagement
-          file: ./abis/RewardManagement.json
-      eventHandlers:
-        - event: AdditionalDisbursementToTask(indexed bytes32,uint256,string,indexed address)
-          handler: handleAdditionalDisbursementToTask
-        - event: ContractPaused(indexed address)
-          handler: handleContractPaused
-        - event: ContractUnpaused(indexed address)
-          handler: handleContractUnpaused
-        - event: DisbursementToTask(indexed bytes32,uint256,indexed address)
-          handler: handleDisbursementToTask
-        - event: EtherWithdrawn(indexed address,uint256,indexed address)
-          handler: handleEtherWithdrawn
-        - event: ParticipantApplied(indexed bytes32,indexed address)
-          handler: handleParticipantApplied
-        - event: ParticipantRemovedFromWhitelist(indexed bytes32,indexed address,indexed address)
-          handler: handleParticipantRemovedFromWhitelist
-        - event: ParticipantWhitelisted(indexed bytes32,indexed address,indexed address)
-          handler: handleParticipantWhitelisted
-        - event: TaskAccepted(indexed bytes32,indexed address)
-          handler: handleTaskAccepted
-        - event: TaskApproved(indexed bytes32,indexed address)
-          handler: handleTaskApproved
-        - event: TaskClosed(indexed bytes32,indexed address)
-          handler: handleTaskClosed
-        - event: TaskCompleted(indexed bytes32,indexed address)
-          handler: handleTaskCompleted
-        - event: TaskCreated(indexed bytes32,indexed address)
-          handler: handleTaskCreated
-        - event: TaskDetailsUpdated(indexed bytes32,indexed address)
-          handler: handleTaskDetailsUpdated
-        - event: TaskVerified(indexed bytes32,indexed address,indexed address)
-          handler: handleTaskVerified
-        - event: TokenTransferred(indexed address,indexed address,uint256,string,indexed address)
-          handler: handleTokenTransferred
-      file: ./src/reward-management.ts
+      file: ./src/contract.ts

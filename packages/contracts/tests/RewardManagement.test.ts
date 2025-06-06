@@ -14,12 +14,12 @@ describe('RewardManagement Contract', function() {
       const { rewardManagement, appRegistry, APP_ID, user2 , participant1,} = await fixture();
       expect(await rewardManagement.appId()).to.equal(APP_ID);
       expect(await rewardManagement.name()).to.equal("Test Reward Management");
-      console.log(rewardManagement.target, 'reward management address from test file');
+     
       
       const ownerRole = await rewardManagement.OWNER();
-     console.log(ownerRole, 'from the test file owner role');
+     
       const participantRole = await rewardManagement.PARTICIPANT();
-      console.log(await appRegistry.hasRole(APP_ID, ownerRole, user2.address), 'user2 has owner role');
+   
     
       
       // Verify roles are set correctly
