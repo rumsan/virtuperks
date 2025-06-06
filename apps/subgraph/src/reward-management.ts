@@ -1,0 +1,295 @@
+import { log } from "matchstick-as"
+import {
+  AdditionalDisbursementToTask,
+  ContractPaused,
+  ContractUnpaused,
+  DisbursementToTask,
+  EtherWithdrawn,
+  ParticipantApplied,
+  ParticipantRemovedFromWhitelist,
+  ParticipantWhitelisted,
+  TaskAccepted,
+  TaskApproved,
+  TaskClosed,
+  RewardManagementCreated,
+  TaskCompleted,
+  TaskCreated,
+  TaskDetailsUpdated,
+  TaskVerified,
+  TokenTransferred,
+} from "../generated/schema"
+import {
+  AdditionalDisbursementToTask as AdditionalDisbursementToTaskEvent,
+  ContractPaused as ContractPausedEvent,
+  ContractUnpaused as ContractUnpausedEvent,
+  DisbursementToTask as DisbursementToTaskEvent,
+  EtherWithdrawn as EtherWithdrawnEvent,
+  ParticipantApplied as ParticipantAppliedEvent,
+  ParticipantRemovedFromWhitelist as ParticipantRemovedFromWhitelistEvent,
+  ParticipantWhitelisted as ParticipantWhitelistedEvent,
+  TaskAccepted as TaskAcceptedEvent,
+  TaskApproved as TaskApprovedEvent,
+  TaskClosed as TaskClosedEvent,
+  TaskCompleted as TaskCompletedEvent,
+  TaskCreated as TaskCreatedEvent,
+  TaskDetailsUpdated as TaskDetailsUpdatedEvent,
+  TaskVerified as TaskVerifiedEvent,
+  TokenTransferred as TokenTransferredEvent,
+} from "../generated/templates/RewardManagement/RewardManagement"
+import { fetchTaskDetails } from "./utils"
+
+export function handleAdditionalDisbursementToTask(
+  event: AdditionalDisbursementToTaskEvent,
+): void {
+  let entity = new AdditionalDisbursementToTask(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.taskId = event.params.taskId
+  entity.amount = event.params.amount
+  entity.remarks = event.params.remarks
+  entity.disbursedBy = event.params.disbursedBy
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleContractPaused(event: ContractPausedEvent): void {
+  let entity = new ContractPaused(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.by = event.params.by
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleContractUnpaused(event: ContractUnpausedEvent): void {
+  let entity = new ContractUnpaused(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.by = event.params.by
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleDisbursementToTask(event: DisbursementToTaskEvent): void {
+  let entity = new DisbursementToTask(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.taskId = event.params.taskId
+  entity.amount = event.params.amount
+  entity.disbursedBy = event.params.disbursedBy
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleEtherWithdrawn(event: EtherWithdrawnEvent): void {
+  let entity = new EtherWithdrawn(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.to = event.params.to
+  entity.amount = event.params.amount
+  entity.by = event.params.by
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleParticipantApplied(event: ParticipantAppliedEvent): void {
+  let entity = new ParticipantApplied(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.internal_id = event.params.id
+  entity.participant = event.params.participant
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleParticipantRemovedFromWhitelist(
+  event: ParticipantRemovedFromWhitelistEvent,
+): void {
+  let entity = new ParticipantRemovedFromWhitelist(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.taskId = event.params.taskId
+  entity.participant = event.params.participant
+  entity.by = event.params.by
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleParticipantWhitelisted(
+  event: ParticipantWhitelistedEvent,
+): void {
+  let entity = new ParticipantWhitelisted(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.taskId = event.params.taskId
+  entity.participant = event.params.participant
+  entity.by = event.params.by
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleTaskAccepted(event: TaskAcceptedEvent): void {
+  let entity = new TaskAccepted(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.internal_id = event.params.id
+  entity.participant = event.params.participant
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleTaskApproved(event: TaskApprovedEvent): void {
+  let entity = new TaskApproved(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.internal_id = event.params.id
+  entity.approver = event.params.approver
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleTaskClosed(event: TaskClosedEvent): void {
+  let entity = new TaskClosed(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.internal_id = event.params.id
+  entity.closedBy = event.params.closedBy
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleTaskCompleted(event: TaskCompletedEvent): void {
+  let entity = new TaskCompleted(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.internal_id = event.params.id
+  entity.participant = event.params.participant
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleTaskCreated(event: TaskCreatedEvent): void {
+    log.info('TaskCreated event fired: {}', [event.address.toHexString()]);
+  let task = new TaskCreated(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  task.internal_id = event.params.id
+  task.createdBy = event.params.createdBy
+
+  task.blockNumber = event.block.number
+  task.blockTimestamp = event.block.timestamp
+  task.transactionHash = event.transaction.hash
+
+  //let entity = RewardManagementCreated.load(event.address);
+  log.info("EntityTaskManagerCreated: {}", [event.address.toHexString()]);
+  //   if (entity) {
+  //   task.rewardManagement = entity.id
+  //   log.info("Linked TaskCreated to EntityTaskManagerCreated: {}", [entity.id.toHexString()]);
+  // } else {
+  //   log.info("No EntityTaskManagerCreated found for address: {}", [event.address.toHexString()]);
+  // }
+  task.save()
+
+  // let taskDetail = fetchTaskDetails(event.params.id, event.address, task.id)
+  //   if (taskDetail) {
+  //   task.taskDetail = taskDetail.id;
+  // } else {
+  //   log.error("TaskDetail is null for task ID: {}", [event.params.id.toHexString()]);
+  // }
+  // task.save()
+
+}
+
+export function handleTaskDetailsUpdated(event: TaskDetailsUpdatedEvent): void {
+  let entity = new TaskDetailsUpdated(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.internal_id = event.params.id
+  entity.updatedBy = event.params.updatedBy
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleTaskVerified(event: TaskVerifiedEvent): void {
+  let entity = new TaskVerified(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.internal_id = event.params.id
+  entity.participant = event.params.participant
+  entity.verifier = event.params.verifier
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleTokenTransferred(event: TokenTransferredEvent): void {
+  let entity = new TokenTransferred(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.token = event.params.token
+  entity.to = event.params.to
+  entity.amount = event.params.amount
+  entity.remarks = event.params.remarks
+  entity.transferredBy = event.params.transferredBy
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
