@@ -49,7 +49,7 @@ export const useGetEntityById = (rewardManagement: string) => {
   const { queryService } = useGraphService();
 
   return useQuery({
-    queryKey: ["entityId", rewardManagement],
+    queryKey: ["entityByRewardManagement", rewardManagement],
     enabled: !!rewardManagement && !!queryService,
     queryFn: async () => {
       if (!queryService) {
@@ -57,11 +57,13 @@ export const useGetEntityById = (rewardManagement: string) => {
       }
 
       const result =
-        await queryService.getRewardManagementCreatedById(rewardManagement);
+        await queryService.getRewardManagementCreatedByAddress(
+          rewardManagement,
+        );
 
-      console.log("Subgraph result:", result); // For debugging
+      console.log("Subgraph result:", result);
 
-      const entity = result?.data?.rewardManagementCreated;
+      const entity = result?.data?.rewardManagementCreateds?.[0];
 
       if (!entity) {
         throw new Error("Entity not found in subgraph response.");

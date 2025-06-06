@@ -22,9 +22,10 @@ export default function DepartmentDetailsCard({
   cuid,
   router,
 }: DepartmentDetailsCardProps) {
-  console.log("cuid.id:", cuid.id);
+  console.log("CUID Department: ", cuid.id);
 
   const { data: entity, isLoading, isError, error } = useGetEntityById(cuid.id);
+  console.log("Entity Department: ", entity);
 
   if (isLoading) {
     return <p className="text-gray-600">Loading department info...</p>;

@@ -20,7 +20,7 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
   const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
 
   const hasEntityOwnerRole = hasRole({
-    role: process.env.NEXT_PUBLIC_DEFAULT_ROLE || "",
+    role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
   });
 
   return (
@@ -35,6 +35,7 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
 
       {entityList &&
         entityList.map((department: DepartmentDetails) => {
+          console.log("Department: ", department.rewardManagement);
           return (
             <Card
               key={department.id}

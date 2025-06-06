@@ -101,11 +101,11 @@ export class SubgraphService {
     }
   }
 
-  async getRewardManagementCreatedById(id: string) {
+  async getRewardManagementCreatedByAddress(rewardManagement: string) {
     try {
       const { data, error } = await this.subgraphQuery.query(
-        FactoryQueries.getRewardManagementCreatedById,
-        { id }
+        FactoryQueries.getRewardManagementCreatedByAddress,
+        { rewardManagement }
       );
   
       if (error) {
@@ -114,10 +114,11 @@ export class SubgraphService {
   
       return { data, error: null };
     } catch (error) {
-      console.error('Error fetching rewardManagementCreated by ID:', error);
+      console.error('Error fetching rewardManagementCreated by address:', error);
       return { data: null, error };
     }
   }
+  
 
   
 }
