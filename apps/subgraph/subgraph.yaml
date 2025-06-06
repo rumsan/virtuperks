@@ -5,11 +5,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: Contract
+    name: AppRegistry
     network: base-sepolia
     source:
       address: "0xC587dbf102afaE9F0632b04D6d74d9E95B409EC7"
-      abi: Contract
+      abi: AppRegistry
       startBlock: 26715013
     mapping:
       kind: ethereum/events
@@ -24,8 +24,8 @@ dataSources:
         - RoleGranted
         - RoleRevoked
       abis:
-        - name: Contract
-          file: ./abis/Contract.json
+        - name: AppRegistry
+          file: ./abis/AppRegistry.json
       eventHandlers:
         - event: AppCreated(indexed bytes32,indexed address,indexed address)
           handler: handleAppCreated
@@ -41,4 +41,4 @@ dataSources:
           handler: handleRoleGranted
         - event: RoleRevoked(indexed bytes32,indexed bytes32,indexed address,address)
           handler: handleRoleRevoked
-      file: ./src/contract.ts
+      file: ./src/app-registry.ts

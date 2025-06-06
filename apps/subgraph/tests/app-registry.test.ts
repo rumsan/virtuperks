@@ -8,9 +8,9 @@ import {
 } from "matchstick-as/assembly/index"
 import { Bytes, Address } from "@graphprotocol/graph-ts"
 import { AppCreated } from "../generated/schema"
-import { AppCreated as AppCreatedEvent } from "../generated/Contract/Contract"
-import { handleAppCreated } from "../src/contract"
-import { createAppCreatedEvent } from "./contract-utils"
+import { AppCreated as AppCreatedEvent } from "../generated/AppRegistry/AppRegistry"
+import { handleAppCreated } from "../src/app-registry"
+import { createAppCreatedEvent } from "./app-registry-utils"
 
 // Tests structure (matchstick-as >=0.5.0)
 // https://thegraph.com/docs/en/developer/matchstick/#tests-structure-0-5-0

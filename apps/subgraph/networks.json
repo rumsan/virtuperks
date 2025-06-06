@@ -1,6 +1,6 @@
 {
   "base-sepolia": {
-    "Contract": {
+    "AppRegistry": {
       "address": "0xC587dbf102afaE9F0632b04D6d74d9E95B409EC7",
       "startBlock": 26715013
     }

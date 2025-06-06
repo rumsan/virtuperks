@@ -6,7 +6,7 @@ import {
   RoleAdminRevoked as RoleAdminRevokedEvent,
   RoleGranted as RoleGrantedEvent,
   RoleRevoked as RoleRevokedEvent
-} from "../generated/Contract/Contract"
+} from "../generated/AppRegistry/AppRegistry"
 import {
   AppCreated,
   AppNameUpdated,
