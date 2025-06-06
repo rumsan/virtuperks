@@ -6,13 +6,9 @@ import { useParams, useRouter } from "next/navigation";
 
 function Page() {
   const id = useParams() as { id: string };
-  
+
   const router = useRouter();
-  return (
-    <div>
-      <DepartmentDetails cuid={id} router={router} />;
-    </div>
-  );
+  return <div>{<DepartmentDetails cuid={id} router={router} />}</div>;
 }
 
 export default dynamic(() => Promise.resolve(Page), {
