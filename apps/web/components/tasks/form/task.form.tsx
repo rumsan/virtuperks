@@ -1,6 +1,6 @@
 "use client";
 
-import { useEntityList } from "@/hooks/subgraph/querycall";
+import { useGetAllEntity } from "@/hooks/subgraph/entity";
 import { Button } from "@workspace/ui/components/button";
 
 import { Calendar } from "@workspace/ui/components/calendar";
@@ -60,7 +60,7 @@ export default function TaskBaseForm({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [currentWallet, setCurrentWallet] = useState("");
   const [walletAddresses, setWalletAddresses] = useState<string[]>([]);
-  const getAllEntity = useEntityList();
+  const getAllEntity = useGetAllEntity();
   const entityList = getAllEntity?.data?.data?.entityTaskManagerCreateds;
 
   const handleAddWallet = () => {

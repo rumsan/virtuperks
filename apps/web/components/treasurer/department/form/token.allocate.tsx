@@ -1,6 +1,6 @@
 "use client";
 
-import { useTokenMint } from "@/hooks/subgraph/querycall";
+import { useRewardTokenMint } from "@/hooks/subgraph/entity";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
@@ -33,7 +33,8 @@ const TokenAllocateForm = ({ router, id }: TokenAllocateMainProps) => {
     defaultValues,
   });
 
-  const { tokenMint, mintPending, mintSuccess, mintError } = useTokenMint();
+  const { tokenMint, mintPending, mintSuccess, mintError } =
+    useRewardTokenMint();
 
   useEffect(() => {
     if (mintSuccess) {

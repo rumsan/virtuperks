@@ -50,6 +50,7 @@ const Validation = ({ children }: ValidationProps) => {
 
     if (hasDefaultAdminRole && hasTreasurerRole) {
       setCurrentRole("BOTH");
+      console.log("Role: ", currentRole);
     } else if (hasDefaultAdminRole) {
       setCurrentRole("ADMIN");
     } else if (hasTreasurerRole) {
@@ -60,6 +61,7 @@ const Validation = ({ children }: ValidationProps) => {
   }, [isConnected, hasDefaultAdminRole, hasTreasurerRole]);
 
   const renderNav = () => {
+    console.log("Current Role: ", currentRole);
     switch (currentRole) {
       case "BOTH":
         return <UnifiedNav>{children}</UnifiedNav>;

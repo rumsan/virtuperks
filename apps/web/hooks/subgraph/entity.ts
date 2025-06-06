@@ -1,6 +1,9 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useWriteRewardManagementFactoryCreateRewardManagement } from "../wagmi/contracts";
+import {
+  useWriteRewardManagementFactoryCreateRewardManagement,
+  useWriteRewardTokenMint,
+} from "../wagmi/contracts";
 
 export const useGetAllEntity = () => {
   const { queryService } = useGraphService();
@@ -42,17 +45,61 @@ export const useDepartmentAdd = () => {
   };
 };
 
-export const useGetEntityById = (id: string) => {
+export const useGetEntityById = (rewardManagement: string) => {
   const { queryService } = useGraphService();
+
   return useQuery({
-    queryKey: ["entity", id],
-    enabled: !!id && !!queryService,
+    queryKey: ["entityByRewardManagement", rewardManagement],
+    enabled: !!rewardManagement && !!queryService,
     queryFn: async () => {
       if (!queryService) {
         throw new Error("Subgraph query service is not initialized.");
       }
-      const result = await queryService.getRewardManagementCreatedById(id);
-      return result.data?.rewardManagementCreated;
+
+      const result =
+        await queryService.getRewardManagementCreatedByAddress(
+          rewardManagement,
+        );
+
+      console.log("Subgraph result:", result);
+
+      const entity = result?.data?.rewardManagementCreateds?.[0];
+
+      if (!entity) {
+        throw new Error("Entity not found in subgraph response.");
+      }
+
+      return entity;
     },
   });
+};
+
+// Mint tokens
+export const useRewardTokenMint = () => {
+  const { writeContractAsync } = useWriteRewardTokenMint();
+
+  const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
+
+  const mutation = useMutation({
+    mutationFn: async ({
+      address,
+      amount,
+    }: {
+      address: string;
+      amount: number;
+    }) => {
+      const result = await writeContractAsync({
+        address: tokenAddress,
+        args: [address as `0x${string}`, BigInt(amount)],
+      });
+      return result;
+    },
+  });
+
+  return {
+    tokenMint: mutation.mutateAsync,
+    mintPending: mutation.isPending,
+    mintSuccess: mutation.isSuccess,
+    mintError: mutation.isError,
+  };
 };
