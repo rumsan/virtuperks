@@ -213,17 +213,40 @@ type TaskCompleted @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
+type TaskDetail @entity {
+  id: Bytes!
+ 
+  name: String!
+  detailsUrl: String!
+  owner: Bytes!
+  expiryDate: BigInt!
+  rewardToken: Bytes!
+  totalRewardAmount: BigInt!
+  isOpen: Boolean!
+  requireApproval: Boolean!
+  isWhitelisted: Boolean!
+  isTokenDisbursed: Boolean!
+  maxParticipants: BigInt!
+  acceptedParticipantCount: BigInt!
+  verifiedParticipants: [Bytes!]!
+  createdAt: BigInt
+  tasks: [TaskCreated!]! @derivedFrom(field: "taskDetail")
+}
+
 type TaskCreated @entity(immutable: true) {
   id: Bytes!
-  internal_id: Bytes! # bytes32
-  createdBy: Bytes! # address
+  internal_id: Bytes!
+  taskDetail: TaskDetail!
+  createdBy: Bytes!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
- 
 }
 
-
+type TaskIdMapping @entity {
+  id: Bytes! # internal_id (event.params.id)
+  taskCreated: TaskCreated!
+}
 
 type TaskDetailsUpdated @entity(immutable: true) {
   id: Bytes!
