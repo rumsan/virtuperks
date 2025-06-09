@@ -9,22 +9,19 @@ type TaskDetailsProps = {
 };
 
 const TaskDetails = ({ cuid }: TaskDetailsProps) => {
-
- 
   const getTaskDetail = useGetTaskDetailById(cuid.id);
- 
-  const taskData = getTaskDetail?.data?.data?.taskCreateds[0]
+  console.log("Task Details: ", getTaskDetail.data);
+  const taskData = getTaskDetail?.data?.taskCreateds[0];
+  console.log("data--", taskData);
+
   const formattedDate = formatDate(taskData?.taskDetail?.expiryDate);
 
-   const handleUrlClick = (e: React.MouseEvent<HTMLDivElement>, url: string) => {
+  const handleUrlClick = (e: React.MouseEvent<HTMLDivElement>, url: string) => {
     e.preventDefault();
     if (url) {
-      window.open(url, '_blank', 'noopener,noreferrer');
+      window.open(url, "_blank", "noopener,noreferrer");
     }
   };
-
-
-
 
   return (
     <>
@@ -33,13 +30,12 @@ const TaskDetails = ({ cuid }: TaskDetailsProps) => {
           <div className="flex items-center gap-2">
             <span>Default Title</span>
             <span className="w-20 h-6 flex items-center justify-center bg-green-50 rounded-full text-green-700 p-1 text-sm font-normal">
-              {}
+              Status
             </span>
           </div>
-          <div className="flex items-center gap-2 cursor-pointer hover:text-blue-400"
-          
-           onClick={(e) => handleUrlClick(e, taskData?.taskDetail?.detailsUrl)}
-          
+          <div
+            className="flex items-center gap-2 cursor-pointer hover:text-blue-400"
+            onClick={(e) => handleUrlClick(e, taskData?.taskDetail?.detailsUrl)}
           >
             <span className="text-[#297AD6] text-sm font-normal">
               View Github repository
