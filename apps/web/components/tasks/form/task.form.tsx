@@ -2,9 +2,7 @@
 
 import { useGetAllEntity } from "@/hooks/subgraph/entity";
 import { Button } from "@workspace/ui/components/button";
-
 import { Calendar } from "@workspace/ui/components/calendar";
-
 import {
   Form,
   FormControl,
@@ -28,7 +26,6 @@ import {
 } from "@workspace/ui/components/select";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-
 import { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { isAddress } from "viem";
@@ -61,12 +58,15 @@ export default function TaskBaseForm({
   const [currentWallet, setCurrentWallet] = useState("");
   const [walletAddresses, setWalletAddresses] = useState<string[]>([]);
   const getAllEntity = useGetAllEntity();
-  const entityList = getAllEntity?.data?.data?.rewardManagementCreateds
+  const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
 
   const handleAddWallet = () => {
     if (currentWallet && isAddress(currentWallet)) {
       setWalletAddresses((prev) => [...prev, currentWallet]);
-      form.setValue("whitelistedParticipants", [...walletAddresses, currentWallet]);
+      form.setValue("whitelistedParticipants", [
+        ...walletAddresses,
+        currentWallet,
+      ]);
       setCurrentWallet("");
     }
   };
