@@ -11,5 +11,6 @@ export interface DepartmentDetails {
   __typename: string;
   _appId: string;
   name: string;
-  tasks:TaskCreated[]
+  tasks: TaskCreated[];
+  rewardManagement: string;
 }

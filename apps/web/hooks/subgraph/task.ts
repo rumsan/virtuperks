@@ -1,4 +1,5 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useGraphService } from "@/providers/subgraph-provider";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
 import { useWriteRewardManagementCreateTask } from "../wagmi/contracts";
 
@@ -50,4 +51,19 @@ export const useTaskAdd = () => {
     taskPending: mutation.isPending,
     taskSuccess: mutation.isSuccess,
   };
+};
+
+
+
+
+export const useGetAllTask = () => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["taskList"],
+    queryFn: async () => {
+      const taskDetail = await queryService?.getTaskManagementData()
+      return taskDetail;
+    },
+  });
 };

@@ -10,6 +10,8 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { Copy, Plus, User } from "lucide-react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { Cuid } from "./details.main";
 
 type DepartmentDetailsCardProps = {
   cuid: Cuid;
@@ -20,8 +22,11 @@ export default function DepartmentDetailsCard({
   cuid,
   router,
 }: DepartmentDetailsCardProps) {
-  const { data, isLoading, isError, error } = useGetEntityById(cuid.id);
-  console.log("Data: ", data);
+  console.log("CUID Department: ", cuid.id);
+
+  const { data: entity, isLoading, isError, error } = useGetEntityById(cuid.id);
+  console.log("Entity Department: ", entity);
+
   if (isLoading) {
     return <p className="text-gray-600">Loading department info...</p>;
   }
@@ -32,9 +37,14 @@ export default function DepartmentDetailsCard({
     );
   }
 
-  const entity = data;
+  if (!entity) {
+    return (
+      <p className="text-red-600">
+        Department data is not available or could not be found.
+      </p>
+    );
+  }
 
-  console.log("Entity: ", entity);
   const roleCheck = hasRole({
     role: process.env.NEXT_PUBLIC_MINTER_ROLE || "",
   });
@@ -45,7 +55,7 @@ export default function DepartmentDetailsCard({
       <div className="flex flex-col gap-1 my-2">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-bold text-4xl">{entity?.name}</h1>
+            <h1 className="font-bold text-4xl">{entity.name}</h1>
             <h3 className="text-gray-500 font-normal text-sm">
               Detailed view of the selected department
             </h3>
@@ -55,7 +65,9 @@ export default function DepartmentDetailsCard({
               className="min-w-[10rem] fw-[600] h-10 ml-auto"
               variant="default"
               type="button"
-              onClick={() => router.push(PATHS.TREASURER.CREATE(entity.id))}
+              onClick={() =>
+                router.push(PATHS.TREASURER.CREATE(entity.rewardManagement))
+              }
             >
               <Plus size={22} strokeWidth={2.75} />
               <span>Allocate Token</span>
@@ -73,7 +85,7 @@ export default function DepartmentDetailsCard({
             <CardDescription className="flex flex-col gap-2">
               <div className="flex flex-col items-start gap-2">
                 <div className="flex flex-start text-[#334155] text-xl justify-start">
-                  {/* {entity?.name} */}
+                  {entity.name}
                 </div>
                 <div className="flex items-center gap-1">
                   <Copy size={16} strokeWidth={3} color="#94A3B8" />
@@ -90,7 +102,7 @@ export default function DepartmentDetailsCard({
             </CardTitle>
           </CardHeader>
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {entity?.totalTokenBalance ?? "-"}
+            {entity.totalTokenBalance ?? "-"}
           </CardFooter>
         </Card>
         <Card className="font-normal text-base h-40 flex flex-col">
@@ -100,7 +112,7 @@ export default function DepartmentDetailsCard({
             </CardTitle>
           </CardHeader>
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {entity?.remainingTokenBalance ?? "-"}
+            {entity.remainingTokenBalance ?? "-"}
           </CardFooter>
         </Card>
         <Card className="font-normal text-base h-40 flex flex-col">

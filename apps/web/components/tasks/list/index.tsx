@@ -12,7 +12,6 @@ import {
 import { Plus } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
-import ListCardDetails from "./list.card";
 import { DatePickerWithRange } from "./list.date";
 
 interface TaskListMainProps {
@@ -22,6 +21,7 @@ interface TaskListMainProps {
 export default function TaskListMain({ router }: TaskListMainProps) {
   const [tabStatus, setTabStatus] = useState("active");
   // const getAllTask = useTaskList();
+  // const getAllTask = useGetAllTask()
   // const taskList = getAllTask?.data?.data?.taskCreateds;
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
