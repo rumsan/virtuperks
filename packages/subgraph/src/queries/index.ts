@@ -181,18 +181,29 @@ export const RewardManagementQueries = {
       taskCreateds(first: 10, orderBy: blockTimestamp, orderDirection: desc) {
         id
         internal_id
+        taskDetail {
+        acceptedParticipantCount
+        detailsUrl
+        id
+        expiryDate
+        isOpen
+        isTokenDisbursed
+        maxParticipants
+        name
+        owner
+        rewardToken
+        totalRewardAmount
+        requireApproval
+        isWhitelisted
+        verifiedParticipants
+        
+        }
         createdBy
         blockNumber
         blockTimestamp
         transactionHash
       }
-      taskDetailsUpdateds(first: 10) {
-        id
-        internal_id
-        updatedBy
-        blockNumber
-        blockTimestamp
-      }
+  
     }
   `,
   getTaskCreatedById: `
@@ -200,6 +211,23 @@ export const RewardManagementQueries = {
     taskCreated(id: $id) {
       id
       internal_id
+       taskDetail {
+        acceptedParticipantCount
+        detailsUrl
+        id
+        expiryDate
+        isOpen
+        isTokenDisbursed
+        maxParticipants
+        name
+        owner
+        rewardToken
+        totalRewardAmount
+        requireApproval
+        isWhitelisted
+        verifiedParticipants
+        
+        }
       createdBy
       blockNumber
       blockTimestamp
@@ -212,6 +240,23 @@ getTaskDetailsUpdatedById: `
     taskDetailsUpdated(id: $id) {
       id
       internal_id
+       taskDetail {
+        acceptedParticipantCount
+        detailsUrl
+        id
+        expiryDate
+        isOpen
+        isTokenDisbursed
+        maxParticipants
+        name
+        owner
+        rewardToken
+        totalRewardAmount
+        requireApproval
+        isWhitelisted
+        verifiedParticipants
+        
+        }
       updatedBy
       blockNumber
       blockTimestamp
@@ -223,6 +268,23 @@ getParticipantAppliedById: `
     participantApplied(id: $id) {
       id
       internal_id
+       taskDetail {
+        acceptedParticipantCount
+        detailsUrl
+        id
+        expiryDate
+        isOpen
+        isTokenDisbursed
+        maxParticipants
+        name
+        owner
+        rewardToken
+        totalRewardAmount
+        requireApproval
+        isWhitelisted
+        verifiedParticipants
+        
+        }
       participant
       blockNumber
       blockTimestamp
