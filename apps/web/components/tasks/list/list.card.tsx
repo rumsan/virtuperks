@@ -56,8 +56,8 @@ const ListCardDetails = ({
         >
           <CardTitle className="flex flex-col p-4 gap-2">
             <div className="flex items-center gap-2 text-[#334155]">
-              <span>{task?.taskDetail?.taskName}</span>
-              <span>{task?.taskDetail?.isOpen ? "Active" : "Closed"}</span>
+              <span>{task?.taskDetail?.name}</span>
+              <span>{task?.taskDetail?.isOpen ? "Open" : "Closed"}</span>
             </div>
 
             <div className="flex flex-col gap-1 text-sm">
@@ -83,7 +83,11 @@ const ListCardDetails = ({
               </div>
 
               <div className="flex items-center font-normal text-[#64748B]">
-                <span>{task?.taskDetail?.owner}</span>
+                <span>
+                  {task?.taskDetail?.owner
+                    ? `${task.taskDetail.owner.slice(0, 15)}.. . . ${task.taskDetail.owner.slice(-10)}`
+                    : ""}
+                </span>
                 <Dot />
                 <span>
                   Deadline: {formatDate(task?.taskDetail?.expiryDate)}
@@ -98,7 +102,7 @@ const ListCardDetails = ({
           <div className="flex items-center gap-2 pl-4 pb-4">
             <Coins color="#297AD6" />
             <span className="text-xl text-[#297AD6] font-bold">
-              {task?.taskDetail?.rewardAmount} tokens
+              {task?.taskDetail?.totalRewardAmount} tokens
             </span>
           </div>
         </Card>
