@@ -11,12 +11,15 @@ describe('RewardManagement Contract', function() {
 
   describe('Deployment', function() {
     it('should deploy successfully and set initial state', async function() {
-      const { rewardManagement, appRegistry, APP_ID, user2 , participant1} = await fixture();
+      const { rewardManagement, appRegistry, APP_ID, user2 , participant1,} = await fixture();
       expect(await rewardManagement.appId()).to.equal(APP_ID);
       expect(await rewardManagement.name()).to.equal("Test Reward Management");
+     
       
       const ownerRole = await rewardManagement.OWNER();
+     
       const participantRole = await rewardManagement.PARTICIPANT();
+   
     
       
       // Verify roles are set correctly
@@ -44,7 +47,7 @@ describe('RewardManagement Contract', function() {
         totalRewardAmount:BigInt(100),
         isOpen: true,
         requireApproval: true,
-        isWhitelisted: false,
+        isWhitelisted:true,
         isTokenDisbursed: false,
         maxParticipants: 10,
         acceptedParticipantCount: 0,

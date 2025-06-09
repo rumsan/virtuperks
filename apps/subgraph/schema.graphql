@@ -99,6 +99,7 @@ type RewardManagementCreated @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  
 }
 type AdditionalDisbursementToTask @entity(immutable: true) {
   id: Bytes!
@@ -219,7 +220,10 @@ type TaskCreated @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+ 
 }
+
+
 
 type TaskDetailsUpdated @entity(immutable: true) {
   id: Bytes!

@@ -5,13 +5,14 @@ import {
   useWriteRewardTokenMint,
 } from "../wagmi/contracts";
 
+
 export const useGetAllEntity = () => {
   const { queryService } = useGraphService();
 
   return useQuery({
     queryKey: ["entityList"],
     queryFn: async () => {
-      const taskDetail = await queryService?.getDeployments();
+      const taskDetail = await queryService?.getDeployments()
       return taskDetail;
     },
   });
@@ -22,7 +23,9 @@ export const useDepartmentAdd = () => {
   const { writeContractAsync } =
     useWriteRewardManagementFactoryCreateRewardManagement();
 
-  const appId = (process.env.NEXT_PUBLIC_APP_ID as `0x${string}`) || "0x";
+  const appId = process.env.NEXT_PUBLIC_APP_ID as `0x${string}` || "0x";
+
+
 
   const mutation = useMutation({
     mutationFn: async ({ name }: { name: string }) => {

@@ -1,8 +1,7 @@
-import { log } from "@graphprotocol/graph-ts"
-import { RewardManagementCreated as RewardManagementCreatedEvent } from "../generated/RewardManagementFactory/RewardManagementFactory"
-
-import { RewardManagementCreated } from "../generated/schema"
-import { RewardManagement } from "../generated/templates"
+import { log } from "matchstick-as";
+import { RewardManagementCreated as RewardManagementCreatedEvent } from "../generated/RewardManagementFactory/RewardManagementFactory";
+import { RewardManagementCreated } from "../generated/schema";
+import { RewardManagement } from "../generated/templates";
 
 export function handleRewardManagementCreated(
   event: RewardManagementCreatedEvent,
@@ -20,7 +19,9 @@ export function handleRewardManagementCreated(
   entity.transactionHash = event.transaction.hash
 
   entity.save()
-  log.debug("RewardManagementCreated: {}", [entity.rewardManagement.toHexString()]);
-  RewardManagement.create(event.params.rewardManagement)
-  log.debug("RewardManagement template created for: {}", [event.params.rewardManagement.toHexString()]);
+
+    log.debug("EntityTaskManagerCreated: {}", [entity.rewardManagement.toHexString()]);
+
+  RewardManagement.create(event.params.rewardManagement);
+  log.debug("entityTemplateAdded: {}", [entity.rewardManagement.toHexString()]);
 }

@@ -448,11 +448,11 @@ export const FactoryQueries = {
   query GetRewardManagementCreatedByAddress($rewardManagement: String!) {
     rewardManagementCreateds(where: { rewardManagement: $rewardManagement }) {
       aclAddress
-      allocatedToTasks
+  
       id
       name
       rewardManagement
-      totalTokenBalance
+    
     }
   }
 `,

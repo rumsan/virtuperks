@@ -18,6 +18,7 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
   const getAllEntity = useGetAllEntity();
   console.log("All Entity Data: ", getAllEntity?.data);
   const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
+  console.log("Entity List: ", entityList);
 
   const hasEntityOwnerRole = hasRole({
     role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",

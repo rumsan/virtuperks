@@ -1,3 +1,4 @@
+import { log } from "matchstick-as"
 import {
   AdditionalDisbursementToTask,
   ContractPaused,
@@ -10,6 +11,7 @@ import {
   TaskAccepted,
   TaskApproved,
   TaskClosed,
+  RewardManagementCreated,
   TaskCompleted,
   TaskCreated,
   TaskDetailsUpdated,
@@ -34,6 +36,7 @@ import {
   TaskVerified as TaskVerifiedEvent,
   TokenTransferred as TokenTransferredEvent,
 } from "../generated/templates/RewardManagement/RewardManagement"
+import { fetchTaskDetails } from "./utils"
 
 export function handleAdditionalDisbursementToTask(
   event: AdditionalDisbursementToTaskEvent,
@@ -214,17 +217,35 @@ export function handleTaskCompleted(event: TaskCompletedEvent): void {
 }
 
 export function handleTaskCreated(event: TaskCreatedEvent): void {
-  let entity = new TaskCreated(
+    log.info('TaskCreated event fired: {}', [event.address.toHexString()]);
+  let task = new TaskCreated(
     event.transaction.hash.concatI32(event.logIndex.toI32()),
   )
-  entity.internal_id = event.params.id
-  entity.createdBy = event.params.createdBy
+  task.internal_id = event.params.id
+  task.createdBy = event.params.createdBy
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
+  task.blockNumber = event.block.number
+  task.blockTimestamp = event.block.timestamp
+  task.transactionHash = event.transaction.hash
 
-  entity.save()
+  //let entity = RewardManagementCreated.load(event.address);
+  log.info("EntityTaskManagerCreated: {}", [event.address.toHexString()]);
+  //   if (entity) {
+  //   task.rewardManagement = entity.id
+  //   log.info("Linked TaskCreated to EntityTaskManagerCreated: {}", [entity.id.toHexString()]);
+  // } else {
+  //   log.info("No EntityTaskManagerCreated found for address: {}", [event.address.toHexString()]);
+  // }
+  task.save()
+
+  // let taskDetail = fetchTaskDetails(event.params.id, event.address, task.id)
+  //   if (taskDetail) {
+  //   task.taskDetail = taskDetail.id;
+  // } else {
+  //   log.error("TaskDetail is null for task ID: {}", [event.params.id.toHexString()]);
+  // }
+  // task.save()
+
 }
 
 export function handleTaskDetailsUpdated(event: TaskDetailsUpdatedEvent): void {

@@ -113,7 +113,7 @@ contract RewardManagement is IRewardManagement, Multicall, ReentrancyGuard {
 
         if (task.isWhitelisted) {
             for (uint256 i = 0; i < _whitelistParticipants.length; i++) {
-                this.addToWhitelist(taskId, _whitelistParticipants[i], false);
+                _addToWhitelist(taskId, _whitelistParticipants[i], false);
             }
         }
 
@@ -125,6 +125,10 @@ contract RewardManagement is IRewardManagement, Multicall, ReentrancyGuard {
         address participant,
         bool throwError
     ) public onlyRole(OWNER) {
+        _addToWhitelist(taskId, participant, throwError);
+    }
+
+    function _addToWhitelist(bytes32 taskId, address participant, bool throwError) internal {
         Task storage task = tasks[taskId];
         if (!task.isWhitelisted) {
             require(!throwError, "Task does not require whitelist");
