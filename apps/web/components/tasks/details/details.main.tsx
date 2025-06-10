@@ -1,14 +1,13 @@
-import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
-import {
-  useApproveTaskMutation,
-  useGetApprovedAndCompletedList,
-} from "@/hooks/subgraph/querycall";
+// import {
+//   useApproveTaskMutation,
+//   useGetApprovedAndCompletedList,
+// } from "@/hooks/subgraph/querycall";
 import { useGetTaskDetailById } from "@/hooks/subgraph/taskDetail";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { useToast } from "@workspace/ui/hooks/use-toast";
-import { ArrowLeft, CheckCircle, CircleX } from "lucide-react";
+import { ArrowLeft, CircleX } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 import TaskParticipant from "./details.participant";
@@ -25,67 +24,65 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
 
   const { toast } = useToast();
-  const { completedData, approvedData } = useGetApprovedAndCompletedList(
-    cuid.id,
-  );
+  // const { completedData, approvedData } = useGetApprovedAndCompletedList(
+  //   cuid.id,
+  // );
   const [localStatus, setLocalStatus] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  const approveTask = useApproveTaskMutation();
+  // const approveTask = useApproveTaskMutation();
 
-  const getApproveButtonState = () => {
-    // If approved data exists, show approved state
-    if (
-      (approvedData && approvedData.length > 0) ||
-      localStatus === "VERIFIED"
-    ) {
-      return {
-        className: "border border-[#03AB65] bg-[#03AB65]",
-        text: "Verified",
-        disabled: true,
-        onClick: undefined,
-      };
-    }
+  // const getApproveButtonState = () => {
+  // If approved data exists, show approved state
+  // if (
+  //   (approvedData && approvedData.length > 0) ||
+  //   localStatus === "VERIFIED"
+  // ) {
+  //   return {
+  //     className: "border border-[#03AB65] bg-[#03AB65]",
+  //     text: "Verified",
+  //     disabled: true,
+  //     onClick: undefined,
+  //   };
+  // }
+  // If completed data exists but not approved, enable approve button
+  // if (completedData && completedData.length > 0) {
+  //   return {
+  //     className: "border border-[#03AB65]",
+  //     text: approveTask.isPending ? "Processing..." : "Approve",
+  //     disabled: approveTask.isPending,
+  //     onClick: () => setIsOpen(true),
+  //   };
+  // }
+  // If neither exists, disable approve button
+  // return {
+  //   className: "border border-[#03AB65]",
+  //   text: "Approve",
+  //   disabled: true,
+  //   onClick: undefined,
+  // };
+  // };
 
-    // If completed data exists but not approved, enable approve button
-    if (completedData && completedData.length > 0) {
-      return {
-        className: "border border-[#03AB65]",
-        text: approveTask.isPending ? "Processing..." : "Approve",
-        disabled: approveTask.isPending,
-        onClick: () => setIsOpen(true),
-      };
-    }
-
-    // If neither exists, disable approve button
-    return {
-      className: "border border-[#03AB65]",
-      text: "Approve",
-      disabled: true,
-      onClick: undefined,
-    };
-  };
-
-  const handleDialogAction = async () => {
-    try {
-      await approveTask.mutateAsync({
-        taskId: cuid.id,
-        entityId: taskData.entityTaskManager.entityTaskManager,
-      });
-      setIsOpen(false);
-      setLocalStatus("VERIFIED"); // Update local status immediately after successful approval
-      toast({
-        title: "Task Approved Successfully!.",
-        variant: "success",
-      });
-    } catch (error) {
-      console.error("Error approving task:", error);
-      toast({
-        title: "Failed To Approve Task. Please Try Again.",
-        variant: "destructive",
-      });
-    }
-  };
+  // const handleDialogAction = async () => {
+  //   try {
+  //     await approveTask.mutateAsync({
+  //       taskId: cuid.id,
+  //       entityId: taskData.entityTaskManager.entityTaskManager,
+  //     });
+  //     setIsOpen(false);
+  //     setLocalStatus("VERIFIED"); // Update local status immediately after successful approval
+  //     toast({
+  //       title: "Task Approved Successfully!.",
+  //       variant: "success",
+  //     });
+  //   } catch (error) {
+  //     console.error("Error approving task:", error);
+  //     toast({
+  //       title: "Failed To Approve Task. Please Try Again.",
+  //       variant: "destructive",
+  //     });
+  //   }
+  // };
 
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
@@ -105,7 +102,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
             </h3>
           </div>
           <div className="flex items-center ml-auto gap-4">
-            <Button
+            {/* <Button
               variant="outline"
               className={getApproveButtonState().className}
               onClick={getApproveButtonState().onClick}
@@ -129,13 +126,13 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
                 strokeWidth={2.5}
                 size={20}
               />
-            </Button>
+            </Button> */}
 
             <Button variant="outline" className="border border-[#E44134]">
               <span className="text-[#E44134]">Close</span>{" "}
               <CircleX color="#E44134" strokeWidth={2.5} size={20} />
             </Button>
-            {!approveTask.isPending && isOpen && (
+            {/* {!approveTask.isPending && isOpen && (
               <DialogButton
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
@@ -144,7 +141,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
                 buttonName="Approve"
                 handleApplyTaskLogic={handleDialogAction}
               />
-            )}
+            )} */}
           </div>
         </div>
 

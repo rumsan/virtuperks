@@ -1,22 +1,13 @@
-import { DataTablePagination } from "@/components/common/list/list.pagination";
-import { ListTable } from "@/components/common/list/list.table";
-import { useGetTaskParticipantsWithStatus } from "@/hooks/subgraph/querycall";
-import { shortAddress } from "@/utils/shortAddress";
+// import { useGetTaskParticipantsWithStatus } from "@/hooks/subgraph/querycall";
 import {
   ColumnFiltersState,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   SortingState,
-  useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { ParticipantTaskStatus } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Input } from "@workspace/ui/components/input";
-import { Search, User } from "lucide-react";
-import React, { useMemo } from "react";
+import { Search } from "lucide-react";
+import React from "react";
 import { useColumns } from "./details.column";
 
 type Cuid = {
@@ -41,44 +32,47 @@ const TaskParticipant = ({ taskId }: TaskParticipantProps) => {
   });
   const columns = useColumns();
 
-  const { taskParticipantsWithStatus } = useGetTaskParticipantsWithStatus(taskId.id);
+  // const { taskParticipantsWithStatus } = useGetTaskParticipantsWithStatus(
+  //   taskId.id,
+  // );
 
+  // const { tableData, acceptedParticipants } = useMemo(() => {
+  //   if (!taskParticipantsWithStatus)
+  //     return { tableData: [], acceptedParticipants: [] };
 
+  //   return {
+  //     // For table: show only UNACCEPTED and COMPLETED participants
+  //     tableData: taskParticipantsWithStatus.filter(
+  //       (participant: ParticipantTaskStatus) =>
+  //         participant.status === "UNACCEPTED" ||
+  //         participant.status === "COMPLETED",
+  //     ),
+  //     // For sidebar: show only ACCEPTED participants
+  //     acceptedParticipants: taskParticipantsWithStatus.filter(
+  //       (participant: ParticipantTaskStatus) =>
+  //         participant.status === "ACCEPTED",
+  //     ),
+  //   };
+  // }, [taskParticipantsWithStatus]);
 
-  const { tableData, acceptedParticipants } = useMemo(() => {
-    if (!taskParticipantsWithStatus) return { tableData: [], acceptedParticipants: [] };
-
-    return {
-      // For table: show only UNACCEPTED and COMPLETED participants
-      tableData: taskParticipantsWithStatus.filter((participant:ParticipantTaskStatus) => 
-        participant.status === "UNACCEPTED" || participant.status === "COMPLETED"
-      ),
-      // For sidebar: show only ACCEPTED participants
-      acceptedParticipants: taskParticipantsWithStatus.filter((participant:ParticipantTaskStatus) => 
-        participant.status === "ACCEPTED"
-      )
-    };
-  }, [taskParticipantsWithStatus]);
- 
-
-  const table = useReactTable({
-    data: tableData,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
-  });
+  // const table = useReactTable({
+  //   data: tableData,
+  //   columns,
+  //   onSortingChange: setSorting,
+  //   onColumnFiltersChange: setColumnFilters,
+  //   getCoreRowModel: getCoreRowModel(),
+  //   getPaginationRowModel: getPaginationRowModel(),
+  //   getSortedRowModel: getSortedRowModel(),
+  //   getFilteredRowModel: getFilteredRowModel(),
+  //   onColumnVisibilityChange: setColumnVisibility,
+  //   onRowSelectionChange: setRowSelection,
+  //   state: {
+  //     sorting,
+  //     columnFilters,
+  //     columnVisibility,
+  //     rowSelection,
+  //   },
+  // });
 
   return (
     <>
@@ -102,13 +96,13 @@ const TaskParticipant = ({ taskId }: TaskParticipantProps) => {
         </div>
 
         <div className="">
-          <ListTable table={table} columns={columns} />
+          {/* <ListTable table={table} columns={columns} />
           <hr />
           <DataTablePagination
             table={table}
             setPagination={setPagination}
             pagination={pagination}
-          />
+          /> */}
         </div>
       </Card>
 
@@ -120,8 +114,8 @@ const TaskParticipant = ({ taskId }: TaskParticipantProps) => {
           </span>
         </CardTitle>
 
-        <div className="flex items-center w-full mt-5 mb-5 gap-2 flex-wrap">
-          {acceptedParticipants.map((participant:any) => (
+        {/* <div className="flex items-center w-full mt-5 mb-5 gap-2 flex-wrap">
+          {acceptedParticipants.map((participant: any) => (
             <div
               key={participant.participant}
               className="flex flex-col items-center gap-1"
@@ -135,7 +129,7 @@ const TaskParticipant = ({ taskId }: TaskParticipantProps) => {
               </span>
             </div>
           ))}
-        </div>
+        </div> */}
       </Card>
     </>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-// import { useTaskList } from "@/hooks/subgraph/querycall";
+import { useGetAllTask } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -12,6 +12,7 @@ import {
 import { Plus } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
+import ListCardDetails from "./list.card";
 import { DatePickerWithRange } from "./list.date";
 
 interface TaskListMainProps {
@@ -21,8 +22,11 @@ interface TaskListMainProps {
 export default function TaskListMain({ router }: TaskListMainProps) {
   const [tabStatus, setTabStatus] = useState("active");
   // const getAllTask = useTaskList();
-  // const getAllTask = useGetAllTask()
-  // const taskList = getAllTask?.data?.data?.taskCreateds;
+  const getAllTask = useGetAllTask();
+
+  console.log("Get all task: ", getAllTask.data);
+  const taskList = getAllTask?.data?.taskCreation?.taskCreateds;
+  console.log("Task List: ", taskList);
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
       <div className="space-y-4">
@@ -50,16 +54,16 @@ export default function TaskListMain({ router }: TaskListMainProps) {
         <Tabs defaultValue="active" className="">
           <div className="flex items-center">
             <div className="w-[400px]">
-              <TabsList className="flex bg-blue-50 h-10 ">
+              <TabsList className="flex bg-blue-50 h-10">
                 <TabsTrigger
-                  value="active"
+                  value="open"
                   className="w-full h-8"
-                  onClick={() => setTabStatus("active")}
+                  onClick={() => setTabStatus("open")}
                 >
-                  Active
+                  Open
                 </TabsTrigger>
                 <TabsTrigger
-                  value="completed"
+                  value="closed"
                   className="w-full h-8"
                   onClick={() => setTabStatus("completed")}
                 >
@@ -75,18 +79,18 @@ export default function TaskListMain({ router }: TaskListMainProps) {
 
           <div className="w-full mt-5 mb-5">
             <TabsContent className="w-full" value="active">
-              {/* <ListCardDetails
+              <ListCardDetails
                 taskList={taskList}
                 router={router}
                 tabStatus={tabStatus}
-              /> */}
+              />
             </TabsContent>
             <TabsContent className="w-full" value="completed">
-              {/* <ListCardDetails
+              <ListCardDetails
                 taskList={taskList}
                 router={router}
                 tabStatus={tabStatus}
-              /> */}
+              />
             </TabsContent>
           </div>
         </Tabs>
