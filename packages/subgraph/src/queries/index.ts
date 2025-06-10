@@ -531,6 +531,35 @@ export const FactoryQueries = {
   }
 `,
 
+};
 
 
+export const ParticipantQueries = {
+  getParticipantTasks: `
+  query GetParticipantTasks($participant: Bytes!) {
+  participantApplieds(where: { participant: $participant }) {
+    id
+    internal_id
+    blockTimestamp
+    transactionHash
+    taskDetail {
+      id
+      name
+      detailsUrl
+      owner
+      expiryDate
+      rewardToken
+      totalRewardAmount
+      isOpen
+      requireApproval
+      isWhitelisted
+      isTokenDisbursed
+      maxParticipants
+      acceptedParticipantCount
+      verifiedParticipants
+      createdAt
+    }
+  }
+}
+  `
 };

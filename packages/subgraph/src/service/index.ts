@@ -2,6 +2,7 @@ import { Client, fetchExchange } from '@urql/core';
 import {
   AppRegistryQueries,
   FactoryQueries,
+  ParticipantQueries,
   RewardManagementQueries,
   TokenQueries
 } from '../queries';
@@ -118,6 +119,31 @@ export class SubgraphService {
       return { data: null, error };
     }
   }
+
+  async getParticipantTasks(participantAddress: string) {
+    console.log('Fetching tasks for participant:', participantAddress);
+  
+    try { 
+
+      const { data, error } = await this.subgraphQuery.query(
+      ParticipantQueries.getParticipantTasks, 
+      { participant:participantAddress }
+      )
+      return { data, error}
+
+
+    } catch (error) { 
+
+       console.error('Error fetching rewardManagementCreated by address:', error);
+      return { data: null, error };
+
+
+    }
+
+
+
+
+}
   
 
   

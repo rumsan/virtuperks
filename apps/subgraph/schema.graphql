@@ -156,6 +156,7 @@ type ParticipantApplied @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  taskDetail: TaskDetail
 }
 
 type ParticipantRemovedFromWhitelist @entity(immutable: true) {
@@ -185,6 +186,7 @@ type TaskAccepted @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  taskDetail: TaskDetail
 }
 
 type TaskApproved @entity(immutable: true) {
@@ -194,6 +196,7 @@ type TaskApproved @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  taskDetail: TaskDetail
 }
 
 type TaskClosed @entity(immutable: true) {
