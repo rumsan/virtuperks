@@ -1,3 +1,4 @@
+import { log } from "@graphprotocol/graph-ts"
 import {
   AdditionalDisbursementToTask,
   ContractPaused,
@@ -7,6 +8,7 @@ import {
   ParticipantApplied,
   ParticipantRemovedFromWhitelist,
   ParticipantWhitelisted,
+  RewardManagementCreated,
   TaskAccepted,
   TaskApproved,
   TaskClosed,
@@ -215,19 +217,44 @@ export function handleTaskCompleted(event: TaskCompletedEvent): void {
 }
 
 export function handleTaskCreated(event: TaskCreatedEvent): void {
-  // Create TaskDetail entity first
-  const taskDetail = fetchTaskDetails(event.params.id, event.address);
-  taskDetail.createdAt = event.block.timestamp;
-  taskDetail.save();
+ 
 
   // Create TaskCreated entity
+  let entityId = event.transaction.hash.concatI32(event.logIndex.toI32());
   const entity = new TaskCreated(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
+   entityId
   );
+
+  // Get or create RewardManagementCreated entity
+  let rewardManagement = RewardManagementCreated.load(event.address);
+ 
+  
+
+
+if (rewardManagement) {
+    
+  entity.rewardManagement = rewardManagement.id
+      log.info("RewardManagementCreated found for address: {}", [event.address.toHexString()]);
+  } else {
+     log.error("No RewardManagementCreated found for address: {}", [event.address.toHexString()]);
+}
+  
+   // Create TaskDetail entity first
+  let taskDetail = fetchTaskDetails(event.params.id, event.address);
+  taskDetail.createdAt = event.block.timestamp;
+  taskDetail.task = entity.id; 
+  taskDetail.save();
+
+  
+// let mapping = new TaskIdMapping(event.params.id)
+//   mapping.taskCreated = entity.id;
+//   mapping.save();
+
   
   entity.internal_id = event.params.id;
   entity.taskDetail = taskDetail.id;
   entity.createdBy = event.params.createdBy;
+ 
   entity.blockNumber = event.block.number;
   entity.blockTimestamp = event.block.timestamp;
   entity.transactionHash = event.transaction.hash;

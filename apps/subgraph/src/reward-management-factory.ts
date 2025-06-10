@@ -7,7 +7,8 @@ export function handleRewardManagementCreated(
   event: RewardManagementCreatedEvent,
 ): void {
   let entity = new RewardManagementCreated(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  event.params.rewardManagement,
+   
   )
   entity.rewardManagement = event.params.rewardManagement
   entity.aclAddress = event.params.aclAddress
