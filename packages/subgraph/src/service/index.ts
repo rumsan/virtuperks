@@ -2,6 +2,7 @@ import { Client, fetchExchange } from '@urql/core';
 import {
   AppRegistryQueries,
   FactoryQueries,
+  getTaskCreatedById,
   getTaskCreation,
   ParticipantQueries,
   RewardManagementQueries,
@@ -51,6 +52,14 @@ export class SubgraphService {
     const { data, error } = await this.subgraphQuery.query(getTaskCreation, {});
     return { data, error };
   }
+
+  async getTaskById(id:string) {
+    const { data, error } = await this.subgraphQuery.query(getTaskCreatedById, { id })
+    return {data, error }
+
+
+
+}
   // async getTaskManagementData(taskId?: string) {
   //   try {
   //     //const taskCreation = await this.subgraphQuery.query(RewardManagementQueries.getTaskCreation, {});

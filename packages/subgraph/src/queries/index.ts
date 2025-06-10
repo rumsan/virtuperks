@@ -212,10 +212,8 @@ export const getTaskCreation = `
     }
   `;
 
-// RewardManagement Queries
-export const RewardManagementQueries = {
-  
-  getTaskCreatedById: `
+
+export const getTaskCreatedById = `
   query GetTaskCreatedById($id: ID!) {
     taskCreated(id: $id) {
       id
@@ -249,7 +247,12 @@ export const RewardManagementQueries = {
       transactionHash
     }
   }
-`,
+`;
+
+// RewardManagement Queries
+export const RewardManagementQueries = {
+  
+ 
 getTaskDetailsUpdatedById: `
   query GetTaskDetailsUpdatedById($id: ID!) {
     taskDetailsUpdated(id: $id) {

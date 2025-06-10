@@ -1,71 +1,12 @@
-// import { useGraphService } from "@/providers/subgraph-provider";
-// import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-// import { EntityTaskManagementABI } from "@workspace/contracts/abis";
+import { useGraphService } from "@/providers/subgraph-provider";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-// import { useAccount, useReadContract } from "wagmi";
-// import {
-//   useWriteEntityTaskManagerAcceptParticipant,
-//   useWriteEntityTaskManagerCompleteTask,
-//   useWriteEntityTaskManagerParticipate,
-//   useWriteEntityTaskManagerVerifyCompletion,
-//   useWriteRewardTokenMint,
-// } from "../wagmi/contracts";
 
-// // Add these query key constants
-// export const QUERY_KEYS = {
-//   PARTICIPANT: "participant",
-//   ACCEPTED: "accepted",
-//   COMPLETED: "completed",
-//   TASKS: "tasks",
-//   REWARDS: "rewards",
-// } as const;
+import { useAccount, useReadContract } from "wagmi";
+import { useWriteRewardManagementAcceptParticipant, useWriteRewardManagementParticipate } from "../wagmi/contracts";
 
-// export const useApplist = () => {
-//   const { queryService } = useGraphService();
 
-//   return useQuery({
-//     queryKey: ["app"],
-//     queryFn: async () => {
-//       const getAllData = await queryService?.getAppCreatedlist();
-
-//       return getAllData;
-//     },
-//   });
-// };
-
-// export const useEntityList = () => {
-//   const { queryService } = useGraphService();
-
-//   return useQuery({
-//     queryKey: ["entity"],
-//     queryFn: async () => {
-//       const getAllData = await queryService?.getEntityManagerCreatedList();
-
-//       return getAllData;
-//     },
-//   });
-// };
-// export const useEntityDetailById = (id: string) => {
-//   const { queryService } = useGraphService();
-//   return useQuery({
-//     queryKey: ["entityDetail", id],
-//     queryFn: async () => {
-//       const getAllData = await queryService?.getEntityDetailById(id);
-//       return getAllData;
-//     },
-//   });
-// };
-// export const useTaskList = () => {
-//   const { queryService } = useGraphService();
-
-//   return useQuery({
-//     queryKey: [QUERY_KEYS.TASKS],
-//     queryFn: async () => {
-//       const getAllData = await queryService?.getTaskCreatedList();
-//       return getAllData;
-//     },
-//   });
-// };
+;
 
 // export const useGetAllowedWallets = (
 //   entityId: string,
@@ -171,7 +112,7 @@
 // export const useAcceptParticipantMutation = () => {
 //   const queryClient = useQueryClient();
 //   const { writeContractAsync, isPending, isSuccess } =
-//     useWriteEntityTaskManagerAcceptParticipant();
+//     useWriteRewardManagementAcceptParticipant();
 
 //   return useMutation({
 //     mutationFn: async ({
@@ -199,114 +140,114 @@
 //     },
 //   });
 // };
-// const participateInTask = async (
-//   writeContractAsync: (config: any) => Promise<any>,
-//   taskId: string,
-//   entityId: string,
-// ) => {
-//   const result = await writeContractAsync({
-//     address: entityId as `0x${string}`,
-//     args: [taskId as `0x${string}`],
-//   });
-//   return result;
-// };
+const participateInTask = async (
+  writeContractAsync: (config: any) => Promise<any>,
+  taskId: string,
+  entityId: string,
+) => {
+  const result = await writeContractAsync({
+    address: entityId as `0x${string}`,
+    args: [taskId as `0x${string}`],
+  });
+  return result;
+};
 
-// export const useParticipateTaskMutation = () => {
-//   const queryClient = useQueryClient();
-//   const { writeContractAsync } = useWriteEntityTaskManagerParticipate();
-//   const { address: participant } = useAccount();
+export const useParticipateTaskMutation = () => {
+  const queryClient = useQueryClient();
+  const { writeContractAsync } = useWriteRewardManagementParticipate();
+  const { address: participant } = useAccount();
 
-//   const mutation = useMutation({
-//     mutationFn: async ({
-//       taskId,
-//       entityId,
-//     }: {
-//       taskId: string;
-//       entityId: string;
-//     }) => {
-//       const result = await writeContractAsync({
-//         address: (entityId as `0x${string}`) || "0x",
-//         args: [taskId as `0x${string}`],
-//       });
-//       return result;
-//     },
-//     onSuccess: (result, variable) => {
-//       if (participant) {
-//         setTimeout(() => {
-//           queryClient.invalidateQueries({
-//             queryKey: ["participantTaskStatus", participant, variable.taskId],
-//           });
-//         }, 5000);
-//       }
-//     },
-//   });
-//   return {
-//     participateTask: mutation.mutateAsync,
-//     participatePending: mutation.isPending,
-//     participateSuccess: mutation.isSuccess,
-//   };
-// };
+  const mutation = useMutation({
+    mutationFn: async ({
+      taskId,
+      entityId,
+    }: {
+      taskId: string;
+      entityId: string;
+    }) => {
+      const result = await writeContractAsync({
+        address: (entityId as `0x${string}`) || "0x",
+        args: [taskId as `0x${string}`],
+      });
+      return result;
+    },
+    onSuccess: (result, variable) => {
+      if (participant) {
+        setTimeout(() => {
+          queryClient.invalidateQueries({
+            queryKey: ["participantTaskStatus", participant, variable.taskId],
+          });
+        }, 5000);
+      }
+    },
+  });
+  return {
+    participateTask: mutation.mutateAsync,
+    participatePending: mutation.isPending,
+    participateSuccess: mutation.isSuccess,
+  };
+};
 
-// export const useCompleteTaskMutation = () => {
-//   const queryClient = useQueryClient();
-//   const { writeContractAsync } = useWriteEntityTaskManagerCompleteTask();
-//   const { address: participant } = useAccount();
+export const useCompleteTaskMutation = () => {
+  const queryClient = useQueryClient();
+  const { writeContractAsync } = useWriteEntityTaskManagerCompleteTask();
+  const { address: participant } = useAccount();
 
-//   const mutation = useMutation({
-//     mutationFn: async ({
-//       taskId,
-//       entityId,
-//     }: {
-//       taskId: string;
-//       entityId: string;
-//     }) => {
-//       const result = await writeContractAsync({
-//         address: (entityId as `0x${string}`) || "0x",
-//         args: [taskId as `0x${string}`],
-//       });
-//       return result;
-//     },
-//     onSuccess: (result, variable) => {
-//       if (participant) {
-//         setTimeout(() => {
-//           queryClient.invalidateQueries({
-//             queryKey: ["participantTaskStatus", participant, variable.taskId],
-//           });
-//         }, 5000);
-//       }
-//     },
-//   });
-//   return {
-//     completeTask: mutation.mutateAsync,
-//     completePending: mutation.isPending,
-//     completeSuccess: mutation.isSuccess,
-//   };
-// };
+  const mutation = useMutation({
+    mutationFn: async ({
+      taskId,
+      entityId,
+    }: {
+      taskId: string;
+      entityId: string;
+    }) => {
+      const result = await writeContractAsync({
+        address: (entityId as `0x${string}`) || "0x",
+        args: [taskId as `0x${string}`],
+      });
+      return result;
+    },
+    onSuccess: (result, variable) => {
+      if (participant) {
+        setTimeout(() => {
+          queryClient.invalidateQueries({
+            queryKey: ["participantTaskStatus", participant, variable.taskId],
+          });
+        }, 5000);
+      }
+    },
+  });
+  return {
+    completeTask: mutation.mutateAsync,
+    completePending: mutation.isPending,
+    completeSuccess: mutation.isSuccess,
+  };
+};
 
-// export const useTokenMint = () => {
-//   const { writeContractAsync } = useWriteRewardTokenMint();
+export const useTokenMint = () => {
+  const { writeContractAsync } = useWriteRewardTokenMint();
 
-//   const token = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
-//   const mutation = useMutation({
-//     mutationFn: async ({
-//       address,
-//       amount,
-//     }: {
-//       address: string;
-//       amount: number;
-//     }) => {
-//       const result = await writeContractAsync({
-//         address: token,
-//         args: [address as `0x${string}`, BigInt(amount)],
-//       });
+  const token = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
+  const mutation = useMutation({
+    mutationFn: async ({
+      address,
+      amount,
+    }: {
+      address: string;
+      amount: number;
+    }) => {
+      const result = await writeContractAsync({
+        address: token,
+        args: [address as `0x${string}`, BigInt(amount)],
+      });
 
-//       return result;
-//     },
-//   });
-//   return {
-//     tokenMint: mutation.mutateAsync,
-//     mintPending: mutation.isPending,
-//     mintSuccess: mutation.isSuccess,
-//     mintError: mutation.isError,
-//   };
-// };
+      return result;
+    },
+  });
+  return {
+    tokenMint: mutation.mutateAsync,
+    mintPending: mutation.isPending,
+    mintSuccess: mutation.isSuccess,
+    mintError: mutation.isError,
+  };
+};

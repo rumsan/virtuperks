@@ -68,3 +68,22 @@ export const useGetAllTask = () => {
     enabled: !!queryService,
   });
 };
+
+export const useGetTaskById = (id: string) => {
+  const { queryService } = useGraphService();
+  
+  return useQuery({
+    queryKey: ["taskById", id],
+    queryFn: async () => {
+      if (!queryService) {
+        throw new Error("Subgraph query service is not initialized.");
+      }
+      const taskDetail = await queryService?.getTaskById(id);
+      return taskDetail;
+    },
+    enabled: !!id && !!queryService,
+  });
+
+
+
+}
