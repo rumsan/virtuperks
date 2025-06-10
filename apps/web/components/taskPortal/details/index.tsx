@@ -18,6 +18,7 @@ import { useAccount } from "wagmi";
 import TaskPortalParticipant from "./details.participant";
 import TaskPortalDetails from "./details.task";
 import { useParticipateTaskMutation } from "@/hooks/subgraph/querycall";
+import { useGetTaskById } from "@/hooks/subgraph/task";
 
 type TaskPortalMainProps = {
   cuid: Cuid;
@@ -36,9 +37,10 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   //   cuid.id,
   // );
 
-  const getTaskDetail = useGetTaskDetailById(cuid.id);
+  const getTaskDetail = useGetTaskById(cuid.id);
+  console.log(getTaskDetail, 'getTaskDetail')
   const { toast } = useToast();
-  const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
+  const taskData = getTaskDetail?.data?.data?.taskCreated;
   console.log(taskData,'taskdata')
 
   const { participateTask, participatePending, participateSuccess } =
@@ -199,7 +201,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             </h3>
           </div>
           <div className="flex items-center ml-auto gap-4">
-            {/* {getButtonContent()} */}
+            {getButtonContent()}
             
           </div>
         </div>
@@ -213,18 +215,18 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
         ) : (
           !participatePending &&
           isOpen &&
-          getDialogContents(participantTaskStatus?.[0]?.status) && (
+          getDialogContents("pending") && (
             <DialogButton
               isOpen={isOpen}
               setIsOpen={setIsOpen}
               title={
-                getDialogContents(participantTaskStatus?.status)?.title || ""
+                getDialogContents("pending")?.title || ""
               }
               subTitle={
-                getDialogContents(participantTaskStatus?.status)?.subTitle || ""
+                getDialogContents("pendign")?.subTitle || ""
               }
               buttonName={
-                getDialogContents(participantTaskStatus?.status)?.buttonName ||
+                getDialogContents("pending")?.buttonName ||
                 ""
               }
               handleApplyTaskLogic={handleApplyTaskLogic}
