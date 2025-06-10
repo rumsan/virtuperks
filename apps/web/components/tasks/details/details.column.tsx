@@ -1,5 +1,4 @@
-import { DialogButton } from "@/components/common/ui/dialog";
-import { useAcceptParticipantMutation } from "@/hooks/subgraph/querycall";
+// import { useAcceptParticipantMutation } from "@/hooks/subgraph/querycall";
 import { getDialogContent } from "@/utils/dialog";
 import { ColumnDef } from "@tanstack/react-table";
 import { useToast } from "@workspace/ui/hooks/use-toast";
@@ -10,7 +9,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [isRefetching, setIsRefetching] = useState(false);
-  const acceptParticipantMutation = useAcceptParticipantMutation();
+  // const acceptParticipantMutation = useAcceptParticipantMutation();
   const { toast } = useToast();
 
   const handleAction = (row: any) => {
@@ -29,44 +28,38 @@ export function useColumns<T>(): ColumnDef<T>[] {
     }
   };
 
-  const handleDialogAction = async () => {
-    if (selectedTask && selectedTask.status === "UNACCEPTED") {
-      try {
-        setIsRefetching(true);
-        await acceptParticipantMutation.mutateAsync({
-          taskId: selectedTask.id,
-          participant: selectedTask.participant,
-          entityId: selectedTask.entityId,
-        });
-        // await new Promise((resolve) =>
-        //   setTimeout(() => {
-        //     resolve();
-        //     setIsRefetching(false); // Stop loading after refetch
-        //   }, 8500) // 8s delay + buffer
-        // );
+  // const handleDialogAction = async () => {
+  //   if (selectedTask && selectedTask.status === "UNACCEPTED") {
+  //     try {
+  //       setIsRefetching(true);
+  //       await acceptParticipantMutation.mutateAsync({
+  //         taskId: selectedTask.id,
+  //         participant: selectedTask.participant,
+  //         entityId: selectedTask.entityId,
+  //       });
 
-        // Success Toast
-        toast({
-          title: "Participant accepted successfully!",
-          variant: "success",
-        });
-        setIsDialogOpen(false);
-        setSelectedTask(null);
-      } catch (error) {
-        console.error("Error accepting participant:", error);
-        // Error Toast
-        toast({
-          title: "Failed to accept participant.",
-          variant: "destructive",
-        });
-      }
-    }
-  };
+  //       // Success Toast
+  //       toast({
+  //         title: "Participant accepted successfully!",
+  //         variant: "success",
+  //       });
+  //       setIsDialogOpen(false);
+  //       setSelectedTask(null);
+  //     } catch (error) {
+  //       console.error("Error accepting participant:", error);
+  //       // Error Toast
+  //       toast({
+  //         title: "Failed to accept participant.",
+  //         variant: "destructive",
+  //       });
+  //     }
+  //   }
+  // };
 
-  const LoadingBar = () =>
-    acceptParticipantMutation.isPending ? (
-      <div className="fixed top-0 left-0 w-full h-1 bg-blue-500 animate-pulse" />
-    ) : null;
+  // const LoadingBar = () =>
+  //   acceptParticipantMutation.isPending ? (
+  //     <div className="fixed top-0 left-0 w-full h-1 bg-blue-500 animate-pulse" />
+  //   ) : null;
 
   return [
     {
@@ -137,7 +130,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
               <CircleX color="#E44134" strokeWidth={1.5} size={28} />
             </span>
 
-            <DialogButton
+            {/* <DialogButton
               isOpen={isDialogOpen}
               setIsOpen={setIsDialogOpen}
               title={dialogContent.title}
@@ -150,7 +143,7 @@ export function useColumns<T>(): ColumnDef<T>[] {
               handleApplyTaskLogic={handleDialogAction}
               isDisabled={acceptParticipantMutation.isPending}
             />
-            <LoadingBar />
+            <LoadingBar /> */}
           </>
         );
       },

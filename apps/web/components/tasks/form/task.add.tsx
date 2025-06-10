@@ -1,36 +1,33 @@
 "use client";
 
+import { useTaskAdd } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { useToast } from "@workspace/ui/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { isAddress, keccak256 } from "viem";
 import { useWriteContract } from "wagmi";
 import { TaskFormData, taskSchema } from "./schema";
 import TaskBaseForm from "./task.form";
-import { isAddress, keccak256 } from "viem";
-import { useTaskAdd } from "@/hooks/subgraph/task";
 
 const defaultValues = {
-
-      name: "",
-      detailsUrl: "",
+  name: "",
+  detailsUrl: "",
   owner: "",
-      entityAddress: "",
-      expiryDate: new Date(),
-      rewardToken: process.env.NEXT_PUBLIC_RAHAT_TOKEN || "",
-      totalRewardAmount: "",
-      isOpen: true,
-      isTokenDisbursed: false,
-      requireApproval: true,
-      isWhitelisted: true,
-      maxParticipants: 0,
-      whitelistedParticipants: [],
-
+  entityAddress: "",
+  expiryDate: new Date(),
+  rewardToken: process.env.NEXT_PUBLIC_RAHAT_TOKEN || "",
+  totalRewardAmount: "",
+  isOpen: true,
+  isTokenDisbursed: false,
+  requireApproval: true,
+  isWhitelisted: true,
+  maxParticipants: 0,
+  whitelistedParticipants: [],
 };
 
 type TaskAddProps = {
@@ -48,17 +45,11 @@ export default function TaskAdd({ router }: TaskAddProps) {
     useWriteContract();
 
   useEffect(() => {
-    if (isSuccess) {
-      router.push(PATHS.TASKPORTAL.HOME);
-    }
-  }, [isSuccess, router]);
-
-  useEffect(() => {
     if (isError && error) {
       console.error("Transaction failed:", error);
     }
   }, [isError, error]);
-  const { taskAdd, taskPending, taskSuccess}= useTaskAdd()
+  const { taskAdd, taskPending, taskSuccess } = useTaskAdd();
 
   const createTask = async (data: any) => {
     console.log("Creating task with data:", data);
@@ -66,11 +57,10 @@ export default function TaskAdd({ router }: TaskAddProps) {
       console.error("Invalid Ethereum address:", data.entityAddress);
       return;
     }
-    const taskId = keccak256(data.name)
+    const taskId = keccak256(data.name);
     console.log("Generated task ID:", taskId);
-    
 
-    const { detailsUrl, rewardToken, owner, isOpen, name} = data;
+    const { detailsUrl, rewardToken, owner, isOpen, name } = data;
     const expiryDate = BigInt(
       Math.floor(new Date(data.expiryDate).getTime() / 1000),
     );
@@ -115,14 +105,17 @@ export default function TaskAdd({ router }: TaskAddProps) {
         maxParticipants: maxParticipants.toString(),
         acceptedParticipantCount: 0, // Default to 0
         whitelistedParticipants: whitelistedParticipants || [],
-         verfiedParticipants: [], // Default to empty array
+        verfiedParticipants: [], // Default to empty array
       });
-      
+
       // Success Toast
       toast({
         title: "Task Created Successfully!",
         variant: "success",
       });
+
+      //navigate to
+      router.push(PATHS.TASKS.HOME);
     } catch (err) {
       console.error("Failed to create task:", err);
       // Error Toast
@@ -158,7 +151,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
                 form={form}
                 defaultValues={defaultValues}
                 saveForm={createTask}
-                isPending={isPending}
+                isPending={taskPending}
               />
             </CardContent>
           </Card>
