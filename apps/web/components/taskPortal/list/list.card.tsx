@@ -6,6 +6,7 @@ import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Coins, Dot, ExternalLink, Timer, Users } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import NoTask from "./no.task";
+import { useGetAllEntity } from "@/hooks/subgraph/entity";
 
 interface TaskPortalCardProps<TData> {
   table: Table<TData>;
@@ -17,6 +18,7 @@ const TaskPortalCard = <TData,>({
   router,
 }: TaskPortalCardProps<TData>) => {
   const paginatedTasks = table.getRowModel().rows.map((row) => row.original);
+ 
 
   const filteredTasks = paginatedTasks
     ?.filter((task) => {

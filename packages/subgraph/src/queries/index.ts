@@ -174,9 +174,8 @@ export const TokenQueries = {
 `,
 };
 
-// RewardManagement Queries
-export const RewardManagementQueries = {
-  getTaskCreation: `
+
+export const getTaskCreation = `
     query GetTaskCreation {
       taskCreateds(first: 10, orderBy: blockTimestamp, orderDirection: desc) {
         id
@@ -211,7 +210,11 @@ export const RewardManagementQueries = {
       }
   
     }
-  `,
+  `;
+
+// RewardManagement Queries
+export const RewardManagementQueries = {
+  
   getTaskCreatedById: `
   query GetTaskCreatedById($id: ID!) {
     taskCreated(id: $id) {

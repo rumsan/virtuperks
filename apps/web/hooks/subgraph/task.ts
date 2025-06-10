@@ -62,8 +62,9 @@ export const useGetAllTask = () => {
   return useQuery({
     queryKey: ["taskList"],
     queryFn: async () => {
-      const taskDetail = await queryService?.getTaskManagementData()
-      return taskDetail;
+      const taskDetail = await queryService?.getAllTasks()
+      return taskDetail
     },
+    enabled: !!queryService,
   });
 };
