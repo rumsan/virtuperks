@@ -1,4 +1,5 @@
 import { useGetAllEntity } from "@/hooks/subgraph/entity";
+import { useGetAllTask } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
 import hasRole from "@/utils/role";
 import { DepartmentDetails } from "@workspace/sdk/type";
@@ -19,6 +20,8 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
   console.log("All Entity Data: ", getAllEntity?.data);
   const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
   console.log("Entity List: ", entityList);
+  const getAllTask = useGetAllTask()
+  console.log("All Task Data: ", getAllTask?.data);
 
   const hasEntityOwnerRole = hasRole({
     role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",

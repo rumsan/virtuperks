@@ -174,9 +174,8 @@ export const TokenQueries = {
 `,
 };
 
-// RewardManagement Queries
-export const RewardManagementQueries = {
-  getTaskCreation: `
+
+export const getTaskCreation = `
     query GetTaskCreation {
       taskCreateds(first: 10, orderBy: blockTimestamp, orderDirection: desc) {
         id
@@ -211,8 +210,10 @@ export const RewardManagementQueries = {
       }
   
     }
-  `,
-  getTaskCreatedById: `
+  `;
+
+
+export const getTaskCreatedById = `
   query GetTaskCreatedById($id: ID!) {
     taskCreated(id: $id) {
       id
@@ -246,7 +247,12 @@ export const RewardManagementQueries = {
       transactionHash
     }
   }
-`,
+`;
+
+// RewardManagement Queries
+export const RewardManagementQueries = {
+  
+ 
 getTaskDetailsUpdatedById: `
   query GetTaskDetailsUpdatedById($id: ID!) {
     taskDetailsUpdated(id: $id) {
@@ -531,6 +537,35 @@ export const FactoryQueries = {
   }
 `,
 
+};
 
 
+export const ParticipantQueries = {
+  getParticipantTasks: `
+  query GetParticipantTasks($participant: Bytes!) {
+  participantApplieds(where: { participant: $participant }) {
+    id
+    internal_id
+    blockTimestamp
+    transactionHash
+    taskDetail {
+      id
+      name
+      detailsUrl
+      owner
+      expiryDate
+      rewardToken
+      totalRewardAmount
+      isOpen
+      requireApproval
+      isWhitelisted
+      isTokenDisbursed
+      maxParticipants
+      acceptedParticipantCount
+      verifiedParticipants
+      createdAt
+    }
+  }
+}
+  `
 };

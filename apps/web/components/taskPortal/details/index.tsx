@@ -17,6 +17,7 @@ import { useState } from "react";
 import { useAccount } from "wagmi";
 import TaskPortalParticipant from "./details.participant";
 import TaskPortalDetails from "./details.task";
+import { useParticipateTaskMutation } from "@/hooks/subgraph/querycall";
 
 type TaskPortalMainProps = {
   cuid: Cuid;
@@ -38,9 +39,10 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const getTaskDetail = useGetTaskDetailById(cuid.id);
   const { toast } = useToast();
   const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
+  console.log(taskData,'taskdata')
 
-  // const { participateTask, participatePending, participateSuccess } =
-  //   useParticipateTaskMutation();
+  const { participateTask, participatePending, participateSuccess } =
+    useParticipateTaskMutation();
   // const { completeTask, completePending, completeSuccess } =
   //   useCompleteTaskMutation();
 
@@ -84,98 +86,100 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
   const handleApplyTaskLogic = async () => {
     return new Promise<void>((resolve, reject) => {
-      // participateTask(
-      //   {
-      //     taskId: cuid.id,
-      //     entityId: taskData?.entityTaskManager?.entityTaskManager || "0x",
-      //   },
-      //   {
-      //     onSuccess: () => {
-      //       setIsOpen(false);
-      //       setLocalButtonState("UNACCEPTED");
-      //       toast({
-      //         title: "Task Application Submitted Successfully!",
-      //         variant: "success",
-      //       });
-      //       resolve();
-      //     },
-      //     onError: (error) => {
-      //       console.error("Error applying for task:", error);
-      //       toast({
-      //         title: "Failed To Apply For Task. Please Try Again.",
-      //         variant: "destructive",
-      //       });
-      //       reject(error);
-      //     },
-      //   },
-      // );
+      participateTask(
+        {
+          taskId: cuid.id,
+          entityId: taskData?.entityTaskManager?.entityTaskManager || "0x",
+        },
+        {
+          onSuccess: () => {
+            setIsOpen(false);
+            setLocalButtonState("UNACCEPTED");
+            toast({
+              title: "Task Application Submitted Successfully!",
+              variant: "success",
+            });
+            resolve();
+          },
+          onError: (error) => {
+            console.error("Error applying for task:", error);
+            toast({
+              title: "Failed To Apply For Task. Please Try Again.",
+              variant: "destructive",
+            });
+            reject(error);
+          },
+        },
+      );
     });
   };
 
-  // const getDialogHandler = () => {
-  //   switch (participantTaskStatus[0]?.status) {
-  //     case "COMPLETED":
-  //       return handleCompletedTask;
-  //     case "WAITING":
-  //       return undefined;
-  //     case "VERIFIED":
-  //       return undefined;
-  //     default:
-  //       return handleApplyTaskLogic;
-  //   }
-  // };
+  const getDialogHandler = () => {
+    switch (localButtonState) {
+      case "COMPLETED":
+        return handleCompletedTask;
+      case "WAITING":
+        return undefined;
+      case "VERIFIED":
+        return undefined;
+      default:
+        return handleApplyTaskLogic;
+    }
+  };
 
-  // const getButtonContent = () => {
-  //   const currentStatus = localButtonState || participantTaskStatus[0]?.status;
+  const getButtonContent = () => {
+    // const currentStatus = localButtonState || participantTaskStatus[0]?.status;
+    const currentStatus = localButtonState
 
-  //   switch (currentStatus) {
-  //     case "COMPLETED":
-  //       return (
-  //         <Button className="bg-[#03AB65]" disabled>
-  //           <span className="text-[#F8FAFC]">Task Completed</span>
-  //         </Button>
-  //       );
+    switch (currentStatus) {
+      case "COMPLETED":
+      case "COMPLETED":
+        return (
+          <Button className="bg-[#03AB65]" disabled>
+            <span className="text-[#F8FAFC]">Task Completed</span>
+          </Button>
+        );
 
-  //     case "ACCEPTED":
-  //       return (
-  //         <Button
-  //           className="bg-[#297AD6]"
-  //           onClick={handleCompletedTask}
-  //           disabled={completePending}
-  //         >
-  //           <span className="text-[#F8FAFC]">
-  //             {completePending ? "Processing..." : "Mark as completed"}
-  //           </span>
-  //           {!completePending && (
-  //             <ArrowRight color="#F8FAFC" strokeWidth={2.5} size={20} />
-  //           )}
-  //         </Button>
-  //       );
+      case "ACCEPTED":
+        // return (
+        //   <Button
+        //     className="bg-[#297AD6]"
+        //     onClick={handleCompletedTask}
+        //    // disabled={completePending}
+        //   >
+        //     <span className="text-[#F8FAFC]">
+        //       {completePending ? "Processing..." : "Mark as completed"}
+        //     </span>
+        //     {!completePending && (
+        //       <ArrowRight color="#F8FAFC" strokeWidth={2.5} size={20} />
+        //     )}
+        //   </Button>
+        // );
 
-  //     case "UNACCEPTED":
-  //       return (
-  //         <Button className="bg-[#F59E0B]" disabled>
-  //           <span className="text-[#F8FAFC]">Waiting for Approval</span>
-  //         </Button>
-  //       );
+      case "UNACCEPTED":
+        return (
+          <Button className="bg-[#F59E0B]" disabled>
+            <span className="text-[#F8FAFC]">Waiting for Approval</span>
+          </Button>
+        );
 
-  //     default:
-  //       return (
-  //         <Button
-  //           className="bg-[#297AD6]"
-  //           onClick={handleApplyTask}
-  //           disabled={participatePending}
-  //         >
-  //           <span className="text-[#F8FAFC]">
-  //             {participatePending ? "Processing..." : "Apply for task"}
-  //           </span>
-  //           {!participatePending && (
-  //             <ArrowRight color="#F8FAFC" strokeWidth={2.5} size={20} />
-  //           )}
-  //         </Button>
-  //       );
-  //   }
-  // };
+      default:
+        return (
+          <Button
+            className="bg-[#297AD6]"
+            onClick={handleApplyTask}
+            disabled={participatePending}
+          >
+            <span className="text-[#F8FAFC]">
+              {participatePending ? "Processing..." : "Apply for task"}
+            </span>
+            {!participatePending && (
+              <ArrowRight color="#F8FAFC" strokeWidth={2.5} size={20} />
+            )}
+          </Button>
+        );
+    }
+  };
 
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
@@ -196,10 +200,11 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
           </div>
           <div className="flex items-center ml-auto gap-4">
             {/* {getButtonContent()} */}
+            
           </div>
         </div>
 
-        {/* {alertDialog ? (
+        {alertDialog ? (
           <CustomAlertDialog
             alertDialog={alertDialog}
             setAlertDialog={setAlertDialog}
@@ -225,7 +230,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
               handleApplyTaskLogic={handleApplyTaskLogic}
             />
           )
-        )} */}
+        )}
 
         <div className="flex w-full gap-4">
           <TaskPortalDetails taskData={taskData} />

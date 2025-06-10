@@ -2,6 +2,9 @@ import { Client, fetchExchange } from '@urql/core';
 import {
   AppRegistryQueries,
   FactoryQueries,
+  getTaskCreatedById,
+  getTaskCreation,
+  ParticipantQueries,
   RewardManagementQueries,
   TokenQueries
 } from '../queries';
@@ -44,38 +47,51 @@ export class SubgraphService {
   }
 
   // RewardManagement Related Services
-  async getTaskManagementData(taskId?: string) {
-    try {
-      const taskCreation = await this.subgraphQuery.query(RewardManagementQueries.getTaskCreation, {});
-      
-      if (taskId) {
-        const participationStatus = await this.subgraphQuery.query(
-          RewardManagementQueries.getParticipationStatus, 
-          { taskId }
-        );
-        const whitelistStatus = await this.subgraphQuery.query(
-          RewardManagementQueries.getWhitelistStatus, 
-          { taskId }
-        );
-        const disbursements = await this.subgraphQuery.query(
-          RewardManagementQueries.getDisbursements, 
-          { taskId }
-        );
-
-        return {
-          taskCreation: taskCreation.data,
-          participationStatus: participationStatus.data,
-          whitelistStatus: whitelistStatus.data,
-          disbursements: disbursements.data
-        };
-      }
-
-      return { taskCreation: taskCreation.data };
-    } catch (error) {
-      console.error('Error fetching task management data:', error);
-      return { error };
-    }
+  async getAllTasks() {
+    
+    const { data, error } = await this.subgraphQuery.query(getTaskCreation, {});
+    return { data, error };
   }
+
+  async getTaskById(id:string) {
+    const { data, error } = await this.subgraphQuery.query(getTaskCreatedById, { id })
+    return {data, error }
+
+
+
+}
+  // async getTaskManagementData(taskId?: string) {
+  //   try {
+  //     //const taskCreation = await this.subgraphQuery.query(RewardManagementQueries.getTaskCreation, {});
+      
+  //     if (taskId) {
+  //       const participationStatus = await this.subgraphQuery.query(
+  //         RewardManagementQueries.getParticipationStatus, 
+  //         { taskId }
+  //       );
+  //       const whitelistStatus = await this.subgraphQuery.query(
+  //         RewardManagementQueries.getWhitelistStatus, 
+  //         { taskId }
+  //       );
+  //       const disbursements = await this.subgraphQuery.query(
+  //         RewardManagementQueries.getDisbursements, 
+  //         { taskId }
+  //       );
+
+  //       return {
+  //        // taskCreation: taskCreation.data,
+  //         participationStatus: participationStatus.data,
+  //         whitelistStatus: whitelistStatus.data,
+  //         disbursements: disbursements.data
+  //       };
+  //     }
+
+  //     return { taskCreation: taskCreation.data };
+  //   } catch (error) {
+  //     console.error('Error fetching task management data:', error);
+  //     return { error };
+  //   }
+  // }
 
   async getContractState() {
     try {
@@ -118,6 +134,31 @@ export class SubgraphService {
       return { data: null, error };
     }
   }
+
+  async getParticipantTasks(participantAddress: string) {
+    console.log('Fetching tasks for participant:', participantAddress);
+  
+    try { 
+
+      const { data, error } = await this.subgraphQuery.query(
+      ParticipantQueries.getParticipantTasks, 
+      { participant:participantAddress }
+      )
+      return { data, error}
+
+
+    } catch (error) { 
+
+       console.error('Error fetching rewardManagementCreated by address:', error);
+      return { data: null, error };
+
+
+    }
+
+
+
+
+}
   
 
   
