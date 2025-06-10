@@ -198,6 +198,12 @@ export const RewardManagementQueries = {
         verifiedParticipants
         
         }
+        rewardManagement{
+        appId
+        id
+        name
+        rewardManagement
+        }
         createdBy
         blockNumber
         blockTimestamp
@@ -227,6 +233,12 @@ export const RewardManagementQueries = {
         isWhitelisted
         verifiedParticipants
         
+        }
+        rewardManagement{
+        appId
+        id
+        name
+        rewardManagement
         }
       createdBy
       blockNumber

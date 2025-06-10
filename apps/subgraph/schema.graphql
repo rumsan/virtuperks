@@ -90,12 +90,13 @@ type Transfer @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
-type RewardManagementCreated @entity(immutable: true) {
+type RewardManagementCreated @entity {
   id: Bytes!
   rewardManagement: Bytes! # address
   aclAddress: Bytes! # address
   appId: Bytes! # bytes32
   name: String! # string
+  tasks: [TaskCreated!] @derivedFrom(field: "rewardManagement")
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
@@ -230,14 +231,15 @@ type TaskDetail @entity {
   acceptedParticipantCount: BigInt!
   verifiedParticipants: [Bytes!]!
   createdAt: BigInt
-  tasks: [TaskCreated!]! @derivedFrom(field: "taskDetail")
+  task: TaskCreated
 }
 
 type TaskCreated @entity(immutable: true) {
   id: Bytes!
   internal_id: Bytes!
-  taskDetail: TaskDetail!
+  taskDetail: TaskDetail
   createdBy: Bytes!
+  rewardManagement: RewardManagementCreated
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
