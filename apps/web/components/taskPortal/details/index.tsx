@@ -6,7 +6,8 @@ import { Cuid } from "@/components/departments/details/details.main";
 //   useGetParticipantTaskStatus,
 //   useParticipateTaskMutation,
 // } from "@/hooks/subgraph/querycall";
-import { useGetTaskDetailById } from "@/hooks/subgraph/taskDetail";
+import { useCheckParticipantStatus, useCompleteTaskMutation, useParticipateTaskMutation } from "@/hooks/subgraph/querycall";
+import { useGetTaskById } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
 import { getDialogContents } from "@/utils/dialog";
 import { Button } from "@workspace/ui/components/button";
@@ -17,8 +18,6 @@ import { useState } from "react";
 import { useAccount } from "wagmi";
 import TaskPortalParticipant from "./details.participant";
 import TaskPortalDetails from "./details.task";
-import { useParticipateTaskMutation } from "@/hooks/subgraph/querycall";
-import { useGetTaskById } from "@/hooks/subgraph/task";
 
 type TaskPortalMainProps = {
   cuid: Cuid;
@@ -29,24 +28,23 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [alertDialog, setAlertDialog] = useState(false);
   const [localButtonState, setLocalButtonState] = useState<string | null>(null);
-
+ 
   const { isConnected, address } = useAccount();
 
-  // const { participantTaskStatus } = useGetParticipantTaskStatus(
-  //   address,
-  //   cuid.id,
-  // );
-
   const getTaskDetail = useGetTaskById(cuid.id);
-  console.log(getTaskDetail, 'getTaskDetail')
+
   const { toast } = useToast();
   const taskData = getTaskDetail?.data?.data?.taskCreated;
-  console.log(taskData,'taskdata')
+ 
 
   const { participateTask, participatePending, participateSuccess } =
     useParticipateTaskMutation();
-  // const { completeTask, completePending, completeSuccess } =
-  //   useCompleteTaskMutation();
+  const {completeTask, completePending}= useCompleteTaskMutation()
+
+  const { status: participantStatus, isLoading: statusLoading } = useCheckParticipantStatus(
+    taskData?.internal_id,
+    taskData?.rewardManagement?.rewardManagement
+  );
 
   const handleApplyTask = () => {
     if (isConnected) {
@@ -56,42 +54,20 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
     }
   };
 
-  const handleCompletedTask = async () => {
-    return new Promise<void>((resolve, reject) => {
-      // completeTask(
-      //   {
-      //     taskId: cuid.id,
-      //     entityId: taskData?.entityTaskManager?.entityTaskManager || "0x",
-      //   },
-      //   {
-      //     onSuccess: () => {
-      //       setIsOpen(false);
-      //       setLocalButtonState("COMPLETED");
-      //       toast({
-      //         title: "Task Marked As Completed!",
-      //         variant: "success",
-      //       });
-      //       resolve();
-      //     },
-      //     onError: (error) => {
-      //       console.error("Error completing task:", error);
-      //       toast({
-      //         title: "Failed To Complete Task. Please Try Again.",
-      //         variant: "destructive",
-      //       });
-      //       reject(error);
-      //     },
-      //   },
-      // );
-    });
+   const handleTask = () => {
+    if (isConnected) {
+      setIsOpen(true);
+    } else {
+      setAlertDialog(true);
+    }
   };
 
   const handleApplyTaskLogic = async () => {
     return new Promise<void>((resolve, reject) => {
       participateTask(
         {
-          taskId: cuid.id,
-          entityId: taskData?.entityTaskManager?.entityTaskManager || "0x",
+          taskId: taskData?.internal_id,
+          entityId: taskData?.rewardManagement?.rewardManagement || "0x",
         },
         {
           onSuccess: () => {
@@ -116,10 +92,36 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
     });
   };
 
+   const handleCompletedTask = async (data:any) => { 
+return new Promise<void>((resolve, reject) => {
+      completeTask(
+        { taskId: cuid.id, entityId: taskData?.entityTaskManager?.entityTaskManager || "0x", completionUrl: data.completionUrl },
+        {
+          onSuccess: () => {
+            setIsOpen(false);
+            setLocalButtonState("COMPLETED");
+            resolve();
+          },
+          onError: (error) => {
+            console.error("Error completing task:", error);
+            reject(error);
+          },
+        }
+      );
+    }
+  );
+
+
+
+
+
+
+  }
+
   const getDialogHandler = () => {
     switch (localButtonState) {
       case "COMPLETED":
-        return handleCompletedTask;
+        return undefined;
       case "WAITING":
         return undefined;
       case "VERIFIED":
@@ -130,44 +132,12 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   };
 
   const getButtonContent = () => {
-    // const currentStatus = localButtonState || participantTaskStatus[0]?.status;
-    const currentStatus = localButtonState
+    if (statusLoading) return <Button disabled>Loading...</Button>;
 
-    switch (currentStatus) {
-      case "COMPLETED":
-      case "COMPLETED":
+    switch (participantStatus) {
+      case 0: // NONE
         return (
-          <Button className="bg-[#03AB65]" disabled>
-            <span className="text-[#F8FAFC]">Task Completed</span>
-          </Button>
-        );
-
-      case "ACCEPTED":
-        // return (
-        //   <Button
-        //     className="bg-[#297AD6]"
-        //     onClick={handleCompletedTask}
-        //    // disabled={completePending}
-        //   >
-        //     <span className="text-[#F8FAFC]">
-        //       {completePending ? "Processing..." : "Mark as completed"}
-        //     </span>
-        //     {!completePending && (
-        //       <ArrowRight color="#F8FAFC" strokeWidth={2.5} size={20} />
-        //     )}
-        //   </Button>
-        // );
-
-      case "UNACCEPTED":
-        return (
-          <Button className="bg-[#F59E0B]" disabled>
-            <span className="text-[#F8FAFC]">Waiting for Approval</span>
-          </Button>
-        );
-
-      default:
-        return (
-          <Button
+          <Button 
             className="bg-[#297AD6]"
             onClick={handleApplyTask}
             disabled={participatePending}
@@ -179,6 +149,25 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
               <ArrowRight color="#F8FAFC" strokeWidth={2.5} size={20} />
             )}
           </Button>
+        );
+      case 1: // PENDING
+        return (
+          <Button className="bg-[#F59E0B]" disabled>
+            <span className="text-[#F8FAFC]">Waiting for Approval</span>
+          </Button>
+        );
+      
+
+       case 2: // ACCEPTED
+        return (
+          <Button className="bg-green-500 disabled:bg-green-500"
+            
+          
+          >
+    <span className="text-[#F8FAFC]">
+              {completePending ? "Processing..." : "Mark as complete"}
+            </span>
+         </Button>
         );
     }
   };
@@ -202,10 +191,9 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
           </div>
           <div className="flex items-center ml-auto gap-4">
             {getButtonContent()}
-            
           </div>
         </div>
-
+       
         {alertDialog ? (
           <CustomAlertDialog
             alertDialog={alertDialog}
