@@ -3,7 +3,7 @@ import { Cuid } from "@/components/departments/details/details.main";
 //   useApproveTaskMutation,
 //   useGetApprovedAndCompletedList,
 // } from "@/hooks/subgraph/querycall";
-import { useGetTaskDetailById } from "@/hooks/subgraph/taskDetail";
+import { useGetParticipantPending } from "@/hooks/subgraph/querycall";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { useToast } from "@workspace/ui/hooks/use-toast";
@@ -13,15 +13,18 @@ import { useState } from "react";
 import TaskParticipant from "./details.participant";
 import TaskDetails from "./details.task";
 
+
 type TaskMainProps = {
   cuid: Cuid;
   router: AppRouterInstance;
 };
 
 const TaskMain = ({ cuid, router }: TaskMainProps) => {
-  const getTaskDetail = useGetTaskDetailById(cuid.id);
+  //const getTaskDetail = useGetTaskDetailById(cuid.id);
 
-  const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
+
+  //  const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
+ 
 
   const { toast } = useToast();
   // const { completedData, approvedData } = useGetApprovedAndCompletedList(
