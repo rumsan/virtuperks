@@ -358,6 +358,30 @@ export function handleTaskVerified(event: TaskVerifiedEvent): void {
   let taskDetail = fetchTaskDetails(event.params.id, event.address);
   entity.taskDetail = taskDetail.id;
 
+  // Get the completion URL from the contract
+  let contract = RewardManagement.bind(event.address);
+  let taskAssignmentResult = contract.try_getParticipantTaskAssignment(
+    event.params.id, 
+    event.params.participant
+  );
+
+   // Store the completion URL if available
+  if (!taskAssignmentResult.reverted) {
+    let taskAssignment = taskAssignmentResult.value;
+    entity.completionUrl = taskAssignment.completionUrl;
+    log.info("Completion URL found for task {} and participant {}: {}", [
+      event.params.id.toHexString(),
+      event.params.participant.toHexString(),
+      taskAssignment.completionUrl
+    ]);
+  } else {
+    log.error("Failed to fetch task assignment for task {} and participant {}", [
+      event.params.id.toHexString(),
+      event.params.participant.toHexString()
+    ]);
+  }
+
+
   entity.save()
    updateParticipantTaskStatus(
     event.params.participant, 
@@ -365,7 +389,8 @@ export function handleTaskVerified(event: TaskVerifiedEvent): void {
     'VERIFIED', 
     event.block.number, 
     event.block.timestamp, 
-    taskDetail ? taskDetail.id : null
+     taskDetail ? taskDetail.id : null,
+    entity.completionUrl
   );
 }
 

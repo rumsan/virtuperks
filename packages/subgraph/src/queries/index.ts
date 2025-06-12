@@ -348,6 +348,7 @@ export const GetCombineParticipantsByTask = `
       participant
       status
         taskId
+        completionUrl
         lastUpdatedBlock
       lastUpdatedTimestamp
       taskDetail {

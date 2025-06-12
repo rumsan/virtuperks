@@ -1,15 +1,16 @@
-// import { useAcceptParticipantMutation } from "@/hooks/subgraph/querycall";
 import { DialogButton } from "@/components/common/ui/dialog";
 import { useAcceptParticipantMutation, useVerifyParticipantMutation } from "@/hooks/subgraph/querycall";
 import { getDialogContent } from "@/utils/dialog";
 import { ColumnDef } from "@tanstack/react-table";
 import { useToast } from "@workspace/ui/hooks/use-toast";
-import { CircleCheck, CircleX, Copy } from "lucide-react";
+import { CircleCheck, CircleX, Copy, ExternalLink } from 'lucide-react';
 import { useState } from "react";
 interface SelectedTask {
   id: string;
   participant: string;
-  status: "PENDING" | "COMPLETED";
+  completionUrl?: string;
+  status: "PENDING" | "COMPLETED" |
+  "vERIFIED";
   entityId?: string;
 }
 
@@ -97,6 +98,33 @@ const handleAction = (row: any) => {
             </span>
             <Copy color="#94A3B8" size={16} strokeWidth={2.75} />
           </div>
+        );
+      },
+    },
+
+    {
+      accessorKey: "completionUrl",
+      header: () => (
+        <div className="text-left text-gray-600 font-bold">Completion URL</div>
+      ),
+      cell: ({ row }) => {
+        const status = row.getValue("status");
+        const completionUrl = row.getValue("completionUrl");
+
+        if (!completionUrl) {
+          return null;
+        }
+
+        return (
+          <a 
+            href={completionUrl as string}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline"
+          >
+            <span className="text-sm">View Submission</span>
+            <ExternalLink size={16} />
+          </a>
         );
       },
     },
