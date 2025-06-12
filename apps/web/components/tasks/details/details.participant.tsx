@@ -1,4 +1,8 @@
 // import { useGetTaskParticipantsWithStatus } from "@/hooks/subgraph/querycall";
+import { DataTablePagination } from "@/components/common/list/list.pagination";
+import { ListTable } from "@/components/common/list/list.table";
+import { useGetCombineStausByTask } from "@/hooks/subgraph/querycall";
+import { shortAddress } from "@/utils/shortAddress";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -14,10 +18,6 @@ import { Input } from "@workspace/ui/components/input";
 import { Search, User } from "lucide-react";
 import React, { useMemo } from "react";
 import { useColumns } from "./details.column";
-import { useGetParticipantAccepted, useGetParticipantPending} from "@/hooks/subgraph/querycall";
-import { ListTable } from "@/components/common/list/list.table";
-import { DataTablePagination } from "@/components/common/list/list.pagination";
-import { shortAddress } from "@/utils/shortAddress";
 
 type Cuid = {
   id: string;
@@ -41,13 +41,21 @@ const TaskParticipant = ({ taskId }: TaskParticipantProps) => {
     pageSize: 10,
   });
   const columns = useColumns(); 
-  const { pendingParticipants } = useGetParticipantPending(taskId.id)
-  const { acceptedParticipants} = useGetParticipantAccepted(taskId.id)
+
+  const { pendingParticipants, acceptedParticipants, completedParticipants, verifiedPartcipants } = useGetCombineStausByTask(taskId.id);
+  const pendingAndAcceptedParticipants = useMemo(() => {
+    return [
+      ...(pendingParticipants || []),
+      ...(completedParticipants || []),
+       ...(verifiedPartcipants || []),
+    ];
+  }
+  , [pendingParticipants, acceptedParticipants]);
   
 
 
   const table = useReactTable({
-    data: pendingParticipants || [],
+    data: pendingAndAcceptedParticipants,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

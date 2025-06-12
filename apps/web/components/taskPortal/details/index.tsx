@@ -38,7 +38,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
   const { toast } = useToast();
   const taskData = getTaskDetail?.data?.data?.taskCreated;
-  console.log("Task Data: ", taskData);
+ 
 
   const { participateTask, participatePending, participateSuccess } =
     useParticipateTaskMutation();

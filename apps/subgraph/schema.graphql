@@ -281,6 +281,7 @@ type TaskVerified @entity(immutable: true) {
   participant: Bytes! # address
   verifier: Bytes! # address
   status: String # string
+  taskDetail: TaskDetail
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
