@@ -1,7 +1,7 @@
 "use client";
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
-//import { useTaskList } from "@/hooks/subgraph/querycall";
+
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -18,7 +18,7 @@ import React from "react";
 import { useColumns } from "../details/details.column";
 import TaskPortalCard from "./list.card";
 import { useGetAllTask } from "@/hooks/subgraph/task";
-import { useGetAllEntity } from "@/hooks/subgraph/entity";
+
 
 
 interface TaskPortalMainProps {

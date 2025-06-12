@@ -3,7 +3,7 @@ import { Cuid } from "@/components/departments/details/details.main";
 //   useApproveTaskMutation,
 //   useGetApprovedAndCompletedList,
 // } from "@/hooks/subgraph/querycall";
-import { useGetParticipantPending } from "@/hooks/subgraph/querycall";
+
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { useToast } from "@workspace/ui/hooks/use-toast";
