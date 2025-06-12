@@ -67,7 +67,39 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
     }
   };
 
+  // const handleApplyTaskLogic = async () => {
+  //   return new Promise<void>((resolve, reject) => {
+  //     participateTask(
+  //       {
+  //         taskId: taskData?.internal_id,
+  //         entityId: taskData?.rewardManagement?.rewardManagement || "0x",
+  //       },
+  //       {
+  //         onSuccess: () => {
+  //           setIsOpen(false);
+  //           setLocalButtonState("UNACCEPTED");
+  //           toast({
+  //             title: "Task Application Submitted Successfully!",
+  //             variant: "success",
+  //           });
+  //           resolve();
+  //         },
+  //         onError: (error) => {
+  //           console.error("Error applying for task:", error);
+  //           toast({
+  //             title: "Failed To Apply For Task. Please Try Again.",
+  //             variant: "destructive",
+  //           });
+  //           reject(error);
+  //         },
+  //       },
+  //     );
+  //   });
+  // };
+
   const handleApplyTaskLogic = async () => {
+    // Optimistically update status
+
     return new Promise<void>((resolve, reject) => {
       participateTask(
         {
@@ -77,7 +109,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
         {
           onSuccess: () => {
             setIsOpen(false);
-            setLocalButtonState("UNACCEPTED");
+            setLocalButtonState("WAITING");
             toast({
               title: "Task Application Submitted Successfully!",
               variant: "success",
@@ -86,6 +118,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
           },
           onError: (error) => {
             console.error("Error applying for task:", error);
+            setLocalButtonState(null); // Rollback
             toast({
               title: "Failed To Apply For Task. Please Try Again.",
               variant: "destructive",
@@ -97,6 +130,37 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
     });
   };
 
+  // const handleCompletedTask = async (data: any) => {
+  //   return new Promise<void>((resolve, reject) => {
+  //     completeTask(
+  //       {
+  //         taskId: taskData.internal_id,
+  //         entityId: taskData?.rewardManagement?.rewardManagement || "0x",
+  //         completionUrl: data.completionUrl,
+  //       },
+  //       {
+  //         onSuccess: () => {
+  //           setIsOpen(false);
+  //           setLocalButtonState("COMPLETED");
+  //           resolve();
+  //         },
+  //         onError: (error) => {
+  //           console.error("Error completing task:", error);
+  //           reject(error);
+  //         },
+  //       },
+  //     );
+  //   });
+  // };
+
+  const handleCompleteTask = () => {
+    if (isConnected) {
+      setIsOpen(true);
+    } else {
+      setAlertDialog(true);
+    }
+  };
+
   const handleCompletedTask = async (data: any) => {
     return new Promise<void>((resolve, reject) => {
       completeTask(
@@ -105,6 +169,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
           entityId: taskData?.rewardManagement?.rewardManagement || "0x",
           completionUrl: data.completionUrl,
         },
+
         {
           onSuccess: () => {
             setIsOpen(false);
@@ -113,19 +178,12 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
           },
           onError: (error) => {
             console.error("Error completing task:", error);
+            setLocalButtonState("ACCEPTED"); // Rollback
             reject(error);
           },
         },
       );
     });
-  };
-
-  const handleCompleteTask = () => {
-    if (isConnected) {
-      setIsOpen(true);
-    } else {
-      setAlertDialog(true);
-    }
   };
 
   const getDialogHandler = () => {
@@ -144,8 +202,11 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const getButtonContent = () => {
     if (statusLoading) return <Button disabled>Loading...</Button>;
 
-    switch (participantStatus) {
-      case 0: // NONE
+    const effectiveStatus = localButtonState ?? participantStatus;
+
+    switch (effectiveStatus) {
+      case "Waiting":
+      case 0:
         return (
           <Button
             className="bg-[#297AD6]"
@@ -160,14 +221,17 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             )}
           </Button>
         );
-      case 1: // PENDING
+
+      case "WAITING":
+      case 1:
         return (
           <Button className="bg-[#F59E0B]" disabled>
-            <span className="text-[#F8FAFC]">Waiting for Approval</span>
+            <span className="text-[#F8FAFC]">Waiting for Acceptance</span>
           </Button>
         );
 
-      case 2: // ACCEPTED
+      case "ACCEPTED":
+      case 2:
         return (
           <Button
             className="bg-green-500 disabled:bg-green-500"
@@ -179,6 +243,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
           </Button>
         );
 
+      case "COMPLETED":
       case 3:
         return (
           <Button
@@ -188,12 +253,17 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             <span className="text-[#F8FAFC]">{"Completed"}</span>
           </Button>
         );
+
+      case "VERIFIED":
       case 4:
         return (
           <Button className="bg-green-500 disabled:bg-blue-500" disabled={true}>
             <span className="text-[#F8FAFC]">{"Verified"}</span>
           </Button>
         );
+
+      default:
+        return null;
     }
   };
 
