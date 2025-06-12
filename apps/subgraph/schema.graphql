@@ -213,6 +213,7 @@ type TaskCompleted @entity(immutable: true) {
   internal_id: Bytes! # bytes32
   participant: Bytes! # address
   blockNumber: BigInt!
+  completionUrl: String  # string
   blockTimestamp: BigInt!
   transactionHash: Bytes!
   taskDetail: TaskDetail
@@ -257,6 +258,7 @@ type ParticipantTaskStatus @entity(immutable: false) {
   lastUpdatedBlock: BigInt! 
   lastUpdatedTimestamp: BigInt!
   taskDetail: TaskDetail
+  completionUrl: String # string
   rewardManagement: RewardManagementCreated
 }
 

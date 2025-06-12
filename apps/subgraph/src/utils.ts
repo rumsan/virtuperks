@@ -44,7 +44,8 @@ export function updateParticipantTaskStatus(
   status: string,
   blockNumber: BigInt,
   blockTimestamp: BigInt,
-  taskDetailId:Bytes | null 
+  taskDetailId: Bytes | null ,
+  completionUrl: string | null = null
 ): void {
   let id = participant.toHexString() + "-" + taskId.toHexString();
   let idBytes = Bytes.fromUTF8(id);
@@ -80,6 +81,11 @@ export function updateParticipantTaskStatus(
   statusEntity.status = status;
   if (taskDetailId) {
     statusEntity.taskDetail = taskDetailId;
+  }
+
+   // Store the completion URL if provided
+  if (completionUrl) {
+     statusEntity.completionUrl = completionUrl;
   }
  
 
