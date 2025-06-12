@@ -3,9 +3,10 @@ import {
   AppRegistryQueries,
   FactoryQueries,
 
-  GetAcceptedParticipantsByTask,
 
-  GetPendingParticipantsByTask,
+  GetCombineParticipantsByTask,
+
+
   getTaskCreatedById,
   getTaskCreation,
 
@@ -67,34 +68,15 @@ export class SubgraphService {
   }
   
   
-async getPendingParticipantsByTask(taskId: string) { 
-    try { 
 
-const {data, error} = await this.subgraphQuery.query(
-      GetPendingParticipantsByTask,
-      { taskId }
-    );
-      return { data, error };
-    } catch (error) {
-      console.error('Error fetching task with participant status:', error);
-      return { error };
-
-
-    } 
   
 
 
-
-
-
-
-}
-  
-  async getAcceptedParticipantsByTask(taskId: string) { 
+   async getCombineParticipantsByTask(taskId: string) { 
     try { 
 
 const {data, error} = await this.subgraphQuery.query(
-      GetAcceptedParticipantsByTask,
+      GetCombineParticipantsByTask,
       { taskId }
     );
       return { data, error };
@@ -112,39 +94,7 @@ const {data, error} = await this.subgraphQuery.query(
 
 
   }
-  // async getTaskManagementData(taskId?: string) {
-  //   try {
-  //     //const taskCreation = await this.subgraphQuery.query(RewardManagementQueries.getTaskCreation, {});
-      
-  //     if (taskId) {
-  //       const participationStatus = await this.subgraphQuery.query(
-  //         RewardManagementQueries.getParticipationStatus, 
-  //         { taskId }
-  //       );
-  //       const whitelistStatus = await this.subgraphQuery.query(
-  //         RewardManagementQueries.getWhitelistStatus, 
-  //         { taskId }
-  //       );
-  //       const disbursements = await this.subgraphQuery.query(
-  //         RewardManagementQueries.getDisbursements, 
-  //         { taskId }
-  //       );
-
-  //       return {
-  //        // taskCreation: taskCreation.data,
-  //         participationStatus: participationStatus.data,
-  //         whitelistStatus: whitelistStatus.data,
-  //         disbursements: disbursements.data
-  //       };
-  //     }
-
-  //     return { taskCreation: taskCreation.data };
-  //   } catch (error) {
-  //     console.error('Error fetching task management data:', error);
-  //     return { error };
-  //   }
-  // }
-
+  
   async getContractState() {
     try {
       const { data, error } = await this.subgraphQuery.query(

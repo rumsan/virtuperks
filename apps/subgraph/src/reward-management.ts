@@ -332,7 +332,19 @@ export function handleTaskVerified(event: TaskVerifiedEvent): void {
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
 
+   // Create TaskDetail entity first
+  let taskDetail = fetchTaskDetails(event.params.id, event.address);
+  entity.taskDetail = taskDetail.id;
+
   entity.save()
+   updateParticipantTaskStatus(
+    event.params.participant, 
+    event.params.id, 
+    'VERIFIED', 
+    event.block.number, 
+    event.block.timestamp, 
+    taskDetail ? taskDetail.id : null
+  );
 }
 
 export function handleTokenTransferred(event: TokenTransferredEvent): void {

@@ -19,7 +19,7 @@ type DialogButtonProps = {
   title: string;
   subTitle: string;
   buttonName: string;
-  submitType: "Apply" | "complete";
+  submitType?: "Apply" | "complete";
   inputLabel?: string;
   inputPlaceholder?: string;
   handleApplyTaskLogic?: (data?: { completionUrl?: string }) => Promise<void>;
@@ -41,7 +41,7 @@ export const DialogButton = ({
   const [completionUrl, setCompletionUrl] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
-  console.log("dialogubox");
+
 
   const handleSubmit = async () => {
     setError(null);
