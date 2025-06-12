@@ -37,9 +37,9 @@ const TaskPortalCard = <TData,>({
           >
             <CardTitle className="flex flex-col gap-1 w-full">
               <div className="flex items-center gap-2">
-                <span>{task?.taskName}</span>
+                <span>{task?.name}</span>
                 <span className="w-20 h-6 flex items-center justify-center bg-green-50 rounded-full text-green-700 p-1 text-sm font-normal">
-                  {task?.isActive === true ? `active` : `closed`}
+                  {task?.isOpen === true ? `open` : `closed`}
                 </span>
               </div>
               <div className="flex items-center gap-2 cursor-pointer hover:text-blue-400">
@@ -59,7 +59,7 @@ const TaskPortalCard = <TData,>({
                 <div className="flex justify-end ml-auto items-center gap-2">
                   <Coins color="#297AD6" />
                   <span className="text-xl text-[#297AD6] font-bold">
-                    {task?.rewardAmount} tokens
+                    {task?.totalRewardAmount} tokens
                   </span>
                 </div>
               </div>

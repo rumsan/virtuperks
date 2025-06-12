@@ -2,7 +2,6 @@
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import { useGetTaskListByParticipant } from "@/hooks/subgraph/participant";
-// import { useTaskList } from "@/hooks/subgraph/querycall";
 import { useWallet } from "@/providers/walletProvider";
 import {
   ColumnFiltersState,
@@ -34,9 +33,11 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
 
   const { connect } = useConnect();
 
-  const { data: myTaskList, isLoading } = useGetTaskListByParticipant(address as `0x${string}`);
-
- const taskList = myTaskList?.data?.data?.participantApplieds
+  const { data: myTaskList, isLoading } = useGetTaskListByParticipant(
+    address as `0x${string}`,
+  );
+  const taskList = myTaskList?.data?.participantTaskStatuses;
+  console.log("Task List: ", taskList);
 
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -49,8 +50,7 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
   const columns = useColumns();
 
   const table = useReactTable({
-    
-    data:taskList || [],
+    data: taskList || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

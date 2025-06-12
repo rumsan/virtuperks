@@ -7,10 +7,11 @@ import {
   GetCombineParticipantsByTask,
 
 
+  getParticipantTasks,
+
+
   getTaskCreatedById,
   getTaskCreation,
-
-  ParticipantQueries,
   RewardManagementQueries,
   TokenQueries
 } from '../queries';
@@ -59,9 +60,9 @@ export class SubgraphService {
     return { data, error };
   }
 
-  async getTaskById(id:string) {
+  async getTaskById(id: string) {
     const { data, error } = await this.subgraphQuery.query(getTaskCreatedById, { id })
-    return {data, error }
+    return { data, error }
 
 
 
@@ -72,20 +73,20 @@ export class SubgraphService {
   
 
 
-   async getCombineParticipantsByTask(taskId: string) { 
-    try { 
+  async getCombineParticipantsByTask(taskId: string) {
+    try {
 
-const {data, error} = await this.subgraphQuery.query(
-      GetCombineParticipantsByTask,
-      { taskId }
-    );
+      const { data, error } = await this.subgraphQuery.query(
+        GetCombineParticipantsByTask,
+        { taskId }
+      );
       return { data, error };
     } catch (error) {
       console.error('Error fetching task with participant status:', error);
       return { error };
 
 
-    } 
+    }
   
 
 
@@ -98,7 +99,7 @@ const {data, error} = await this.subgraphQuery.query(
   async getContractState() {
     try {
       const { data, error } = await this.subgraphQuery.query(
-        RewardManagementQueries.getContractState, 
+        RewardManagementQueries.getContractState,
         {}
       );
       return { data, error };
@@ -138,33 +139,30 @@ const {data, error} = await this.subgraphQuery.query(
   }
 
   async getParticipantTasks(participantAddress: string) {
-    console.log('Fetching tasks for participant:', participantAddress);
+   
   
-    try { 
+    try {
 
       const { data, error } = await this.subgraphQuery.query(
-      ParticipantQueries.getParticipantTasks, 
-      { participant:participantAddress }
+        getParticipantTasks,
+        { participant: participantAddress }
       )
-      return { data, error}
+      return { data, error }
 
 
-    } catch (error) { 
+    } catch (error) {
 
-       console.error('Error fetching rewardManagementCreated by address:', error);
+      console.error('Error fetching rewardManagementCreated by address:', error);
       return { data: null, error };
 
 
     }
+  
+  
 
+  
+  }
 
 
 
 }
-  
-
-  
-}
-
-
-
