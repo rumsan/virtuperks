@@ -1,7 +1,7 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
-import { useWriteRewardManagementCreateTask } from "../wagmi/contracts";
+import { useWriteRewardManagementCloseTask, useWriteRewardManagementCreateTask } from "../wagmi/contracts";
 
 
 
@@ -87,3 +87,39 @@ export const useGetTaskById = (id: string) => {
 
 
 }
+
+
+
+export const useCloseTaskMutation = () => {
+  const queryClient = useQueryClient();
+  const { writeContractAsync, isPending, isSuccess } =
+    useWriteRewardManagementCloseTask()
+
+  return useMutation({
+    mutationFn: async ({
+      taskId,
+      entityId
+     
+    }: {
+      taskId: string;
+     
+      entityId: string;
+    }) => {
+      const result = await writeContractAsync({
+        address: (entityId as `0x${string}`) || "0x",
+        args: [taskId as `0x${string}`],
+      });
+
+      return result;
+    },
+
+    onSuccess: async (result, variable) => {
+      // await new Promise((resolve) => setTimeout(resolve, 9000));
+      // await queryClient.invalidateQueries({
+      //   queryKey: ["AllParticipantsStatus", variable.taskId],
+      // });
+    },
+  });
+};
+
+
