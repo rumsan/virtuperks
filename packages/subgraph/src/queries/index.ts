@@ -177,7 +177,7 @@ export const TokenQueries = {
 
 export const getTaskCreation = `
     query GetTaskCreation {
-      taskCreateds(first: 10, orderBy: blockTimestamp, orderDirection: desc) {
+      taskCreateds(first: 100, orderBy: blockTimestamp, orderDirection: desc) {
         id
         internal_id
         taskDetail {
