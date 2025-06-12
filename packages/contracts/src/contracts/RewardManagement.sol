@@ -278,7 +278,7 @@ contract RewardManagement is IRewardManagement, Multicall, ReentrancyGuard {
     /// @notice Internal implementation for closing a task
     /// @param taskId The unique identifier of the task to close
     function _closeTask(bytes32 taskId) internal {
-        // Remove from openTasks array
+        // Remove from openTasks arrayhh
         uint256 openTasksLength = openTasks.length;
         for (uint256 i = 0; i < openTasksLength; i++) {
             if (openTasks[i] == taskId) {
