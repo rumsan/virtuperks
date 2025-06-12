@@ -8,7 +8,7 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import NoTask from "./no.task";
 import { useGetAllEntity } from "@/hooks/subgraph/entity";
 
-interface TaskWithId {
+interface Tasks {
   id: string;
   taskDetail: {
     name: string;
@@ -20,16 +20,16 @@ interface TaskWithId {
   };
 }
 
-interface TaskPortalCardProps<TData extends TaskWithId> {
-  table: Table<TData>;
+interface TaskPortalCardProps{
+  data: [Tasks]
   router: AppRouterInstance;
 }
 
-const TaskPortalCard = <TData extends TaskWithId>({
-  table,
+const TaskPortalCard = ({
+  data,
   router,
-}: TaskPortalCardProps<TData>) => {
-  const paginatedTasks = table.getRowModel().rows.map((row) => row.original);
+}: TaskPortalCardProps) => {
+  
  
  
 
@@ -42,8 +42,8 @@ const TaskPortalCard = <TData extends TaskWithId>({
 
   return (
     <>
-      {paginatedTasks.length > 0 ? (
-        paginatedTasks.map((task) => (
+      {data.length > 0 ? (
+        data.map((task) => (
           <Card
             key={task.id}
             className="w-full cursor-pointer p-4"

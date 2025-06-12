@@ -97,7 +97,7 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
           </h3>
         </div>
 
-        <TaskPortalCard table={table} router={router} />
+        <TaskPortalCard data={allTask} router={router} />
 
         <div className="mt-5 mb-5">
           <DataTablePagination
