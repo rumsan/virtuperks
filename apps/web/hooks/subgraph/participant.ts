@@ -1,6 +1,7 @@
 
-import { useQuery } from "@tanstack/react-query";
 import { useGraphService } from "@/providers/subgraph-provider";
+import { useQuery } from "@tanstack/react-query";
+import { useReadRewardManagementGetParticipantTaskAssignment, useReadRewardManagementIsTaskExpired } from "../wagmi/contracts";
 
 
 export const useGetTaskListByParticipant = (
@@ -22,18 +23,35 @@ export const useGetTaskListByParticipant = (
   };
 
 
-// export const useGetAllParticipantsByRole = (
-//   role: string,
-//   skip: boolean = false,
-// ) => {
-//   const { queryService } = useGraphService();
 
-//   return useQuery({
-//     queryKey: ["participantsByRole", role],
-//     queryFn: async () => {
-//       const participants = await queryService?.getAllParticipantsByRole(role);
-//       return participants;
-//     },
-//     enabled: !!role && !skip,
-//   });
-// };
+// to check wheter the task is expired or not
+
+export const useCheckTaskStatus = (taskId:string, entityId:string) => {
+  
+  const {
+    data: status,
+    isError,
+    isLoading,
+  } = useReadRewardManagementIsTaskExpired({
+    address: entityId as `0x${string}`,
+    args: [taskId as `0x${string}`],
+  });
+
+  return {
+    status,
+    isError,
+    isLoading,
+  };
+};
+
+// to get the participant task assignment
+
+export const useGetParticipantTaskAssignmet = (taskId:string, participant:string,  entityId:string) => {
+  
+  const data = useReadRewardManagementGetParticipantTaskAssignment({
+    address: entityId as `0x${string}`,
+    args: [taskId as `0x${string}`, participant as `0x${string}`],
+  });
+
+  return data
+};

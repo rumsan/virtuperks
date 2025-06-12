@@ -7,7 +7,7 @@ import { useGetParticipantPending } from "@/hooks/subgraph/querycall";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { useToast } from "@workspace/ui/hooks/use-toast";
-import { ArrowLeft, CircleX } from "lucide-react";
+import { ArrowLeft, CheckCircle, CircleX } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 import TaskParticipant from "./details.participant";
@@ -105,31 +105,28 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
             </h3>
           </div>
           <div className="flex items-center ml-auto gap-4">
-            {/* <Button
-              variant="outline"
-              className={getApproveButtonState().className}
-              onClick={getApproveButtonState().onClick}
-              disabled={getApproveButtonState().disabled}
-            >
-              <span
-                className={
-                  approvedData && approvedData.length > 0
-                    ? "text-white"
-                    : "text-[#03AB65]"
-                }
-              >
-                {getApproveButtonState().text}
-              </span>
-              <CheckCircle
-                color={
-                  approvedData && approvedData.length > 0
-                    ? "#ffffff"
-                    : "#03AB65"
-                }
-                strokeWidth={2.5}
-                size={20}
-              />
-            </Button> */}
+          <Button
+  variant="outline"
+  style={{
+    border: '1px solid #03AB65'
+  }}
+>
+  <span
+    style={{
+      color: '#03AB65'
+    }}
+  >
+    Disburse Tokens
+  </span>{" "}
+  <CheckCircle
+    style={{
+      color: '#03AB65',
+      strokeWidth: 2.5,
+      width: '20px',
+      height: '20px'
+    }}
+  />
+</Button>
 
             <Button variant="outline" className="border border-[#E44134]">
               <span className="text-[#E44134]">Close</span>{" "}
