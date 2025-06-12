@@ -99,7 +99,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
   const handleApplyTaskLogic = async () => {
     // Optimistically update status
-    setLocalButtonState("WAITING");
 
     return new Promise<void>((resolve, reject) => {
       participateTask(
@@ -110,6 +109,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
         {
           onSuccess: () => {
             setIsOpen(false);
+            setLocalButtonState("WAITING");
             toast({
               title: "Task Application Submitted Successfully!",
               variant: "success",
@@ -162,8 +162,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   };
 
   const handleCompletedTask = async (data: any) => {
-    setLocalButtonState("COMPLETED");
-
     return new Promise<void>((resolve, reject) => {
       completeTask(
         {
@@ -171,9 +169,11 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
           entityId: taskData?.rewardManagement?.rewardManagement || "0x",
           completionUrl: data.completionUrl,
         },
+
         {
           onSuccess: () => {
             setIsOpen(false);
+            setLocalButtonState("COMPLETED");
             resolve();
           },
           onError: (error) => {
@@ -205,7 +205,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
     const effectiveStatus = localButtonState ?? participantStatus;
 
     switch (effectiveStatus) {
-      case "UNACCEPTED":
+      case "Waiting":
       case 0:
         return (
           <Button
@@ -223,10 +223,10 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
         );
 
       case "WAITING":
-      case 1: // PENDING
+      case 1:
         return (
           <Button className="bg-[#F59E0B]" disabled>
-            <span className="text-[#F8FAFC]">Waiting for Approval</span>
+            <span className="text-[#F8FAFC]">Waiting for Acceptance</span>
           </Button>
         );
 
