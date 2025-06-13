@@ -131,8 +131,8 @@ const {disburseTokenToTask, disbursePending}= useDisburseTokenToTask()
                 setIsOpen={setIsOpen}
                 title="Are you sure you want to disperse the amount?"
                 subTitle="This action cannot be undone"
-                buttonName="disperse"
-                submitType="directdisburse"
+                buttonName="Disperse"
+                submitType="Disperse"
                 handleApplyTaskLogic={handleDialogAction}
               />
             )}
