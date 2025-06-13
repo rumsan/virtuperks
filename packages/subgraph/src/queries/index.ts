@@ -375,6 +375,8 @@ export const GetCombineParticipantsByTask = `
       }
     }
   }
+
+  
 `;
 
 
@@ -676,32 +678,40 @@ export const FactoryQueries = {
 };
 
 
-export const ParticipantQueries = {
-  getParticipantTasks: `
-  query GetParticipantTasks($participant: Bytes!) {
-  participantApplieds(where: { participant: $participant }) {
-    id
-    internal_id
-    blockTimestamp
-    transactionHash
-    taskDetail {
+
+
+export const getParticipantTasks=`
+   query GetParticipantTasks($participant: Bytes!) {
+    participantTaskStatuses(where: { participant: $participant }) {
       id
-      name
-      detailsUrl
-      owner
-      expiryDate
-      rewardToken
-      totalRewardAmount
-      isOpen
-      requireApproval
-      isWhitelisted
-      isTokenDisbursed
-      maxParticipants
-      acceptedParticipantCount
-      verifiedParticipants
-      createdAt
+      participant
+      taskId
+      status
+      lastUpdatedBlock
+      lastUpdatedTimestamp
+      taskDetail {
+        acceptedParticipantCount
+        detailsUrl
+        id
+        expiryDate
+        isOpen
+        isTokenDisbursed
+        maxParticipants
+        name
+        owner
+        rewardToken
+        totalRewardAmount
+        requireApproval
+        isWhitelisted
+        verifiedParticipants
+        
+        }
+        rewardManagement{
+        appId
+        id
+        name
+        rewardManagement
+        }
     }
-  }
 }
   `
-};
