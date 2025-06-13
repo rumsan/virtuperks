@@ -12,7 +12,7 @@ import { Button } from "@workspace/ui/components/button";
 import { useToast } from "@workspace/ui/hooks/use-toast";
 import { ArrowLeft, CheckCircle, CircleX, Loader2 } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import TaskParticipant from "./details.participant";
 import TaskDetails from "./details.task";
 
@@ -68,12 +68,11 @@ const {disburseTokenToTask, disbursePending}= useDisburseTokenToTask()
       });
     }
   };
-  console.log(status, "status");
+  
 
 
   const isDisburseButtonDisabled = statusLoading || !status || isDisbursed || disbursePending
-  console.log("isDisburseButtonDisabled", isDisburseButtonDisabled);
-  
+
 
 
 
@@ -103,7 +102,7 @@ const {disburseTokenToTask, disbursePending}= useDisburseTokenToTask()
         disabled={isDisburseButtonDisabled}
         
       >
-        <span className="text-[#03AB65]">Disburse Tokens</span>
+        <span className="text-[#03AB65]">Disperse Token</span>
         <CheckCircle
           className="ml-2"
           style={{
