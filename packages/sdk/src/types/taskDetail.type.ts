@@ -10,4 +10,5 @@ export type TaskDetail = {
   totalRewardAmount: string;
   rewardToken: string;
   isTokenDisbursed: boolean;
+  status: string;
 };
