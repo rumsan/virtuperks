@@ -51,7 +51,7 @@ const ListCardDetails = ({
           key={task?.id}
           className="cursor-pointer"
           onClick={() =>
-            task?.id && router.push(PATHS.TASKS.DETAILS(task?.internal_id))
+            task?.id && router.push(PATHS.TASKS.DETAILS(task?.id))
           }
         >
           <CardTitle className="flex flex-col p-4 gap-2">

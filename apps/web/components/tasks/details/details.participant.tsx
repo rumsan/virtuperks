@@ -24,15 +24,16 @@ type Cuid = {
 };
 
 type TaskParticipantProps = {
-  taskId: Cuid;
+  taskData: any;
 };
 
-const TaskParticipant = ({ taskId }: TaskParticipantProps) => {
+const TaskParticipant = (  {taskData} : TaskParticipantProps) => {
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
+
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
@@ -42,7 +43,7 @@ const TaskParticipant = ({ taskId }: TaskParticipantProps) => {
   });
   const columns = useColumns(); 
 
-  const { pendingParticipants, acceptedParticipants, completedParticipants, verifiedPartcipants } = useGetCombineStausByTask(taskId.id);
+  const { pendingParticipants, acceptedParticipants, completedParticipants, verifiedPartcipants } = useGetCombineStausByTask(taskData?.internal_id);
   const pendingAndAcceptedParticipants = useMemo(() => {
     return [
       ...(pendingParticipants || []),
