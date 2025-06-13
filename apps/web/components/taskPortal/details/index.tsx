@@ -50,7 +50,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
       taskData?.rewardManagement?.rewardManagement,
     );
 
-  console.log("Participant Status: ", participantStatus);
+
   const handleApplyTask = () => {
     if (isConnected) {
       setIsOpen(true);
@@ -317,7 +317,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
                 subTitle="This action cannot be undone"
                 buttonName="Complete"
                 handleApplyTaskLogic={handleCompletedTask}
-                submitType="complete"
+                submitType="Complete"
                 isDisabled={completePending}
               />
             )}
