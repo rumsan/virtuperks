@@ -138,7 +138,7 @@ const {data, error} = await this.subgraphQuery.query(
   }
 
   async getParticipantTasks(participantAddress: string) {
-    console.log('Fetching tasks for participant:', participantAddress);
+   
   
     try { 
 
