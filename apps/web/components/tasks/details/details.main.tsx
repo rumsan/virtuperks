@@ -5,14 +5,14 @@ import { Cuid } from "@/components/departments/details/details.main";
 // } from "@/hooks/subgraph/querycall";
 
 import { DialogButton } from "@/components/common/ui/dialog";
-import { useGetTaskById } from "@/hooks/subgraph/task";
+import { useCheckTaskStatus, useGetTaskById } from "@/hooks/subgraph/task";
 import { useDisburseTokenToTask } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { useToast } from "@workspace/ui/hooks/use-toast";
 import { ArrowLeft, CheckCircle, CircleX, Loader2 } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import TaskParticipant from "./details.participant";
 import TaskDetails from "./details.task";
 
@@ -23,17 +23,23 @@ type TaskMainProps = {
 };
 
 const TaskMain = ({ cuid, router }: TaskMainProps) => {
-  const getTaskDetail = useGetTaskById(cuid.id);
+const getTaskDetail = useGetTaskById(cuid.id);
+
+  const [isDisbursed, setIsDisbursed] = useState(false);
 
 
 
   const taskData = getTaskDetail?.data?.data?.taskCreated
   
+
+  const { status , statusLoading} = useCheckTaskStatus(taskData?.internal_id, taskData?.rewardManagement?.rewardManagement);
+
+  
   
 
   const { toast } = useToast();
  
-  const [localStatus, setLocalStatus] = useState<string | null>(null);
+  const [localStatus, setLocalStatus] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
  
@@ -49,7 +55,7 @@ const {disburseTokenToTask, disbursePending}= useDisburseTokenToTask()
         entityId: taskData.rewardManagement.rewardManagement,
       });
       setIsOpen(false);
-      setLocalStatus("DISPERSE"); 
+      setIsDisbursed(true);
       toast({
         title: "Disperse Token Successfully!.",
         variant: "success",
@@ -62,6 +68,14 @@ const {disburseTokenToTask, disbursePending}= useDisburseTokenToTask()
       });
     }
   };
+  console.log(status, "status");
+
+
+  const isDisburseButtonDisabled = statusLoading || !status || isDisbursed || disbursePending
+  console.log("isDisburseButtonDisabled", isDisburseButtonDisabled);
+  
+
+
 
   const getDisburseButton = () => {
     if (disbursePending) {
@@ -86,6 +100,8 @@ const {disburseTokenToTask, disbursePending}= useDisburseTokenToTask()
           border: '1px solid #03AB65'
         }}
         onClick={() => setIsOpen(true)}
+        disabled={isDisburseButtonDisabled}
+        
       >
         <span className="text-[#03AB65]">Disburse Tokens</span>
         <CheckCircle

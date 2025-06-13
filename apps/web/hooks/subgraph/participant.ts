@@ -24,25 +24,6 @@ export const useGetTaskListByParticipant = (
 
 
 
-// to check wheter the task is expired or not
-
-export const useCheckTaskStatus = (taskId:string, entityId:string) => {
-  
-  const {
-    data: status,
-    isError,
-    isLoading,
-  } = useReadRewardManagementIsTaskExpired({
-    address: entityId as `0x${string}`,
-    args: [taskId as `0x${string}`],
-  });
-
-  return {
-    status,
-    isError,
-    isLoading,
-  };
-};
 
 // to get the participant task assignment
 

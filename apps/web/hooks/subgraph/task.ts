@@ -1,7 +1,7 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
-import { useWriteRewardManagementCloseTask, useWriteRewardManagementCreateTask } from "../wagmi/contracts";
+import { useReadRewardManagementIsTaskExpired, useWriteRewardManagementCloseTask, useWriteRewardManagementCreateTask } from "../wagmi/contracts";
 
 
 
@@ -122,4 +122,23 @@ export const useCloseTaskMutation = () => {
   });
 };
 
+// to check wheter the task is expired or not
+
+export const useCheckTaskStatus = (taskId:string, entityId:string) => {
+  
+  const {
+    data: status,
+    isError,
+    isLoading,
+  } = useReadRewardManagementIsTaskExpired({
+    address: entityId as `0x${string}`,
+    args: [taskId as `0x${string}`],
+  });
+
+  return {
+    status,
+    isError,
+    statusLoading: isLoading,
+  };
+};
 
