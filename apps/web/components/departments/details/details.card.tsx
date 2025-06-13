@@ -1,4 +1,6 @@
+import { DialogButton } from "@/components/common/ui/dialog";
 import { useGetEntityById } from "@/hooks/subgraph/entity";
+import { useDirectTokenTransfer } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
 import hasRole from "@/utils/role";
 import { Button } from "@workspace/ui/components/button";
@@ -9,8 +11,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import { Copy, Plus, User } from "lucide-react";
+import { toast } from "@workspace/ui/hooks/use-toast";
+import { CheckCircle, Copy, Plus, User } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { useState } from "react";
 import { Cuid } from "./details.main";
 
 type DepartmentDetailsCardProps = {
@@ -25,7 +29,17 @@ export default function DepartmentDetailsCard({
   console.log("CUID Department: ", cuid.id);
 
   const { data: entity, isLoading, isError, error } = useGetEntityById(cuid.id);
-  console.log("Entity Department: ", entity);
+  console.log("Entity ID: ", entity);
+
+  const {
+    directTransfer,
+    directTransferPending,
+    directTransferSuccess,
+    directTransferError,
+  } = useDirectTokenTransfer();
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [localStatus, setLocalStatus] = useState<string | null>(null);
 
   if (isLoading) {
     return <p className="text-gray-600">Loading department info...</p>;
@@ -45,6 +59,29 @@ export default function DepartmentDetailsCard({
     );
   }
 
+  const handleDialogAction = async (data: any) => {
+    try {
+      await directTransfer({
+        to: data.to,
+        amount: data.amount,
+        remarks: data.remarks,
+        entityId: entity.id,
+      });
+      setIsOpen(false);
+      setLocalStatus("DISPERSE");
+      toast({
+        title: "Token transfered Successfully!.",
+        variant: "success",
+      });
+    } catch (error) {
+      console.error("Error approving transfering token:", error);
+      toast({
+        title: "Failed To transfer token. Please Try Again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const roleCheck = hasRole({
     role: process.env.NEXT_PUBLIC_MINTER_ROLE || "",
   });
@@ -61,17 +98,50 @@ export default function DepartmentDetailsCard({
             </h3>
           </div>
           {hasTreasurerRole && (
-            <Button
-              className="min-w-[10rem] fw-[600] h-10 ml-auto"
-              variant="default"
-              type="button"
-              onClick={() =>
-                router.push(PATHS.TREASURER.CREATE(entity.rewardManagement))
-              }
-            >
-              <Plus size={22} strokeWidth={2.75} />
-              <span>Allocate Token</span>
-            </Button>
+            <div className="flex gap-10">
+              <Button
+                variant="outline"
+                className="h-12 w-48 flex items-center justify-center"
+                style={{
+                  border: "1px solid #03AB65",
+                }}
+                onClick={() => setIsOpen(true)}
+              >
+                {!directTransferPending && isOpen && (
+                  <DialogButton
+                    isOpen={isOpen}
+                    setIsOpen={setIsOpen}
+                    title="Are you sure you want to transfer token amount?"
+                    subTitle="This action cannot be undone"
+                    buttonName="Transfer Token"
+                    submitType="directdisburse"
+                    handleApplyTaskLogic={handleDialogAction}
+                  />
+                )}
+                <span className="text-[#03AB65]">Disburse Tokens</span>
+                <CheckCircle
+                  className="ml-2"
+                  style={{
+                    color: "#03AB65",
+                    strokeWidth: 2.5,
+                    width: "20px",
+                    height: "20px",
+                  }}
+                />
+              </Button>
+
+              <Button
+                className="h-12 w-48 fw-[600] flex items-center justify-center"
+                variant="default"
+                type="button"
+                onClick={() =>
+                  router.push(PATHS.TREASURER.CREATE(entity.rewardManagement))
+                }
+              >
+                <Plus size={22} strokeWidth={2.75} />
+                <span className="ml-2">Allocate Token</span>
+              </Button>
+            </div>
           )}
         </div>
       </div>
