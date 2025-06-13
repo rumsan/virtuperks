@@ -10,7 +10,7 @@ export const useGetTaskDetailById = (id: string) => {
   return useQuery({
     queryKey: ["taskDetail", id],
     queryFn: async () => {
-      const taskDetail = await queryService?.getTaskDetails(id)
+      const taskDetail = await queryService?.getTaskById(id)
       return taskDetail;
     },
   });

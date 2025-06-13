@@ -10,9 +10,9 @@ type TaskDetailsProps = {
 
 const TaskDetails = ({ cuid }: TaskDetailsProps) => {
   const getTaskDetail = useGetTaskDetailById(cuid.id);
-  console.log("Task Details: ", getTaskDetail.data);
-  const taskData = getTaskDetail?.data?.taskCreateds[0];
-  console.log("data--", taskData);
+ 
+  const taskData = getTaskDetail?.data?.data?.taskCreated
+
 
   const formattedDate = formatDate(taskData?.taskDetail?.expiryDate);
 
