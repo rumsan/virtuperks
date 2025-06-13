@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { toast } from "@workspace/ui/hooks/use-toast";
-import { CheckCircle, Copy, Plus, User } from "lucide-react";
+import { CheckCircle, Copy, Loader2, Plus, User } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 import { Cuid } from "./details.main";
@@ -26,10 +26,10 @@ export default function DepartmentDetailsCard({
   cuid,
   router,
 }: DepartmentDetailsCardProps) {
-  console.log("CUID Department: ", cuid.id);
+ 
 
   const { data: entity, isLoading, isError, error } = useGetEntityById(cuid.id);
-  console.log("Entity ID: ", entity);
+  
 
   const {
     directTransfer,
@@ -86,6 +86,52 @@ export default function DepartmentDetailsCard({
     role: process.env.NEXT_PUBLIC_MINTER_ROLE || "",
   });
   const hasTreasurerRole = typeof roleCheck === "boolean" ? roleCheck : false;
+             
+
+
+  const getTransferButton = () => {
+      if (directTransferPending) {
+        return (
+          <Button
+            variant="outline"
+          className="h-12 w-48 flex items-center justify-center"
+                style={{
+                  border: "1px solid #03AB65",
+                }}
+            disabled
+          >
+            <span className="text-[#03AB65] flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Processing...
+            </span>
+          </Button>
+        );
+      }
+  
+      return (
+        <Button
+          variant="outline"
+          className="h-12 w-48 flex items-center justify-center"
+                style={{
+                  border: "1px solid #03AB65",
+                }}
+          onClick={() => setIsOpen(true)}
+          //disabled={isDisburseButtonDisabled}
+          
+        >
+          <span className="text-[#03AB65]">Transfer Token</span>
+          <CheckCircle
+            className="ml-2"
+            style={{
+              color: '#03AB65',
+              strokeWidth: 2.5,
+              width: '20px',
+              height: '20px'
+            }}
+          />
+        </Button>
+      );
+    };
 
   return (
     <>
@@ -99,14 +145,8 @@ export default function DepartmentDetailsCard({
           </div>
           {hasTreasurerRole && (
             <div className="flex gap-10">
-              <Button
-                variant="outline"
-                className="h-12 w-48 flex items-center justify-center"
-                style={{
-                  border: "1px solid #03AB65",
-                }}
-                onClick={() => setIsOpen(true)}
-              >
+           {getTransferButton()}
+              
                 {!directTransferPending && isOpen && (
                   <DialogButton
                     isOpen={isOpen}
@@ -118,17 +158,8 @@ export default function DepartmentDetailsCard({
                     handleApplyTaskLogic={handleDialogAction}
                   />
                 )}
-                <span className="text-[#03AB65]">Disburse Tokens</span>
-                <CheckCircle
-                  className="ml-2"
-                  style={{
-                    color: "#03AB65",
-                    strokeWidth: 2.5,
-                    width: "20px",
-                    height: "20px",
-                  }}
-                />
-              </Button>
+               
+            
 
               <Button
                 className="h-12 w-48 fw-[600] flex items-center justify-center"
