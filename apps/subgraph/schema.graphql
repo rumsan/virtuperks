@@ -86,6 +86,7 @@ type Transfer @entity(immutable: true) {
   from: Bytes! # address
   to: Bytes! # address
   value: BigInt! # uint256
+  rewardManagement: RewardManagementCreated
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
@@ -97,6 +98,10 @@ type RewardManagementCreated @entity {
   appId: Bytes! # bytes32
   name: String! # string
   tasks: [TaskCreated!] @derivedFrom(field: "rewardManagement")
+  totalMintedTokens: BigInt! # 
+  tokenTransfers: [TokenTransferred!] @derivedFrom(field: "rewardManagement")
+  totalAvailableTokens: BigInt! # uint256
+  disbursements: [DisbursementToTask!] @derivedFrom(field: "rewardManagement")
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
@@ -134,6 +139,8 @@ type DisbursementToTask @entity(immutable: true) {
   taskId: Bytes! # bytes32
   amount: BigInt! # uint256
   disbursedBy: Bytes! # address
+  rewardManagement: RewardManagementCreated
+  task: TaskCreated
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
@@ -297,6 +304,7 @@ type TokenTransferred @entity(immutable: true) {
   amount: BigInt! # uint256
   remarks: String! # string
   transferredBy: Bytes! # address
+  rewardManagement: RewardManagementCreated
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

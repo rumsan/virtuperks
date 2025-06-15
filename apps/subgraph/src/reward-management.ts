@@ -1,4 +1,4 @@
-import { log } from "@graphprotocol/graph-ts"
+import { log } from "@graphprotocol/graph-ts";
 import {
   AdditionalDisbursementToTask,
   ContractPaused,
@@ -18,7 +18,7 @@ import {
   TaskIdMapping,
   TaskVerified,
   TokenTransferred
-} from "../generated/schema"
+} from "../generated/schema";
 import {
   AdditionalDisbursementToTask as AdditionalDisbursementToTaskEvent,
   ContractPaused as ContractPausedEvent,
@@ -36,8 +36,8 @@ import {
   TaskDetailsUpdated as TaskDetailsUpdatedEvent,
   TaskVerified as TaskVerifiedEvent,
   TokenTransferred as TokenTransferredEvent,
-} from "../generated/templates/RewardManagement/RewardManagement"
-import { fetchTaskDetails, updateParticipantTaskStatus } from "./utils"
+} from "../generated/templates/RewardManagement/RewardManagement";
+import { fetchTaskDetails, updateParticipantTaskStatus } from "./utils";
 
 import { RewardManagement } from "../generated/templates/RewardManagement/RewardManagement";
 
@@ -96,6 +96,25 @@ export function handleDisbursementToTask(event: DisbursementToTaskEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+
+  // Link to RewardManagement
+  let rewardManagement = RewardManagementCreated.load(event.address);
+  if (rewardManagement != null) {
+    entity.rewardManagement = rewardManagement.id;
+    // Update totalAvailableTokens (ensure non-negative)
+    if (rewardManagement.totalAvailableTokens >= event.params.amount) {
+      rewardManagement.totalAvailableTokens = rewardManagement.totalAvailableTokens.minus(
+        event.params.amount
+      );
+      rewardManagement.save();
+    } else {
+      log.warning("Insufficient available tokens for disbursement: {}", [
+        rewardManagement.id.toHexString(),
+      ]);
+    }
+  }
+
+
 
   entity.save()
 }
@@ -407,6 +426,23 @@ export function handleTokenTransferred(event: TokenTransferredEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+
+
+ let rewardManagement = RewardManagementCreated.load(event.address);
+  if (rewardManagement != null) {
+    entity.rewardManagement = rewardManagement.id;
+    // Update totalAvailableTokens (ensure non-negative)
+    if (rewardManagement.totalAvailableTokens >= event.params.amount) {
+      rewardManagement.totalAvailableTokens = rewardManagement.totalAvailableTokens.minus(
+        event.params.amount
+      );
+      rewardManagement.save();
+    } else {
+      log.warning("Insufficient available tokens for transfer: {}", [
+        rewardManagement.id.toHexString(),
+      ]);
+    }
+  }
 
   entity.save()
 }

@@ -1,8 +1,9 @@
 import { Client, fetchExchange } from '@urql/core';
 import {
   AppRegistryQueries,
-  FactoryQueries,
-
+  
+  GetRewardManagement,
+GetRewardManagementCreatedByAddress,
 
   GetCombineParticipantsByTask,
 
@@ -112,7 +113,7 @@ export class SubgraphService {
   // Factory Related Services
   async getDeployments() {
     try {
-      const { data, error } = await this.subgraphQuery.query(FactoryQueries.getDeployments, {});
+      const { data, error } = await this.subgraphQuery.query(GetRewardManagement, {});
       return { data, error };
     } catch (error) {
       console.error('Error fetching deployments:', error);
@@ -123,7 +124,7 @@ export class SubgraphService {
   async getRewardManagementCreatedByAddress(rewardManagement: string) {
     try {
       const { data, error } = await this.subgraphQuery.query(
-        FactoryQueries.getRewardManagementCreatedByAddress,
+        GetRewardManagementCreatedByAddress,
         { rewardManagement }
       );
   
