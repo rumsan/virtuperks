@@ -29,6 +29,7 @@ export default function DepartmentDetailsCard({
  
 
   const { data: entity, isLoading, isError, error } = useGetEntityById(cuid.id);
+ 
   
 
   const {
@@ -203,7 +204,7 @@ export default function DepartmentDetailsCard({
             </CardTitle>
           </CardHeader>
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {entity.totalTokenBalance ?? "-"}
+            {entity.totalMintedTokens ?? "-"}
           </CardFooter>
         </Card>
         <Card className="font-normal text-base h-40 flex flex-col">
@@ -213,7 +214,7 @@ export default function DepartmentDetailsCard({
             </CardTitle>
           </CardHeader>
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {entity.remainingTokenBalance ?? "-"}
+            {entity.totalAvailableTokens ?? "-"}
           </CardFooter>
         </Card>
         <Card className="font-normal text-base h-40 flex flex-col">

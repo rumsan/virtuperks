@@ -17,11 +17,11 @@ interface DepartmentListCardProps {
 
 const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
   const getAllEntity = useGetAllEntity();
-  console.log("All Entity Data: ", getAllEntity?.data);
+
   const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
-  console.log("Entity List: ", entityList);
+ 
   const getAllTask = useGetAllTask()
-  console.log("All Task Data: ", getAllTask?.data);
+
 
   const hasEntityOwnerRole = hasRole({
     role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
@@ -69,7 +69,7 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
                   <div className="flex items-center text-[#297AD6] gap-2">
                     <Coins size={20} strokeWidth={2.5} color="#297AD6" />
                     <span className="text-2xl font-bold">
-                      {department.remainingTokenBalance}
+                      {department.totalAvailableTokens}
                     </span>
                   </div>
                   <div className="flex items-center ml-auto gap-2">

@@ -29,7 +29,7 @@ const Validation = ({ children }: ValidationProps) => {
     ],
   });
 
-  console.log("Default admin Role: ", hasDefaultAdminRole);
+
 
   const { data: hasTreasurerRole } = useReadContract({
     address: process.env.NEXT_PUBLIC_APPREGISTRY as `0x${string}`,
