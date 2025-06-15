@@ -1,4 +1,4 @@
-import { log } from "@graphprotocol/graph-ts"
+import { log } from "@graphprotocol/graph-ts";
 import {
   AdditionalDisbursementToTask,
   ContractPaused,
@@ -18,7 +18,7 @@ import {
   TaskIdMapping,
   TaskVerified,
   TokenTransferred
-} from "../generated/schema"
+} from "../generated/schema";
 import {
   AdditionalDisbursementToTask as AdditionalDisbursementToTaskEvent,
   ContractPaused as ContractPausedEvent,
@@ -36,8 +36,8 @@ import {
   TaskDetailsUpdated as TaskDetailsUpdatedEvent,
   TaskVerified as TaskVerifiedEvent,
   TokenTransferred as TokenTransferredEvent,
-} from "../generated/templates/RewardManagement/RewardManagement"
-import { fetchTaskDetails, updateParticipantTaskStatus } from "./utils"
+} from "../generated/templates/RewardManagement/RewardManagement";
+import { fetchTaskDetails, updateParticipantTaskStatus } from "./utils";
 
 import { RewardManagement } from "../generated/templates/RewardManagement/RewardManagement";
 
@@ -407,6 +407,12 @@ export function handleTokenTransferred(event: TokenTransferredEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+
+  // Link to RewardManagement (event.address is the contract emitting the event)
+  let rewardManagement = RewardManagementCreated.load(event.address);
+  if (rewardManagement != null) {
+    entity.rewardManagement = rewardManagement.id;
+  }
 
   entity.save()
 }
