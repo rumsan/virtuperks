@@ -97,6 +97,25 @@ export function handleDisbursementToTask(event: DisbursementToTaskEvent): void {
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
 
+  // Link to RewardManagement
+  let rewardManagement = RewardManagementCreated.load(event.address);
+  if (rewardManagement != null) {
+    entity.rewardManagement = rewardManagement.id;
+    // Update totalAvailableTokens (ensure non-negative)
+    if (rewardManagement.totalAvailableTokens >= event.params.amount) {
+      rewardManagement.totalAvailableTokens = rewardManagement.totalAvailableTokens.minus(
+        event.params.amount
+      );
+      rewardManagement.save();
+    } else {
+      log.warning("Insufficient available tokens for disbursement: {}", [
+        rewardManagement.id.toHexString(),
+      ]);
+    }
+  }
+
+
+
   entity.save()
 }
 
@@ -408,10 +427,21 @@ export function handleTokenTransferred(event: TokenTransferredEvent): void {
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
 
-  // Link to RewardManagement (event.address is the contract emitting the event)
-  let rewardManagement = RewardManagementCreated.load(event.address);
+
+ let rewardManagement = RewardManagementCreated.load(event.address);
   if (rewardManagement != null) {
     entity.rewardManagement = rewardManagement.id;
+    // Update totalAvailableTokens (ensure non-negative)
+    if (rewardManagement.totalAvailableTokens >= event.params.amount) {
+      rewardManagement.totalAvailableTokens = rewardManagement.totalAvailableTokens.minus(
+        event.params.amount
+      );
+      rewardManagement.save();
+    } else {
+      log.warning("Insufficient available tokens for transfer: {}", [
+        rewardManagement.id.toHexString(),
+      ]);
+    }
   }
 
   entity.save()

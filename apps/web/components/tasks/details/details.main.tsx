@@ -100,7 +100,7 @@ const {disburseTokenToTask, disbursePending}= useDisburseTokenToTask()
           border: '1px solid #03AB65'
         }}
         onClick={() => setIsOpen(true)}
-        disabled={isDisburseButtonDisabled}
+        disabled={!isDisburseButtonDisabled}
         
       >
         <span className="text-[#03AB65]">Disperse Token</span>

@@ -252,7 +252,6 @@ type TaskCreated @entity(immutable: true) {
   taskDetail: TaskDetail
   createdBy: Bytes!
   rewardManagement: RewardManagementCreated
-  totalDisbursedToTask: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

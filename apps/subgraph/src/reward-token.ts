@@ -32,17 +32,18 @@ export function handleTransfer(event: TransferEvent): void {
   entity.transactionHash = event.transaction.hash
 
 
-
   if (event.params.from.toHexString() == "0x0000000000000000000000000000000000000000") {
-    // Check if the 'to' address is a RewardManagement contract
     let rewardManagement = RewardManagementCreated.load(event.params.to);
     if (rewardManagement != null) {
-      // Update totalMintedTokens
-      rewardManagement.totalMintedTokens = rewardManagement.totalMintedTokens
-        ? rewardManagement.totalMintedTokens.plus(event.params.value)
-        : event.params.value;
+      
+      rewardManagement.totalMintedTokens = rewardManagement.totalMintedTokens.plus(
+        event.params.value
+      );
+      rewardManagement.totalAvailableTokens = rewardManagement.totalAvailableTokens.plus(
+        event.params.value
+      );
       rewardManagement.save();
-      entity.rewardManagement = rewardManagement.id; // Link Transfer to RewardManagement
+      entity.rewardManagement = rewardManagement.id;
     }
   }
 
