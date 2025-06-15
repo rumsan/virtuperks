@@ -6,8 +6,8 @@ export interface DepartmentDetails {
   blockTimestamp: string;
   id: string;
   transactionHash: string;
-  totalTokenBalance: string;
-  remainingTokenBalance: string;
+  totalAvailableTokens: string;
+  totalMintedTokens: string;
   __typename: string;
   _appId: string;
   name: string;
