@@ -647,8 +647,7 @@ getContractUnpausedById: `
 };
 
 // Factory Queries
-export const FactoryQueries = {
-  getDeployments: `
+export const GetRewardManagement = `
     query GetDeployments {
       rewardManagementCreateds(first: 100, orderBy: blockTimestamp, orderDirection: desc) {
         id
@@ -656,26 +655,51 @@ export const FactoryQueries = {
         aclAddress
         appId
         name
+        totalMintedTokens
+        totalAvailableTokens
+        
+        
         blockNumber
         blockTimestamp
         transactionHash
       }
     }
-  `,
-  getRewardManagementCreatedByAddress: `
-  query GetRewardManagementCreatedByAddress($rewardManagement: String!) {
+  `;
+ export const GetRewardManagementCreatedByAddress = `
+  query GetRewardManagementCreatedByAddress($rewardManagement: Bytes!) {
     rewardManagementCreateds(where: { rewardManagement: $rewardManagement }) {
-      aclAddress
-  
-      id
-      name
-      rewardManagement
-    
-    }
-  }
-`,
+     id
+        rewardManagement
+        aclAddress
+        appId
+        name
+        totalMintedTokens
+        totalAvailableTokens
+        
+       tokenTransfers(first:30, orderBy: blockTimestamp, orderDirection: desc) {
+        id
+        token
+        to
+        amount
+        remarks
+        transferredBy
+        }
 
-};
+        disbursements(first:30, orderBy: blockTimestamp, orderDirection: desc) {
+        id
+        taskId
+        amount
+        disbursedBy
+        
+        }
+        blockNumber
+        blockTimestamp
+        transactionHash
+      }
+  }
+`;
+
+
 
 
 

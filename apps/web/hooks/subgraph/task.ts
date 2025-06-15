@@ -134,6 +134,7 @@ export const useCheckTaskStatus = (taskId:string, entityId:string) => {
     address: entityId as `0x${string}`,
     args: [taskId as `0x${string}`],
   });
+  console.log(taskStatus, 'taskStatus from hook')
 
   return {
     status:taskStatus?.isOpen,

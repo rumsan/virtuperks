@@ -1,3 +1,4 @@
+import { BigInt } from "@graphprotocol/graph-ts";
 import { log } from "matchstick-as";
 import { RewardManagementCreated as RewardManagementCreatedEvent } from "../generated/RewardManagementFactory/RewardManagementFactory";
 import { RewardManagementCreated } from "../generated/schema";
@@ -14,6 +15,9 @@ export function handleRewardManagementCreated(
   entity.aclAddress = event.params.aclAddress
   entity.appId = event.params.appId
   entity.name = event.params.name
+  entity.totalMintedTokens = BigInt.fromI32(0);
+  entity.totalAvailableTokens = BigInt.fromI32(0);
+
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp

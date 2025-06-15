@@ -33,7 +33,7 @@ const getTaskDetail = useGetTaskById(cuid.id);
   
 
   const { status , statusLoading} = useCheckTaskStatus(taskData?.internal_id, taskData?.rewardManagement?.rewardManagement);
-
+console.log(status, 'status')
   
   
 
@@ -71,7 +71,8 @@ const {disburseTokenToTask, disbursePending}= useDisburseTokenToTask()
   
 
 
-  const isDisburseButtonDisabled = statusLoading || !status || isDisbursed || disbursePending
+  const isDisburseButtonDisabled = statusLoading || status || isDisbursed || disbursePending
+  console.log(isDisburseButtonDisabled, 'isDisburseButtonDisabled')
 
 
 
@@ -99,7 +100,7 @@ const {disburseTokenToTask, disbursePending}= useDisburseTokenToTask()
           border: '1px solid #03AB65'
         }}
         onClick={() => setIsOpen(true)}
-        disabled={isDisburseButtonDisabled}
+        disabled={!isDisburseButtonDisabled}
         
       >
         <span className="text-[#03AB65]">Disperse Token</span>

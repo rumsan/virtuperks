@@ -37,7 +37,7 @@ const TaskPortalParticipant = ({ taskId }: TaskPortalParticipantProps) => {
   });
     const getTaskDetail = useGetTaskDetailById(taskId.id);
      
-  const taskData = getTaskDetail?.data?.data?.taskCreateds[0]
+  const taskData = getTaskDetail?.data?.data?.taskCreated
 
 
 
