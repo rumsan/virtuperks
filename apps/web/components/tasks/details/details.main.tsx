@@ -32,7 +32,8 @@ const getTaskDetail = useGetTaskById(cuid.id);
   const taskData = getTaskDetail?.data?.data?.taskCreated
   
 
-  const { status , statusLoading} = useCheckTaskStatus(taskData?.internal_id, taskData?.rewardManagement?.rewardManagement);
+  const { status, statusLoading } = useCheckTaskStatus(taskData?.internal_id, taskData?.rewardManagement?.rewardManagement);
+  console.log(status, "status");
 
   
   
@@ -72,6 +73,7 @@ const {disburseTokenToTask, disbursePending}= useDisburseTokenToTask()
 
 
   const isDisburseButtonDisabled = statusLoading || !status || isDisbursed || disbursePending
+  
 
 
 
