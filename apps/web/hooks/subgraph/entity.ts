@@ -1,6 +1,8 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  useReadRewardManagementGetTotalUnallocatedTokens,
+  useReadRewardManagementTotalAllocatedTokens,
   useWriteRewardManagementFactoryCreateRewardManagement,
   useWriteRewardTokenMint,
 } from "../wagmi/contracts";
@@ -106,3 +108,49 @@ export const useRewardTokenMint = () => {
     mintError: mutation.isError,
   };
 };
+
+
+export const useCheckTotalUnallocatedTokens = (entityId:string) => {
+  const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
+  
+  const {
+    data,
+    isError,
+    isLoading,
+  } = useReadRewardManagementGetTotalUnallocatedTokens({
+    address: entityId as `0x${string}`,
+    args: [tokenAddress],
+  });
+ 
+console.log(data, 'data from useCheckTotalUnallocatedTokens hook');
+  return {
+    unallocatedTokens:data,
+    isError,
+    statusLoading: isLoading,
+  };
+};
+
+
+
+export const useCheckTotalAllocatedTokens= (entityId:string) => {
+  const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
+  
+  const {
+    data,
+    isError,
+    isLoading,
+  } = useReadRewardManagementTotalAllocatedTokens({
+    address: entityId as `0x${string}`,
+    args: [tokenAddress],
+  });
+ 
+console.log(data, 'data from  totalAllocatedTokens hook');
+  return {
+     totalAllocatedTokens:data,
+    isError,
+    statusLoading: isLoading,
+  };
+};
+
+
+
