@@ -9,20 +9,19 @@ import { ConnectKitButton } from "connectkit";
 import { Coins, Layers, LayoutList, Wallet } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { PropsWithChildren, useState } from "react";
+import { usePathname } from "next/navigation";
+import { PropsWithChildren } from "react";
 import { NavItem } from "../../../type/nav.types";
+import { navItemPaths } from "./navItemPaths";
 
 export default function SuperAdminNav({ children }: PropsWithChildren) {
-  const [activeNavBar, setActiveNavBar] = useState<NavItem>(
-    NavItem.TASK_PORTAL,
-  );
+  const pathname = usePathname();
 
-  const handleNavClick = (nav: NavItem) => {
-    setActiveNavBar(nav);
-  };
-
-  const getNavItemClasses = (nav: NavItem) => {
-    return activeNavBar === nav
+  const getNavItemClasses = (navItem: NavItem) => {
+    const paths = navItemPaths[navItem];
+    return paths.some(
+      (path) => pathname === path || pathname.startsWith(`${path}/`),
+    )
       ? "text-[#297AD6] border-b-2 border-[#297AD6]"
       : "text-[#1E293B] hover:text-[#1e293b]";
   };
@@ -40,11 +39,11 @@ export default function SuperAdminNav({ children }: PropsWithChildren) {
             />
           </Link>
         </nav>
+
         <nav className="flex items-center gap-6 h-full">
           <Link
             href="/participants"
-            onClick={() => handleNavClick(NavItem.PARTICIPANTs)}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.PARTICIPANTs)}`}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.PARTICIPANTS)}`}
           >
             <LayoutList size={18} strokeWidth={2.65} />
             Participant
@@ -52,15 +51,14 @@ export default function SuperAdminNav({ children }: PropsWithChildren) {
 
           <Link
             href="/tasks"
-            onClick={() => handleNavClick(NavItem.TASKS)}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASKS)}`}
           >
             <Layers size={18} strokeWidth={2.65} />
             Task Management
           </Link>
+
           <Link
             href="/departments"
-            onClick={() => handleNavClick(NavItem.DEPARTMENTS)}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.DEPARTMENTS)}`}
           >
             <Coins size={18} strokeWidth={2.65} />
@@ -70,26 +68,27 @@ export default function SuperAdminNav({ children }: PropsWithChildren) {
 
         <div className="ml-auto flex items-center gap-4 h-full">
           <Link
-            href="/tasks"
-            onClick={() => handleNavClick(NavItem.MY_TASKS)}
+            href="/tasks/mine"
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.MY_TASKS)}`}
           >
             <LayoutList size={18} strokeWidth={2.65} />
             My Tasks
           </Link>
-          <div className="flex items-center h-10 p-2 bg-[#F1F5F9] rounded-md p-2">
-            <span className="flex items-center gap-2 font-normal text-[#1E293B] text-sm middle-ellipsis">
+
+          <div className="flex items-center h-10 bg-[#F1F5F9] rounded-md p-2">
+            <span className="flex items-center gap-2 font-normal text-[#1E293B] text-sm">
               <Wallet size={18} strokeWidth={2.65} color="#334155" />
               <ConnectKitButton showAvatar={false} theme="auto" />
             </span>
           </div>
+
           <Avatar className="bg-red-400 h-7 w-7">
             <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         </div>
-        {/* )} */}
       </div>
+
       <div className="h-[calc(100dvh-60px)] overflow-auto">{children}</div>
     </header>
   );

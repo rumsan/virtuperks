@@ -75,7 +75,7 @@ export default function TokenCreateMain({ router, id }: TokenCreateMainProps) {
             <CardDescription />
           </CardHeader>
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {department?.totalTokenBalance}
+            {department?.totalMintedTokens}
           </CardFooter>
         </Card>
 
@@ -90,7 +90,7 @@ export default function TokenCreateMain({ router, id }: TokenCreateMainProps) {
             <CardDescription />
           </CardHeader>
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {department?.remainingTokenBalance}
+            {department?.totalAvailableTokens}
           </CardFooter>
         </Card>
 
