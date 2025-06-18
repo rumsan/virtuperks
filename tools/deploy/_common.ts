@@ -1,7 +1,7 @@
 import { randomBytes } from 'crypto';
 import * as dotenv from 'dotenv';
 import { ethers, uuidV4 } from 'ethers';
-import { access, existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { ContractArtifacts, ContractDetails } from '../types/contract';
 dotenv.config();
 
@@ -147,11 +147,11 @@ export class commonLib {
     );
 
  
-    const roleHash = ethers.id(role);
+    //const roleHash = ethers.id(role);
   
 
-    if (accessManager.grantRole) {
-      const tx = await accessManager.grantRole(appId, roleHash, account);
+    if (accessManager.grantRoleAdmin) {
+      const tx = await accessManager.grantRoleAdmin(appId, role, account);
       await tx.wait(); // Wait for the transaction to be mined
       console.log(`Role "${role}" assigned to account "${account}"`);
     } else {

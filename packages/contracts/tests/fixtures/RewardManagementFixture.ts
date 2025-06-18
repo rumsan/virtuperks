@@ -16,6 +16,8 @@ export interface RewardManagementFixture {
   App: any;
   user1: any;
   user2: any;
+  user4?: any; // Additional user for testing multiple owners
+  user5?: any;
   OwnerRole?: any;
   participant1: any;
   participant2: any;
@@ -25,16 +27,7 @@ export interface RewardManagementFixture {
   PARTICIPANT_ROLE: string;
 }
 
-/**
- * Deploys all contracts needed for testing the RewardManagement system
- * This includes:
- * - AppRegistry contract
- * - RewardToken contract
- * - RewardManagement contract deployed through factory
- * - ERC2771Forwarder contract
- * Also sets up all necessary roles and mints initial tokens
- * @returns Object containing all deployed contracts and configured accounts
- */
+
 export async function deployRewardManagementFixture(): Promise<RewardManagementFixture> {
   // Deploy base contracts
   const appRegistryFixture = await deployAppRegistryFixture();
@@ -56,11 +49,33 @@ export async function deployRewardManagementFixture(): Promise<RewardManagementF
   const factory = await RewardManagementFactory.deploy();
   await factory.waitForDeployment();
 
+   // CRITICAL: Grant DEFAULT_ADMIN_ROLE to factory contract so it can assign roles
+
+  await appRegistry.connect(admin1).grantRoleAdmin(APP_ID, DEFAULT_ADMIN_ROLE, factory.target);
+
+
+
+  // Verify factory has admin role
+
+  const factoryHasAdminRole = await appRegistry.hasRole(APP_ID, DEFAULT_ADMIN_ROLE, factory.target);
+    const adminRole = await appRegistry.hasRole(APP_ID, DEFAULT_ADMIN_ROLE, admin1.address);
+
+
+
+
+  
+    // Create array of entity owners based on numOwners parameter
+  const availableOwners = [user1, user2].filter(Boolean)
+  const entityOwnerAddresses = availableOwners.map(user => user.address);
+    console.log(`Setting up ${entityOwnerAddresses.length} entity owners:`,entityOwnerAddresses);
+
+
   // Deploy RewardManagement instance through factory
   const tx = await factory.connect(admin1).createRewardManagement(
     APP_ID,
     "Test Reward Management",
-    appRegistry.target
+    appRegistry.target,
+    entityOwnerAddresses,
   );
   const receipt = await tx.wait();
 
@@ -69,30 +84,32 @@ export async function deployRewardManagementFixture(): Promise<RewardManagementF
     (log: any) => log.fragment && log.fragment.name === 'RewardManagementCreated'
   );
   if (!event) throw new Error('RewardManagement creation event not found');
-  const [rewardManagementAddress] = event.args;
+  const [rewardManagementAddress, aclAddress, name, eventEntityOwners] = event.args;
   console.log('RewardManagement deployed at:', rewardManagementAddress);
+    console.log('Entity owners set:', eventEntityOwners);
+
 
   // Get contract instance
   const RewardManagement = await ethers.getContractFactory('RewardManagement');
   const rewardManagement = RewardManagement.attach(rewardManagementAddress);
 
   // Setup roles for deployed instance
-  const ownerRole = await rewardManagement.OWNER();
+  // const ownerRole = await rewardManagement.OWNER();
+  // console.log(ownerRole, 'owner role');
 
   const participantRole = await rewardManagement.PARTICIPANT();
   const appId = await rewardManagement.appId();
   console.log(appId, 'appId');
   
 
-  await appRegistry.connect(admin1).grantRoleAdmin(APP_ID, ownerRole, user2.address);
   await appRegistry.connect(admin1).grantRoleAdmin(APP_ID, participantRole, participant1.address);
   await appRegistry.connect(admin1).grantRoleAdmin(APP_ID, MINTER, user2.address);
 
   // Log role assignments for verification
-   console.log(await appRegistry.getRoleAdmins(APP_ID, ownerRole), 'owner role');
+
   console.log(await appRegistry.getRoleAdmins(APP_ID, participantRole), 'participant role');
   console.log(await appRegistry.getRoleAdmins(APP_ID, MINTER), 'MINTER role');
-  console.log(await appRegistry.hasRole(appId, ownerRole,rewardManagementAddress), 'entity-contract has owner role');
+  // console.log(await appRegistry.hasRole(appId, ownerRole,rewardManagementAddress), 'entity-contract has owner role');
 
 
   // Mint tokens to deployed instance
@@ -102,7 +119,7 @@ export async function deployRewardManagementFixture(): Promise<RewardManagementF
 
     // Verify initial token balance
   const balance = await rewardToken.balanceOf(rewardManagement.target);
-  console.log(balance, 'balance');
+
 
 
   // Get signer for task ownership

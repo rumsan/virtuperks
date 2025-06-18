@@ -114,7 +114,8 @@ class SeedProject extends commonLib {
   }
 
    public async deployEntityContractFactory(
-    
+     accessManager: string,
+     appId: string,
   ) {
     const entityFactory = await this.deployContract('RewardManagementFactory', [
    
@@ -122,8 +123,19 @@ class SeedProject extends commonLib {
     this.contracts['entityFactory'] = {
       address: entityFactory.contract.target as string,
       startBlock: entityFactory.blockNumber,
-    };
-    console.log('RewardManagementFactory Contract deployed', entityFactory.contract.target);
+    };  
+  
+     console.log('RewardManagementFactory Contract deployed', entityFactory.contract.target);
+     //assign default admin role to factory address 
+     const role = "0x0000000000000000000000000000000000000000000000000000000000000000"
+     await this.assignRole(
+       accessManager,
+       appId,
+       role,
+       entityFactory.contract.target as string,
+      
+       
+      )
     return {entityFactory};
   }
 }
@@ -141,8 +153,9 @@ async function main() {
     name,
     accessManagerV2.contract.target as string,
   );
-  await seedProject.deployEntityContractFactory();
-console.log('deploy factory contract')
+ const {entityFactory}=  await seedProject.deployEntityContractFactory(accessManagerV2.contract.target as string, RUMSAN_APP_ID);
+  console.log('deploy factory contract')
+
   await seedProject.writeToDeploymentFile('contracts', seedProject.contracts);
 }
 
