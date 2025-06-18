@@ -2,5 +2,18 @@
   "singleQuote": true,
   "printWidth": 80,
   "trailingComma": "all",
-  "bracketSpacing": false
+  "bracketSpacing": false,
+  "overrides": [
+    {
+      "files": "*.sol",
+      "options": {
+        "printWidth": 100,
+        "tabWidth": 4,
+        "useTabs": false,
+        "singleQuote": false,
+        "bracketSpacing": true
+      }
+    }
+  ],
+  "plugins": ["prettier-plugin-solidity"]
 }

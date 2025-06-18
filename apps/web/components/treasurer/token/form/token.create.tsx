@@ -1,86 +1,85 @@
+"use client";
+
+import { useRewardTokenMint } from "@/hooks/subgraph/entity";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@workspace/ui/components/form";
-import { Input } from "@workspace/ui/components/input";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Token, tokenSchema } from "./schema";
+import TokenBaseForm from "./token.form";
 
 const defaultValues: Token = {
-  amount: "",
+  amount: 0,
 };
 
-const TokenCreateForm = () => {
+interface TokenCreateProps {
+  router: AppRouterInstance;
+  id: { id: string };
+}
+
+export default function TokenCreate({ router, id }: TokenCreateProps) {
   const form = useForm({
     resolver: zodResolver(tokenSchema()),
-    defaultValues: defaultValues,
+    defaultValues,
   });
 
-  const handleSubmit = async (data: Token) => {
-    console.log(data, "data");
+  const { tokenMint, mintPending, mintSuccess, mintError } =
+    useRewardTokenMint();
+
+  useEffect(() => {
+    if (mintSuccess) {
+      history.back();
+    } else if (mintError) {
+      console.error("Token minting failed:", mintError);
+    }
+  }, [mintSuccess, mintError]);
+
+  const handleMintToken = async (data: Token) => {
+    try {
+      await tokenMint({
+        address: id.id,
+        amount: data.amount,
+      });
+    } catch (err) {
+      console.error("Minting failed:", err);
+    }
   };
 
   return (
     <div className="my-6">
       <Card className="rounded-lg w-full">
         <CardContent className="p-0">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)}>
-              <div className="p-6">
-                <div className="grid grid-cols-1 gap-4 mb-5">
-                  <FormField
-                    control={form.control}
-                    name="amount"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Token</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Write token amount"
-                            {...field}
-                            value={field.value ?? ""}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="w-full flex justify-end gap-4">
-                  <Button
-                    variant="outline"
-                    type="button"
-                    className="w-[170px] flex justify-center items-center gap-2"
-                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                      e.preventDefault();
-                      history.back();
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="default"
-                    className="w-[170px] flex justify-center items-center gap-2"
-                  >
-                    Create
-                  </Button>
-                </div>
-              </div>
-            </form>
-          </Form>
+          <TokenBaseForm
+            form={form}
+            saveForm={handleMintToken}
+            router={router}
+            id={id}
+          >
+            <Button
+              variant="outline"
+              type="button"
+              className="w-[170px] flex justify-center items-center gap-2"
+              onClick={(e) => {
+                e.preventDefault();
+                history.back();
+              }}
+              disabled={mintPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="default"
+              className="w-[170px] flex justify-center items-center gap-2"
+              disabled={mintPending}
+            >
+              {mintPending ? "Minting..." : "Allocate"}
+            </Button>
+          </TokenBaseForm>
         </CardContent>
       </Card>
     </div>
   );
-};
-
-export default TokenCreateForm;
+}

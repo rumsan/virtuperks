@@ -1,42 +1,28 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-import './EntityTaskManager.sol';
+import "./RewardManagement.sol";
 
-contract EntityTaskManagerFactory {
+contract RewardManagementFactory {
     address[] public deployedContracts;
 
-    //Event to be emitted when a new EntityTaskManager is created
-    event EntityTaskManagerCreated(
-        address entityTaskManager,
+    //Event to be emitted when a new RewardManagement is created
+    event RewardManagementCreated(
+        address rewardManagement,
         address aclAddress,
-        bytes32 _appId,
-        string _name
+        bytes32 appId,
+        string name
     );
 
-    function createEntityTaskManager(
-        address aclAddress,
-        bytes32 _appId,
-        string memory _name
-    ) public {
-        // Deploy a new instance of EntityTaskManager
-
-        EntityTaskManager newEntityTaskManager = new EntityTaskManager(
-            aclAddress,
-            _appId,
-            _name
-        );
+    function createRewardManagement(bytes32 appId, string memory name, address registry) public {
+        // Deploy a new instance of RewardManagement
+        RewardManagement newRewardManagement = new RewardManagement(appId, name, registry);
 
         // Track the deployed contract
-        deployedContracts.push(address(newEntityTaskManager));
+        deployedContracts.push(address(newRewardManagement));
 
         //Emit an event when a new contract is deployed
-        emit EntityTaskManagerCreated(
-            address(newEntityTaskManager),
-            aclAddress,
-            _appId,
-            _name
-        );
+        emit RewardManagementCreated(address(newRewardManagement), registry, appId, name);
     }
     function getDeployedContracts() public view returns (address[] memory) {
         return deployedContracts;

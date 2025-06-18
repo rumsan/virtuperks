@@ -15,8 +15,8 @@ interface QueryProviderProps {
 }
 
 export function GraphQueryProvider({ children }: QueryProviderProps) {
- // const graphql = "http://localhost:8000/subgraphs/name/virtuperks";
- const graphql = process.env.NEXT_PUBLIC_SUBGRAPH_URL  || 'http://localhost:8000/subgraphs/name/virtuperks';
+
+const graphql = process.env.NEXT_PUBLIC_SUBGRAPH_URL  || 'http://localhost:8000/subgraphs/name/virtuperks';
 
   return (
     <GraphContext.Provider

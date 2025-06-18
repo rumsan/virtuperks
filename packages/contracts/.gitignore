@@ -1,0 +1,11 @@
+# Typechain
+typechain-types/
+typechain-types/**/*
+
+# Hardhat files
+cache/
+artifacts/
+
+# Test coverage
+coverage/
+coverage.json

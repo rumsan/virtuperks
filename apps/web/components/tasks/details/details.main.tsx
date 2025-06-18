@@ -1,14 +1,21 @@
-import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
-import { useApproveTaskMutation, useGetApprovedAndCompletedList } from "@/hooks/subgraph/querycall";
-import { useGetTaskDetailById } from "@/hooks/subgraph/taskDetail";
+// import {
+//   useApproveTaskMutation,
+//   useGetApprovedAndCompletedList,
+// } from "@/hooks/subgraph/querycall";
+
+import { DialogButton } from "@/components/common/ui/dialog";
+import { useCheckTaskStatus, useGetTaskById } from "@/hooks/subgraph/task";
+import { useDisburseTokenToTask } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
-import { ArrowLeft, CheckCircle, CircleX } from "lucide-react";
+import { useToast } from "@workspace/ui/hooks/use-toast";
+import { ArrowLeft, CheckCircle, CircleX, Loader2 } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 import TaskParticipant from "./details.participant";
 import TaskDetails from "./details.task";
+
 
 type TaskMainProps = {
   cuid: Cuid;
@@ -16,64 +23,98 @@ type TaskMainProps = {
 };
 
 const TaskMain = ({ cuid, router }: TaskMainProps) => {
- 
-    const getTaskDetail = useGetTaskDetailById(cuid.id);
-       
-    const taskData = getTaskDetail?.data?.data?.taskCreateds[0]
+const getTaskDetail = useGetTaskById(cuid.id);
+
+  const [isDisbursed, setIsDisbursed] = useState(false);
+
+
+
+  const taskData = getTaskDetail?.data?.data?.taskCreated
   
+
+  const { status , statusLoading} = useCheckTaskStatus(taskData?.internal_id, taskData?.rewardManagement?.rewardManagement);
+
+  
+  
+
+  const { toast } = useToast();
  
-  const { completedData, approvedData } = useGetApprovedAndCompletedList(cuid.id);
-  const [localStatus, setLocalStatus] = useState<string | null>(null);
+  const [localStatus, setLocalStatus] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  const approveTask = useApproveTaskMutation()
  
+const {disburseTokenToTask, disbursePending}= useDisburseTokenToTask()
+  
+  
 
-  const getApproveButtonState = () => {
-    // If approved data exists, show approved state
-    if (approvedData && approvedData.length > 0 || localStatus === "VERIFIED") {
-      return {
-        className: "border border-[#03AB65] bg-[#03AB65]",
-        text: "Verified",
-        disabled: true,
-        onClick: undefined
-      };
-    }
-
-    // If completed data exists but not approved, enable approve button
-    if (completedData && completedData.length > 0) {
-      return {
-        className: "border border-[#03AB65]",
-        text: approveTask.isPending ? "Processing..." : "Approve",
-        disabled: approveTask.isPending,
-        onClick: () => setIsOpen(true)
-      };
-    }
-
-    // If neither exists, disable approve button
-    return {
-      className: "border border-[#03AB65]",
-      text: "Approve",
-      disabled: true,
-      onClick: undefined
-    };
-  };
-
-  const handleDialogAction = async () => {
+  const handleDialogAction = async (data:any) => {
     try {
-     
-      
-      await approveTask.mutateAsync({
-        taskId: cuid.id,
-        entityId: taskData.entityTaskManager.entityTaskManager
-      })
+      await disburseTokenToTask({
+        taskId: taskData.internal_id,
+        amount:data.amount,
+        entityId: taskData.rewardManagement.rewardManagement,
+      });
       setIsOpen(false);
-      setLocalStatus("VERIFIED"); // Update local status immediately after successful approval
+      setIsDisbursed(true);
+      toast({
+        title: "Disperse Token Successfully!.",
+        variant: "success",
+      });
     } catch (error) {
       console.error("Error approving task:", error);
-    } 
-      
-    
+      toast({
+        title: "Failed To Approve Task. Please Try Again.",
+        variant: "destructive",
+      });
+    }
+  };
+  
+
+
+  const isDisburseButtonDisabled = statusLoading || status || isDisbursed || disbursePending
+
+
+
+
+
+  const getDisburseButton = () => {
+    if (disbursePending) {
+      return (
+        <Button
+          variant="outline"
+          className="border border-[#03AB65]"
+          disabled
+        >
+          <span className="text-[#03AB65] flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Processing...
+          </span>
+        </Button>
+      );
+    }
+
+    return (
+      <Button
+        variant="outline"
+        style={{
+          border: '1px solid #03AB65'
+        }}
+        onClick={() => setIsOpen(true)}
+        disabled={isDisburseButtonDisabled}
+        
+      >
+        <span className="text-[#03AB65]">Disperse Token</span>
+        <CheckCircle
+          className="ml-2"
+          style={{
+            color: '#03AB65',
+            strokeWidth: 2.5,
+            width: '20px',
+            height: '20px'
+          }}
+        />
+      </Button>
+    );
   };
 
   return (
@@ -94,39 +135,23 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
             </h3>
           </div>
           <div className="flex items-center ml-auto gap-4">
-            <Button 
-              variant="outline" 
-              className={getApproveButtonState().className}
-              onClick={getApproveButtonState().onClick}
-              disabled={getApproveButtonState().disabled}
-            >
-              <span className={approvedData && approvedData.length > 0 ? "text-white" : "text-[#03AB65]"}>
-                {getApproveButtonState().text}
-              </span>
-              <CheckCircle 
-                color={approvedData && approvedData.length > 0 ? "#ffffff" : "#03AB65"} 
-                strokeWidth={2.5} 
-                size={20} 
-              />
-            </Button>
+            {getDisburseButton()}
 
             <Button variant="outline" className="border border-[#E44134]">
               <span className="text-[#E44134]">Close</span>{" "}
               <CircleX color="#E44134" strokeWidth={2.5} size={20} />
             </Button>
-            {!approveTask.isPending && isOpen && (
-              
-
-                  <DialogButton
-              isOpen={isOpen}
-              setIsOpen={setIsOpen}
-              title="Are you sure you want to approve this task?"
-              subTitle="This action cannot be undone"
-              buttonName="Approve"
-              handleApplyTaskLogic={handleDialogAction}
-            />
-)}
-        
+            {!disbursePending && isOpen && (
+              <DialogButton
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+                title="Are you sure you want to disperse the amount?"
+                subTitle="This action cannot be undone"
+                buttonName="Disperse"
+                submitType="Disperse"
+                handleApplyTaskLogic={handleDialogAction}
+              />
+            )}
           </div>
         </div>
 
@@ -135,7 +160,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
         </div>
 
         <div className="flex w-full gap-4">
-          <TaskParticipant taskId={cuid} />
+          <TaskParticipant taskData={taskData} />
         </div>
       </div>
     </main>

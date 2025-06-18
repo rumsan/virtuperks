@@ -5,41 +5,50 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: AccessManager
+    name: AppRegistry
     network: base-sepolia
     source:
-      abi: AccessManager
-      address: "0x079983B5B56Ba8576B4C8312a287f920DF759c34"
-      startBlock: 23833013
+      address: "0xC587dbf102afaE9F0632b04D6d74d9E95B409EC7"
+      abi: AppRegistry
+      startBlock: 26715013
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - AppCreated
-        - OwnershipTransferred
+        - AppNameUpdated
+        - AppPrivacyChanged
+        - RoleAdminGranted
+        - RoleAdminRevoked
         - RoleGranted
         - RoleRevoked
       abis:
-        - name: AccessManager
-          file: ./abis/AccessManager.json
+        - name: AppRegistry
+          file: ./abis/AppRegistry.json
       eventHandlers:
-        - event: AppCreated(indexed bytes32,indexed address)
+        - event: AppCreated(indexed bytes32,indexed address,indexed address)
           handler: handleAppCreated
-        - event: OwnershipTransferred(indexed bytes32,indexed address,indexed address)
-          handler: handleOwnershipTransferred
-        - event: RoleGranted(bytes32,indexed bytes32,indexed address)
+        - event: AppNameUpdated(indexed bytes32,string,indexed address)
+          handler: handleAppNameUpdated
+        - event: AppPrivacyChanged(indexed bytes32,indexed bool,indexed address)
+          handler: handleAppPrivacyChanged
+        - event: RoleAdminGranted(indexed bytes32,indexed bytes32,indexed address,address)
+          handler: handleRoleAdminGranted
+        - event: RoleAdminRevoked(indexed bytes32,indexed bytes32,indexed address,address)
+          handler: handleRoleAdminRevoked
+        - event: RoleGranted(indexed bytes32,indexed bytes32,indexed address,address)
           handler: handleRoleGranted
-        - event: RoleRevoked(bytes32,indexed bytes32,indexed address)
+        - event: RoleRevoked(indexed bytes32,indexed bytes32,indexed address,address)
           handler: handleRoleRevoked
-      file: ./src/access-manager.ts
+      file: ./src/app-registry.ts
   - kind: ethereum
     name: RewardToken
     network: base-sepolia
     source:
+      address: "0x83EeB5dbddc0E2B8330a67d00E5de6AdE583d66a"
       abi: RewardToken
-      address: "0x3408E6Bf74157271BC9220f080074bF9E991086C"
-      startBlock: 23833081
+      startBlock: 26715024
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -57,56 +66,86 @@ dataSources:
           handler: handleTransfer
       file: ./src/reward-token.ts
   - kind: ethereum
-    name: EntityFactory
+    name: RewardManagementFactory
     network: base-sepolia
     source:
-      abi: EntityFactory
-      address: "0x6C358DA5E9E674b1C03e102371b7E76E0a36b754"
-      startBlock: 23833090
+      address: "0x9C1A8D0f6A7b5FDfb5cB58f5Ce16A57FDd74cdaa"
+      abi: RewardManagementFactory
+      startBlock: 26715036
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
-        - EntityTaskManagerCreated
+        - RewardManagementCreated
       abis:
-        - name: EntityFactory
-          file: ./abis/EntityFactory.json
+        - name: RewardManagementFactory
+          file: ./abis/RewardManagementFactory.json
       eventHandlers:
-        - event: EntityTaskManagerCreated(address,address,bytes32,string)
-          handler: handleEntityTaskManagerCreated
-      file: ./src/entity-factory.ts
+        - event: RewardManagementCreated(address,address,bytes32,string)
+          handler: handleRewardManagementCreated
+      file: ./src/reward-management-factory.ts
 templates:
   - kind: ethereum
-    name: EntityContract
+    name: RewardManagement
     network: base-sepolia
     source:
-      abi: EntityContract
+      abi: RewardManagement
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
-        - PINGED
-        - ParticiantApplied
+        - AdditionalDisbursementToTask
+        - ContractPaused
+        - ContractUnpaused
+        - DisbursementToTask
+        - EtherWithdrawn
+        - ParticipantApplied
+        - ParticipantRemovedFromWhitelist
+        - ParticipantWhitelisted
         - TaskAccepted
         - TaskApproved
+        - TaskClosed
         - TaskCompleted
         - TaskCreated
+        - TaskDetailsUpdated
+        - TaskVerified
+        - TokenTransferred
       abis:
-        - name: EntityContract
-          file: ./abis/EntityContract.json
+        - name: RewardManagement
+          file: ./abis/RewardManagement.json
       eventHandlers:
-        - event: PINGED(indexed address,uint256)
-          handler: handlePINGED
-        - event: ParticiantApplied(indexed bytes32,indexed address)
-          handler: handleParticiantApplied
+        - event: AdditionalDisbursementToTask(indexed bytes32,uint256,string,indexed address)
+          handler: handleAdditionalDisbursementToTask
+        - event: ContractPaused(indexed address)
+          handler: handleContractPaused
+        - event: ContractUnpaused(indexed address)
+          handler: handleContractUnpaused
+        - event: DisbursementToTask(indexed bytes32,uint256,indexed address)
+          handler: handleDisbursementToTask
+        - event: EtherWithdrawn(indexed address,uint256,indexed address)
+          handler: handleEtherWithdrawn
+        - event: ParticipantApplied(indexed bytes32,indexed address)
+          handler: handleParticipantApplied
+        - event: ParticipantRemovedFromWhitelist(indexed bytes32,indexed address,indexed address)
+          handler: handleParticipantRemovedFromWhitelist
+        - event: ParticipantWhitelisted(indexed bytes32,indexed address,indexed address)
+          handler: handleParticipantWhitelisted
         - event: TaskAccepted(indexed bytes32,indexed address)
           handler: handleTaskAccepted
         - event: TaskApproved(indexed bytes32,indexed address)
           handler: handleTaskApproved
+        - event: TaskClosed(indexed bytes32,indexed address)
+          handler: handleTaskClosed
         - event: TaskCompleted(indexed bytes32,indexed address)
           handler: handleTaskCompleted
         - event: TaskCreated(indexed bytes32,indexed address)
           handler: handleTaskCreated
-      file: ./src/entity-contract.ts
+        - event: TaskDetailsUpdated(indexed bytes32,indexed address)
+          handler: handleTaskDetailsUpdated
+        - event: TaskVerified(indexed bytes32,indexed address,indexed address)
+          handler: handleTaskVerified
+        - event: TokenTransferred(indexed address,indexed address,uint256,string,indexed address)
+          handler: handleTokenTransferred
+      file: ./src/reward-management.ts

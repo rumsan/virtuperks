@@ -1,20 +1,21 @@
 export const getDialogContent = (status: string) => {
-    console.log(status, 'status')
+  
+ 
     return {
-      title: status === "UNACCEPTED" 
+      title: status === "PENDING" 
         ? "Are you sure you want to accept this participant?" 
-        : "Are you sure you want to approve task request?",
-      subTitle: status === "UNACCEPTED"
-        ? "This will allow the participant to start working on the task"
+        : "Are you sure you want to  verify participant's tas request?",
+      subTitle: status === "COMPLETED"
+        ? "Are you sure you want to  verify this participant?"
         : "This action cannot be undone",
-      buttonName: status === "UNACCEPTED" ? "Accept" : "Approve"
+      buttonName: status === "PENDING" ? "Accept" : "Verify",
     };
 };
   
 
 
   export const getDialogContents = (buttonState:string) => {
-    if (buttonState === "COMPLETE") {
+    if (buttonState === "COMPLETEd") {
       return {
         title: "Are you sure you want to mark this task as completed?",
         subTitle: "This action cannot be undone",

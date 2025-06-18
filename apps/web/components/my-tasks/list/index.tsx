@@ -2,7 +2,7 @@
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import { useGetTaskListByParticipant } from "@/hooks/subgraph/participant";
-import { useTaskList } from "@/hooks/subgraph/querycall";
+import { useWallet } from "@/providers/walletProvider";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -15,10 +15,9 @@ import {
 } from "@tanstack/react-table";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import React from "react";
-import { injected, useAccount, useConnect,  } from "wagmi";
+import { useConnect } from "wagmi";
 import { useColumns } from "../details/details.column";
 import TaskPortalCard from "./list.card";
-import { useWallet } from "@/providers/walletProvider";
 
 interface TaskPortalMainProps {
   router: AppRouterInstance;
@@ -29,17 +28,17 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
- 
-  const { address, isConnected } = useWallet()
-  const {connect}= useConnect()
- 
-const getMyTaskList = useGetTaskListByParticipant(
+
+  const { address, isConnected } = useWallet();
+
+  const { connect } = useConnect();
+
+  const { data: myTaskList, isLoading } = useGetTaskListByParticipant(
     address as `0x${string}`,
-    !isConnected || !address // Skip query if not connected
   );
-  
- 
-  const myTaskList = getMyTaskList?.data?.data?.participantTaskStatuses || [];
+  const taskList = myTaskList?.data?.participantTaskStatuses;
+  console.log("Task List: ", taskList);
+
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
@@ -50,10 +49,8 @@ const getMyTaskList = useGetTaskListByParticipant(
 
   const columns = useColumns();
 
-
-
   const table = useReactTable({
-    data: myTaskList,
+    data: taskList || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -79,19 +76,14 @@ const getMyTaskList = useGetTaskListByParticipant(
           <p className="mb-6 text-gray-600 text-lg">
             Please connect your MetaMask wallet to view your tasks.
           </p>
-          <button
-            onClick={() => connect({ connector: injected() })}
-            className="bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 transition-colors duration-200"
-          >
-            Connect MetaMask
-          </button>
         </div>
       </main>
     );
   }
 
-  // If not connected or no address, show connect wallet prompt
-
+  if (isLoading) {
+    return <div>Loading tasks...</div>;
+  }
 
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full flex flex-col">

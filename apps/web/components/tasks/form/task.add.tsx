@@ -1,29 +1,35 @@
 "use client";
 
+import { useTaskAdd } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { EntityTaskManagementABI } from "@workspace/contracts/abis";
 import { Card, CardContent } from "@workspace/ui/components/card";
+import { useToast } from "@workspace/ui/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { isAddress } from "viem";
+import { isAddress, keccak256 } from "viem";
 import { useWriteContract } from "wagmi";
-import { taskSchema } from "./schema";
+import { TaskFormData, taskSchema } from "./schema";
 import TaskBaseForm from "./task.form";
+import {createId} from "@paralleldrive/cuid2"
+import { toUtf8Bytes } from "ethers";
 
-const defaultValues: any = {
-  taskName: "",
+const defaultValues = {
+  name: "",
   detailsUrl: "",
   owner: "",
-  rewardToken: process.env.NEXT_PUBLIC_RAHAT_TOKEN || "",
-  expiryDate: "",
-  allowedWallets: "",
-  maxParticipants: 0,
-  rewardAmount: 0,
-  isActive: false,
   entityAddress: "",
+  expiryDate: new Date(),
+  rewardToken: process.env.NEXT_PUBLIC_RAHAT_TOKEN || "",
+  totalRewardAmount: "",
+  isOpen: true,
+  isTokenDisbursed: false,
+  requireApproval: true,
+  isWhitelisted: true,
+  maxParticipants: 0,
+  whitelistedParticipants: [],
 };
 
 type TaskAddProps = {
@@ -31,63 +37,80 @@ type TaskAddProps = {
 };
 
 export default function TaskAdd({ router }: TaskAddProps) {
-  const form = useForm({
+  const form = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema()),
     defaultValues: defaultValues,
   });
+  const { toast } = useToast();
 
-  const { 
-    writeContractAsync, 
-    isPending, 
-    isSuccess, 
-    isError,
-    error 
-  } = useWriteContract();
-
-  useEffect(() => {
-    if (isSuccess) {
-      router.push(PATHS.TASKPORTAL.HOME);
-    }
-  }, [isSuccess, router]);
+  const { writeContractAsync, isPending, isSuccess, isError, error } =
+    useWriteContract();
 
   useEffect(() => {
     if (isError && error) {
-      console.error('Transaction failed:', error);
+      console.error("Transaction failed:", error);
     }
   }, [isError, error]);
+  const { taskAdd, taskPending, taskSuccess } = useTaskAdd();
 
   const createTask = async (data: any) => {
+
     if (!isAddress(data.entityAddress)) {
       console.error("Invalid Ethereum address:", data.entityAddress);
       return;
     }
+    const cuid = createId()
+    const taskId = keccak256(toUtf8Bytes(cuid)); // Generate a unique ID for the task
+    //update this to cuid or parallet drive
+  
+    
 
-    const { detailsUrl, rewardToken, owner, isActive , taskName} = data;
-    const expiryDate = BigInt(Math.floor(new Date(data.expiryDate).getTime() / 1000));
-    const allowedWallets = Array.isArray(data.allowedWallets) ? data.allowedWallets : [data.allowedWallets];
-    const rewardAmount = BigInt(data.rewardAmount);
+    const { detailsUrl, rewardToken, owner, isOpen, name } = data;
+    const expiryDate = BigInt(
+      Math.floor(new Date(data.expiryDate).getTime() / 1000),
+    );
+    const whitelistedParticipants = Array.isArray(data.whitelistedParticipants)
+      ? data.whitelistedParticipants
+      : [data.whitelistedParticipants];
+    const totalRewardAmount = BigInt(data.totalRewardAmount);
     const maxParticipants = BigInt(data.maxParticipants);
-   
 
     try {
-      await writeContractAsync({
-        address: data.entityAddress,
-        abi: EntityTaskManagementABI,
-        functionName: "createTask",
-        args: [{
-          taskName,
-          detailsUrl,
-          rewardToken,
-          rewardAmount,
-          allowedWallets,
-          maxParticipants,
-          expiryDate,
-          owner,
-          isActive,
-        }],
+      
+      await taskAdd({
+        taskId,
+        name,
+        detailsUrl,
+        owner,
+        entityAddress: data.entityAddress,
+        expiryDate,
+        rewardToken,
+        totalRewardAmount: totalRewardAmount.toString(),
+        isOpen,
+        isTokenDisbursed: data.isTokenDisbursed,
+        requireApproval: data.requireApproval,
+        isWhitelisted: data.isWhitelisted,
+        maxParticipants: maxParticipants.toString(),
+        acceptedParticipantCount: 0, // Default to 0
+        whitelistedParticipants: whitelistedParticipants || [],
+        verfiedParticipants: [], // Default to empty array
       });
+
+      // Success Toast
+      toast({
+        title: "Task Created Successfully!",
+        variant: "success",
+      });
+
+      //navigate to
+      router.push(PATHS.TASKS.HOME);
     } catch (err) {
-      console.error('Failed to create task:', err);
+      console.error("Failed to create task:", err);
+      // Error Toast
+      toast({
+        title: "Task Creation Failed",
+        variant: "destructive",
+      });
     }
   };
 
@@ -116,7 +139,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
                 form={form}
                 defaultValues={defaultValues}
                 saveForm={createTask}
-                isPending={isPending}
+                isPending={taskPending}
               />
             </CardContent>
           </Card>

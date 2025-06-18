@@ -32,10 +32,9 @@ export const PATHS = {
   },
 
   TREASURER: {
-    TOKEN: {
-      HOME: `${ROOTS.TREASURER}/token`,
-      CREATE: `${ROOTS.TREASURER}/token/create`,
-    },
+    HOME: `${ROOTS.TREASURER}/token`,
+    CREATE: (cuid: string) =>
+      `${ROOTS.TREASURER}/department/allocate/${cuid}/create`,
   },
 
   TASKS: {

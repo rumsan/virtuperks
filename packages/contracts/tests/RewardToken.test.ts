@@ -1,9 +1,9 @@
-import { expect } from "chai";
 import {
   loadFixture,
 } from "@nomicfoundation/hardhat-toolbox/network-helpers";
-import {ethers}  from "hardhat";
-import { deployRahatTokenFixture } from "./fixtures/tokenFixture";
+import { expect } from "chai";
+import { ethers } from "hardhat";
+import { deployRahatTokenFixture } from "./fixtures/RewardTokenFixture";
 const getFunctionId = (signature: string) => {
   return ethers.FunctionFragment.from(signature).selector;
 }
@@ -20,11 +20,12 @@ describe('------ Reward Token Tests ------', function () {
     // let provider: EthereumProvider;
     before(async function () {
       const fixtures = await loadFixture(deployRahatTokenFixture);
+     
       deployer = fixtures.deployer;
       minter = fixtures.signers[1];
       rewardToken = fixtures.rewardToken;
       rumsanForwarder = fixtures.rumsanForwarder;
-      accessManagerV2 = fixtures.accessManagerV2;
+      accessManagerV2 = fixtures._appRegistry;
     });
     it("should deploy contracts with expected initial values", async function () {
       expect(await rewardToken.name()).to.equal('Rahat');

@@ -1,4 +1,6 @@
-import { DialogButton } from "@/components/common/ui/dialog";
+"use client";
+
+import { useRewardTokenMint } from "@/hooks/subgraph/entity";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
@@ -11,29 +13,48 @@ import {
   FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
-import { useState } from "react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Token, tokenSchema } from "../../token/form/schema";
+import { Token, tokenSchema } from "./schema";
 
 const defaultValues: Token = {
-  amount: "",
+  amount: 0,
 };
 
-const DepartmentTokenAllocate = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface TokenAllocateMainProps {
+  router: AppRouterInstance;
+  id: { id: string };
+}
 
+const TokenAllocateForm = ({ router, id }: TokenAllocateMainProps) => {
   const form = useForm({
     resolver: zodResolver(tokenSchema()),
-    defaultValues: defaultValues,
+    defaultValues,
   });
 
-  const handleSubmit = async (data: Token) => {
-    console.log(data, "data");
-  };
+  const { tokenMint, mintPending, mintSuccess, mintError } =
+    useRewardTokenMint();
 
-  const handleDialogButton = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setIsOpen(true);
+  useEffect(() => {
+    if (mintSuccess) {
+      history.back();
+    } else if (mintError) {
+      console.error("Token minting failed:", mintError);
+    }
+  }, [mintSuccess, mintError]);
+
+  const handleSubmit = async (data: Token) => {
+    try {
+      const amount = data.amount;
+
+      await tokenMint({
+        address: id.id,
+        amount: amount,
+      });
+    } catch (err) {
+      console.error("Minting failed:", err);
+    }
   };
 
   return (
@@ -49,14 +70,15 @@ const DepartmentTokenAllocate = () => {
                     name="amount"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-base">
-                          Token Amount
-                        </FormLabel>
+                        <FormLabel>Token Amount</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Write token amount"
+                            type="number"
+                            placeholder="Enter token amount"
                             {...field}
-                            value={field.value ?? ""}
+                            onChange={(e) =>
+                              field.onChange(e.target.valueAsNumber)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -81,22 +103,10 @@ const DepartmentTokenAllocate = () => {
                     type="submit"
                     variant="default"
                     className="w-[170px] flex justify-center items-center gap-2"
-                    onClick={(e) => handleDialogButton(e)}
+                    disabled={mintPending}
                   >
-                    Allocate
+                    {mintPending ? "Minting..." : "Create"}
                   </Button>
-
-                  {isOpen && (
-                    <DialogButton
-                      isOpen={isOpen}
-                      setIsOpen={setIsOpen}
-                      title={"Allocate Token"}
-                      subTitle={
-                        "Are you sure you want to confirm this token alloation?"
-                      }
-                      buttonName={"Confirm"}
-                    />
-                  )}
                 </div>
               </div>
             </form>
@@ -107,4 +117,4 @@ const DepartmentTokenAllocate = () => {
   );
 };
 
-export default DepartmentTokenAllocate;
+export default TokenAllocateForm;

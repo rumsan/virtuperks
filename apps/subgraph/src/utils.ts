@@ -1,46 +1,42 @@
 import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
 import { ParticipantTaskStatus, TaskCreated, TaskDetail, TaskIdMapping } from "../generated/schema";
-import { EntityContract } from "../generated/templates/EntityContract/EntityContract";
+import { RewardManagement } from "../generated/templates/RewardManagement/RewardManagement";
 
-export function fetchTaskDetails(taskId: Bytes, contractAddress: Address, taskCreatedId: Bytes): TaskDetail | null {
+
+
+export function fetchTaskDetails(taskId: Bytes, contractAddress: Address): TaskDetail {
   let taskDetail = TaskDetail.load(taskId);
-  const contract = EntityContract.bind(contractAddress);
-  const taskData = contract.try_tasks(taskId);
-  const wallets = contract.try_getAllowedWallets(taskId);
 
   if (!taskDetail) {
     taskDetail = new TaskDetail(taskId);
-  }
-
-  if (taskData.reverted || wallets.reverted) {
-    log.error("Data fetch reverted for taskId: {}", [taskId.toHexString()]);
-    return null;
-  }
-
- 
-  taskDetail.detailsUrl = taskData.value.getDetailsUrl()
-  taskDetail.taskName = taskData.value.getTaskName()
+    const contract = RewardManagement.bind(contractAddress);
+   
+    const task = contract.getTask(taskId);
+   
   
-  taskDetail.rewardToken = taskData.value.getRewardToken()
-  taskDetail.rewardAmount = taskData.value.getRewardAmount();
-  taskDetail.maxParticipants = taskData.value.getMaxParticipants();
-  taskDetail.expiryDate = taskData.value.getExpiryDate();
-  taskDetail.owner = taskData.value.getOwner();
-  taskDetail.isActive = taskData.value.getIsActive();
+    taskDetail.name = task.name;
+    
+    taskDetail.detailsUrl = task.detailsUrl;
+    taskDetail.owner = task.owner;
+    taskDetail.expiryDate = task.expiryDate;
+    taskDetail.rewardToken = task.rewardToken;
+    taskDetail.totalRewardAmount = task.totalRewardAmount;
+    taskDetail.isOpen = task.isOpen;
+    taskDetail.requireApproval = task.requireApproval;
+    taskDetail.isWhitelisted = task.isWhitelisted;
+    taskDetail.isTokenDisbursed = task.isTokenDisbursed;
+    taskDetail.maxParticipants = task.maxParticipants;
+    taskDetail.acceptedParticipantCount = task.acceptedParticipantCount;
+    taskDetail.verifiedParticipants = []; // Initialize empty array
   
 
-  if (!wallets.reverted) {
-    const allowedWalletsBytes = wallets.value.map<Bytes>((address: Address) => {
-      return address as Bytes;
-    });
-    taskDetail.allowedWallets = allowedWalletsBytes;
+    taskDetail.save();
   }
-
-  taskDetail.task = taskCreatedId;
-  taskDetail.save();
 
   return taskDetail;
 }
+
+
 
 export function updateParticipantTaskStatus(
   participant: Bytes,
@@ -48,7 +44,8 @@ export function updateParticipantTaskStatus(
   status: string,
   blockNumber: BigInt,
   blockTimestamp: BigInt,
-  taskDetailId:Bytes | null 
+  taskDetailId: Bytes | null ,
+  completionUrl: string | null = null
 ): void {
   let id = participant.toHexString() + "-" + taskId.toHexString();
   let idBytes = Bytes.fromUTF8(id);
@@ -64,7 +61,7 @@ export function updateParticipantTaskStatus(
   if (mapping) {
     let taskCreated = TaskCreated.load(mapping.taskCreated);
     if(taskCreated){
-      statusEntity.entityTaskManager = taskCreated.entityTaskManager
+      statusEntity.rewardManagement = taskCreated.rewardManagement
      
     } else {
       log.warning("TaskCreated not found for taskId: {}", [taskId.toHexString()]);
@@ -84,6 +81,11 @@ export function updateParticipantTaskStatus(
   statusEntity.status = status;
   if (taskDetailId) {
     statusEntity.taskDetail = taskDetailId;
+  }
+
+   // Store the completion URL if provided
+  if (completionUrl) {
+     statusEntity.completionUrl = completionUrl;
   }
  
 

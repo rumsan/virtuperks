@@ -6,10 +6,11 @@ export interface DepartmentDetails {
   blockTimestamp: string;
   id: string;
   transactionHash: string;
-  totalTokenBalance: string;
-  remainingBalance: string;
+  totalAvailableTokens: string;
+  totalMintedTokens: string;
   __typename: string;
   _appId: string;
-  _name: string;
-  tasks:TaskCreated[]
+  name: string;
+  tasks: TaskCreated[];
+  rewardManagement: string;
 }

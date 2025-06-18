@@ -1,6 +1,6 @@
 "use client";
 
-import { useTaskList } from "@/hooks/subgraph/querycall";
+import { useGetAllTask } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -11,10 +11,12 @@ import {
 } from "@workspace/ui/components/tabs";
 import { Plus } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { useState } from "react";
+import React, { useState } from "react";
 import ListCardDetails from "./list.card";
 import { DatePickerWithRange } from "./list.date";
-
+import { useColumns } from "../details/details.column";
+import { ColumnFiltersState, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { DataTablePagination } from "@/components/common/list/list.pagination";
 
 interface TaskListMainProps {
   router: AppRouterInstance;
@@ -22,13 +24,45 @@ interface TaskListMainProps {
 
 export default function TaskListMain({ router }: TaskListMainProps) {
   const [tabStatus, setTabStatus] = useState("active");
-  const getAllTask = useTaskList();
-  const taskList = getAllTask?.data?.data?.taskCreateds 
+    const [sorting, setSorting] = React.useState<SortingState>([]);
+
+  const getAllTask = useGetAllTask();
+  const columns = useColumns();
+    const [columnVisibility, setColumnVisibility] =
+      React.useState<VisibilityState>({});
+ const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+     [],
+   );
+    const [rowSelection, setRowSelection] = React.useState({});
+    const [pagination, setPagination] = React.useState({
+      pageIndex: 0,
+      pageSize: 10,
+    });
+
+  const taskList = getAllTask?.data?.data?.taskCreateds;
+  const table = useReactTable({
+      data: taskList || [],
+      columns,
+      onSortingChange: setSorting,
+      onColumnFiltersChange: setColumnFilters,
+      getCoreRowModel: getCoreRowModel(),
+      getPaginationRowModel: getPaginationRowModel(),
+      getSortedRowModel: getSortedRowModel(),
+      getFilteredRowModel: getFilteredRowModel(),
+      onColumnVisibilityChange: setColumnVisibility,
+      onRowSelectionChange: setRowSelection,
+      state: {
+        sorting,
+        columnFilters,
+        columnVisibility,
+        rowSelection,
+      },
+    });
+  
+ 
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
       <div className="space-y-4">
-     
-
         <div className="flex items-center">
           <div className="flex flex-col w-[80%] gap-1">
             <h1 className="font-bold text-xl">Task List</h1>
@@ -53,16 +87,16 @@ export default function TaskListMain({ router }: TaskListMainProps) {
         <Tabs defaultValue="active" className="">
           <div className="flex items-center">
             <div className="w-[400px]">
-              <TabsList className="flex bg-blue-50 h-10 ">
+              <TabsList className="flex bg-blue-50 h-10">
                 <TabsTrigger
-                  value="active"
+                  value="open"
                   className="w-full h-8"
-                  onClick={() => setTabStatus("active")}
+                  onClick={() => setTabStatus("open")}
                 >
-                  Active
+                  Open
                 </TabsTrigger>
                 <TabsTrigger
-                  value="completed"
+                  value="closed"
                   className="w-full h-8"
                   onClick={() => setTabStatus("completed")}
                 >
@@ -92,6 +126,13 @@ export default function TaskListMain({ router }: TaskListMainProps) {
               />
             </TabsContent>
           </div>
+          <div className="mt-5 mb-5">
+                    <DataTablePagination
+                      table={table}
+                      setPagination={setPagination}
+                      pagination={pagination}
+                    />
+                  </div>
         </Tabs>
       </div>
     </main>

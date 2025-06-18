@@ -16,15 +16,17 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { PropsWithChildren, useState } from "react";
+import { NavItem } from "../../../type/nav.types";
 
-export default function TreasurerNav({ children }: PropsWithChildren) {
-  const [activeNavBar, setActiveNavBar] = useState("dashboard");
-
-  const handleNavClick = (nav: string) => {
+export default function UnifiedNav({ children }: PropsWithChildren) {
+  const [activeNavBar, setActiveNavBar] = useState<NavItem>(
+    NavItem.TASK_PORTAL,
+  );
+  const handleNavClick = (nav: NavItem) => {
     setActiveNavBar(nav);
   };
 
-  const getNavItemClasses = (nav: string) => {
+  const getNavItemClasses = (nav: NavItem) => {
     return activeNavBar === nav
       ? "text-[#297AD6] border-b-2 border-[#297AD6]"
       : "text-[#1E293B] hover:text-[#1e293b]";
@@ -37,6 +39,7 @@ export default function TreasurerNav({ children }: PropsWithChildren) {
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/bg/rumsan-logo.png"
+              onClick={() => handleNavClick(NavItem.TASK_PORTAL)}
               width={50}
               height={50}
               alt="Logo"
@@ -46,53 +49,45 @@ export default function TreasurerNav({ children }: PropsWithChildren) {
         <nav className="flex items-center gap-6 h-full">
           <Link
             href="/participants"
-            onClick={() => handleNavClick("participants")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("dashboard")}`}
+            onClick={() => handleNavClick(NavItem.PARTICIPANTs)}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.PARTICIPANTs)}`}
           >
-            <LayoutDashboard
-              size={18}
-              strokeWidth={2.65}
-              color={`${activeNavBar === "dashboard" ? "#297AD6" : "#334155"}`}
-            />
+            <LayoutDashboard size={18} strokeWidth={2.65} />
             Participants
           </Link>
           <Link
             href="/departments"
-            onClick={() => handleNavClick("treasurer")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("treasurer")}`}
+            onClick={() => handleNavClick(NavItem.DEPARTMENTS)}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.DEPARTMENTS)}`}
           >
-            <Coins
-              size={18}
-              strokeWidth={2.65}
-              color={`${activeNavBar === "treasurer" ? "#297AD6" : "#334155"}`}
-            />
+            <Coins size={18} strokeWidth={2.65} />
             Department
           </Link>
           <Link
-            href="/token"
-            onClick={() => handleNavClick("departments")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("departments")}`}
+            href="/treasurer/token"
+            onClick={() => handleNavClick(NavItem.TREASURER_TOKEN)}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TREASURER_TOKEN)}`}
           >
-            <Layers
-              size={18}
-              strokeWidth={2.65}
-              color={`${activeNavBar === "departments" ? "#297AD6" : "#334155"}`}
-            />
+            <Layers size={18} strokeWidth={2.65} />
             Token Management
           </Link>
         </nav>
 
         <div className="ml-auto flex items-center gap-4 h-full">
           <Link
-            href="/tasks"
-            onClick={() => handleNavClick("tasks")}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses("tasks")}`}
+            href="/task_portal"
+            onClick={() => handleNavClick(NavItem.TASK_PORTAL)}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASK_PORTAL)}`}
           >
-            <LayoutList
-              size={18}
-              strokeWidth={2.65}
-              color={`${activeNavBar === "tasks" ? "#297AD6" : "#334155"}`}
-            />
+            <LayoutList size={18} strokeWidth={2.65} />
+            Tasks Portal
+          </Link>
+          <Link
+            href="/tasks"
+            onClick={() => handleNavClick(NavItem.TASKS)}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASKS)}`}
+          >
+            <LayoutList size={18} strokeWidth={2.65} />
             My Tasks
           </Link>
           <div className="flex items-center h-10 p-2 bg-[#F1F5F9] rounded-md p-2">

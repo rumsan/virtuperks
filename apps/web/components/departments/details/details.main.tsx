@@ -1,6 +1,6 @@
 "use client";
 
-import { useEntityDetailById } from "@/hooks/subgraph/querycall";
+import { useGetEntityById } from "@/hooks/subgraph/entity";
 import { PATHS } from "@/routes/paths";
 import {
   ColumnFiltersState,
@@ -43,9 +43,10 @@ export default function DepartmentDetails({
     pageIndex: 0,
     pageSize: 10,
   });
-  const getEntity = useEntityDetailById(cuid.id)
-  const EntityData = getEntity?.data?.data?.entityTaskManagerCreateds[0]
-  const taskData = EntityData?.tasks || [];
+
+  const { data, isLoading, isError, error } = useGetEntityById(cuid.id);
+
+  const taskData = data?.tasks ?? [];
 
   const columns = useColumns();
   const table = useReactTable({
@@ -76,16 +77,21 @@ export default function DepartmentDetails({
         <ArrowLeft size={24} strokeWidth={2} />
         <span className="font-base text-gray-700">Back</span>
       </div>
-     
-
-      <DepartmentDetailsCard cuid={cuid} />
-
-      <DepartmentDetailsTable
-        table={table}
-        columns={columns}
-        pagination={pagination}
-        setPagination={setPagination}
-      />
+      s{isLoading && <p className="text-gray-600">Loading entity details...</p>}
+      {isError && (
+        <p className="text-red-600">Error loading entity: {error.message}</p>
+      )}
+      {!isLoading && !isError && (
+        <>
+          <DepartmentDetailsCard cuid={cuid} router={router} />
+          <DepartmentDetailsTable
+            table={table}
+            columns={columns}
+            pagination={pagination}
+            setPagination={setPagination}
+          />
+        </>
+      )}
     </main>
   );
 }

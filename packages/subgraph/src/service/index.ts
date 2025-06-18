@@ -1,23 +1,24 @@
 import { Client, fetchExchange } from '@urql/core';
-
 import {
-  ApprovalList,
+  AppRegistryQueries,
+  
+  GetRewardManagement,
+GetRewardManagementCreatedByAddress,
 
-  CreatedAppList,
-  EntityTaskManagerCreatedList,
-  GetAllTasksForParticipant,
-  getEntityDetailById,
-  GetParticipantTaskStatusWithVariables,
-  GetTaskApprovedAndCompleted,
-  GetTaskDetailsById,
-  GetTaskParticipantsWithStatus,
-
-  RoleGrantedList,
+  GetCombineParticipantsByTask,
 
 
-  TaskCreatedList,
-  TransferList,
+  getParticipantTasks,
+
+
+  getTaskCreatedById,
+  getTaskCreation,
+  RewardManagementQueries,
+  TokenQueries
 } from '../queries';
+
+
+const SUBGRAPH_URL = process.env.NEXT_PUBLIC_SUBGRAPH_URL!; 
 
 export class SubgraphService {
   private subgraphQuery: Client;
@@ -29,88 +30,140 @@ export class SubgraphService {
     });
   }
 
-  async getAppCreatedlist() {
+  // AppRegistry Related Services
+  async getAppRegistryData() {
     try {
-      const data = await this.subgraphQuery.query(CreatedAppList, {});
-
-      return {data};
+      const appCreated = await this.subgraphQuery.query(AppRegistryQueries.getAppCreated, {});
+      const roleManagement = await this.subgraphQuery.query(AppRegistryQueries.getRoleManagement, {});
+      return { appCreated: appCreated.data, roleManagement: roleManagement.data };
     } catch (error) {
-      console.log(error, 'error');
+      console.error('Error fetching AppRegistry data:', error);
+      return { error };
     }
   }
 
-  async getRoleGrantedList() {
-    const {data, error} = await this.subgraphQuery.query(RoleGrantedList, {});
-    return {data, error};
+  // Token Related Services
+  async getTokenData() {
+    try {
+      const transfers = await this.subgraphQuery.query(TokenQueries.getTransfers, {});
+      const approvals = await this.subgraphQuery.query(TokenQueries.getApprovals, {});
+      return { transfers: transfers.data, approvals: approvals.data };
+    } catch (error) {
+      console.error('Error fetching token data:', error);
+      return { error };
+    }
   }
 
-  async getApprovalList() {
-    const {data, error} = await this.subgraphQuery.query(ApprovalList, {});
-    return {data, error};
-  }
-  async getTransferList() {
-    const {data, error} = await this.subgraphQuery.query(TransferList, {});
-    return {data, error};
-  }
-
-  async getTaskCreatedList() {
-    const {data, error} = await this.subgraphQuery.query(TaskCreatedList, {});
-    return {data, error};
-  }
-
- 
-  async getEntityManagerCreatedList() {
-    const {data, error} = await this.subgraphQuery.query(
-      EntityTaskManagerCreatedList,
-      {},
-    );
-    return {data, error};
-  }
-
-  async getEntityDetailById(id:string) {
-    const {data, error} = await this.subgraphQuery.query(
-  getEntityDetailById,
-      {id},
-    );
-    return {data, error};
-  }
-
-
- 
- 
-  
-  async getParticipantTaskStatus(participant: string, taskId: string) {
+  // RewardManagement Related Services
+  async getAllTasks() {
     
-    const { data, error } = await this.subgraphQuery.query(
-      GetParticipantTaskStatusWithVariables,
-      { participant, taskId }
-    );
+    const { data, error } = await this.subgraphQuery.query(getTaskCreation, {});
     return { data, error };
   }
 
-  async getTaskParticipantsWithStatus(taskId: string) {
-    const { data, error } = await this.subgraphQuery.query(
-      GetTaskParticipantsWithStatus,
-      { taskId }
-    );
-    return { data, error };
-  }
+  async getTaskById(id: string) {
+    const { data, error } = await this.subgraphQuery.query(getTaskCreatedById, { id })
+    return { data, error }
 
-  async getTaskApprovedAndCompletedList(taskId: string) {
-    const { data, error } = await this.subgraphQuery.query(GetTaskApprovedAndCompleted, {taskId});
-    return { data, error };
-  }
 
- async getTaskDetails(taskId: string) {
-    const { data, error } = await this.subgraphQuery.query(GetTaskDetailsById, {taskId});
-    return { data, error };
- }
+
+  }
   
-  async getAllTaskByParticipant(participant: string) {
-    const { data, error } = await this.subgraphQuery.query(
-      GetAllTasksForParticipant,
-      { participant }
-    );
-    return { data, error };
+  
+
+  
+
+
+  async getCombineParticipantsByTask(taskId: string) {
+    try {
+
+      const { data, error } = await this.subgraphQuery.query(
+        GetCombineParticipantsByTask,
+        { taskId }
+      );
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching task with participant status:', error);
+      return { error };
+
+
+    }
+  
+
+
+
+
+
+
   }
+  
+  async getContractState() {
+    try {
+      const { data, error } = await this.subgraphQuery.query(
+        RewardManagementQueries.getContractState,
+        {}
+      );
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching contract state:', error);
+      return { error };
+    }
+  }
+
+  // Factory Related Services
+  async getDeployments() {
+    try {
+      const { data, error } = await this.subgraphQuery.query(GetRewardManagement, {});
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching deployments:', error);
+      return { error };
+    }
+  }
+
+  async getRewardManagementCreatedByAddress(rewardManagement: string) {
+    try {
+      const { data, error } = await this.subgraphQuery.query(
+        GetRewardManagementCreatedByAddress,
+        { rewardManagement }
+      );
+  
+      if (error) {
+        throw error;
+      }
+  
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error fetching rewardManagementCreated by address:', error);
+      return { data: null, error };
+    }
+  }
+
+  async getParticipantTasks(participantAddress: string) {
+   
+  
+    try {
+
+      const { data, error } = await this.subgraphQuery.query(
+        getParticipantTasks,
+        { participant: participantAddress }
+      )
+      return { data, error }
+
+
+    } catch (error) {
+
+      console.error('Error fetching rewardManagementCreated by address:', error);
+      return { data: null, error };
+
+
+    }
+  
+  
+
+  
+  }
+
+
+
 }
