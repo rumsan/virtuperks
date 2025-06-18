@@ -101,17 +101,7 @@ export function handleDisbursementToTask(event: DisbursementToTaskEvent): void {
   let rewardManagement = RewardManagementCreated.load(event.address);
   if (rewardManagement != null) {
     entity.rewardManagement = rewardManagement.id;
-    // Update totalAvailableTokens (ensure non-negative)
-    if (rewardManagement.totalAvailableTokens >= event.params.amount) {
-      rewardManagement.totalAvailableTokens = rewardManagement.totalAvailableTokens.minus(
-        event.params.amount
-      );
-      rewardManagement.save();
-    } else {
-      log.warning("Insufficient available tokens for disbursement: {}", [
-        rewardManagement.id.toHexString(),
-      ]);
-    }
+    
   }
 
 
@@ -432,16 +422,7 @@ export function handleTokenTransferred(event: TokenTransferredEvent): void {
   if (rewardManagement != null) {
     entity.rewardManagement = rewardManagement.id;
     // Update totalAvailableTokens (ensure non-negative)
-    if (rewardManagement.totalAvailableTokens >= event.params.amount) {
-      rewardManagement.totalAvailableTokens = rewardManagement.totalAvailableTokens.minus(
-        event.params.amount
-      );
-      rewardManagement.save();
-    } else {
-      log.warning("Insufficient available tokens for transfer: {}", [
-        rewardManagement.id.toHexString(),
-      ]);
-    }
+   
   }
 
   entity.save()

@@ -655,8 +655,7 @@ export const GetRewardManagement = `
         aclAddress
         appId
         name
-        totalMintedTokens
-        totalAvailableTokens
+       
         
         
         blockNumber
@@ -673,9 +672,7 @@ export const GetRewardManagement = `
         aclAddress
         appId
         name
-        totalMintedTokens
-        totalAvailableTokens
-        
+         
        tokenTransfers(first:30, orderBy: blockTimestamp, orderDirection: desc) {
         id
         token

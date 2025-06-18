@@ -36,12 +36,6 @@ export function handleTransfer(event: TransferEvent): void {
     let rewardManagement = RewardManagementCreated.load(event.params.to);
     if (rewardManagement != null) {
       
-      rewardManagement.totalMintedTokens = rewardManagement.totalMintedTokens.plus(
-        event.params.value
-      );
-      rewardManagement.totalAvailableTokens = rewardManagement.totalAvailableTokens.plus(
-        event.params.value
-      );
       rewardManagement.save();
       entity.rewardManagement = rewardManagement.id;
     }
