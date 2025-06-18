@@ -9,20 +9,19 @@ import { ConnectKitButton } from "connectkit";
 import { LayoutList, Wallet } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { PropsWithChildren, useState } from "react";
+import { usePathname } from "next/navigation";
+import { PropsWithChildren } from "react";
 import { NavItem } from "../../../type/nav.types";
+import { navItemPaths } from "./navItemPaths";
 
 export default function TaskPortalNav({ children }: PropsWithChildren) {
-  const [activeNavBar, setActiveNavBar] = useState<NavItem>(
-    NavItem.TASK_PORTAL,
-  );
+  const pathname = usePathname();
 
-  const handleNavClick = (nav: NavItem) => {
-    setActiveNavBar(nav);
-  };
-
-  const getNavItemClasses = (nav: NavItem) => {
-    return activeNavBar === nav
+  const getNavItemClasses = (navItem: NavItem) => {
+    const paths = navItemPaths[navItem] ?? [];
+    return paths.some(
+      (path) => pathname === path || pathname.startsWith(`${path}/`),
+    )
       ? "text-[#297AD6] border-b-2 border-[#297AD6]"
       : "text-[#1E293B] hover:text-[#1e293b]";
   };
@@ -34,7 +33,6 @@ export default function TaskPortalNav({ children }: PropsWithChildren) {
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/bg/rumsan-logo.png"
-              onClick={() => handleNavClick(NavItem.TASK_PORTAL)}
               width={50}
               height={50}
               alt="Logo"
@@ -45,7 +43,6 @@ export default function TaskPortalNav({ children }: PropsWithChildren) {
         <div className="ml-auto flex items-center gap-4 h-full">
           <Link
             href="/task_portal"
-            onClick={() => handleNavClick(NavItem.TASK_PORTAL)}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASK_PORTAL)}`}
           >
             <LayoutList size={18} strokeWidth={2.65} />
@@ -53,15 +50,14 @@ export default function TaskPortalNav({ children }: PropsWithChildren) {
           </Link>
           <Link
             href="/task_portal/mine"
-            onClick={() => handleNavClick(NavItem.MY_TASKS)}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.MY_TASKS)}`}
           >
             <LayoutList size={18} strokeWidth={2.65} />
             My Tasks
           </Link>
 
-          <div className="flex items-center h-10 p-2 bg-[#F1F5F9] rounded-md p-2">
-            <span className="flex items-center gap-2 font-normal text-[#1E293B] text-sm middle-ellipsis">
+          <div className="flex items-center h-10 bg-[#F1F5F9] rounded-md p-2">
+            <span className="flex items-center gap-2 font-normal text-[#1E293B] text-sm">
               <Wallet size={18} strokeWidth={2.65} color="#334155" />
               <ConnectKitButton showAvatar={false} theme="auto" />
             </span>
