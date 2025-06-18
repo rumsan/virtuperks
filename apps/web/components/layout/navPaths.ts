@@ -1,5 +1,7 @@
-import { PATHS } from "@routes/paths";
-import { NavItem } from "@type/nav.types";
+
+import { PATHS } from "@/routes/paths";
+import { NavItem } from "@/type/nav.types";
+
 
 export const navItemPaths: Record<NavItem, string[]> = {
   [NavItem.PARTICIPANTS]: [PATHS.PARTICIPANT.HOME],
