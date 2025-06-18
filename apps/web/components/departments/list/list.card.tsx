@@ -62,9 +62,9 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
                 <span>{department.name}</span>
               </CardDescription>
               <div className="flex flex-col mr-auto gap-2 p-0 font-normal">
-                <span className="flex text-[#64748B] mt-5">
+                {/* <span className="flex text-[#64748B] mt-5">
                   Available Tokens:
-                </span>
+                </span> */}
                 <div className="flex items-center justify-start">
                   <div className="flex items-center text-[#297AD6] gap-2">
                     <Coins size={20} strokeWidth={2.5} color="#297AD6" />

@@ -70,7 +70,7 @@ export default function TaskBaseForm({
       setCurrentWallet("");
     }
   };
-  console.log(currentWallet, "currentWallet");
+
 
   const removeWallet = (addressToRemove: string) => {
     const filtered = walletAddresses.filter((addr) => addr !== addressToRemove);
