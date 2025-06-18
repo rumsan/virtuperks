@@ -66,7 +66,7 @@ export const useGetEntityById = (rewardManagement: string) => {
           rewardManagement,
         );
 
-      console.log("Subgraph result:", result);
+   
 
       const entity = result?.data?.rewardManagementCreateds?.[0];
 
@@ -122,7 +122,7 @@ export const useCheckTotalUnallocatedTokens = (entityId:string) => {
     args: [tokenAddress],
   });
  
-console.log(data, 'data from useCheckTotalUnallocatedTokens hook');
+
   return {
     unallocatedTokens:data,
     isError,
@@ -144,7 +144,7 @@ export const useCheckTotalAllocatedTokens= (entityId:string) => {
     args: [tokenAddress],
   });
  
-console.log(data, 'data from  totalAllocatedTokens hook');
+
   return {
      totalAllocatedTokens:data,
     isError,
