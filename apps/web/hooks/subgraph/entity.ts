@@ -1,11 +1,15 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  useReadRewardManagementFactoryGetEntityOwners,
   useReadRewardManagementGetTotalUnallocatedTokens,
   useReadRewardManagementTotalAllocatedTokens,
   useWriteRewardManagementFactoryCreateRewardManagement,
   useWriteRewardTokenMint,
 } from "../wagmi/contracts";
+import { createId } from "@paralleldrive/cuid2";
+import { keccak256 } from "viem";
+import { toUtf8Bytes } from "ethers";
 
 
 export const useGetAllEntity = () => {
@@ -30,13 +34,17 @@ export const useDepartmentAdd = () => {
 
 
   const mutation = useMutation({
-    mutationFn: async ({ name }: { name: string }) => {
+    mutationFn: async (data: any) => {
+         const cuid = createId()
+            const entityId = keccak256(toUtf8Bytes(cuid))
       const result = await writeContractAsync({
         address: process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}`,
         args: [
+          entityId as `0x${string}`,
           appId,
-          name,
+          
           process.env.NEXT_PUBLIC_APPREGISTRY as `0x${string}`,
+          {name:data.name as string, entityOwners: data.entityOwners as readonly `0x${string}`[]},
         ],
       });
       return result;
@@ -152,5 +160,28 @@ export const useCheckTotalAllocatedTokens= (entityId:string) => {
   };
 };
 
+
+
+export const useGetEntityOwners= (entityId:string) => {
+  const factoryAddress = process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}`;
+  console.log("factoryAddress", factoryAddress);
+  console.log("entityId", entityId);
+  
+  const {
+    data,
+    isError,
+    isLoading,
+  } = useReadRewardManagementFactoryGetEntityOwners({
+    address: factoryAddress as `0x${string}`,
+    args: [entityId as `0x${string}`],
+  });
+ 
+
+  return {
+     getEntityOwners:data,
+    isError,
+    statusLoading: isLoading,
+  };
+};
 
 
