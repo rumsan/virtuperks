@@ -2,6 +2,7 @@ import { randomBytes } from 'crypto';
 import * as dotenv from 'dotenv';
 import { Addressable, ethers, uuidV4 } from 'ethers';
 import { commonLib } from './_common';
+import { minterRole, roleAdmin } from './deployments/wallets';
 dotenv.config();
 
 interface DeployedContract {
@@ -46,34 +47,26 @@ class SeedProject extends commonLib {
     // Create app
     await this.createApp(accessManagerV2.contract.target as string, appId,name, "0x127359CD56487f76307b186651ddbf684B9c2dFE", false);
 
-    // Assign MINTER role
-    // await this.assignRole(
-    //   accessManagerV2.contract.target as string,
-    //   appId,
-    //   'MINTER',
-    //      '0x127359CD56487f76307b186651ddbf684B9c2dFE',
+   
+    for (const participant of minterRole) {
+      await this.assignRole(
+        accessManagerV2.contract.target as string,
+        appId,
+        'MINTER',
+        participant.address
+      );
+    }
 
-    // );
-
-    // Assign ENTITY_OWNER role to all entity owners
-    // for (const owner of entityOwnerWallet) {
-    //   await this.assignRole(
-    //     accessManagerV2.contract.target as string,
-    //     appId,
-    //     'ENTITY_OWNER',
-    //     owner.address
-    //   );
-    // }
-
-    // Assign PARTICIPANT role to all participants
-    // for (const participant of participantsWallet) {
-    //   await this.assignRole(
-    //     accessManagerV2.contract.target as string,
-    //     appId,
-    //     'PARTICIPANT',
-    //     participant.address
-    //   );
-    // }
+  //  Assign RoleAdmin role
+    for (const participant of roleAdmin) {
+      await this.assignRole(
+        accessManagerV2.contract.target as string,
+        appId,
+"0x0000000000000000000000000000000000000000000000000000000000000000",
+        
+        participant.address
+      );
+    }
 
     const rewardToken = await this.deployContract('RewardToken', [
         'Rahat',

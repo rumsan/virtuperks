@@ -71,11 +71,17 @@ export async function deployRewardManagementFixture(): Promise<RewardManagementF
 
 
   // Deploy RewardManagement instance through factory
+  const entityId = ethers.id('Test Entity');
+  const entity = {
+    name: "Test Entity",
+    entityOwners : entityOwnerAddresses,
+  }
   const tx = await factory.connect(admin1).createRewardManagement(
+    entityId,
     APP_ID,
-    "Test Reward Management",
+    
     appRegistry.target,
-    entityOwnerAddresses,
+    entity
   );
   const receipt = await tx.wait();
 
@@ -88,14 +94,17 @@ export async function deployRewardManagementFixture(): Promise<RewardManagementF
   console.log('RewardManagement deployed at:', rewardManagementAddress);
     console.log('Entity owners set:', eventEntityOwners);
 
+  //call getEntityOwners to verify owners
 
+  
+  
   // Get contract instance
   const RewardManagement = await ethers.getContractFactory('RewardManagement');
   const rewardManagement = RewardManagement.attach(rewardManagementAddress);
 
-  // Setup roles for deployed instance
-  // const ownerRole = await rewardManagement.OWNER();
-  // console.log(ownerRole, 'owner role');
+  //call getEntityOwners to verify owners
+  const retrievedOwners = await factory.connect(admin1).getEntityOwners(entityId);
+  console.log('Retrieved entity owners:', retrievedOwners);
 
   const participantRole = await rewardManagement.PARTICIPANT();
   const appId = await rewardManagement.appId();

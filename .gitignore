@@ -82,12 +82,16 @@ apps/subgraph/node_modules/
 
 #Sample Data
 apps/web/sampleData.ts
-wallet.ts
 
 #typechain
 packages/contracts/typechain-types/*
 packages/contracts/typechain-types/**/*
 
 
+
+# Wallets file (contains sensitive information)
+
 tools/deploy/deployments/wallets.ts
+
+
 .qodo

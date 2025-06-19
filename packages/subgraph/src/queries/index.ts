@@ -701,6 +701,8 @@ export const GetRewardManagement = `
 
 
 
+
+
 export const getParticipantTasks=`
    query GetParticipantTasks($participant: Bytes!) {
     participantTaskStatuses(where: { participant: $participant }) {
