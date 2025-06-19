@@ -739,3 +739,44 @@ export const getParticipantTasks=`
     }
 }
   `
+
+
+  export const GetRewardManagementTokenTransfers = `
+  query GetRewardManagementCreatedByAddress($rewardManagement: Bytes!) {
+    rewardManagementCreateds(where: { rewardManagement: $rewardManagement }) {
+     id
+        rewardManagement
+       tokenTransfers(first:2, orderBy: blockTimestamp, orderDirection: desc) {
+        id
+        token
+        to
+        amount
+        remarks
+        transferredBy
+        }
+
+        blockNumber
+        blockTimestamp
+        transactionHash
+      }
+  }
+`;
+
+export const GetRewardManagementDisbursements = `
+  query GetRewardManagementCreatedByAddress($rewardManagement: Bytes!) {
+    rewardManagementCreateds(where: { rewardManagement: $rewardManagement }) {
+     id
+        rewardManagement
+        disbursements(first:2, orderBy: blockTimestamp, orderDirection: desc) {
+        id
+        taskId
+        amount
+        disbursedBy
+        }
+
+        blockNumber
+        blockTimestamp
+        transactionHash
+      }
+  }
+`;

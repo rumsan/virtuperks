@@ -1,21 +1,24 @@
-import { useMutation } from "@tanstack/react-query";
-import { useWriteRewardManagementDisburseTokensToTask, useWriteRewardManagementTransferToken } from "../wagmi/contracts";
-
+"use client";
+import { useGraphService } from "@/providers/subgraph-provider";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useWriteRewardManagementDisburseTokensToTask,
+  useWriteRewardManagementTransferToken,
+} from "../wagmi/contracts";
 
 export const useDisburseTokenToTask = () => {
-  const { writeContractAsync } = useWriteRewardManagementDisburseTokensToTask()
+  const { writeContractAsync } = useWriteRewardManagementDisburseTokensToTask();
 
- const mutation = useMutation({
+  const mutation = useMutation({
     mutationFn: async ({
       taskId,
-        amount,
+      amount,
       entityId,
     }: {
       taskId: string;
-            amount: number;
+      amount: number;
       entityId: string;
-      }) => {
-
+    }) => {
       const result = await writeContractAsync({
         address: entityId as `0x${string}`,
         args: [taskId as `0x${string}`, BigInt(amount)],
@@ -26,33 +29,37 @@ export const useDisburseTokenToTask = () => {
 
   return {
     disburseTokenToTask: mutation.mutateAsync,
-     disbursePending: mutation.isPending,
-     disburseSuccess: mutation.isSuccess,
-     disburseError: mutation.isError,
+    disbursePending: mutation.isPending,
+    disburseSuccess: mutation.isSuccess,
+    disburseError: mutation.isError,
   };
 };
 
-
 export const useDirectTokenTransfer = () => {
-  const { writeContractAsync } = useWriteRewardManagementTransferToken()
+  const { writeContractAsync } = useWriteRewardManagementTransferToken();
 
-  const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN
+  const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN;
 
- const mutation = useMutation({
+  const mutation = useMutation({
     mutationFn: async ({
       to,
-        amount,
+      amount,
       remarks,
-     entityId
+      entityId,
     }: {
       to: string;
-            amount: number;
-        remarks: string;
+      amount: number;
+      remarks: string;
       entityId: string;
     }) => {
       const result = await writeContractAsync({
         address: entityId as `0x${string}`,
-        args: [tokenAddress as `0x${string}`, to as `0x${string}`, BigInt(amount), remarks],
+        args: [
+          tokenAddress as `0x${string}`,
+          to as `0x${string}`,
+          BigInt(amount),
+          remarks,
+        ],
       });
       return result;
     },
@@ -60,13 +67,69 @@ export const useDirectTokenTransfer = () => {
 
   return {
     directTransfer: mutation.mutateAsync,
-     directTransferPending: mutation.isPending,
-     directTransferSuccess: mutation.isSuccess,
-     directTransferError: mutation.isError,
+    directTransferPending: mutation.isPending,
+    directTransferSuccess: mutation.isSuccess,
+    directTransferError: mutation.isError,
   };
 };
 
+//Query to get list of token i.e directly transfered and task token
+export const useGetTokenTransfers = (
+  rewardManagementAddress: string,
+  skip: boolean = false,
+) => {
+  const { queryService } = useGraphService();
 
+  return useQuery({
+    queryKey: ["tokenTransfers", rewardManagementAddress],
+    enabled: !!rewardManagementAddress && !skip,
+    queryFn: async () => {
+      if (!queryService) {
+        throw new Error("Graph service not initialized");
+      }
 
+      const { data, error } =
+        await queryService.getRewardManagementTokenTransfers(
+          rewardManagementAddress,
+        );
 
+      if (error) {
+        throw new Error(
+          (error as Error)?.message || "Error fetching token transfers",
+        );
+      }
 
+      return data;
+    },
+  });
+};
+
+export const useGetDisbursements = (
+  rewardManagementAddress: string,
+  skip: boolean = false,
+) => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["disbursements", rewardManagementAddress],
+    enabled: !!rewardManagementAddress && !skip,
+    queryFn: async () => {
+      if (!queryService) {
+        throw new Error("Graph service not initialized");
+      }
+
+      const { data, error } =
+        await queryService.getRewardManagementDisbursements(
+          rewardManagementAddress,
+        );
+
+      if (error) {
+        throw new Error(
+          (error as Error)?.message || "Error fetching disbursements",
+        );
+      }
+
+      return data;
+    },
+  });
+};

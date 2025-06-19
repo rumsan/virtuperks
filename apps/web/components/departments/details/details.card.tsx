@@ -1,3 +1,5 @@
+"use client";
+
 import { DialogButton } from "@/components/common/ui/dialog";
 import { useGetEntityById } from "@/hooks/subgraph/entity";
 import { useDirectTokenTransfer } from "@/hooks/subgraph/token";
@@ -12,7 +14,7 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { toast } from "@workspace/ui/hooks/use-toast";
-import { CheckCircle, Copy, Loader2, Plus, User } from "lucide-react";
+import { Copy, Loader2, Plus, User } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 import { Cuid } from "./details.main";
@@ -26,11 +28,7 @@ export default function DepartmentDetailsCard({
   cuid,
   router,
 }: DepartmentDetailsCardProps) {
- 
-
   const { data: entity, isLoading, isError, error } = useGetEntityById(cuid.id);
- 
-  
 
   const {
     directTransfer,
@@ -40,7 +38,6 @@ export default function DepartmentDetailsCard({
   } = useDirectTokenTransfer();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [localStatus, setLocalStatus] = useState<string | null>(null);
 
   if (isLoading) {
     return <p className="text-gray-600">Loading department info...</p>;
@@ -69,7 +66,6 @@ export default function DepartmentDetailsCard({
         entityId: entity.id,
       });
       setIsOpen(false);
-      setLocalStatus("DISPERSE");
       toast({
         title: "Token transfered Successfully!.",
         variant: "success",
@@ -87,52 +83,26 @@ export default function DepartmentDetailsCard({
     role: process.env.NEXT_PUBLIC_MINTER_ROLE || "",
   });
   const hasTreasurerRole = typeof roleCheck === "boolean" ? roleCheck : false;
-             
-
 
   const getTransferButton = () => {
-      if (directTransferPending) {
-        return (
-          <Button
-            variant="outline"
-          className="h-12 w-48 flex items-center justify-center"
-                style={{
-                  border: "1px solid #03AB65",
-                }}
-            disabled
-          >
-            <span className="text-[#03AB65] flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Processing...
-            </span>
-          </Button>
-        );
-      }
-  
+    if (directTransferPending) {
       return (
         <Button
           variant="outline"
           className="h-12 w-48 flex items-center justify-center"
-                style={{
-                  border: "1px solid #03AB65",
-                }}
-          onClick={() => setIsOpen(true)}
-          //disabled={isDisburseButtonDisabled}
-          
+          style={{
+            border: "1px solid #03AB65",
+          }}
+          disabled
         >
-          <span className="text-[#03AB65]">Transfer Token</span>
-          <CheckCircle
-            className="ml-2"
-            style={{
-              color: '#03AB65',
-              strokeWidth: 2.5,
-              width: '20px',
-              height: '20px'
-            }}
-          />
+          <span className="text-[#03AB65] flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Processing...
+          </span>
         </Button>
       );
-    };
+    }
+  };
 
   return (
     <>
@@ -146,21 +116,19 @@ export default function DepartmentDetailsCard({
           </div>
           {hasTreasurerRole && (
             <div className="flex gap-10">
-           {getTransferButton()}
-              
-                {!directTransferPending && isOpen && (
-                  <DialogButton
-                    isOpen={isOpen}
-                    setIsOpen={setIsOpen}
-                    title="Are you sure you want to transfer token amount?"
-                    subTitle="This action cannot be undone"
-                    buttonName="Transfer Token"
-                    submitType="directdisburse"
-                    handleApplyTaskLogic={handleDialogAction}
-                  />
-                )}
-               
-            
+              {getTransferButton()}
+
+              {!directTransferPending && isOpen && (
+                <DialogButton
+                  isOpen={isOpen}
+                  setIsOpen={setIsOpen}
+                  title="Are you sure you want to transfer token amount?"
+                  subTitle="This action cannot be undone"
+                  buttonName="Transfer Token"
+                  submitType="directdisburse"
+                  handleApplyTaskLogic={handleDialogAction}
+                />
+              )}
 
               <Button
                 className="h-12 w-48 fw-[600] flex items-center justify-center"
