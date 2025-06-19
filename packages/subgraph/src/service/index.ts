@@ -121,11 +121,11 @@ export class SubgraphService {
     }
   }
 
-  async getRewardManagementCreatedByAddress(rewardManagement: string) {
+  async getRewardManagementCreatedByAddress(entityId: string) {
     try {
       const { data, error } = await this.subgraphQuery.query(
         GetRewardManagementCreatedByAddress,
-        { rewardManagement }
+        { entityId }
       );
   
       if (error) {

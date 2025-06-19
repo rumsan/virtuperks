@@ -60,6 +60,7 @@ export default function TaskBaseForm({
   const getAllEntity = useGetAllEntity();
   const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
 
+
   const handleAddWallet = () => {
     if (currentWallet && isAddress(currentWallet)) {
       setWalletAddresses((prev) => [...prev, currentWallet]);

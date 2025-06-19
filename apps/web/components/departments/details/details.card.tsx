@@ -97,6 +97,7 @@ export default function DepartmentDetailsCard({
     role: process.env.NEXT_PUBLIC_MINTER_ROLE || "",
   });
   const hasTreasurerRole = typeof roleCheck === "boolean" ? roleCheck : false;
+console.log("hasTreasurerRole", hasTreasurerRole);
              
 
 

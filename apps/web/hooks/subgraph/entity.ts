@@ -164,8 +164,7 @@ export const useCheckTotalAllocatedTokens= (entityId:string) => {
 
 export const useGetEntityOwners= (entityId:string) => {
   const factoryAddress = process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}`;
-  console.log("factoryAddress", factoryAddress);
-  console.log("entityId", entityId);
+
   
   const {
     data,
