@@ -79,7 +79,7 @@ export default function TreasurerNav({ children }: PropsWithChildren) {
             Tasks Portal
           </Link>
           <Link
-            href="/tasks"
+            href="/task_portal/mine"
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.MY_TASKS)}`}
           >
             <LayoutList size={18} strokeWidth={2.65} />
