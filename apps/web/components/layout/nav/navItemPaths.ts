@@ -5,8 +5,8 @@ export const navItemPaths: Record<NavItem, string[]> = {
   [NavItem.DEPARTMENTS]: ["/departments", "/treasurer/department/allocate"],
   [NavItem.TREASURER_TOKEN]: ["/treasurer/token"],
   [NavItem.TASK_PORTAL]: ["/task_portal"],
-  [NavItem.MY_TASKS]: ["/tasks"],
-  [NavItem.TASKS]: [],
-  [NavItem.TOKEN]: [],
+  [NavItem.MY_TASKS]: ["/task_portal/mine"],
+  [NavItem.TASKS]: ["/tasks"],
+  [NavItem.TOKEN]: ["/TOKEN"],
   [NavItem.TREASURER_DEPARTMENT]: [],
 };
