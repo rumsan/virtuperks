@@ -91,12 +91,14 @@ type Transfer @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
 type RewardManagementCreated @entity {
   id: Bytes!
   rewardManagement: Bytes! # address
-  aclAddress: Bytes! # address
-  appId: Bytes! # bytes32
+   appId: Bytes! # bytes32
   name: String! # string
+  registry: Bytes! # address
+  entityId: Bytes! # bytes32
   tasks: [TaskCreated!] @derivedFrom(field: "rewardManagement")
   tokenTransfers: [TokenTransferred!] @derivedFrom(field: "rewardManagement")
   disbursements: [DisbursementToTask!] @derivedFrom(field: "rewardManagement")

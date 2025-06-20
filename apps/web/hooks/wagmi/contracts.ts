@@ -1246,22 +1246,37 @@ export const rewardManagementFactoryAbi = [
         indexed: false,
       },
       {
-        name: 'aclAddress',
+        name: 'registry',
         internalType: 'address',
         type: 'address',
         indexed: false,
       },
       {name: 'appId', internalType: 'bytes32', type: 'bytes32', indexed: false},
       {name: 'name', internalType: 'string', type: 'string', indexed: false},
+      {
+        name: 'entityId',
+        internalType: 'bytes32',
+        type: 'bytes32',
+        indexed: false,
+      },
     ],
     name: 'RewardManagementCreated',
   },
   {
     type: 'function',
     inputs: [
+      {name: 'entityId', internalType: 'bytes32', type: 'bytes32'},
       {name: 'appId', internalType: 'bytes32', type: 'bytes32'},
-      {name: 'name', internalType: 'string', type: 'string'},
       {name: 'registry', internalType: 'address', type: 'address'},
+      {
+        name: 'entity',
+        internalType: 'struct IRewardManagementFactory.Entity',
+        type: 'tuple',
+        components: [
+          {name: 'name', internalType: 'string', type: 'string'},
+          {name: 'entityOwners', internalType: 'address[]', type: 'address[]'},
+        ],
+      },
     ],
     name: 'createRewardManagement',
     outputs: [],
@@ -1269,15 +1284,15 @@ export const rewardManagementFactoryAbi = [
   },
   {
     type: 'function',
-    inputs: [{name: '', internalType: 'uint256', type: 'uint256'}],
-    name: 'deployedContracts',
-    outputs: [{name: '', internalType: 'address', type: 'address'}],
+    inputs: [{name: '', internalType: 'bytes32', type: 'bytes32'}],
+    name: 'entities',
+    outputs: [{name: 'name', internalType: 'string', type: 'string'}],
     stateMutability: 'view',
   },
   {
     type: 'function',
-    inputs: [],
-    name: 'getDeployedContracts',
+    inputs: [{name: 'entityId', internalType: 'bytes32', type: 'bytes32'}],
+    name: 'getEntityOwners',
     outputs: [{name: '', internalType: 'address[]', type: 'address[]'}],
     stateMutability: 'view',
   },
@@ -2517,21 +2532,21 @@ export const useReadRewardManagementFactory =
   /*#__PURE__*/ createUseReadContract({abi: rewardManagementFactoryAbi})
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardManagementFactoryAbi}__ and `functionName` set to `"deployedContracts"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardManagementFactoryAbi}__ and `functionName` set to `"entities"`
  */
-export const useReadRewardManagementFactoryDeployedContracts =
+export const useReadRewardManagementFactoryEntities =
   /*#__PURE__*/ createUseReadContract({
     abi: rewardManagementFactoryAbi,
-    functionName: 'deployedContracts',
+    functionName: 'entities',
   })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardManagementFactoryAbi}__ and `functionName` set to `"getDeployedContracts"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardManagementFactoryAbi}__ and `functionName` set to `"getEntityOwners"`
  */
-export const useReadRewardManagementFactoryGetDeployedContracts =
+export const useReadRewardManagementFactoryGetEntityOwners =
   /*#__PURE__*/ createUseReadContract({
     abi: rewardManagementFactoryAbi,
-    functionName: 'getDeployedContracts',
+    functionName: 'getEntityOwners',
   })
 
 /**
