@@ -39,14 +39,14 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
 
       {entityList &&
         entityList.map((department: DepartmentDetails) => {
-          console.log("Department: ", department.rewardManagement);
+      
           return (
             <Card
               key={department.id}
               className="cursor-pointer hover:shadow-lg p-4"
               onClick={() =>
                 router.push(
-                  PATHS.DEPARTMENT.DETAILS(department.rewardManagement),
+                  PATHS.DEPARTMENT.DETAILS(department.entityId),
                 )
               }
             >

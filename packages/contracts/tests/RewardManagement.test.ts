@@ -13,7 +13,7 @@ describe('RewardManagement Contract', function() {
     it('should deploy successfully and set initial state', async function() {
       const { rewardManagement, appRegistry, APP_ID, user2 , participant1,} = await fixture();
       expect(await rewardManagement.appId()).to.equal(APP_ID);
-      expect(await rewardManagement.name()).to.equal("Test Reward Management");
+      expect(await rewardManagement.name()).to.equal("Test Entity");
      
       
       const ownerRole = await rewardManagement.OWNER();

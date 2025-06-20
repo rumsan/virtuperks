@@ -4,9 +4,10 @@ import { RewardManagementCreated } from "../generated/RewardManagementFactory/Re
 
 export function createRewardManagementCreatedEvent(
   rewardManagement: Address,
-  aclAddress: Address,
+  registry: Address,
   appId: Bytes,
-  name: string
+  name: string,
+  entityId: Bytes
 ): RewardManagementCreated {
   let rewardManagementCreatedEvent =
     changetype<RewardManagementCreated>(newMockEvent())
@@ -20,16 +21,16 @@ export function createRewardManagementCreatedEvent(
     )
   )
   rewardManagementCreatedEvent.parameters.push(
-    new ethereum.EventParam(
-      "aclAddress",
-      ethereum.Value.fromAddress(aclAddress)
-    )
+    new ethereum.EventParam("registry", ethereum.Value.fromAddress(registry))
   )
   rewardManagementCreatedEvent.parameters.push(
     new ethereum.EventParam("appId", ethereum.Value.fromFixedBytes(appId))
   )
   rewardManagementCreatedEvent.parameters.push(
     new ethereum.EventParam("name", ethereum.Value.fromString(name))
+  )
+  rewardManagementCreatedEvent.parameters.push(
+    new ethereum.EventParam("entityId", ethereum.Value.fromFixedBytes(entityId))
   )
 
   return rewardManagementCreatedEvent

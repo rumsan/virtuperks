@@ -20,16 +20,18 @@ describe("Describe entity assertions", () => {
     let rewardManagement = Address.fromString(
       "0x0000000000000000000000000000000000000001"
     )
-    let aclAddress = Address.fromString(
+    let registry = Address.fromString(
       "0x0000000000000000000000000000000000000001"
     )
     let appId = Bytes.fromI32(1234567890)
     let name = "Example string value"
+    let entityId = Bytes.fromI32(1234567890)
     let newRewardManagementCreatedEvent = createRewardManagementCreatedEvent(
       rewardManagement,
-      aclAddress,
+      registry,
       appId,
-      name
+      name,
+      entityId
     )
     handleRewardManagementCreated(newRewardManagementCreatedEvent)
   })
@@ -54,7 +56,7 @@ describe("Describe entity assertions", () => {
     assert.fieldEquals(
       "RewardManagementCreated",
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
-      "aclAddress",
+      "registry",
       "0x0000000000000000000000000000000000000001"
     )
     assert.fieldEquals(
@@ -68,6 +70,12 @@ describe("Describe entity assertions", () => {
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
       "name",
       "Example string value"
+    )
+    assert.fieldEquals(
+      "RewardManagementCreated",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "entityId",
+      "1234567890"
     )
 
     // More assert options:

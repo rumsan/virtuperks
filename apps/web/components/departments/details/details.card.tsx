@@ -1,5 +1,5 @@
 import { DialogButton } from "@/components/common/ui/dialog";
-import { useCheckTotalAllocatedTokens, useCheckTotalUnallocatedTokens, useGetEntityById } from "@/hooks/subgraph/entity";
+import { useCheckTotalAllocatedTokens, useCheckTotalUnallocatedTokens, useGetEntityById, useGetEntityOwners } from "@/hooks/subgraph/entity";
 import { useDirectTokenTransfer } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
 import hasRole from "@/utils/role";
@@ -29,10 +29,14 @@ export default function DepartmentDetailsCard({
  
 
   const { data: entity, isLoading, isError, error } = useGetEntityById(cuid.id);
+
   
   const { unallocatedTokens } = useCheckTotalUnallocatedTokens(entity?.rewardManagement)
 
   const { totalAllocatedTokens } = useCheckTotalAllocatedTokens(entity?.rewardManagement)
+  //useGetEntityOwners get all the entity Owners
+  const { getEntityOwners } = useGetEntityOwners(entity?.entityId)
+
 
 
  
@@ -93,6 +97,7 @@ export default function DepartmentDetailsCard({
     role: process.env.NEXT_PUBLIC_MINTER_ROLE || "",
   });
   const hasTreasurerRole = typeof roleCheck === "boolean" ? roleCheck : false;
+console.log("hasTreasurerRole", hasTreasurerRole);
              
 
 
