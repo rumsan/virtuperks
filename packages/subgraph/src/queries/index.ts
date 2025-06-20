@@ -651,13 +651,11 @@ export const GetRewardManagement = `
     query GetDeployments {
       rewardManagementCreateds(first: 100, orderBy: blockTimestamp, orderDirection: desc) {
         id
-        rewardManagement
-        aclAddress
+        registry
+        entityId
         appId
         name
-       
-        
-        
+        rewardManagement
         blockNumber
         blockTimestamp
         transactionHash
@@ -665,11 +663,12 @@ export const GetRewardManagement = `
     }
   `;
  export const GetRewardManagementCreatedByAddress = `
-  query GetRewardManagementCreatedByAddress($rewardManagement: Bytes!) {
-    rewardManagementCreateds(where: { rewardManagement: $rewardManagement }) {
+  query GetRewardManagementCreatedByAddress($entityId: Bytes!) {
+    rewardManagementCreateds(where: { entityId: $entityId }) {
      id
         rewardManagement
-        aclAddress
+        registry
+        entityId
         appId
         name
          
@@ -695,6 +694,8 @@ export const GetRewardManagement = `
       }
   }
 `;
+
+
 
 
 

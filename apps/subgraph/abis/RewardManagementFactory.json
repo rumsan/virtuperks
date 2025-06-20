@@ -11,7 +11,7 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "aclAddress",
+        "name": "registry",
         "type": "address"
       },
       {
@@ -25,6 +25,12 @@
         "internalType": "string",
         "name": "name",
         "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "entityId",
+        "type": "bytes32"
       }
     ],
     "name": "RewardManagementCreated",
@@ -32,9 +38,22 @@
   },
   {
     "inputs": [
+      { "internalType": "bytes32", "name": "entityId", "type": "bytes32" },
       { "internalType": "bytes32", "name": "appId", "type": "bytes32" },
-      { "internalType": "string", "name": "name", "type": "string" },
-      { "internalType": "address", "name": "registry", "type": "address" }
+      { "internalType": "address", "name": "registry", "type": "address" },
+      {
+        "components": [
+          { "internalType": "string", "name": "name", "type": "string" },
+          {
+            "internalType": "address[]",
+            "name": "entityOwners",
+            "type": "address[]"
+          }
+        ],
+        "internalType": "struct IRewardManagementFactory.Entity",
+        "name": "entity",
+        "type": "tuple"
+      }
     ],
     "name": "createRewardManagement",
     "outputs": [],
@@ -42,15 +61,17 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "name": "deployedContracts",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "name": "entities",
+    "outputs": [{ "internalType": "string", "name": "name", "type": "string" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "getDeployedContracts",
+    "inputs": [
+      { "internalType": "bytes32", "name": "entityId", "type": "bytes32" }
+    ],
+    "name": "getEntityOwners",
     "outputs": [
       { "internalType": "address[]", "name": "", "type": "address[]" }
     ],
