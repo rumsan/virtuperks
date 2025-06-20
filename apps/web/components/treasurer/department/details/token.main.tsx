@@ -1,4 +1,4 @@
-import { useGetAllEntity } from "@/hooks/subgraph/entity";
+import { useCheckTotalUnallocatedTokens,useCheckTotalAllocatedTokens, useGetAllEntity, useGetEntityById } from "@/hooks/subgraph/entity";
 import { DepartmentDetails } from "@workspace/sdk/type";
 import {
   Card,
@@ -17,14 +17,17 @@ interface TokenCreateMainProps {
 }
 
 const TokenCreateMain = ({ router, id }: TokenCreateMainProps) => {
-  const getAllEntity = useGetAllEntity();
-  const departmentList =
-    getAllEntity?.data?.data?.entityTaskManagerCreateds || [];
+ 
 
-  // Find the department by id
-  const department: DepartmentDetails | undefined = departmentList.find(
-    (dept: DepartmentDetails) => dept.id === id.id,
-  );
+  const { data: entity, isLoading, isError, error } = useGetEntityById(id.id);
+ 
+  
+
+   const { unallocatedTokens } = useCheckTotalUnallocatedTokens(entity?.rewardManagement)
+  
+  const { totalAllocatedTokens  }   = useCheckTotalAllocatedTokens(entity?.rewardManagement)
+  
+
 
   return (
     <main className="gap-2 p-4 sm:px-8 md:gap-8 w-full">
@@ -87,7 +90,7 @@ const TokenCreateMain = ({ router, id }: TokenCreateMainProps) => {
           </CardHeader>
 
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {department?.totalTokenBalance}
+            {totalAllocatedTokens ?? "0"}
           </CardFooter>
         </Card>
 
@@ -105,7 +108,7 @@ const TokenCreateMain = ({ router, id }: TokenCreateMainProps) => {
           </CardHeader>
 
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {department?.remainingTokenBalance}
+            {unallocatedTokens ?? "0"}
           </CardFooter>
         </Card>
 
@@ -121,7 +124,7 @@ const TokenCreateMain = ({ router, id }: TokenCreateMainProps) => {
           </CardHeader>
 
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {department?.name}
+            {entity?.name}
           </CardFooter>
         </Card>
       </div>

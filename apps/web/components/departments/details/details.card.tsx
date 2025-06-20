@@ -1,5 +1,5 @@
 import { DialogButton } from "@/components/common/ui/dialog";
-import { useGetEntityById } from "@/hooks/subgraph/entity";
+import { useCheckTotalAllocatedTokens, useCheckTotalUnallocatedTokens, useGetEntityById } from "@/hooks/subgraph/entity";
 import { useDirectTokenTransfer } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
 import hasRole from "@/utils/role";
@@ -29,6 +29,12 @@ export default function DepartmentDetailsCard({
  
 
   const { data: entity, isLoading, isError, error } = useGetEntityById(cuid.id);
+  
+  const { unallocatedTokens } = useCheckTotalUnallocatedTokens(entity?.rewardManagement)
+
+  const { totalAllocatedTokens } = useCheckTotalAllocatedTokens(entity?.rewardManagement)
+
+
  
   
 
@@ -204,7 +210,7 @@ export default function DepartmentDetailsCard({
             </CardTitle>
           </CardHeader>
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {entity.totalMintedTokens ?? "-"}
+            {totalAllocatedTokens ?? "-"}
           </CardFooter>
         </Card>
         <Card className="font-normal text-base h-40 flex flex-col">
@@ -214,7 +220,7 @@ export default function DepartmentDetailsCard({
             </CardTitle>
           </CardHeader>
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {entity.totalAvailableTokens ?? "-"}
+            {unallocatedTokens ?? "-"}
           </CardFooter>
         </Card>
         <Card className="font-normal text-base h-40 flex flex-col">
