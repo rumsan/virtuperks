@@ -1,16 +1,14 @@
 import { Client, fetchExchange } from '@urql/core';
 import {
   AppRegistryQueries,
-  
-  GetRewardManagement,
-GetRewardManagementCreatedByAddress,
-
   GetCombineParticipantsByTask,
 
 
   getParticipantTasks,
-
-
+  GetRewardManagement,
+  GetRewardManagementCreatedByAddress,
+  GetRewardManagementDisbursements,
+  GetRewardManagementTokenTransfers,
   getTaskCreatedById,
   getTaskCreation,
   RewardManagementQueries,
@@ -64,9 +62,6 @@ export class SubgraphService {
   async getTaskById(id: string) {
     const { data, error } = await this.subgraphQuery.query(getTaskCreatedById, { id })
     return { data, error }
-
-
-
   }
   
   
@@ -76,7 +71,6 @@ export class SubgraphService {
 
   async getCombineParticipantsByTask(taskId: string) {
     try {
-
       const { data, error } = await this.subgraphQuery.query(
         GetCombineParticipantsByTask,
         { taskId }
@@ -140,30 +134,52 @@ export class SubgraphService {
   }
 
   async getParticipantTasks(participantAddress: string) {
-   
-  
     try {
-
       const { data, error } = await this.subgraphQuery.query(
         getParticipantTasks,
         { participant: participantAddress }
       )
       return { data, error }
-
-
     } catch (error) {
 
       console.error('Error fetching rewardManagementCreated by address:', error);
       return { data: null, error };
-
-
     }
-  
-  
-
-  
   }
 
 
-
+  
+  async getRewardManagementTokenTransfers(rewardManagementAddress: string) {
+    try {
+      const { data, error } = await this.subgraphQuery.query(
+        GetRewardManagementTokenTransfers,
+        { rewardManagement: rewardManagementAddress }
+      );
+      return { data, error };
+    } catch (error) {
+      console.error(
+        `Error fetching token transfers for reward management address: ${rewardManagementAddress}`,
+        error
+      );
+      return { data: null, error };
+    }
+  }
+  
+  async getRewardManagementDisbursements(rewardManagementAddress: string) {
+    try {
+      const { data, error } = await this.subgraphQuery.query(
+        GetRewardManagementDisbursements,
+        { rewardManagement: rewardManagementAddress }
+      );
+      return { data, error };
+    } catch (error) {
+      console.error(
+        `Error fetching disbursements for reward management address: ${rewardManagementAddress}`,
+        error
+      );
+      return { data: null, error };
+    }
+  }
+  
+  
 }
