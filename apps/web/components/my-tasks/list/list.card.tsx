@@ -1,4 +1,3 @@
-import { PATHS } from "@/routes/paths";
 import { formatDate } from "@/utils/formatDate";
 import { Table } from "@tanstack/react-table";
 import { TaskCreated } from "@workspace/sdk/type";
@@ -30,10 +29,10 @@ const TaskPortalCard = <TData,>({
           <Card
             key={task.taskDetail.id}
             className="w-full cursor-pointer p-4"
-            onClick={() =>
-              task.taskDetail.id &&
-              router.push(PATHS.TASKPORTAL.DETAILS(task.taskDetail.id))
-            }
+            // onClick={() =>
+            //   task.taskDetail.id &&
+            //   router.push(PATHS.TASKPORTAL.DETAILS(task.taskDetail.id))
+            // }
           >
             <CardTitle className="flex flex-col gap-1 w-full">
               <div className="flex items-center gap-2">
