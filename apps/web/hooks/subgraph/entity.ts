@@ -118,8 +118,10 @@ export const useRewardTokenMint = () => {
 };
 
 
-export const useCheckTotalUnallocatedTokens = (entityId:string) => {
+export const useCheckTotalUnallocatedTokens = (entityId: string) => {
+ console.log(entityId, "entityId in useCheckTotalUnallocatedTokens");
   const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
+  console.log(tokenAddress, "tokenAddress in useCheckTotalUnallocatedTokens");
   
   const {
     data,
@@ -129,6 +131,7 @@ export const useCheckTotalUnallocatedTokens = (entityId:string) => {
     address: entityId as `0x${string}`,
     args: [tokenAddress],
   });
+  console.log(data, "data in useCheckTotalUnallocatedTokens");
  
 
   return {
