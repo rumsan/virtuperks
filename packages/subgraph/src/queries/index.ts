@@ -651,14 +651,11 @@ export const GetRewardManagement = `
     query GetDeployments {
       rewardManagementCreateds(first: 100, orderBy: blockTimestamp, orderDirection: desc) {
         id
-        rewardManagement
-        aclAddress
+        registry
+        entityId
         appId
         name
-        totalMintedTokens
-        totalAvailableTokens
-        
-        
+        rewardManagement
         blockNumber
         blockTimestamp
         transactionHash
@@ -666,16 +663,15 @@ export const GetRewardManagement = `
     }
   `;
  export const GetRewardManagementCreatedByAddress = `
-  query GetRewardManagementCreatedByAddress($rewardManagement: Bytes!) {
-    rewardManagementCreateds(where: { rewardManagement: $rewardManagement }) {
+  query GetRewardManagementCreatedByAddress($entityId: Bytes!) {
+    rewardManagementCreateds(where: { entityId: $entityId }) {
      id
         rewardManagement
-        aclAddress
+        registry
+        entityId
         appId
         name
-        totalMintedTokens
-        totalAvailableTokens
-        
+         
        tokenTransfers(first:30, orderBy: blockTimestamp, orderDirection: desc) {
         id
         token
@@ -698,6 +694,8 @@ export const GetRewardManagement = `
       }
   }
 `;
+
+
 
 
 
@@ -742,11 +740,11 @@ export const getParticipantTasks=`
 
 
   export const GetRewardManagementTokenTransfers = `
-  query GetRewardManagementCreatedByAddress($rewardManagement: Bytes!) {
+  query GetRewardManagementTokenTransfers($rewardManagement: Bytes!) {
     rewardManagementCreateds(where: { rewardManagement: $rewardManagement }) {
      id
         rewardManagement
-       tokenTransfers(first:2, orderBy: blockTimestamp, orderDirection: desc) {
+       tokenTransfers(first:100, orderBy: blockTimestamp, orderDirection: desc) {
         id
         token
         to
@@ -763,11 +761,11 @@ export const getParticipantTasks=`
 `;
 
 export const GetRewardManagementDisbursements = `
-  query GetRewardManagementCreatedByAddress($rewardManagement: Bytes!) {
+  query GetRewardManagementDisbursements($rewardManagement: Bytes!) {
     rewardManagementCreateds(where: { rewardManagement: $rewardManagement }) {
      id
         rewardManagement
-        disbursements(first:2, orderBy: blockTimestamp, orderDirection: desc) {
+        disbursements(first:100, orderBy: blockTimestamp, orderDirection: desc) {
         id
         taskId
         amount

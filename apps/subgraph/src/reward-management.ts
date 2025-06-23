@@ -1,4 +1,22 @@
-import { log } from "@graphprotocol/graph-ts";
+import { log } from "@graphprotocol/graph-ts"
+import {
+  AdditionalDisbursementToTask as AdditionalDisbursementToTaskEvent,
+  ContractPaused as ContractPausedEvent,
+  ContractUnpaused as ContractUnpausedEvent,
+  DisbursementToTask as DisbursementToTaskEvent,
+  EtherWithdrawn as EtherWithdrawnEvent,
+  ParticipantApplied as ParticipantAppliedEvent,
+  ParticipantRemovedFromWhitelist as ParticipantRemovedFromWhitelistEvent,
+  ParticipantWhitelisted as ParticipantWhitelistedEvent,
+  TaskAccepted as TaskAcceptedEvent,
+  TaskApproved as TaskApprovedEvent,
+  TaskClosed as TaskClosedEvent,
+  TaskCompleted as TaskCompletedEvent,
+  TaskCreated as TaskCreatedEvent,
+  TaskDetailsUpdated as TaskDetailsUpdatedEvent,
+  TaskVerified as TaskVerifiedEvent,
+  TokenTransferred as TokenTransferredEvent,
+} from "../generated/RewardManagement/RewardManagement"
 import {
   AdditionalDisbursementToTask,
   ContractPaused,
@@ -17,29 +35,10 @@ import {
   TaskDetailsUpdated,
   TaskIdMapping,
   TaskVerified,
-  TokenTransferred
-} from "../generated/schema";
-import {
-  AdditionalDisbursementToTask as AdditionalDisbursementToTaskEvent,
-  ContractPaused as ContractPausedEvent,
-  ContractUnpaused as ContractUnpausedEvent,
-  DisbursementToTask as DisbursementToTaskEvent,
-  EtherWithdrawn as EtherWithdrawnEvent,
-  ParticipantApplied as ParticipantAppliedEvent,
-  ParticipantRemovedFromWhitelist as ParticipantRemovedFromWhitelistEvent,
-  ParticipantWhitelisted as ParticipantWhitelistedEvent,
-  TaskAccepted as TaskAcceptedEvent,
-  TaskApproved as TaskApprovedEvent,
-  TaskClosed as TaskClosedEvent,
-  TaskCompleted as TaskCompletedEvent,
-  TaskCreated as TaskCreatedEvent,
-  TaskDetailsUpdated as TaskDetailsUpdatedEvent,
-  TaskVerified as TaskVerifiedEvent,
-  TokenTransferred as TokenTransferredEvent,
-} from "../generated/templates/RewardManagement/RewardManagement";
-import { fetchTaskDetails, updateParticipantTaskStatus } from "./utils";
-
-import { RewardManagement } from "../generated/templates/RewardManagement/RewardManagement";
+  TokenTransferred,
+} from "../generated/schema"
+import { RewardManagement } from "../generated/templates/RewardManagement/RewardManagement"
+import { fetchTaskDetails, updateParticipantTaskStatus } from "./utils"
 
 export function handleAdditionalDisbursementToTask(
   event: AdditionalDisbursementToTaskEvent,
@@ -96,25 +95,12 @@ export function handleDisbursementToTask(event: DisbursementToTaskEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
-
-  // Link to RewardManagement
+    // Link to RewardManagement
   let rewardManagement = RewardManagementCreated.load(event.address);
   if (rewardManagement != null) {
     entity.rewardManagement = rewardManagement.id;
-    // Update totalAvailableTokens (ensure non-negative)
-    if (rewardManagement.totalAvailableTokens >= event.params.amount) {
-      rewardManagement.totalAvailableTokens = rewardManagement.totalAvailableTokens.minus(
-        event.params.amount
-      );
-      rewardManagement.save();
-    } else {
-      log.warning("Insufficient available tokens for disbursement: {}", [
-        rewardManagement.id.toHexString(),
-      ]);
-    }
+    
   }
-
-
 
   entity.save()
 }
@@ -144,8 +130,7 @@ export function handleParticipantApplied(event: ParticipantAppliedEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
-
-  // Create TaskDetail entity first
+   // Create TaskDetail entity first
   let taskDetail = fetchTaskDetails(event.params.id, event.address);
   entity.taskDetail = taskDetail.id;
   
@@ -160,6 +145,8 @@ export function handleParticipantApplied(event: ParticipantAppliedEvent): void {
     event.block.timestamp, 
     taskDetail ? taskDetail.id : null
   );
+
+ 
 }
 
 export function handleParticipantRemovedFromWhitelist(
@@ -206,6 +193,7 @@ export function handleTaskAccepted(event: TaskAcceptedEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+
    // Create TaskDetail entity first
   let taskDetail = fetchTaskDetails(event.params.id, event.address);
   entity.taskDetail = taskDetail.id;
@@ -298,13 +286,11 @@ export function handleTaskCompleted(event: TaskCompletedEvent): void {
      taskDetail ? taskDetail.id : null,
      entity.completionUrl
   );
-  
 }
 
 export function handleTaskCreated(event: TaskCreatedEvent): void {
- 
 
-  // Create TaskCreated entity
+ // Create TaskCreated entity
   let entityId = event.transaction.hash.concatI32(event.logIndex.toI32());
   const entity = new TaskCreated(
    entityId
@@ -314,8 +300,6 @@ export function handleTaskCreated(event: TaskCreatedEvent): void {
   let rewardManagement = RewardManagementCreated.load(event.address);
  
   
-
-
 if (rewardManagement) {
     
   entity.rewardManagement = rewardManagement.id
@@ -345,6 +329,11 @@ let mapping = new TaskIdMapping(event.params.id)
   entity.transactionHash = event.transaction.hash;
 
   entity.save();
+
+
+
+
+ 
 }
 
 export function handleTaskDetailsUpdated(event: TaskDetailsUpdatedEvent): void {
@@ -373,7 +362,7 @@ export function handleTaskVerified(event: TaskVerifiedEvent): void {
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
 
-   // Create TaskDetail entity first
+// Create TaskDetail entity first
   let taskDetail = fetchTaskDetails(event.params.id, event.address);
   entity.taskDetail = taskDetail.id;
 
@@ -427,21 +416,11 @@ export function handleTokenTransferred(event: TokenTransferredEvent): void {
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
 
-
- let rewardManagement = RewardManagementCreated.load(event.address);
+  let rewardManagement = RewardManagementCreated.load(event.address);
   if (rewardManagement != null) {
     entity.rewardManagement = rewardManagement.id;
     // Update totalAvailableTokens (ensure non-negative)
-    if (rewardManagement.totalAvailableTokens >= event.params.amount) {
-      rewardManagement.totalAvailableTokens = rewardManagement.totalAvailableTokens.minus(
-        event.params.amount
-      );
-      rewardManagement.save();
-    } else {
-      log.warning("Insufficient available tokens for transfer: {}", [
-        rewardManagement.id.toHexString(),
-      ]);
-    }
+   
   }
 
   entity.save()

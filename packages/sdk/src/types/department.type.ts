@@ -1,7 +1,7 @@
 import { TaskCreated } from "./task.type";
 
 export interface DepartmentDetails {
-  aclAddress: string;
+  registry: string;
   blockNumber: string;
   blockTimestamp: string;
   id: string;
@@ -11,6 +11,7 @@ export interface DepartmentDetails {
   __typename: string;
   _appId: string;
   name: string;
+  entityId: string;
   tasks: TaskCreated[];
   rewardManagement: string;
 }

@@ -92,6 +92,7 @@ export const useGetTokenTransfers = (
         await queryService.getRewardManagementTokenTransfers(
           rewardManagementAddress,
         );
+      console.log("Data Transfer: ", data);
 
       if (error) {
         throw new Error(
@@ -122,6 +123,7 @@ export const useGetDisbursements = (
         await queryService.getRewardManagementDisbursements(
           rewardManagementAddress,
         );
+      console.log("Data Disbursement: ", data);
 
       if (error) {
         throw new Error(

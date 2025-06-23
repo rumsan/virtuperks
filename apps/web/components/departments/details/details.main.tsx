@@ -23,16 +23,15 @@ export default function DepartmentDetails({
   router,
 }: DepartmentDetailsProps) {
   const { data, isLoading, isError, error } = useGetEntityById(cuid.id);
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
   const [activeTab, setActiveTab] = useState<"direct" | "task">("direct");
 
   const transferColumns = useColumns("transfer");
   const disbursementColumns = useColumns("disbursement");
-
-  const [pagination, setPagination] = React.useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
 
   return (
     <main className="gap-2 p-4 sm:px-8 md:gap-8">
@@ -51,9 +50,9 @@ export default function DepartmentDetails({
         <>
           <DepartmentDetailsCard cuid={cuid} router={router} />
           <DepartmentDetailsTable
-            cuid={cuid}
-            pagination={pagination}
+            cuid={data.rewardManagement}
             setPagination={setPagination}
+            pagination={pagination}
             filterTab={activeTab}
             setFilterTab={setActiveTab}
           />

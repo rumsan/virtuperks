@@ -13,6 +13,8 @@ import { isAddress, keccak256 } from "viem";
 import { useWriteContract } from "wagmi";
 import { TaskFormData, taskSchema } from "./schema";
 import TaskBaseForm from "./task.form";
+import {createId} from "@paralleldrive/cuid2"
+import { toUtf8Bytes } from "ethers";
 
 const defaultValues = {
   name: "",
@@ -57,7 +59,10 @@ export default function TaskAdd({ router }: TaskAddProps) {
       console.error("Invalid Ethereum address:", data.entityAddress);
       return;
     }
-    const taskId = keccak256(data.name);
+    const cuid = createId()
+    const taskId = keccak256(toUtf8Bytes(cuid)); // Generate a unique ID for the task
+    //update this to cuid or parallet drive
+  
     
 
     const { detailsUrl, rewardToken, owner, isOpen, name } = data;

@@ -1,5 +1,3 @@
-"use client";
-
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import { ListTable } from "@/components/common/list/list.table";
 import {
@@ -41,14 +39,17 @@ const DepartmentDetailsTable = <T extends { type?: string }>({
   filterTab,
   setFilterTab,
 }: ListTableProps<T>) => {
-  const { data: disbursementData } = useGetDisbursements(cuid.id);
-  const { data: tokenTransferData } = useGetTokenTransfers(cuid.id);
+  const { data: disbursementData } = useGetDisbursements(cuid);
+  const { data: tokenTransferData } = useGetTokenTransfers(cuid);
 
   const transferList =
     tokenTransferData?.rewardManagementCreateds?.[0]?.tokenTransfers ?? [];
 
   const disbursementList =
     disbursementData?.rewardManagementCreateds?.[0]?.disbursements ?? [];
+
+  console.log("Transfer List: ", transferList);
+  console.log("Disbursement List: ", disbursementData);
 
   const transferColumns = useColumns("transfer");
   const disbursementColumns = useColumns("disbursement");
@@ -58,6 +59,7 @@ const DepartmentDetailsTable = <T extends { type?: string }>({
     columns: transferColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    pageCount: Math.ceil(transferList.length / pagination.pageSize),
     state: { pagination },
     onPaginationChange: setPagination,
   });
@@ -67,6 +69,7 @@ const DepartmentDetailsTable = <T extends { type?: string }>({
     columns: disbursementColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    pageCount: Math.ceil(disbursementList.length / pagination.pageSize),
     state: { pagination },
     onPaginationChange: setPagination,
   });

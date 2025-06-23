@@ -14,9 +14,13 @@ import { useForm } from "react-hook-form";
 import { useWriteContract } from "wagmi";
 import DepartmentBaseForm from "./department.form";
 import { Department, departmentSchema } from "./schema";
+import { createId } from "@paralleldrive/cuid2";
+import { keccak256 } from "viem";
+import { toUtf8Bytes } from "ethers";
 
 const defaultValues: Department = {
   name: "",
+  entityOwners: [],
 };
 
 type DepartmentAddProps = {
@@ -51,7 +55,8 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
   const createEntityButton = async (data: Department) => {
     if (departmentPending) return;
     try {
-      departmentAdd({ name: data.name || "" });
+     
+      departmentAdd( data);
     } catch (err) {
       console.error("Failed to create entity:", err);
     }

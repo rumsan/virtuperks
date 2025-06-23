@@ -30,18 +30,10 @@ export function handleTransfer(event: TransferEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
-
-
   if (event.params.from.toHexString() == "0x0000000000000000000000000000000000000000") {
     let rewardManagement = RewardManagementCreated.load(event.params.to);
     if (rewardManagement != null) {
       
-      rewardManagement.totalMintedTokens = rewardManagement.totalMintedTokens.plus(
-        event.params.value
-      );
-      rewardManagement.totalAvailableTokens = rewardManagement.totalAvailableTokens.plus(
-        event.params.value
-      );
       rewardManagement.save();
       entity.rewardManagement = rewardManagement.id;
     }

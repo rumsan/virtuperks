@@ -13,6 +13,7 @@ export default function DepartmentEdit() {
   const defaultValues: Department = {
     name: "Hello Hello",
     appId: "0x0ehfrhf94840t05059n",
+    entityOwners:[]
   };
 
   const form = useForm<Department>({

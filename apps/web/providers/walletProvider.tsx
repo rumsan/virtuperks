@@ -3,8 +3,14 @@
 
 import { PATHS } from "@/routes/paths";
 import { useRouter } from "next/navigation";
-import { ReactNode, createContext, useContext, useEffect, useState } from "react";
-import { injected, useAccount, useConnect } from "wagmi";
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { useAccount } from "wagmi";
 
 interface WalletContextType {
   isConnected: boolean;
@@ -17,30 +23,30 @@ const WalletContext = createContext<WalletContextType>({
 });
 
 export const WalletProvider = ({ children }: { children: ReactNode }) => {
-    const { address, isConnected } = useAccount();
-      
+  const { address, isConnected } = useAccount();
+
   const router = useRouter();
-    const [wasConnected, setWasConnected] = useState(false);
-    const [initialCheckDone, setInitialCheckDone] = useState(false);
+  const [wasConnected, setWasConnected] = useState(false);
+  const [initialCheckDone, setInitialCheckDone] = useState(false);
 
-
-    useEffect(() => {
-        if (!initialCheckDone) {
+  useEffect(() => {
+    if (!initialCheckDone) {
       if (!isConnected) {
-        console.log('Initial load: No wallet connected, redirecting to task portal');
-        router.push(PATHS.TASKPORTAL.HOME);
+        console.log(
+          "Initial load: No wallet connected, redirecting to task portal",
+        );
+        // router.push(PATHS.TASKPORTAL.HOME);
       }
       setInitialCheckDone(true);
       setWasConnected(isConnected);
       return;
     }
-        
-    
+
     // If user was connected and now isn't, redirect to task_portal
     if (wasConnected && !isConnected) {
       router.push(PATHS.TASKPORTAL.HOME);
     }
-    
+
     // Update wasConnected state when connection status changes
     setWasConnected(isConnected);
   }, [isConnected, router, address, initialCheckDone]);
@@ -49,14 +55,9 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     isConnected,
     address,
   };
-    
-
-  
 
   return (
-    <WalletContext.Provider value={value}>
-      {children}
-    </WalletContext.Provider>
+    <WalletContext.Provider value={value}>{children}</WalletContext.Provider>
   );
 };
 

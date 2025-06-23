@@ -15,31 +15,43 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { PropsWithChildren, useState } from "react";
+import { usePathname } from "next/navigation";
+import { PropsWithChildren } from "react";
 import { NavItem } from "../../../type/nav.types";
+import { navItemPaths } from "./navItemPaths";
 
 export default function UnifiedNav({ children }: PropsWithChildren) {
-  const [activeNavBar, setActiveNavBar] = useState<NavItem>(
-    NavItem.TASK_PORTAL,
-  );
+  const pathname = usePathname();
+  console.log("Active Page: ", pathname);
 
-  const handleNavClick = (nav: NavItem) => {
-    setActiveNavBar(nav);
-  };
+  const getNavItemClasses = (navItem: NavItem) => {
+    const paths = navItemPaths[navItem];
 
-  const getNavItemClasses = (nav: NavItem) => {
-    return activeNavBar === nav
+    return paths.some((path) => {
+      if (path === "/task_portal") {
+        return (
+          pathname === "/task_portal" ||
+          (pathname.startsWith("/task_portal/") &&
+            pathname !== "/task_portal/mine")
+        );
+      }
+      if (path === "/task_portal/mine") {
+        return pathname === "/task_portal/mine";
+      }
+      return pathname === path || pathname.startsWith(`${path}/`);
+    })
       ? "text-[#297AD6] border-b-2 border-[#297AD6]"
       : "text-[#1E293B] hover:text-[#1e293b]";
   };
+
   return (
     <header className="border-b bg-white">
       <div className="flex h-14 items-center px-4 gap-8 border-b-2 border-[#E2E8F0]">
+        {/* Logo */}
         <nav className="flex items-center justify-center w-[50px] h-full">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href={NavItem.TASK_PORTAL}>
             <Image
               src="/bg/rumsan-logo.png"
-              onClick={() => handleNavClick(NavItem.TASK_PORTAL)}
               width={50}
               height={50}
               alt="Logo"
@@ -47,11 +59,11 @@ export default function UnifiedNav({ children }: PropsWithChildren) {
           </Link>
         </nav>
 
+        {/* Navigation */}
         <nav className="flex items-center gap-6 h-full">
           <Link
             href="/participants"
-            onClick={() => handleNavClick(NavItem.PARTICIPANTs)}
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.PARTICIPANTs)}`}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.PARTICIPANTS)}`}
           >
             <LayoutDashboard size={18} strokeWidth={2.65} />
             Participants
@@ -59,7 +71,6 @@ export default function UnifiedNav({ children }: PropsWithChildren) {
 
           <Link
             href="/departments"
-            onClick={() => handleNavClick(NavItem.DEPARTMENTS)}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.DEPARTMENTS)}`}
           >
             <Coins size={18} strokeWidth={2.65} />
@@ -68,15 +79,14 @@ export default function UnifiedNav({ children }: PropsWithChildren) {
 
           <Link
             href="/tasks"
-            onClick={() => handleNavClick(NavItem.TASKS)}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASKS)}`}
           >
             <Layers size={18} strokeWidth={2.65} />
             Task Management
           </Link>
+
           <Link
             href="/treasurer/token"
-            onClick={() => handleNavClick(NavItem.TREASURER_TOKEN)}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TREASURER_TOKEN)}`}
           >
             <Layers size={18} strokeWidth={2.65} />
@@ -84,10 +94,10 @@ export default function UnifiedNav({ children }: PropsWithChildren) {
           </Link>
         </nav>
 
+        {/* Right Side */}
         <div className="ml-auto flex items-center gap-4 h-full">
           <Link
             href="/task_portal"
-            onClick={() => handleNavClick(NavItem.TASK_PORTAL)}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASK_PORTAL)}`}
           >
             <LayoutList size={18} strokeWidth={2.65} />
@@ -96,7 +106,6 @@ export default function UnifiedNav({ children }: PropsWithChildren) {
 
           <Link
             href="/task_portal/mine"
-            onClick={() => handleNavClick(NavItem.MY_TASKS)}
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.MY_TASKS)}`}
           >
             <LayoutList size={18} strokeWidth={2.65} />
@@ -117,6 +126,7 @@ export default function UnifiedNav({ children }: PropsWithChildren) {
         </div>
       </div>
 
+      {/* Page Content */}
       <div className="h-[calc(100dvh-60px)] overflow-auto">{children}</div>
     </header>
   );
