@@ -16,6 +16,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
+import { AlertCircle } from "lucide-react";
 import { Dispatch, SetStateAction } from "react";
 import { useColumns } from "./details.column";
 
@@ -49,7 +50,7 @@ const DepartmentDetailsTable = <T extends { type?: string }>({
     disbursementData?.rewardManagementCreateds?.[0]?.disbursements ?? [];
 
   console.log("Transfer List: ", transferList);
-  console.log("Disbursement List: ", disbursementData);
+  console.log("Disbursement List: ", disbursementList);
 
   const transferColumns = useColumns("transfer");
   const disbursementColumns = useColumns("disbursement");
@@ -108,25 +109,51 @@ const DepartmentDetailsTable = <T extends { type?: string }>({
 
         <TabsContent value="direct">
           <Card className="p-4">
-            <ListTable table={directTable} columns={transferColumns} />
-            <hr />
-            <DataTablePagination
-              table={directTable}
-              pagination={pagination}
-              setPagination={setPagination}
-            />
+            {transferList.length === 0 ? (
+              <div className="text-gray-500 text-center py-6 flex flex-col items-center gap-2">
+                <AlertCircle className="text-gray-400" size={32} />
+                <p>No direct token transfers found.</p>
+                <p className="text-sm text-gray-400 max-w-md">
+                  This department has not transfered any token yet.
+                </p>
+              </div>
+            ) : (
+              <>
+                <ListTable table={directTable} columns={transferColumns} />
+                <hr />
+                <DataTablePagination
+                  table={directTable}
+                  pagination={pagination}
+                  setPagination={setPagination}
+                />
+              </>
+            )}
           </Card>
         </TabsContent>
 
         <TabsContent value="task">
           <Card className="p-4">
-            <ListTable table={taskTable} columns={disbursementColumns} />
-            <hr />
-            <DataTablePagination
-              table={taskTable}
-              pagination={pagination}
-              setPagination={setPagination}
-            />
+            {disbursementList.length === 0 ? (
+              <div className="text-gray-500 text-center py-6 flex flex-col items-center gap-2">
+                <AlertCircle className="text-gray-400" size={32} />
+                <p>No task token disbursements found.</p>
+                <p className="text-sm text-gray-400 max-w-md">
+                  This department has not disbursed any tokens through
+                  task-based allocations. Task token disbursements are issued as
+                  rewards for completing assigned work or bounties.
+                </p>
+              </div>
+            ) : (
+              <>
+                <ListTable table={taskTable} columns={disbursementColumns} />
+                <hr />
+                <DataTablePagination
+                  table={taskTable}
+                  pagination={pagination}
+                  setPagination={setPagination}
+                />
+              </>
+            )}
           </Card>
         </TabsContent>
       </Tabs>
