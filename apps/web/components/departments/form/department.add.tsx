@@ -7,6 +7,7 @@ import { Card, CardContent } from "@workspace/ui/components/card";
 import { PATHS } from "@/routes/paths";
 // import { EntityFactoryABI } from "@workspace/contracts/abis";
 import { useDepartmentAdd } from "@/hooks/subgraph/entity";
+import { useToast } from "@workspace/ui/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useEffect } from "react";
@@ -14,9 +15,6 @@ import { useForm } from "react-hook-form";
 import { useWriteContract } from "wagmi";
 import DepartmentBaseForm from "./department.form";
 import { Department, departmentSchema } from "./schema";
-import { createId } from "@paralleldrive/cuid2";
-import { keccak256 } from "viem";
-import { toUtf8Bytes } from "ethers";
 
 const defaultValues: Department = {
   name: "",
@@ -35,13 +33,22 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
 
   const { writeContractAsync, isPending, isSuccess, isError, error } =
     useWriteContract();
+  const { departmentAdd, departmentPending, departmentSuccess } =
+    useDepartmentAdd();
+  const { toast } = useToast();
 
+  console.log("Sucess Status: ", isSuccess);
   // Handle success and redirect
   useEffect(() => {
-    if (isSuccess) {
+    if (departmentSuccess) {
+      toast({
+        title: "Department Created Successfully!",
+        variant: "success",
+      });
+
       router.push(PATHS.DEPARTMENT.HOME);
     }
-  }, [isSuccess, router]);
+  }, [departmentSuccess, router, toast]);
 
   // Handle error with console log
   useEffect(() => {
@@ -49,14 +56,11 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
       console.error("Transaction failed:", error);
     }
   }, [isError, error]);
-  const { departmentAdd, departmentPending, departmentSuccess } =
-    useDepartmentAdd();
 
   const createEntityButton = async (data: Department) => {
     if (departmentPending) return;
     try {
-     
-      departmentAdd( data);
+      departmentAdd(data);
     } catch (err) {
       console.error("Failed to create entity:", err);
     }
