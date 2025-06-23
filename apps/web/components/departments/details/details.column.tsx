@@ -1,92 +1,79 @@
-import { formatDate } from "@/utils/formatDate";
 import { ColumnDef } from "@tanstack/react-table";
 
-interface RowData {
-  taskDetail: {
-    detailsUrl: string;
-    rewardAmount: number;
-    isActive: boolean;
-    expiryDate: number;
-  };
-  createdBy: string;
-  tresurerName: string;
-  date: string;
-  tokens: number;
+type TableType = "transfer" | "disbursement";
+
+interface TransferRow {
+  id: string;
+  token: string;
+  to: string;
+  remarks?: string;
+  amount: string;
+  transferredBy: string;
 }
 
-export function useColumns<T extends RowData>(): ColumnDef<T>[] {
+interface DisbursementRow {
+  id: string;
+  amount: string;
+  disbursedBy: string;
+  recipient: string;
+  purpose?: string;
+}
+
+export function useColumns(type: TableType): ColumnDef<any>[] {
+  if (type === "transfer") {
+    console.log("Type: ", type);
+    return [
+      {
+        accessorKey: "remarks",
+        header: "Remarks",
+        cell: ({ row }) => (
+          <span className="text-sm">{row.original.remarks ?? "N/A"}</span>
+        ),
+      },
+      {
+        accessorKey: "amount",
+        header: "Amount",
+        cell: ({ row }) => (
+          <span className="text-sm">{row.original.amount}</span>
+        ),
+      },
+      {
+        accessorKey: "id",
+        header: "Transfer ID",
+        cell: ({ row }) => {
+          const id = row.original.id;
+          const formattedId = id
+            ? `${id.slice(0, 20)}...${id.slice(-5)}`
+            : "N/A";
+          return <span className="text-sm">{formattedId}</span>;
+        },
+      },
+
+      {
+        accessorKey: "to",
+        header: "To",
+        cell: ({ row }) => <span className="text-sm">{row.original.to}</span>,
+      },
+    ];
+  }
+  // Disbursement Columns
   return [
     {
-      accessorKey: "createdBy",
-      header: () => (
-        <div className="text-left text-gray-600 font-bold">Title</div>
-      ),
-
-      cell: ({ row }) => {
-        const getTaskName = row.original.taskDetail.detailsUrl;
-
-        return (
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-700">{getTaskName}</span>
-          </div>
-        );
-      },
+      accessorKey: "id",
+      header: "Disbursement ID",
+      cell: ({ row }) => <span className="text-sm">{row.original.id}</span>,
     },
     {
-      accessorKey: "Reward Amount",
-      header: () => (
-        <div className="text-left text-gray-600 font-bold">Reward Amount</div>
-      ),
-
-      cell: ({ row }) => {
-        const getAmount = row.original.taskDetail.rewardAmount;
-        return <p className="text-sm text-gray-700">{getAmount} RTH</p>;
-      },
+      accessorKey: "amount",
+      header: "Amount",
+      cell: ({ row }) => <span className="text-sm">{row.original.amount}</span>,
     },
     {
-      accessorKey: "date",
-      header: () => (
-        <div className="text-left text-gray-600 font-bold">Expire Date</div>
+      accessorKey: "disbursedBy",
+      header: "Disbursed By",
+      cell: ({ row }) => (
+        <span className="text-sm">{row.original.disbursedBy}</span>
       ),
-
-      cell: ({ row }) => {
-        const getData = row.original.taskDetail.expiryDate;
-        const formattedData = formatDate(getData);
-
-        return <p className="text-sm text-gray-700">{formattedData}</p>;
-      },
     },
-    {
-      accessorKey: "tokens",
-      header: () => (
-        <div className="text-left text-gray-600 font-bold">Status</div>
-      ),
-      cell: ({ row }) => {
-        const getStatus = row.original.taskDetail.isActive;
-        return (
-          <p
-            className={`text-sm ${
-              getStatus ? "text-green-600" : "text-red-800"
-            }`}
-          >
-            {getStatus ? "Active" : "Inactive"}
-          </p>
-        );
-      },
-    },
-    // {
-    //   id: "actions",
-    //   header: () => (
-    //     <div className="text-left text-gray-600 font-bold">Action</div>
-    //   ),
-    //   enableHiding: false,
-    //   cell: () => {
-    //     return (
-    //       <p>
-    //         <Eye />
-    //       </p>
-    //     );
-    //   },
-    // },
   ];
 }
