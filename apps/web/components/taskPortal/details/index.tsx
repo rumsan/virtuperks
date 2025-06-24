@@ -14,6 +14,7 @@ import {
 import { useGetTaskById } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
+import { Skeleton } from "@workspace/ui/components/skeleton";
 import { useToast } from "@workspace/ui/hooks/use-toast";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
@@ -38,7 +39,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
   const { toast } = useToast();
   const taskData = getTaskDetail?.data?.data?.taskCreated;
- 
 
   const { participateTask, participatePending, participateSuccess } =
     useParticipateTaskMutation();
@@ -50,7 +50,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
       taskData?.rewardManagement?.rewardManagement,
     );
   console.log("Participant Status:", participantStatus);
-
 
   const handleApplyTask = async () => {
     if (!isConnected) {
@@ -81,7 +80,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
               variant: "destructive",
             });
           },
-        }
+        },
       );
     } catch (error) {
       console.error("Error in application:", error);
@@ -112,7 +111,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
               variant: "destructive",
             });
           },
-        }
+        },
       );
     } catch (error) {
       console.error("Error completing task:", error);
@@ -131,13 +130,12 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
     // Convert localButtonState to number if it's a string
     const effectiveStatus = localButtonState ?? participantStatus;
-   console.log(effectiveStatus, 'effectiveStatus');
+    console.log(effectiveStatus, "effectiveStatus");
 
     switch (effectiveStatus) {
-      
       case 0: // NONE
         return (
-          <Button 
+          <Button
             className="bg-[#297AD6]"
             onClick={handleApplyTask}
             disabled={participatePending}
@@ -155,7 +153,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             )}
           </Button>
         );
-case "WAITING":
+      case "WAITING":
       case 1: // PENDING
         return (
           <Button className="bg-[#F59E0B]" disabled>
@@ -166,7 +164,7 @@ case "WAITING":
       case 2: // ACCEPTED
         return (
           <>
-            <Button 
+            <Button
               className="bg-green-500"
               onClick={() => setIsOpen(true)}
               disabled={completePending}
@@ -193,8 +191,8 @@ case "WAITING":
             )}
           </>
         );
-      
-       case "COMPLETED":
+
+      case "COMPLETED":
       case 3:
         return (
           <Button
@@ -207,15 +205,42 @@ case "WAITING":
       case "VERIFIED":
       case 4: // verified
         return (
-       <Button className="bg-[#22C55E]" disabled>
-  <span className="text-[#F8FAFC]">Verified</span>
-</Button>
+          <Button className="bg-[#22C55E]" disabled>
+            <span className="text-[#F8FAFC]">Verified</span>
+          </Button>
         );
 
       default:
         return null;
     }
   };
+
+  if (getTaskDetail.isLoading) {
+    return (
+      <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full flex flex-col">
+        <div className="space-y-4 flex-grow">
+          <div className="flex items-center gap-2 my-3">
+            <Skeleton className="h-6 w-24" /> {/* Back button skeleton */}
+          </div>
+
+          <div className="flex justify-between items-center">
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-10 w-48" /> {/* Title skeleton */}
+              <Skeleton className="h-4 w-64" /> {/* Subtitle skeleton */}
+            </div>
+            <Skeleton className="h-10 w-48" /> {/* Button skeleton */}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+            <Skeleton className="h-64 w-full rounded-lg" />{" "}
+            {/* Task details skeleton */}
+            <Skeleton className="h-64 w-full rounded-lg" />{" "}
+            {/* Participant skeleton */}
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">

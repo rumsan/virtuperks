@@ -1,7 +1,4 @@
-import { useGetAllEntity } from "@/hooks/subgraph/entity";
-import { useGetAllTask } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
-import hasRole from "@/utils/role";
 import { DepartmentDetails } from "@workspace/sdk/type";
 import {
   Card,
@@ -13,20 +10,13 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 
 interface DepartmentListCardProps {
   router: AppRouterInstance;
+  entityList: DepartmentDetails[];
 }
 
-const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
-  const getAllEntity = useGetAllEntity();
-
-  const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
- 
-  const getAllTask = useGetAllTask()
-
-
-  const hasEntityOwnerRole = hasRole({
-    role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
-  });
-
+const DepartmentListCard = ({
+  router,
+  entityList,
+}: DepartmentListCardProps) => {
   return (
     <div className="grid grid-cols-4 gap-4 w-full p-4">
       <Card
@@ -37,50 +27,40 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
         <Plus size={24} />
       </Card>
 
-      {entityList &&
-        entityList.map((department: DepartmentDetails) => {
-      
-          return (
-            <Card
-              key={department.id}
-              className="cursor-pointer hover:shadow-lg p-4"
-              onClick={() =>
-                router.push(
-                  PATHS.DEPARTMENT.DETAILS(department.entityId),
-                )
-              }
-            >
-              <CardTitle className="flex text-base">
-                <span className="text-[#334155]">{department.name}</span>
-
-                <span className="ml-auto w-[90px] flex items-center justify-center bg-[#F1F5F9] rounded-xl font-normal text-[#334155] text-sm">
-                  {department.name}
+      {entityList.map((department) => (
+        <Card
+          key={department.id}
+          className="cursor-pointer hover:shadow-lg p-4"
+          onClick={() =>
+            router.push(PATHS.DEPARTMENT.DETAILS(department.entityId))
+          }
+        >
+          <CardTitle className="flex text-base">
+            <span className="text-[#334155]">{department.name}</span>
+            <span className="ml-auto w-[90px] flex items-center justify-center bg-[#F1F5F9] rounded-xl font-normal text-[#334155] text-sm">
+              {department.name}
+            </span>
+          </CardTitle>
+          <CardDescription className="flex gap-2 text-sm">
+            <User size={20} strokeWidth={2.75} />
+            <span>{department.name}</span>
+          </CardDescription>
+          <div className="flex flex-col mr-auto gap-2 p-0 font-normal">
+            <div className="flex items-center justify-start">
+              <div className="flex items-center text-[#297AD6] gap-2">
+                <Coins size={20} strokeWidth={2.5} color="#297AD6" />
+                <span className="text-2xl font-bold">
+                  {department.totalAvailableTokens}
                 </span>
-              </CardTitle>
-              <CardDescription className="flex gap-2 text-sm">
-                <User size={20} strokeWidth={2.75} />
-                <span>{department.name}</span>
-              </CardDescription>
-              <div className="flex flex-col mr-auto gap-2 p-0 font-normal">
-                {/* <span className="flex text-[#64748B] mt-5">
-                  Available Tokens:
-                </span> */}
-                <div className="flex items-center justify-start">
-                  <div className="flex items-center text-[#297AD6] gap-2">
-                    <Coins size={20} strokeWidth={2.5} color="#297AD6" />
-                    <span className="text-2xl font-bold">
-                      {department.totalAvailableTokens}
-                    </span>
-                  </div>
-                  <div className="flex items-center ml-auto gap-2">
-                    <span className="text-[#297AD6]">View details</span>
-                    <ArrowRight size={24} strokeWidth={2} color="#297AD6" />
-                  </div>
-                </div>
               </div>
-            </Card>
-          );
-        })}
+              <div className="flex items-center ml-auto gap-2">
+                <span className="text-[#297AD6]">View details</span>
+                <ArrowRight size={24} strokeWidth={2} color="#297AD6" />
+              </div>
+            </div>
+          </div>
+        </Card>
+      ))}
     </div>
   );
 };
