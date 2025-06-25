@@ -66,7 +66,7 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
       <LoaderSkeleton
         titleWidth="w-56"
         subtitleWidth="w-72"
-        cardCount={10}
+        cardCount={7}
         gridCols="flex-col"
         cardHeight="h-20"
         showPagination

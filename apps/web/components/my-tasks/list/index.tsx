@@ -14,39 +14,49 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
+import {
+  Card,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@workspace/ui/components/tabs";
+import { CheckCircle, User, Users } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import React from "react";
-import { useConnect } from "wagmi";
+import React, { useState } from "react";
 import { useColumns } from "../details/details.column";
-import TaskPortalCard from "./list.card";
+import ListCardDetails from "./list.card";
+import { DatePickerWithRange } from "./list.date";
 
-interface TaskPortalMainProps {
+interface TaskListMainProps {
   router: AppRouterInstance;
 }
 
-export default function TaskPortalMain({ router }: TaskPortalMainProps) {
+export default function TaskListMain({ router }: TaskListMainProps) {
+  const [tabStatus, setTabStatus] = useState("active");
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
-
-  const { address, isConnected } = useWallet();
-
-  const { connect } = useConnect();
-
-  const { data: myTaskList, isLoading } = useGetTaskListByParticipant(
-    address as `0x${string}`,
-  );
-  const taskList = myTaskList?.data?.participantTaskStatuses;
-  console.log("Task List: ", taskList);
-
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
   });
+
+  const { address } = useWallet();
+  const { data: myTaskList, isLoading } = useGetTaskListByParticipant(
+    address as `0x${string}`,
+  );
+  const taskList = myTaskList?.data?.participantTaskStatuses;
+  console.log("Task List: ", myTaskList);
 
   const columns = useColumns();
 
@@ -69,51 +79,125 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
     },
   });
 
-  if (!isConnected || !address) {
-    return (
-      <main className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
-        <h1 className="font-bold text-4xl mb-6 text-gray-800">My Tasks</h1>
-        <div className="bg-white p-8 rounded-xl shadow-lg text-center max-w-md w-full border border-gray-200">
-          <p className="mb-6 text-gray-600 text-lg">
-            Please connect your MetaMask wallet to view your tasks.
-          </p>
-        </div>
-      </main>
-    );
-  }
-
   if (isLoading) {
     return (
       <LoaderSkeleton
+        title // h1: "My List"
         titleWidth="w-56"
+        subtitle // h3: "List of all the tasks..."
         subtitleWidth="w-72"
-        cardCount={10}
-        gridCols="flex-col"
-        cardHeight="h-20"
+        cardCount={3} // 3 summary cards in grid
+        gridCols="grid-cols-3"
+        cardHeight="h-24"
+        showTabs
+        tabsCount={2} // Participating, Owned
+        rowCount={5} // Simulated rows for ListCardDetails
+        rowHeight="h-20"
         showPagination
       />
     );
   }
 
   return (
-    <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full flex flex-col">
-      <div className="space-y-4 flex-grow">
-        <div className="flex flex-col gap-1 my-3">
-          <h1 className="font-bold text-4xl">Task Portal</h1>
-          <h3 className="text-gray-500 font-normal text-sm">
-            Overview of all the tasks
-          </h3>
+    <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full overflow-x-hidden">
+      <div className="space-y-4">
+        <div className="flex items-center mt-5">
+          <div className="flex flex-col w-[80%] gap-1">
+            <h1 className="font-bold text-3xl">My List</h1>
+            <h3 className="text-gray-500 font-normal text-sm">
+              List of all the tasks you participated in
+            </h3>
+          </div>
         </div>
 
-        <TaskPortalCard table={table} router={router} />
+        <div className="grid grid-cols-4 mt-1 gap-4 w-full">
+          <Card className="font-normal text-base h-25 flex flex-col">
+            <CardHeader className="flex-grow">
+              <CardTitle className="flex items-center gap-2 p-0 mb-2 text-[#0F172A]">
+                <User className="text-blue-500" size={20} />
+                Owned
+              </CardTitle>
+              <CardFooter className="text-blue-500 text-2xl font-bold">
+                {"10"}
+              </CardFooter>
+            </CardHeader>
+          </Card>
 
-        <div className="mt-5 mb-5">
-          <DataTablePagination
-            table={table}
-            setPagination={setPagination}
-            pagination={pagination}
-          />
+          <Card className="font-normal text-base h-25 flex flex-col">
+            <CardHeader className="flex-grow">
+              <CardTitle className="flex items-center gap-2 p-0 mb-2 text-[#0F172A]">
+                <Users className="text-purple-500" size={20} />
+                Participating
+              </CardTitle>
+              <CardFooter className="text-blue-500 text-2xl font-bold">
+                {"5"}
+              </CardFooter>
+            </CardHeader>
+          </Card>
+
+          <Card className="font-normal text-base h-25 flex flex-col">
+            <CardHeader className="flex-grow">
+              <CardTitle className="flex items-center gap-2 p-0 mb-2 text-[#0F172A]">
+                <CheckCircle className="text-green-600" size={20} />
+                Total Task Completed
+              </CardTitle>
+              <CardFooter className="text-blue-500 text-2xl font-bold">
+                {"5"}
+              </CardFooter>
+            </CardHeader>
+          </Card>
         </div>
+
+        <Tabs defaultValue="active" className="">
+          <div className="flex items-center mt-10 mb-10">
+            <div className="w-[400px]">
+              <TabsList className="flex bg-blue-50 h-10">
+                <TabsTrigger
+                  value="open"
+                  className="w-full h-8"
+                  onClick={() => setTabStatus("open")}
+                >
+                  Participating
+                </TabsTrigger>
+                <TabsTrigger
+                  value="closed"
+                  className="w-full h-8"
+                  onClick={() => setTabStatus("completed")}
+                >
+                  Owned
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            <div className="ml-auto">
+              <DatePickerWithRange />
+            </div>
+          </div>
+
+          <div className="w-full mt-5 mb-5">
+            <TabsContent className="w-full" value="active">
+              <ListCardDetails
+                taskList={taskList}
+                router={router}
+                tabStatus={tabStatus}
+              />
+            </TabsContent>
+            <TabsContent className="w-full" value="completed">
+              <ListCardDetails
+                taskList={taskList}
+                router={router}
+                tabStatus={tabStatus}
+              />
+            </TabsContent>
+          </div>
+          <div className="mt-5 mb-5">
+            <DataTablePagination
+              table={table}
+              setPagination={setPagination}
+              pagination={pagination}
+            />
+          </div>
+        </Tabs>
       </div>
     </main>
   );

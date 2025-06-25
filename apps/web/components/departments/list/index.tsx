@@ -2,6 +2,7 @@
 
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { useGetAllEntity } from "@/hooks/subgraph/entity";
+import { DepartmentDetails } from "@workspace/sdk/type";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import DepartmentListCard from "./list.card";
 import ListToolBar from "./list.toolbar";
@@ -12,6 +13,8 @@ interface DepartmentListProps {
 
 export default function DepartmentList({ router }: DepartmentListProps) {
   const getAllEntity = useGetAllEntity();
+  const entityList: DepartmentDetails[] =
+    getAllEntity?.data?.data?.rewardManagementCreateds || [];
   if (getAllEntity.isLoading) {
     return (
       <LoaderSkeleton
@@ -39,7 +42,7 @@ export default function DepartmentList({ router }: DepartmentListProps) {
           </h3>
         </div>
         <ListToolBar />
-        <DepartmentListCard router={router} />
+        <DepartmentListCard router={router} entityList={entityList} />
       </div>
     </main>
   );

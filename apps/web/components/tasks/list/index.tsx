@@ -39,6 +39,7 @@ export default function TaskListMain({ router }: TaskListMainProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const getAllTask = useGetAllTask();
+
   const columns = useColumns();
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -52,6 +53,7 @@ export default function TaskListMain({ router }: TaskListMainProps) {
   });
 
   const taskList = getAllTask?.data?.data?.taskCreateds;
+
   const table = useReactTable({
     data: taskList || [],
     columns,

@@ -12,6 +12,7 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 
 interface DepartmentListCardProps {
   router: AppRouterInstance;
+  entityList: DepartmentDetails[];
 }
 
 const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
