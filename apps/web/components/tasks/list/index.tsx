@@ -1,7 +1,21 @@
 "use client";
 
+import { DataTablePagination } from "@/components/common/list/list.pagination";
+import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { useGetAllTask } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
+import {
+  ColumnFiltersState,
+  getCoreRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
+  useReactTable,
+  VisibilityState,
+} from "@tanstack/react-table";
 import { Button } from "@workspace/ui/components/button";
 import {
   Tabs,
@@ -12,11 +26,9 @@ import {
 import { Plus } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import React, { useState } from "react";
+import { useColumns } from "../details/details.column";
 import ListCardDetails from "./list.card";
 import { DatePickerWithRange } from "./list.date";
-import { useColumns } from "../details/details.column";
-import { ColumnFiltersState, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { DataTablePagination } from "@/components/common/list/list.pagination";
 
 interface TaskListMainProps {
   router: AppRouterInstance;
@@ -24,42 +36,68 @@ interface TaskListMainProps {
 
 export default function TaskListMain({ router }: TaskListMainProps) {
   const [tabStatus, setTabStatus] = useState("active");
-    const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const getAllTask = useGetAllTask();
+
   const columns = useColumns();
-    const [columnVisibility, setColumnVisibility] =
-      React.useState<VisibilityState>({});
- const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-     [],
-   );
-    const [rowSelection, setRowSelection] = React.useState({});
-    const [pagination, setPagination] = React.useState({
-      pageIndex: 0,
-      pageSize: 10,
-    });
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    [],
+  );
+  const [rowSelection, setRowSelection] = React.useState({});
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
   const taskList = getAllTask?.data?.data?.taskCreateds;
+
   const table = useReactTable({
-      data: taskList || [],
-      columns,
-      onSortingChange: setSorting,
-      onColumnFiltersChange: setColumnFilters,
-      getCoreRowModel: getCoreRowModel(),
-      getPaginationRowModel: getPaginationRowModel(),
-      getSortedRowModel: getSortedRowModel(),
-      getFilteredRowModel: getFilteredRowModel(),
-      onColumnVisibilityChange: setColumnVisibility,
-      onRowSelectionChange: setRowSelection,
-      state: {
-        sorting,
-        columnFilters,
-        columnVisibility,
-        rowSelection,
-      },
-    });
-  
- 
+    data: taskList || [],
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    manualSorting: true,
+    manualPagination: true,
+    manualFiltering: true,
+    enableRowSelection: true,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+      pagination,
+    },
+  });
+
+  if (getAllTask.isLoading) {
+    return (
+      <LoaderSkeleton
+        title
+        subtitle
+        titleWidth="w-40"
+        subtitleWidth="w-64"
+        showTabs
+        showDatePicker
+        showCreateButton
+        cardCount={6}
+        gridCols="flex-col"
+        cardHeight="h-24"
+        showPagination
+      />
+    );
+  }
+
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
       <div className="space-y-4">
@@ -127,12 +165,12 @@ export default function TaskListMain({ router }: TaskListMainProps) {
             </TabsContent>
           </div>
           <div className="mt-5 mb-5">
-                    <DataTablePagination
-                      table={table}
-                      setPagination={setPagination}
-                      pagination={pagination}
-                    />
-                  </div>
+            <DataTablePagination
+              table={table}
+              setPagination={setPagination}
+              pagination={pagination}
+            />
+          </div>
         </Tabs>
       </div>
     </main>
