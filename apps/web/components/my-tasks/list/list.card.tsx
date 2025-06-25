@@ -16,7 +16,6 @@ const TaskPortalCard = <TData,>({
   router,
 }: TaskPortalCardProps<TData>) => {
   const paginatedTasks = table.getRowModel().rows.map((row) => row.original);
-  console.log("Paginated: ", paginatedTasks);
 
   const filteredTasks = paginatedTasks.filter(
     (task) => (task as TaskCreated)?.taskDetail,
