@@ -5,6 +5,7 @@ import { Cuid } from "@/components/departments/details/details.main";
 //   useGetParticipantTaskStatus,
 //   useParticipateTaskMutation,
 // } from "@/hooks/subgraph/querycall";
+import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { DialogButton } from "@/components/common/ui/dialog";
 import {
   useCheckParticipantStatus,
@@ -38,7 +39,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
   const { toast } = useToast();
   const taskData = getTaskDetail?.data?.data?.taskCreated;
- 
 
   const { participateTask, participatePending, participateSuccess } =
     useParticipateTaskMutation();
@@ -50,7 +50,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
       taskData?.rewardManagement?.rewardManagement,
     );
   console.log("Participant Status:", participantStatus);
-
 
   const handleApplyTask = async () => {
     if (!isConnected) {
@@ -81,7 +80,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
               variant: "destructive",
             });
           },
-        }
+        },
       );
     } catch (error) {
       console.error("Error in application:", error);
@@ -112,7 +111,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
               variant: "destructive",
             });
           },
-        }
+        },
       );
     } catch (error) {
       console.error("Error completing task:", error);
@@ -131,13 +130,12 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
     // Convert localButtonState to number if it's a string
     const effectiveStatus = localButtonState ?? participantStatus;
-   console.log(effectiveStatus, 'effectiveStatus');
+    console.log(effectiveStatus, "effectiveStatus");
 
     switch (effectiveStatus) {
-      
       case 0: // NONE
         return (
-          <Button 
+          <Button
             className="bg-[#297AD6]"
             onClick={handleApplyTask}
             disabled={participatePending}
@@ -155,7 +153,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             )}
           </Button>
         );
-case "WAITING":
+      case "WAITING":
       case 1: // PENDING
         return (
           <Button className="bg-[#F59E0B]" disabled>
@@ -166,7 +164,7 @@ case "WAITING":
       case 2: // ACCEPTED
         return (
           <>
-            <Button 
+            <Button
               className="bg-green-500"
               onClick={() => setIsOpen(true)}
               disabled={completePending}
@@ -193,8 +191,8 @@ case "WAITING":
             )}
           </>
         );
-      
-       case "COMPLETED":
+
+      case "COMPLETED":
       case 3:
         return (
           <Button
@@ -207,15 +205,31 @@ case "WAITING":
       case "VERIFIED":
       case 4: // verified
         return (
-       <Button className="bg-[#22C55E]" disabled>
-  <span className="text-[#F8FAFC]">Verified</span>
-</Button>
+          <Button className="bg-[#22C55E]" disabled>
+            <span className="text-[#F8FAFC]">Verified</span>
+          </Button>
         );
 
       default:
         return null;
     }
   };
+
+  if (getTaskDetail.isLoading) {
+    return (
+      <LoaderSkeleton
+        backButton
+        title
+        subtitle
+        titleWidth="w-64"
+        subtitleWidth="w-72"
+        cardCount={2} // TaskDetails + Participants
+        gridCols="grid-cols-1" // stacked sections
+        cardHeight="h-60"
+        showPagination={false}
+      />
+    );
+  }
 
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">

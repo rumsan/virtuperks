@@ -1,5 +1,4 @@
 import { useGetAllEntity } from "@/hooks/subgraph/entity";
-import { useGetAllTask } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
 import hasRole from "@/utils/role";
 import { DepartmentDetails } from "@workspace/sdk/type";
@@ -13,15 +12,13 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 
 interface DepartmentListCardProps {
   router: AppRouterInstance;
+  entityList: DepartmentDetails[];
 }
 
 const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
   const getAllEntity = useGetAllEntity();
 
   const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
- 
-  const getAllTask = useGetAllTask()
-
 
   const hasEntityOwnerRole = hasRole({
     role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
@@ -39,15 +36,12 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
 
       {entityList &&
         entityList.map((department: DepartmentDetails) => {
-      
           return (
             <Card
               key={department.id}
               className="cursor-pointer hover:shadow-lg p-4"
               onClick={() =>
-                router.push(
-                  PATHS.DEPARTMENT.DETAILS(department.entityId),
-                )
+                router.push(PATHS.DEPARTMENT.DETAILS(department.entityId))
               }
             >
               <CardTitle className="flex text-base">

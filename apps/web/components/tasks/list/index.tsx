@@ -1,6 +1,7 @@
 "use client";
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
+import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { useGetAllTask } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
 import {
@@ -38,6 +39,7 @@ export default function TaskListMain({ router }: TaskListMainProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const getAllTask = useGetAllTask();
+
   const columns = useColumns();
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -51,6 +53,7 @@ export default function TaskListMain({ router }: TaskListMainProps) {
   });
 
   const taskList = getAllTask?.data?.data?.taskCreateds;
+
   const table = useReactTable({
     data: taskList || [],
     columns,
@@ -76,6 +79,24 @@ export default function TaskListMain({ router }: TaskListMainProps) {
       pagination,
     },
   });
+
+  if (getAllTask.isLoading) {
+    return (
+      <LoaderSkeleton
+        title
+        subtitle
+        titleWidth="w-40"
+        subtitleWidth="w-64"
+        showTabs
+        showDatePicker
+        showCreateButton
+        cardCount={6}
+        gridCols="flex-col"
+        cardHeight="h-24"
+        showPagination
+      />
+    );
+  }
 
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
