@@ -1,6 +1,7 @@
 "use client";
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
+import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { useGetTaskListByParticipant } from "@/hooks/subgraph/participant";
 import { useWallet } from "@/providers/walletProvider";
 import {
@@ -109,6 +110,19 @@ export default function TaskListMain({ router }: TaskListMainProps) {
           </div>
         </div>
       </main>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <LoaderSkeleton
+        titleWidth="w-56"
+        subtitleWidth="w-72"
+        cardCount={10}
+        gridCols="flex-col"
+        cardHeight="h-20"
+        showPagination
+      />
     );
   }
 

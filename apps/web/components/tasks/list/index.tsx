@@ -1,6 +1,7 @@
 "use client";
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
+import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { useGetAllTask } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
 import {
@@ -16,7 +17,6 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { Button } from "@workspace/ui/components/button";
-import { Skeleton } from "@workspace/ui/components/skeleton";
 import {
   Tabs,
   TabsContent,
@@ -81,41 +81,20 @@ export default function TaskListMain({ router }: TaskListMainProps) {
   });
 
   if (getAllTask.isLoading) {
-    // Skeleton loader for the whole page while loading tasks
     return (
-      <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full flex flex-col">
-        <div className="space-y-4">
-          {/* Header skeleton */}
-          <div className="flex items-center gap-4">
-            <div className="flex flex-col w-[80%] gap-2">
-              <Skeleton className="h-6 w-48 rounded" /> {/* Title */}
-              <Skeleton className="h-4 w-64 rounded" /> {/* Subtitle */}
-            </div>
-            <Skeleton className="h-10 w-36 rounded" /> {/* Button */}
-          </div>
-
-          {/* Tabs Skeleton */}
-          <div className="flex items-center gap-4">
-            <Skeleton className="h-10 w-20 rounded" />
-            <Skeleton className="h-10 w-20 rounded" />
-            <div className="ml-auto">
-              <Skeleton className="h-8 w-40 rounded" /> {/* DatePicker */}
-            </div>
-          </div>
-
-          {/* ListCardDetails Skeleton: simulate 5 cards */}
-          <div className="grid grid-cols-1 gap-4 mt-5 mb-5">
-            {[...Array(5)].map((_, i) => (
-              <Skeleton key={i} className="h-24 w-full rounded-lg" />
-            ))}
-          </div>
-
-          {/* Pagination Skeleton */}
-          <div className="mt-5 mb-5 w-full">
-            <Skeleton className="h-10 w-full rounded" />
-          </div>
-        </div>
-      </main>
+      <LoaderSkeleton
+        title
+        subtitle
+        titleWidth="w-40"
+        subtitleWidth="w-64"
+        showTabs
+        showDatePicker
+        showCreateButton
+        cardCount={6}
+        gridCols="flex-col"
+        cardHeight="h-24"
+        showPagination
+      />
     );
   }
 

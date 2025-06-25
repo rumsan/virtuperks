@@ -5,6 +5,7 @@ import { Cuid } from "@/components/departments/details/details.main";
 //   useGetParticipantTaskStatus,
 //   useParticipateTaskMutation,
 // } from "@/hooks/subgraph/querycall";
+import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { DialogButton } from "@/components/common/ui/dialog";
 import {
   useCheckParticipantStatus,
@@ -14,7 +15,6 @@ import {
 import { useGetTaskById } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
-import { Skeleton } from "@workspace/ui/components/skeleton";
 import { useToast } from "@workspace/ui/hooks/use-toast";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
@@ -217,28 +217,17 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
   if (getTaskDetail.isLoading) {
     return (
-      <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full flex flex-col">
-        <div className="space-y-4 flex-grow">
-          <div className="flex items-center gap-2 my-3">
-            <Skeleton className="h-6 w-24" /> {/* Back button skeleton */}
-          </div>
-
-          <div className="flex justify-between items-center">
-            <div className="flex flex-col gap-2">
-              <Skeleton className="h-10 w-48" /> {/* Title skeleton */}
-              <Skeleton className="h-4 w-64" /> {/* Subtitle skeleton */}
-            </div>
-            <Skeleton className="h-10 w-48" /> {/* Button skeleton */}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-            <Skeleton className="h-64 w-full rounded-lg" />{" "}
-            {/* Task details skeleton */}
-            <Skeleton className="h-64 w-full rounded-lg" />{" "}
-            {/* Participant skeleton */}
-          </div>
-        </div>
-      </main>
+      <LoaderSkeleton
+        backButton
+        title
+        subtitle
+        titleWidth="w-64"
+        subtitleWidth="w-72"
+        cardCount={2} // TaskDetails + Participants
+        gridCols="grid-cols-1" // stacked sections
+        cardHeight="h-60"
+        showPagination={false}
+      />
     );
   }
 
