@@ -4,6 +4,7 @@ import { Cuid } from "@/components/departments/details/details.main";
 //   useGetApprovedAndCompletedList,
 // } from "@/hooks/subgraph/querycall";
 
+import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { DialogButton } from "@/components/common/ui/dialog";
 import { useCheckTaskStatus, useGetTaskById } from "@/hooks/subgraph/task";
 import { useDisburseTokenToTask } from "@/hooks/subgraph/token";
@@ -16,42 +17,35 @@ import { useState } from "react";
 import TaskParticipant from "./details.participant";
 import TaskDetails from "./details.task";
 
-
 type TaskMainProps = {
   cuid: Cuid;
   router: AppRouterInstance;
 };
 
 const TaskMain = ({ cuid, router }: TaskMainProps) => {
-const getTaskDetail = useGetTaskById(cuid.id);
+  const getTaskDetail = useGetTaskById(cuid.id);
 
   const [isDisbursed, setIsDisbursed] = useState(false);
 
+  const taskData = getTaskDetail?.data?.data?.taskCreated;
 
-
-  const taskData = getTaskDetail?.data?.data?.taskCreated
-  
-
-  const { status , statusLoading} = useCheckTaskStatus(taskData?.internal_id, taskData?.rewardManagement?.rewardManagement);
-
-  
-  
+  const { status, statusLoading } = useCheckTaskStatus(
+    taskData?.internal_id,
+    taskData?.rewardManagement?.rewardManagement,
+  );
 
   const { toast } = useToast();
- 
+
   const [localStatus, setLocalStatus] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
- 
-const {disburseTokenToTask, disbursePending}= useDisburseTokenToTask()
-  
-  
+  const { disburseTokenToTask, disbursePending } = useDisburseTokenToTask();
 
-  const handleDialogAction = async (data:any) => {
+  const handleDialogAction = async (data: any) => {
     try {
       await disburseTokenToTask({
         taskId: taskData.internal_id,
-        amount:data.amount,
+        amount: data.amount,
         entityId: taskData.rewardManagement.rewardManagement,
       });
       setIsOpen(false);
@@ -68,23 +62,14 @@ const {disburseTokenToTask, disbursePending}= useDisburseTokenToTask()
       });
     }
   };
-  
 
-
-  const isDisburseButtonDisabled = statusLoading || status || isDisbursed || disbursePending
-
-
-
-
+  const isDisburseButtonDisabled =
+    statusLoading || status || isDisbursed || disbursePending;
 
   const getDisburseButton = () => {
     if (disbursePending) {
       return (
-        <Button
-          variant="outline"
-          className="border border-[#03AB65]"
-          disabled
-        >
+        <Button variant="outline" className="border border-[#03AB65]" disabled>
           <span className="text-[#03AB65] flex items-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
             Processing...
@@ -97,25 +82,40 @@ const {disburseTokenToTask, disbursePending}= useDisburseTokenToTask()
       <Button
         variant="outline"
         style={{
-          border: '1px solid #03AB65'
+          border: "1px solid #03AB65",
         }}
         onClick={() => setIsOpen(true)}
         disabled={isDisburseButtonDisabled}
-        
       >
         <span className="text-[#03AB65]">Disperse Token</span>
         <CheckCircle
           className="ml-2"
           style={{
-            color: '#03AB65',
+            color: "#03AB65",
             strokeWidth: 2.5,
-            width: '20px',
-            height: '20px'
+            width: "20px",
+            height: "20px",
           }}
         />
       </Button>
     );
   };
+
+  if (getTaskDetail.isLoading) {
+    return (
+      <LoaderSkeleton
+        backButton
+        title
+        subtitle
+        titleWidth="w-64"
+        subtitleWidth="w-72"
+        cardCount={2} // TaskDetails + Participants
+        gridCols="grid-cols-1" // stacked sections
+        cardHeight="h-44"
+        showPagination={false}
+      />
+    );
+  }
 
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">

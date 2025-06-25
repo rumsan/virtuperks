@@ -1,5 +1,6 @@
 "use client";
 
+import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { useGetEntityById } from "@/hooks/subgraph/entity";
 import { PATHS } from "@/routes/paths";
 import { ArrowLeft } from "lucide-react";
@@ -32,6 +33,26 @@ export default function DepartmentDetails({
 
   const transferColumns = useColumns("transfer");
   const disbursementColumns = useColumns("disbursement");
+
+  if (isLoading) {
+    return (
+      <LoaderSkeleton
+        backButton
+        title
+        titleWidth="w-40"
+        subtitle
+        subtitleWidth="w-64"
+        showTabs
+        tabsCount={2}
+        cardCount={4}
+        gridCols="grid-cols-4"
+        cardHeight="h-48"
+        tableSkeleton
+        tableHeight="h-60"
+        showPagination
+      />
+    );
+  }
 
   return (
     <main className="gap-2 p-4 sm:px-8 md:gap-8">
