@@ -20,7 +20,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import { Skeleton } from "@workspace/ui/components/skeleton";
 import {
   Tabs,
   TabsContent,
@@ -82,45 +81,18 @@ export default function TaskListMain({ router }: TaskListMainProps) {
 
   if (isLoading) {
     return (
-      <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full flex flex-col">
-        <div className="space-y-4 flex-grow">
-          <div className="flex flex-col gap-1 my-3">
-            <Skeleton className="h-10 w-48" /> {/* Title skeleton */}
-            <Skeleton className="h-4 w-64" /> {/* Subtitle skeleton */}
-          </div>
-
-          <div className="grid grid-cols-4 mt-1 gap-4 w-full">
-            {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-24 w-full rounded-lg" /> // Card skeletons
-            ))}
-          </div>
-
-          <div className="mt-10 mb-10">
-            <Skeleton className="h-10 w-[400px]" /> {/* Tabs Skeleton */}
-          </div>
-
-          <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-32 w-full rounded-lg" /> // Task card list skeleton
-            ))}
-          </div>
-
-          <div className="mt-5 mb-5">
-            <Skeleton className="h-10 w-full" /> {/* Pagination skeleton */}
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  if (isLoading) {
-    return (
       <LoaderSkeleton
+        title // h1: "My List"
         titleWidth="w-56"
+        subtitle // h3: "List of all the tasks..."
         subtitleWidth="w-72"
-        cardCount={10}
-        gridCols="flex-col"
-        cardHeight="h-20"
+        cardCount={3} // 3 summary cards in grid
+        gridCols="grid-cols-3"
+        cardHeight="h-24"
+        showTabs
+        tabsCount={2} // Participating, Owned
+        rowCount={5} // Simulated rows for ListCardDetails
+        rowHeight="h-20"
         showPagination
       />
     );
