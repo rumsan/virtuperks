@@ -6,7 +6,11 @@ import { Cuid } from "@/components/departments/details/details.main";
 
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { DialogButton } from "@/components/common/ui/dialog";
-import { useCheckTaskStatus, useGetTaskById } from "@/hooks/subgraph/task";
+import {
+  useCheckTaskStatus,
+  useCloseTaskMutation,
+  useGetTaskById,
+} from "@/hooks/subgraph/task";
 import { useDisburseTokenToTask } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
@@ -24,6 +28,7 @@ type TaskMainProps = {
 
 const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const getTaskDetail = useGetTaskById(cuid.id);
+  const { mutate: closeTask, isPending, isSuccess } = useCloseTaskMutation();
 
   const [isDisbursed, setIsDisbursed] = useState(false);
 
@@ -36,7 +41,6 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
 
   const { toast } = useToast();
 
-  const [localStatus, setLocalStatus] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   const { disburseTokenToTask, disbursePending } = useDisburseTokenToTask();
@@ -61,6 +65,55 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleCloseTask = async () => {
+    try {
+      await closeTask({
+        taskId: taskData.internal_id,
+        entityId: taskData.rewardManagement.rewardManagement,
+      });
+
+      toast({
+        title: "Task Closed Successfully!",
+        variant: "success",
+      });
+    } catch (error) {
+      console.error("Error closing task:", error);
+      toast({
+        title: "Failed to Close Task. Please Try Again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const isCloseButtonDisabled = isPending || statusLoading || !status;
+
+  const getCloseButton = () => {
+    if (isPending || statusLoading) {
+      return (
+        <Button variant="outline" className="border border-[#E44134]" disabled>
+          <span className="text-[#E44134] flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            {statusLoading ? "Checking..." : "Closing..."}
+          </span>
+        </Button>
+      );
+    }
+
+    return (
+      <Button
+        variant="outline"
+        className="border border-[#E44134]"
+        onClick={handleCloseTask}
+        disabled={isCloseButtonDisabled}
+      >
+        <span className="text-[#E44134]">
+          {isCloseButtonDisabled ? "Closed" : "Close"}
+        </span>
+        <CircleX className="ml-2" color="#E44134" strokeWidth={2.5} size={20} />
+      </Button>
+    );
   };
 
   const isDisburseButtonDisabled =
@@ -135,23 +188,23 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
             </h3>
           </div>
           <div className="flex items-center ml-auto gap-4">
-            {getDisburseButton()}
-
-            <Button variant="outline" className="border border-[#E44134]">
-              <span className="text-[#E44134]">Close</span>{" "}
-              <CircleX color="#E44134" strokeWidth={2.5} size={20} />
-            </Button>
-            {!disbursePending && isOpen && (
-              <DialogButton
-                isOpen={isOpen}
-                setIsOpen={setIsOpen}
-                title="Are you sure you want to disperse the amount?"
-                subTitle="This action cannot be undone"
-                buttonName="Disperse"
-                submitType="Disperse"
-                handleApplyTaskLogic={handleDialogAction}
-              />
-            )}
+            <div className="flex items-center ml-auto gap-4">
+              {getDisburseButton()}
+              {!disbursePending && isOpen && (
+                <DialogButton
+                  isOpen={isOpen}
+                  setIsOpen={setIsOpen}
+                  title="Are you sure you want to disperse the amount?"
+                  subTitle="This action cannot be undone"
+                  buttonName="Disperse"
+                  submitType="Disperse"
+                  handleApplyTaskLogic={handleDialogAction}
+                />
+              )}
+            </div>
+            <div className="flex items-center ml-auto gap-4">
+              {getCloseButton()}
+            </div>
           </div>
         </div>
 
