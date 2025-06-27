@@ -1,5 +1,8 @@
 import { useGraphService } from "@/providers/subgraph-provider";
+import { createId } from "@paralleldrive/cuid2";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toUtf8Bytes } from "ethers";
+import { keccak256 } from "viem";
 import {
   useReadRewardManagementFactoryGetEntityOwners,
   useReadRewardManagementGetTotalUnallocatedTokens,
@@ -7,10 +10,6 @@ import {
   useWriteRewardManagementFactoryCreateRewardManagement,
   useWriteRewardTokenMint,
 } from "../wagmi/contracts";
-import { createId } from "@paralleldrive/cuid2";
-import { keccak256 } from "viem";
-import { toUtf8Bytes } from "ethers";
-
 
 export const useGetAllEntity = () => {
   const { queryService } = useGraphService();
@@ -18,7 +17,7 @@ export const useGetAllEntity = () => {
   return useQuery({
     queryKey: ["entityList"],
     queryFn: async () => {
-      const taskDetail = await queryService?.getDeployments()
+      const taskDetail = await queryService?.getDeployments();
       return taskDetail;
     },
   });
@@ -29,22 +28,23 @@ export const useDepartmentAdd = () => {
   const { writeContractAsync } =
     useWriteRewardManagementFactoryCreateRewardManagement();
 
-  const appId = process.env.NEXT_PUBLIC_APP_ID as `0x${string}` || "0x";
-
-
+  const appId = (process.env.NEXT_PUBLIC_APP_ID as `0x${string}`) || "0x";
 
   const mutation = useMutation({
     mutationFn: async (data: any) => {
-         const cuid = createId()
-            const entityId = keccak256(toUtf8Bytes(cuid))
+      const cuid = createId();
+      const entityId = keccak256(toUtf8Bytes(cuid));
       const result = await writeContractAsync({
         address: process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}`,
         args: [
           entityId as `0x${string}`,
           appId,
-          
+
           process.env.NEXT_PUBLIC_APPREGISTRY as `0x${string}`,
-          {name:data.name as string, entityOwners: data.entityOwners as readonly `0x${string}`[]},
+          {
+            name: data.name as string,
+            entityOwners: data.entityOwners as readonly `0x${string}`[],
+          },
         ],
       });
       return result;
@@ -73,8 +73,6 @@ export const useGetEntityById = (rewardManagement: string) => {
         await queryService.getRewardManagementCreatedByAddress(
           rewardManagement,
         );
-
-   
 
       const entity = result?.data?.rewardManagementCreateds?.[0];
 
@@ -117,73 +115,51 @@ export const useRewardTokenMint = () => {
   };
 };
 
-
 export const useCheckTotalUnallocatedTokens = (entityId: string) => {
- console.log(entityId, "entityId in useCheckTotalUnallocatedTokens");
   const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
-  console.log(tokenAddress, "tokenAddress in useCheckTotalUnallocatedTokens");
-  
-  const {
-    data,
-    isError,
-    isLoading,
-  } = useReadRewardManagementGetTotalUnallocatedTokens({
-    address: entityId as `0x${string}`,
-    args: [tokenAddress],
-  });
-  console.log(data, "data in useCheckTotalUnallocatedTokens");
- 
+
+  const { data, isError, isLoading } =
+    useReadRewardManagementGetTotalUnallocatedTokens({
+      address: entityId as `0x${string}`,
+      args: [tokenAddress],
+    });
 
   return {
-    unallocatedTokens:data,
+    unallocatedTokens: data,
     isError,
     statusLoading: isLoading,
   };
 };
 
-
-
-export const useCheckTotalAllocatedTokens= (entityId:string) => {
+export const useCheckTotalAllocatedTokens = (entityId: string) => {
   const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
-  
-  const {
-    data,
-    isError,
-    isLoading,
-  } = useReadRewardManagementTotalAllocatedTokens({
-    address: entityId as `0x${string}`,
-    args: [tokenAddress],
-  });
- 
+
+  const { data, isError, isLoading } =
+    useReadRewardManagementTotalAllocatedTokens({
+      address: entityId as `0x${string}`,
+      args: [tokenAddress],
+    });
 
   return {
-     totalAllocatedTokens:data,
+    totalAllocatedTokens: data,
     isError,
     statusLoading: isLoading,
   };
 };
 
+export const useGetEntityOwners = (entityId: string) => {
+  const factoryAddress = process.env
+    .NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}`;
 
-
-export const useGetEntityOwners= (entityId:string) => {
-  const factoryAddress = process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}`;
-
-  
-  const {
-    data,
-    isError,
-    isLoading,
-  } = useReadRewardManagementFactoryGetEntityOwners({
-    address: factoryAddress as `0x${string}`,
-    args: [entityId as `0x${string}`],
-  });
- 
+  const { data, isError, isLoading } =
+    useReadRewardManagementFactoryGetEntityOwners({
+      address: factoryAddress as `0x${string}`,
+      args: [entityId as `0x${string}`],
+    });
 
   return {
-     getEntityOwners:data,
+    getEntityOwners: data,
     isError,
     statusLoading: isLoading,
   };
 };
-
-

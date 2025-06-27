@@ -213,6 +213,87 @@ export const getTaskCreation = `
   `;
 
 
+
+  export const getOpenTasks = `
+    query GetTaskCreation {
+      taskCreateds(first: 100, orderBy: blockTimestamp, orderDirection: desc, where: { taskDetail_: { isOpen: true } }
+      ) {
+        id
+        internal_id
+        taskDetail {
+        acceptedParticipantCount
+        detailsUrl
+        id
+        expiryDate
+        isOpen
+        isTokenDisbursed
+        maxParticipants
+        name
+        owner
+        rewardToken
+        totalRewardAmount
+        requireApproval
+        isWhitelisted
+        verifiedParticipants
+        
+        }
+        rewardManagement{
+        appId
+        id
+        name
+        rewardManagement
+        }
+        createdBy
+        blockNumber
+        blockTimestamp
+        transactionHash
+      }
+  
+    }
+  `;
+
+
+
+  export const getCloseTasks = `
+    query GetTaskCreation {
+      taskCreateds(first: 100, orderBy: blockTimestamp, orderDirection: desc, where: { taskDetail_: { isOpen: false } }
+      ) {
+        id
+        internal_id
+        taskDetail {
+        acceptedParticipantCount
+        detailsUrl
+        id
+        expiryDate
+        isOpen
+        isTokenDisbursed
+        maxParticipants
+        name
+        owner
+        rewardToken
+        totalRewardAmount
+        requireApproval
+        isWhitelisted
+        verifiedParticipants
+        
+        }
+        rewardManagement{
+        appId
+        id
+        name
+        rewardManagement
+        }
+        createdBy
+        blockNumber
+        blockTimestamp
+        transactionHash
+      }
+  
+    }
+  `;
+
+
+
 export const getTaskCreatedById = `
   query GetTaskCreatedById($id: ID!) {
     taskCreated(id: $id) {
@@ -737,3 +818,44 @@ export const getParticipantTasks=`
     }
 }
   `
+
+
+  export const GetRewardManagementTokenTransfers = `
+  query GetRewardManagementTokenTransfers($rewardManagement: Bytes!) {
+    rewardManagementCreateds(where: { rewardManagement: $rewardManagement }) {
+     id
+        rewardManagement
+       tokenTransfers(first:100, orderBy: blockTimestamp, orderDirection: desc) {
+        id
+        token
+        to
+        amount
+        remarks
+        transferredBy
+        }
+
+        blockNumber
+        blockTimestamp
+        transactionHash
+      }
+  }
+`;
+
+export const GetRewardManagementDisbursements = `
+  query GetRewardManagementDisbursements($rewardManagement: Bytes!) {
+    rewardManagementCreateds(where: { rewardManagement: $rewardManagement }) {
+     id
+        rewardManagement
+        disbursements(first:100, orderBy: blockTimestamp, orderDirection: desc) {
+        id
+        taskId
+        amount
+        disbursedBy
+        }
+
+        blockNumber
+        blockTimestamp
+        transactionHash
+      }
+  }
+`;

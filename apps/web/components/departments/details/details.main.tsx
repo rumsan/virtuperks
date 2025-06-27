@@ -1,20 +1,11 @@
 "use client";
 
+import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { useGetEntityById } from "@/hooks/subgraph/entity";
 import { PATHS } from "@/routes/paths";
-import {
-  ColumnFiltersState,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-  VisibilityState,
-} from "@tanstack/react-table";
 import { ArrowLeft } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import React from "react";
+import React, { useState } from "react";
 import DepartmentDetailsCard from "./details.card";
 import { useColumns } from "./details.column";
 import DepartmentDetailsTable from "./details.table";
@@ -32,41 +23,36 @@ export default function DepartmentDetails({
   cuid,
   router,
 }: DepartmentDetailsProps) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+  const { data, isLoading, isError, error } = useGetEntityById(cuid.id);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
   });
 
-  const { data, isLoading, isError, error } = useGetEntityById(cuid.id);
+  const [activeTab, setActiveTab] = useState<"direct" | "task">("direct");
 
-  const taskData = data?.tasks ?? [];
+  const transferColumns = useColumns("transfer");
+  const disbursementColumns = useColumns("disbursement");
 
-  const columns = useColumns();
-  const table = useReactTable({
-    data: taskData,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
-  });
+  if (isLoading) {
+    return (
+      <LoaderSkeleton
+        backButton
+        title
+        titleWidth="w-40"
+        subtitle
+        subtitleWidth="w-64"
+        showTabs
+        tabsCount={2}
+        cardCount={4}
+        gridCols="grid-cols-4"
+        cardHeight="h-48"
+        tableSkeleton
+        tableHeight="h-60"
+        showPagination
+      />
+    );
+  }
 
   return (
     <main className="gap-2 p-4 sm:px-8 md:gap-8">
@@ -77,7 +63,7 @@ export default function DepartmentDetails({
         <ArrowLeft size={24} strokeWidth={2} />
         <span className="font-base text-gray-700">Back</span>
       </div>
-      s{isLoading && <p className="text-gray-600">Loading entity details...</p>}
+      {isLoading && <p className="text-gray-600">Loading entity details...</p>}
       {isError && (
         <p className="text-red-600">Error loading entity: {error.message}</p>
       )}
@@ -85,10 +71,11 @@ export default function DepartmentDetails({
         <>
           <DepartmentDetailsCard cuid={cuid} router={router} />
           <DepartmentDetailsTable
-            table={table}
-            columns={columns}
-            pagination={pagination}
+            cuid={data.rewardManagement}
             setPagination={setPagination}
+            pagination={pagination}
+            filterTab={activeTab}
+            setFilterTab={setActiveTab}
           />
         </>
       )}
