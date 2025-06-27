@@ -64,6 +64,32 @@ export const useGetAllTask = () => {
   });
 };
 
+export const useOpenTask = () => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["openTasks"],
+    queryFn: async () => {
+      const taskDetail = await queryService?.getOpenTasks();
+      return taskDetail;
+    },
+    enabled: !!queryService,
+  });
+};
+
+export const useClosedTask = () => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["closedTasks"],
+    queryFn: async () => {
+      const taskDetail = await queryService?.getCloseTasks();
+      return taskDetail;
+    },
+    enabled: !!queryService,
+  });
+};
+
 export const useGetTaskById = (id: string) => {
   const { queryService } = useGraphService();
 
@@ -122,7 +148,7 @@ export const useCheckTaskStatus = (taskId: string, entityId: string) => {
     address: entityId as `0x${string}`,
     args: [taskId as `0x${string}`],
   });
-  // console.log(taskStatus, "taskStatus from hook");
+  console.log(taskStatus, "taskStatus from hook");
 
   return {
     status: taskStatus?.isTokenDisbursed,
