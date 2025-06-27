@@ -140,6 +140,7 @@ export const useIsTaskExpired = (taskId: string, entityId: string) => {
     address: entityId as `0x${string}`,
     args: [taskId as `0x${string}`],
   });
+  console.log("Task Status: ", status);
 
   return {
     status,

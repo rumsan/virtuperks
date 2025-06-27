@@ -10,6 +10,7 @@ import {
   useCheckTaskStatus,
   useCloseTaskMutation,
   useGetTaskById,
+  useIsTaskExpired,
 } from "@/hooks/subgraph/task";
 import { useDisburseTokenToTask } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
@@ -31,6 +32,9 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const { mutate: closeTask, isPending, isSuccess } = useCloseTaskMutation();
 
   const [isDisbursed, setIsDisbursed] = useState(false);
+  const { toast } = useToast();
+
+  const [isOpen, setIsOpen] = useState(false);
 
   const taskData = getTaskDetail?.data?.data?.taskCreated;
 
@@ -39,9 +43,12 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     taskData?.rewardManagement?.rewardManagement,
   );
 
-  const { toast } = useToast();
-
-  const [isOpen, setIsOpen] = useState(false);
+  const { status: expiredStatus, statusLoading: expiredStatusLoading } =
+    useIsTaskExpired(
+      taskData?.internal_id,
+      taskData?.rewardManagement?.rewardManagement,
+    );
+  console.log("Is task Expired: ", expiredStatus);
 
   const { disburseTokenToTask, disbursePending } = useDisburseTokenToTask();
 
@@ -87,7 +94,10 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     }
   };
 
-  const isCloseButtonDisabled = isPending || statusLoading || !status;
+  const isCloseButtonDisabled =
+    isPending || statusLoading || expiredStatusLoading || expiredStatus;
+
+  console.log("Closed: ", isCloseButtonDisabled);
 
   const getCloseButton = () => {
     if (isPending || statusLoading) {
@@ -109,15 +119,20 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
         disabled={isCloseButtonDisabled}
       >
         <span className="text-[#E44134]">
-          {isCloseButtonDisabled ? "Closed" : "Close"}
+          {!expiredStatus ? "Close" : status ? "Close" : "Closed"}
         </span>
+
         <CircleX className="ml-2" color="#E44134" strokeWidth={2.5} size={20} />
       </Button>
     );
   };
 
   const isDisburseButtonDisabled =
-    statusLoading || status || isDisbursed || disbursePending;
+    statusLoading ||
+    expiredStatusLoading ||
+    expiredStatus ||
+    isDisbursed ||
+    disbursePending;
 
   const getDisburseButton = () => {
     if (disbursePending) {
