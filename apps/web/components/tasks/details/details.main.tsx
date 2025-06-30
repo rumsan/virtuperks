@@ -7,7 +7,6 @@ import { Cuid } from "@/components/departments/details/details.main";
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { DialogButton } from "@/components/common/ui/dialog";
 import {
-  useCheckTaskStatus,
   useCloseTaskMutation,
   useGetTaskById,
   useIsTaskExpired,
@@ -18,7 +17,7 @@ import { Button } from "@workspace/ui/components/button";
 import { useToast } from "@workspace/ui/hooks/use-toast";
 import { ArrowLeft, CheckCircle, CircleX, Loader2 } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TaskParticipant from "./details.participant";
 import TaskDetails from "./details.task";
 
@@ -34,21 +33,25 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const [isDisbursed, setIsDisbursed] = useState(false);
   const { toast } = useToast();
 
+  useEffect(() => {
+    if (isSuccess) {
+      toast({
+        title: "Task Closed Successfully!",
+        variant: "success",
+      });
+    }
+  }, [isSuccess, toast]);
+
   const [isOpen, setIsOpen] = useState(false);
 
   const taskData = getTaskDetail?.data?.data?.taskCreated;
-
-  const { status, statusLoading } = useCheckTaskStatus(
-    taskData?.internal_id,
-    taskData?.rewardManagement?.rewardManagement,
-  );
 
   const { status: expiredStatus, statusLoading: expiredStatusLoading } =
     useIsTaskExpired(
       taskData?.internal_id,
       taskData?.rewardManagement?.rewardManagement,
     );
-  console.log("Is task Expired: ", expiredStatus);
+  // console.log("Is task Expired: ", expiredStatus);
 
   const { disburseTokenToTask, disbursePending } = useDisburseTokenToTask();
 
@@ -80,11 +83,6 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
         taskId: taskData.internal_id,
         entityId: taskData.rewardManagement.rewardManagement,
       });
-
-      toast({
-        title: "Task Closed Successfully!",
-        variant: "success",
-      });
     } catch (error) {
       console.error("Error closing task:", error);
       toast({
@@ -94,22 +92,27 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     }
   };
 
-  const isCloseButtonDisabled =
-    isPending || statusLoading || expiredStatusLoading || expiredStatus;
+  // const isCloseButtonDisabled =
+  //   isPending || statusLoading || expiredStatusLoading || expiredStatus;
 
-  console.log("Closed: ", isCloseButtonDisabled);
+  const isCloseButtonDisabled =
+    isPending || expiredStatusLoading || expiredStatus;
+
+  // console.log("Closed: ", isCloseButtonDisabled);
 
   const getCloseButton = () => {
-    if (isPending || statusLoading) {
+    if (isPending || expiredStatusLoading) {
       return (
         <Button variant="outline" className="border border-[#E44134]" disabled>
           <span className="text-[#E44134] flex items-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
-            {statusLoading ? "Checking..." : "Closing..."}
+            {expiredStatusLoading ? "Checking..." : "Closing..."}
           </span>
         </Button>
       );
     }
+
+    const buttonLabel = taskData?.closed ? "Closed" : "Close";
 
     return (
       <Button
@@ -118,21 +121,15 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
         onClick={handleCloseTask}
         disabled={isCloseButtonDisabled}
       >
-        <span className="text-[#E44134]">
-          {!expiredStatus ? "Close" : status ? "Close" : "Closed"}
-        </span>
-
+        <span className="text-[#E44134]">{buttonLabel}</span>
         <CircleX className="ml-2" color="#E44134" strokeWidth={2.5} size={20} />
       </Button>
     );
   };
 
   const isDisburseButtonDisabled =
-    statusLoading ||
-    expiredStatusLoading ||
-    expiredStatus ||
-    isDisbursed ||
-    disbursePending;
+    // statusLoading ||
+    expiredStatusLoading || expiredStatus || isDisbursed || disbursePending;
 
   const getDisburseButton = () => {
     if (disbursePending) {
@@ -177,8 +174,8 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
         subtitle
         titleWidth="w-64"
         subtitleWidth="w-72"
-        cardCount={2} // TaskDetails + Participants
-        gridCols="grid-cols-1" // stacked sections
+        cardCount={2}
+        gridCols="grid-cols-1"
         cardHeight="h-44"
         showPagination={false}
       />
