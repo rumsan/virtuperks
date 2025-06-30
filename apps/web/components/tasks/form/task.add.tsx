@@ -14,7 +14,6 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { isAddress, keccak256 } from "viem";
-import { useWriteContract } from "wagmi";
 import { TaskFormData, taskSchema } from "./schema";
 import TaskBaseForm from "./task.form";
 
@@ -41,26 +40,27 @@ type TaskAddProps = {
 export default function TaskAdd({ router }: TaskAddProps) {
   const form = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema()),
-    defaultValues: defaultValues,
+    defaultValues,
   });
+
   const { toast } = useToast();
+
   const [entityId, setEntityId] = useState("");
-  const [showTokenDialog, setShowTokenDialog] = useState(false);
   const [isCheckingBalance, setIsCheckingBalance] = useState(false);
+  const [showTokenDialog, setShowTokenDialog] = useState(false);
+  const [insufficientTokenDialog, setInsufficientTokenDialog] = useState(false);
 
-  const { writeContractAsync, isPending, isSuccess, isError, error } =
-    useWriteContract();
+  const { unallocatedTokens } = useCheckTotalUnallocatedTokens(entityId);
+  const { taskAdd, taskPending } = useTaskAdd();
 
-  const { unallocatedTokens } = useCheckTotalUnallocatedTokens(entityId ?? "");
-  console.log("Unallocated Tokens:", unallocatedTokens);
-
-  // Watch entityAddress changes
+  // Watch for changes to entityAddress
   useEffect(() => {
     const subscription = form.watch((value, { name }) => {
       if (name === "entityAddress") {
-        if (isAddress(value.entityAddress || "")) {
-          setIsCheckingBalance(true); // Set loading state
-          setEntityId(value.entityAddress || "");
+        const address = value.entityAddress || "";
+        if (isAddress(address)) {
+          setIsCheckingBalance(true);
+          setEntityId(address);
         } else {
           setEntityId("");
           setShowTokenDialog(false);
@@ -70,7 +70,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
     return () => subscription.unsubscribe();
   }, [form]);
 
-  // Handle unallocatedTokens changes
+  // Show dialog if tokens are not minted
   useEffect(() => {
     if (!entityId) {
       setShowTokenDialog(false);
@@ -84,10 +84,10 @@ export default function TaskAdd({ router }: TaskAddProps) {
     }
   }, [unallocatedTokens, entityId]);
 
-  const { taskAdd, taskPending, taskSuccess } = useTaskAdd();
+  const createTask = async (data: TaskFormData) => {
+    const address = data.entityAddress;
 
-  const createTask = async (data: any) => {
-    if (!isAddress(data.entityAddress)) {
+    if (!isAddress(address)) {
       toast({
         title: "Invalid Address",
         description: "Please provide a valid Ethereum address",
@@ -96,56 +96,61 @@ export default function TaskAdd({ router }: TaskAddProps) {
       return;
     }
 
-    // Double check balance before proceeding
-    if (!unallocatedTokens || unallocatedTokens === BigInt(0)) {
-      setShowTokenDialog(true);
+    const totalRewardAmount = BigInt(data.totalRewardAmount);
+    const tokenBalance = unallocatedTokens ?? BigInt(0);
+
+    if (tokenBalance < totalRewardAmount) {
+      setInsufficientTokenDialog(true);
       return;
     }
 
-    const cuid = createId();
-    const taskId = keccak256(toUtf8Bytes(cuid));
-
-    const { detailsUrl, rewardToken, owner, isOpen, name } = data;
-    const expiryDate = BigInt(
-      Math.floor(new Date(data.expiryDate).getTime() / 1000)
-    );
-    const whitelistedParticipants = Array.isArray(data.whitelistedParticipants)
-      ? data.whitelistedParticipants
-      : [data.whitelistedParticipants];
-    const totalRewardAmount = BigInt(data.totalRewardAmount);
-    const maxParticipants = BigInt(data.maxParticipants);
-
     try {
+      const cuid = createId();
+      const taskId = keccak256(toUtf8Bytes(cuid));
+
+      const {
+        detailsUrl,
+        rewardToken,
+        owner,
+        isOpen,
+        name,
+        isTokenDisbursed,
+        requireApproval,
+        isWhitelisted,
+        maxParticipants,
+        whitelistedParticipants,
+        expiryDate,
+      } = data;
+
       await taskAdd({
         taskId,
         name,
         detailsUrl,
         owner,
-        entityAddress: data.entityAddress,
-        expiryDate,
+        entityAddress: address,
+        expiryDate: BigInt(Math.floor(new Date(expiryDate).getTime() / 1000)),
         rewardToken,
         totalRewardAmount: totalRewardAmount.toString(),
         isOpen,
-        isTokenDisbursed: data.isTokenDisbursed,
-        requireApproval: data.requireApproval,
-        isWhitelisted: data.isWhitelisted,
-        maxParticipants: maxParticipants.toString(),
-        acceptedParticipantCount: 0, // Default to 0
-        whitelistedParticipants: whitelistedParticipants || [],
-        verfiedParticipants: [], // Default to empty array
+        isTokenDisbursed,
+        requireApproval,
+        isWhitelisted,
+        maxParticipants: BigInt(maxParticipants).toString(),
+        acceptedParticipantCount: 0,
+        whitelistedParticipants: Array.isArray(whitelistedParticipants)
+          ? whitelistedParticipants
+          : [whitelistedParticipants],
+        verfiedParticipants: [],
       });
 
-      // Success Toast
       toast({
         title: "Task Created Successfully!",
         variant: "success",
       });
 
-      //navigate to
       router.push(PATHS.TASKS.HOME);
     } catch (err) {
       console.error("Failed to create task:", err);
-      // Error Toast
       toast({
         title: "Task Creation Failed",
         variant: "destructive",
@@ -186,11 +191,6 @@ export default function TaskAdd({ router }: TaskAddProps) {
               title="No Tokens Available"
               subTitle="This entity does not have any tokens minted. Please mint tokens before creating a task."
               buttonName="Close"
-              // handleApplyTaskLogic={() => {
-              //   setShowTokenDialog(false);
-              //   form.setValue("entityAddress", "");
-              //   setEntityId("");
-              // }}
             />
           ) : (
             <Card className="rounded-lg w-full">
@@ -206,6 +206,17 @@ export default function TaskAdd({ router }: TaskAddProps) {
             </Card>
           )}
         </div>
+
+        {/* Dialog for insufficient token balance */}
+        {insufficientTokenDialog && (
+          <DialogButton
+            isOpen={insufficientTokenDialog}
+            setIsOpen={setInsufficientTokenDialog}
+            title="Insufficient Tokens"
+            subTitle="The entity does not have enough tokens to fulfill the total reward. Please mint more tokens or lower the reward amount."
+            buttonName="Cancel Task Creation"
+          />
+        )}
       </main>
     </div>
   );
