@@ -20,8 +20,6 @@ const ListCardDetails = ({
       return [];
     }
 
-    console.log("Task Status: ", taskList);
-
     if (tabStatus === "open") {
       return taskList.filter((task) => {
         return (
