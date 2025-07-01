@@ -7,9 +7,9 @@ import { Cuid } from "@/components/departments/details/details.main";
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { DialogButton } from "@/components/common/ui/dialog";
 import {
+  useCheckCloseTask,
   useCloseTaskMutation,
   useGetTaskById,
-  useIsTaskExpired,
 } from "@/hooks/subgraph/task";
 import { useDisburseTokenToTask } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
@@ -47,11 +47,10 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const taskData = getTaskDetail?.data?.data?.taskCreated;
 
   const { status: expiredStatus, statusLoading: expiredStatusLoading } =
-    useIsTaskExpired(
+    useCheckCloseTask(
       taskData?.internal_id,
       taskData?.rewardManagement?.rewardManagement,
     );
-  // console.log("Is task Expired: ", expiredStatus);
 
   const { disburseTokenToTask, disbursePending } = useDisburseTokenToTask();
 
@@ -92,13 +91,8 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     }
   };
 
-  // const isCloseButtonDisabled =
-  //   isPending || statusLoading || expiredStatusLoading || expiredStatus;
-
   const isCloseButtonDisabled =
-    isPending || expiredStatusLoading || expiredStatus;
-
-  // console.log("Closed: ", isCloseButtonDisabled);
+    isPending || !expiredStatusLoading || !expiredStatus;
 
   const getCloseButton = () => {
     if (isPending || expiredStatusLoading) {

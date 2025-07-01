@@ -148,10 +148,28 @@ export const useCheckTaskStatus = (taskId: string, entityId: string) => {
     address: entityId as `0x${string}`,
     args: [taskId as `0x${string}`],
   });
-  console.log(taskStatus, "taskStatus from hook");
+  // console.log(taskStatus, "taskStatus from hook");
 
   return {
     status: taskStatus?.isTokenDisbursed,
+    isError,
+    statusLoading: isLoading,
+  };
+};
+
+export const useCheckCloseTask = (taskId: string, entityId: string) => {
+  const {
+    data: taskStatus,
+    isError,
+    isLoading,
+  } = useReadRewardManagementGetTask({
+    address: entityId as `0x${string}`,
+    args: [taskId as `0x${string}`],
+  });
+  // console.log(taskStatus, "Open status from hook");
+
+  return {
+    status: !taskStatus?.isOpen,
     isError,
     statusLoading: isLoading,
   };
@@ -166,7 +184,7 @@ export const useIsTaskExpired = (taskId: string, entityId: string) => {
     address: entityId as `0x${string}`,
     args: [taskId as `0x${string}`],
   });
-  console.log("Task Status: ", status);
+  // console.log("Task Status: ", status);
 
   return {
     status,
