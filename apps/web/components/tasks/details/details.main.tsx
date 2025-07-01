@@ -102,7 +102,8 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     }
   };
 
-  const isCloseButtonDisabled = isPending || closeStatusLoading || closeStatus;
+  const isCloseButtonDisabled =
+    isPending || closeStatusLoading || closeStatus || isClosed;
 
   const getCloseButton = () => {
     if (isPending || closeStatusLoading) {
@@ -137,7 +138,8 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     disburseStatusLoading ||
     disbursePending ||
     isDisbursed ||
-    isClosed;
+    isClosed ||
+    closeStatus;
 
   const getDisburseButton = () => {
     if (disbursePending) {
