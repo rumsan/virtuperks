@@ -8,6 +8,7 @@ import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { DialogButton } from "@/components/common/ui/dialog";
 import {
   useCheckCloseTask,
+  useCheckTaskStatus,
   useCloseTaskMutation,
   useGetTaskById,
 } from "@/hooks/subgraph/task";
@@ -31,6 +32,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const { mutate: closeTask, isPending, isSuccess } = useCloseTaskMutation();
 
   const [isDisbursed, setIsDisbursed] = useState(false);
+  const [isClosed, setIsClosed] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -46,7 +48,14 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
 
   const taskData = getTaskDetail?.data?.data?.taskCreated;
 
-  const { status: expiredStatus, statusLoading: expiredStatusLoading } =
+  const { status: disburseStatus, statusLoading: disburseStatusLoading } =
+    useCheckTaskStatus(
+      taskData?.internal_id,
+      taskData?.rewardManagement?.rewardManagement,
+    );
+
+  console.log("Disburse Status: ", disburseStatus);
+  const { status: closeStatus, statusLoading: closeStatusLoading } =
     useCheckCloseTask(
       taskData?.internal_id,
       taskData?.rewardManagement?.rewardManagement,
@@ -63,6 +72,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
       });
       setIsOpen(false);
       setIsDisbursed(true);
+
       toast({
         title: "Disperse Token Successfully!.",
         variant: "success",
@@ -82,6 +92,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
         taskId: taskData.internal_id,
         entityId: taskData.rewardManagement.rewardManagement,
       });
+      setIsClosed(true);
     } catch (error) {
       console.error("Error closing task:", error);
       toast({
@@ -91,16 +102,15 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     }
   };
 
-  const isCloseButtonDisabled =
-    isPending || !expiredStatusLoading || !expiredStatus;
+  const isCloseButtonDisabled = isPending || closeStatusLoading || closeStatus;
 
   const getCloseButton = () => {
-    if (isPending || expiredStatusLoading) {
+    if (isPending || closeStatusLoading) {
       return (
         <Button variant="outline" className="border border-[#E44134]" disabled>
           <span className="text-[#E44134] flex items-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
-            {expiredStatusLoading ? "Checking..." : "Closing..."}
+            {closeStatusLoading ? "Checking..." : "Closing..."}
           </span>
         </Button>
       );
@@ -122,8 +132,12 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   };
 
   const isDisburseButtonDisabled =
-    // statusLoading ||
-    expiredStatusLoading || expiredStatus || isDisbursed || disbursePending;
+    disburseStatus ||
+    isPending ||
+    disburseStatusLoading ||
+    disbursePending ||
+    isDisbursed ||
+    isClosed;
 
   const getDisburseButton = () => {
     if (disbursePending) {
@@ -196,7 +210,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
           <div className="flex items-center ml-auto gap-4">
             <div className="flex items-center ml-auto gap-4">
               {getDisburseButton()}
-              {!disbursePending && isOpen && (
+              {!disbursePending && (
                 <DialogButton
                   isOpen={isOpen}
                   setIsOpen={setIsOpen}
