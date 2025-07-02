@@ -6,7 +6,7 @@ import {
   AvatarImage,
 } from "@workspace/ui/components/avatar";
 import { ConnectKitButton } from "connectkit";
-import { Coins, Layers, LayoutList, Wallet } from "lucide-react";
+import { Coins, Layers, LayoutList, ShoppingBag, Wallet } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -74,6 +74,13 @@ export default function SuperAdminNav({ children }: PropsWithChildren) {
           >
             <Coins size={18} strokeWidth={2.65} />
             Department
+          </Link>
+          <Link
+            href="/token_marketplace"
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TOKEN_MARKETPLACE)}`}
+          >
+            <ShoppingBag size={18} strokeWidth={2.65} />
+            Token Marketplace
           </Link>
         </nav>
 
