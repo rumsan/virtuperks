@@ -151,7 +151,8 @@ export const useCheckTaskStatus = (taskId: string, entityId: string) => {
   console.log(taskStatus, "taskStatus from hook");
 
   return {
-    status: taskStatus?.isTokenDisbursed,
+    disburseStatus: taskStatus?.isTokenDisbursed,
+    closeStatus: !taskStatus?.isOpen,
     isError,
     statusLoading: isLoading,
   };

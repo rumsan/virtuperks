@@ -7,7 +7,6 @@ import { Cuid } from "@/components/departments/details/details.main";
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { DialogButton } from "@/components/common/ui/dialog";
 import {
-  useCheckCloseTask,
   useCheckTaskStatus,
   useCloseTaskMutation,
   useGetTaskById,
@@ -48,18 +47,10 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
 
   const taskData = getTaskDetail?.data?.data?.taskCreated;
 
-  const { status: disburseStatus, statusLoading: disburseStatusLoading } =
-    useCheckTaskStatus(
-      taskData?.internal_id,
-      taskData?.rewardManagement?.rewardManagement,
-    );
-
-  console.log("Disburse Status: ", disburseStatus);
-  const { status: closeStatus, statusLoading: closeStatusLoading } =
-    useCheckCloseTask(
-      taskData?.internal_id,
-      taskData?.rewardManagement?.rewardManagement,
-    );
+  const { disburseStatus, closeStatus, statusLoading } = useCheckTaskStatus(
+    taskData?.internal_id,
+    taskData?.rewardManagement?.rewardManagement,
+  );
 
   const { disburseTokenToTask, disbursePending } = useDisburseTokenToTask();
 
@@ -103,15 +94,15 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   };
 
   const isCloseButtonDisabled =
-    isPending || closeStatusLoading || closeStatus || isClosed;
+    isPending || statusLoading || closeStatus || isClosed;
 
   const getCloseButton = () => {
-    if (isPending || closeStatusLoading) {
+    if (isPending || statusLoading) {
       return (
         <Button variant="outline" className="border border-[#E44134]" disabled>
           <span className="text-[#E44134] flex items-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
-            {closeStatusLoading ? "Checking..." : "Closing..."}
+            {statusLoading ? "Checking..." : "Closing..."}
           </span>
         </Button>
       );
@@ -135,7 +126,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const isDisburseButtonDisabled =
     disburseStatus ||
     isPending ||
-    disburseStatusLoading ||
+    statusLoading ||
     disbursePending ||
     isDisbursed ||
     isClosed ||
