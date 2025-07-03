@@ -1,4 +1,5 @@
 import { Cuid } from "@/components/departments/details/details.main";
+import { useIsTaskExpired } from "@/hooks/subgraph/task";
 import { useGetTaskDetailById } from "@/hooks/subgraph/taskDetail";
 import { formatDate } from "@/utils/formatDate";
 import { Card, CardTitle } from "@workspace/ui/components/card";
@@ -19,6 +20,13 @@ const TaskDetails = ({ cuid }: TaskDetailsProps) => {
     e.stopPropagation();
     window.open(url, "_blank", "noopener,noreferrer");
   };
+
+  const { status: expiredStatus, statusLoading: expiredStatusLoading } =
+    useIsTaskExpired(
+      taskData?.internal_id,
+      taskData?.rewardManagement?.rewardManagement,
+    );
+  console.log("Is task Expired: ", expiredStatus);
 
   return (
     <>

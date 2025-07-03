@@ -6,14 +6,18 @@ import { Cuid } from "@/components/departments/details/details.main";
 
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { DialogButton } from "@/components/common/ui/dialog";
-import { useCheckTaskStatus, useGetTaskById } from "@/hooks/subgraph/task";
+import {
+  useCheckTaskStatus,
+  useCloseTaskMutation,
+  useGetTaskById,
+} from "@/hooks/subgraph/task";
 import { useDisburseTokenToTask } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { useToast } from "@workspace/ui/hooks/use-toast";
 import { ArrowLeft, CheckCircle, CircleX, Loader2 } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TaskParticipant from "./details.participant";
 import TaskDetails from "./details.task";
 
@@ -24,20 +28,29 @@ type TaskMainProps = {
 
 const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const getTaskDetail = useGetTaskById(cuid.id);
+  const { mutate: closeTask, isPending, isSuccess } = useCloseTaskMutation();
 
   const [isDisbursed, setIsDisbursed] = useState(false);
+  const [isClosed, setIsClosed] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast({
+        title: "Task Closed Successfully!",
+        variant: "success",
+      });
+    }
+  }, [isSuccess, toast]);
+
+  const [isOpen, setIsOpen] = useState(false);
 
   const taskData = getTaskDetail?.data?.data?.taskCreated;
 
-  const { status, statusLoading } = useCheckTaskStatus(
+  const { disburseStatus, closeStatus, statusLoading } = useCheckTaskStatus(
     taskData?.internal_id,
     taskData?.rewardManagement?.rewardManagement,
   );
-
-  const { toast } = useToast();
-
-  const [localStatus, setLocalStatus] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
 
   const { disburseTokenToTask, disbursePending } = useDisburseTokenToTask();
 
@@ -50,6 +63,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
       });
       setIsOpen(false);
       setIsDisbursed(true);
+
       toast({
         title: "Disperse Token Successfully!.",
         variant: "success",
@@ -63,8 +77,60 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     }
   };
 
+  const handleCloseTask = async () => {
+    try {
+      await closeTask({
+        taskId: taskData.internal_id,
+        entityId: taskData.rewardManagement.rewardManagement,
+      });
+      setIsClosed(true);
+    } catch (error) {
+      console.error("Error closing task:", error);
+      toast({
+        title: "Failed to Close Task. Please Try Again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const isCloseButtonDisabled =
+    isPending || statusLoading || closeStatus || isClosed;
+
+  const getCloseButton = () => {
+    if (isPending || statusLoading) {
+      return (
+        <Button variant="outline" className="border border-[#E44134]" disabled>
+          <span className="text-[#E44134] flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            {statusLoading ? "Checking..." : "Closing..."}
+          </span>
+        </Button>
+      );
+    }
+
+    const buttonLabel = taskData?.closed ? "Closed" : "Close";
+
+    return (
+      <Button
+        variant="outline"
+        className="border border-[#E44134]"
+        onClick={handleCloseTask}
+        disabled={isCloseButtonDisabled}
+      >
+        <span className="text-[#E44134]">{buttonLabel}</span>
+        <CircleX className="ml-2" color="#E44134" strokeWidth={2.5} size={20} />
+      </Button>
+    );
+  };
+
   const isDisburseButtonDisabled =
-    statusLoading || status || isDisbursed || disbursePending;
+    disburseStatus ||
+    isPending ||
+    statusLoading ||
+    disbursePending ||
+    isDisbursed ||
+    isClosed ||
+    closeStatus;
 
   const getDisburseButton = () => {
     if (disbursePending) {
@@ -109,8 +175,8 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
         subtitle
         titleWidth="w-64"
         subtitleWidth="w-72"
-        cardCount={2} // TaskDetails + Participants
-        gridCols="grid-cols-1" // stacked sections
+        cardCount={2}
+        gridCols="grid-cols-1"
         cardHeight="h-44"
         showPagination={false}
       />
@@ -135,23 +201,23 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
             </h3>
           </div>
           <div className="flex items-center ml-auto gap-4">
-            {getDisburseButton()}
-
-            <Button variant="outline" className="border border-[#E44134]">
-              <span className="text-[#E44134]">Close</span>{" "}
-              <CircleX color="#E44134" strokeWidth={2.5} size={20} />
-            </Button>
-            {!disbursePending && isOpen && (
-              <DialogButton
-                isOpen={isOpen}
-                setIsOpen={setIsOpen}
-                title="Are you sure you want to disperse the amount?"
-                subTitle="This action cannot be undone"
-                buttonName="Disperse"
-                submitType="Disperse"
-                handleApplyTaskLogic={handleDialogAction}
-              />
-            )}
+            <div className="flex items-center ml-auto gap-4">
+              {getDisburseButton()}
+              {!disbursePending && (
+                <DialogButton
+                  isOpen={isOpen}
+                  setIsOpen={setIsOpen}
+                  title="Are you sure you want to disperse the amount?"
+                  subTitle="This action cannot be undone"
+                  buttonName="Disperse"
+                  submitType="Disperse"
+                  handleApplyTaskLogic={handleDialogAction}
+                />
+              )}
+            </div>
+            <div className="flex items-center ml-auto gap-4">
+              {getCloseButton()}
+            </div>
           </div>
         </div>
 
