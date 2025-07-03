@@ -1,3 +1,4 @@
+import { useCheckParticipantBalance, useRedeemToken } from "@/hooks/subgraph/token";
 import { DepartmentDetails } from "@workspace/sdk/type";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -16,49 +17,76 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
-import {
-  Car,
-  Coffee,
-  Gamepad2,
-  ShoppingBag,
-  Smartphone,
-  Ticket,
-} from "lucide-react";
+import { useToast } from "@workspace/ui/hooks/use-toast";
+
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
+import { useAccount } from "wagmi";
 import { Reward } from "../../../type/token.marketplace";
+import { getCategoryIcon } from "@/utils/rewardIcon";
 
 interface DepartmentListCardProps {
   router: AppRouterInstance;
   entityList: DepartmentDetails[];
 }
 
-// Icon selector based on category
-const getCategoryIcon = (category: string) => {
-  switch (category) {
-    case "Entertainment":
-      return <Ticket className="h-6 w-6 text-[#334155]" />;
-    case "Food & Beverage":
-      return <Coffee className="h-6 w-6 text-[#334155]" />;
-    case "Utilities":
-      return <Smartphone className="h-6 w-6 text-[#334155]" />;
-    case "Shopping":
-      return <ShoppingBag className="h-6 w-6 text-[#334155]" />;
-    case "Transportation":
-      return <Car className="h-6 w-6 text-[#334155]" />;
-    default:
-      return <Gamepad2 className="h-6 w-6 text-[#334155]" />;
-  }
-};
 
 const TokenMarketListCard = ({}) => {
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
+
+  const { address } = useAccount();
+  const { balance } = useCheckParticipantBalance(address as `0x${string}`);
+  const { toast } = useToast();
+  const { tokenRedeem, redeemPending, redeemError } = useRedeemToken();
+
+  const handlePurchase = async (reward: Reward) => {
+
+    try {
+      if (!address) {
+        toast({
+          title: "Error",
+          description: "Please connect your wallet",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!balance || balance < BigInt(reward.tokens)) {
+        toast({
+          title: "Insufficient Balance",
+          description: "You don't have enough tokens for this purchase",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      await tokenRedeem({
+        amount: reward.tokens,
+      });
+
+      toast({
+        title: "Purchase Successful",
+        description: `You have redeemed ${reward.title}`,
+        variant: "success",
+      });
+
+      setSelectedReward(null);
+    } catch (error: any) {
+      console.error("Purchase failed:", error);
+      toast({
+        title: "Purchase Failed",
+        description: error.message || "Failed to complete purchase",
+        variant: "destructive",
+      });
+    }
+  };
+
   const rewards = [
     {
       id: 1,
       title: "Movie Ticket",
       description: "Premium cinema experience",
-      tokens: 500,
+      tokens: 20,
       category: "Entertainment",
     },
     {
@@ -201,13 +229,10 @@ const TokenMarketListCard = ({}) => {
                         </Button>
                         <Button
                           className="bg-[#297AD6] hover:bg-[#1E61B4] text-white"
-                          onClick={() => {
-                            // Call redemption logic here
-                            console.log("Redeemed:", item.title);
-                            setSelectedReward(null);
-                          }}
+                          onClick={() => handlePurchase(item)}
+                          disabled={redeemPending || !balance || balance < BigInt(item.tokens)}
                         >
-                          Confirm Purchase
+                          {redeemPending ? "Processing..." : "Confirm Purchase"}
                         </Button>
                       </DialogFooter>
                     </DialogContent>
