@@ -99,7 +99,7 @@ export default function DepartmentDetailsCard({
   const roleCheck = hasRole({
     role: process.env.NEXT_PUBLIC_MINTER_ROLE || "",
   });
-  const hasTreasurerRole = typeof roleCheck === "boolean" ? roleCheck : false;
+  const hasMinterRole = typeof roleCheck === "boolean" ? roleCheck : false;
 
   const getTransferButton = () => {
     if (directTransferPending) {
@@ -131,7 +131,7 @@ export default function DepartmentDetailsCard({
               Detailed view of the selected department
             </h3>
           </div>
-          {hasTreasurerRole && (
+          {hasMinterRole && (
             <div className="flex gap-10">
               {getTransferButton()}
 

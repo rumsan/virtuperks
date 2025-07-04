@@ -6,13 +6,15 @@ import {
   AvatarImage,
 } from "@workspace/ui/components/avatar";
 import { ConnectKitButton } from "connectkit";
-import { Briefcase, Layers, LayoutList, Wallet } from "lucide-react";
+import { Coins, LayoutList, ShoppingBag, Wallet } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { PropsWithChildren } from "react";
 import { NavItem } from "../../../type/nav.types";
 import { navItemPaths } from "./navItemPaths";
 
-export default function DesktopNav() {
+export default function DesktopNav({ children }: PropsWithChildren) {
   const pathname = usePathname();
 
   const getNavItemClasses = (navItem: NavItem) => {
@@ -37,21 +39,45 @@ export default function DesktopNav() {
 
   return (
     <header className="border-b bg-white">
-      <div className="flex h-14 items-center px-4 gap-8">
+      <div className="flex h-14 items-center px-4 gap-8 border-b-2 border-[#E2E8F0]">
         <nav className="flex items-center justify-center w-[50px] h-full">
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/bg/rumsan-logo.png"
+              width={50}
+              height={50}
+              alt="Logo"
+            />
+          </Link>
+        </nav>
+
+        <nav className="flex items-center gap-6 h-full">
+          <Link
+            href="/participants"
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.PARTICIPANTS)}`}
+          >
+            Participants
+          </Link>
           <Link
             href="/departments"
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.DEPARTMENTS)}`}
           >
-            <Layers size={18} strokeWidth={2.65} />
+            <Coins size={18} strokeWidth={2.65} />
             Department
           </Link>
+          {/* <Link
+                href="/tasks"
+                className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASKS)}`}
+              >
+                <Layers size={18} strokeWidth={2.65} />
+                Task Management
+              </Link> */}
           <Link
-            href="/tasks"
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASKS)}`}
+            href="/token_marketplace"
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TOKEN_MARKETPLACE)}`}
           >
-            <Briefcase size={18} strokeWidth={2.65} />
-            Task Management
+            <ShoppingBag size={18} strokeWidth={2.65} />
+            Token Marketplace
           </Link>
         </nav>
 
@@ -62,6 +88,14 @@ export default function DesktopNav() {
           >
             <LayoutList size={18} strokeWidth={2.65} />
             Tasks Portal
+          </Link>
+
+          <Link
+            href="/task_portal/mine"
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.MY_TASKS)}`}
+          >
+            <LayoutList size={18} strokeWidth={2.65} />
+            My Tasks
           </Link>
 
           <div className="flex items-center h-10 bg-[#F1F5F9] rounded-md p-2">
@@ -77,6 +111,8 @@ export default function DesktopNav() {
           </Avatar>
         </div>
       </div>
+
+      <div className="h-[calc(100dvh-60px)] overflow-auto">{children}</div>
     </header>
   );
 }
