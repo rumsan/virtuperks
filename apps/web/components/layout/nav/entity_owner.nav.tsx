@@ -112,7 +112,7 @@ export default function EntityOwnerNav({ children }: PropsWithChildren) {
         </div>
       </div>
 
-      <div className="h-[calc(100dvh-60px)] overflow-auto">{children}</div>
+      <div className="">{children}</div>
     </header>
   );
 }
