@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Reward {
+  cuid        String       @id @unique @default(cuid())
+  title       String       @db.VarChar(255)
+  description String
+  tokens      BigInt
+  category    String?      @db.VarChar(100)
+  isActive    Boolean      @default(true)
+  imageUrl    String?      @db.VarChar(255)
+  stock       Int?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  redemptions Redemption[]
+}
+
+model Redemption {
+  id              Int              @id @default(autoincrement())
+  userAddress     String           @db.VarChar(42)
+  rewardId        String
+  reward          Reward           @relation(fields: [rewardId], references: [cuid])
+  tokens          BigInt
+  transactionHash String?          @db.VarChar(66)
+  status          RedemptionStatus @default(PENDING)
+  taskId          String?          @db.VarChar(66)
+  redeemedAt      DateTime         @default(now())
+}
+
+enum RedemptionStatus {
+  PENDING
+  COMPLETED
+}
