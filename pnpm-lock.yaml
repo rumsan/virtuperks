@@ -63,6 +63,9 @@ importers:
       '@prisma/client':
         specifier: ^6.2.1
         version: 6.5.0(prisma@6.11.1(typescript@5.8.2))(typescript@5.8.2)
+      '@workspace/prisma':
+        specifier: workspace:*
+        version: link:../../packages/virtueperks-prisma
       '@workspace/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk

@@ -35,8 +35,8 @@ async function bootstrap() {
   const port = process.env.PORT || 3333;
 
   const config = new DocumentBuilder()
-    .setTitle('Rumsan App')
-    .setDescription('API service for Rumsan Apps')
+    .setTitle('Virtue Perks API')
+    .setDescription('API service for Virtueperks Apps')
     .setVersion('1.0')
     .addBearerAuth({type: 'http', scheme: 'bearer', bearerFormat: 'JWT'}, 'JWT')
     .build();
