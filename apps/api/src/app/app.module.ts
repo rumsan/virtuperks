@@ -1,9 +1,11 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { EventEmitterModule } from "@nestjs/event-emitter";
+import { PrismaService } from '@rumsan/prisma';
 import { ListenerModule } from "src/listeners/listener.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+
 
 @Module({
   imports: [
@@ -12,9 +14,10 @@ import { AppService } from "./app.service";
       maxListeners: 10,
       ignoreErrors: false,
     }),
+
     ListenerModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, PrismaService],
 })
 export class AppModule {}

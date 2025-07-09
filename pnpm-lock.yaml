@@ -63,6 +63,9 @@ importers:
       '@prisma/client':
         specifier: ^6.2.1
         version: 6.5.0(prisma@6.11.1(typescript@5.8.2))(typescript@5.8.2)
+      '@rumsan/prisma':
+        specifier: ^1.0.140
+        version: 1.0.140
       '@workspace/prisma':
         specifier: workspace:*
         version: link:../../packages/virtueperks-prisma
@@ -139,6 +142,9 @@ importers:
       prettier:
         specifier: ^3.4.2
         version: 3.5.3
+      prisma:
+        specifier: ^6.3.1
+        version: 6.11.1(typescript@5.8.2)
       source-map-support:
         specifier: ^0.5.21
         version: 0.5.21
@@ -2846,6 +2852,12 @@ packages:
 
   '@rescript/std@9.0.0':
     resolution: {integrity: sha512-zGzFsgtZ44mgL4Xef2gOy1hrRVdrs9mcxCOOKZrIPsmbZW14yTkaF591GXxpQvjXiHtgZ/iA9qLyWH6oSReIxQ==}
+
+  '@rumsan/prisma@1.0.140':
+    resolution: {integrity: sha512-n44tzjMAV4Mr+TpAwgBblkAwnSgnkOcltUf9KUdgWsQnhQh+ubaKiRC4dYhKT+Zgvzat2WlVNOLnk9yB3a4KDg==, tarball: https://npm.pkg.github.com/download/@rumsan/prisma/1.0.140/1667eb935135054a7858e0e567e8054a825d5b0d}
+
+  '@rumsan/sdk@0.1.107':
+    resolution: {integrity: sha512-X8Qj1u5tTruwSEC9tXkvJ3/LDofdpFliq6t0WCnVtCcojtIm/nxwUlwB/To4vCcvnvTcVHGYu63oQRLL8y/Sdw==, tarball: https://npm.pkg.github.com/download/@rumsan/sdk/0.1.107/ecc06e617b87236aec6b1c2000f9e4aa4baa94b6}
 
   '@safe-global/safe-apps-provider@0.18.5':
     resolution: {integrity: sha512-9v9wjBi3TwLsEJ3C2ujYoexp3pFJ0omDLH/GX91e2QB+uwCKTBYyhxFSrTQ9qzoyQd+bfsk4gjOGW87QcJhf7g==}
@@ -12045,6 +12057,12 @@ snapshots:
 
   '@rescript/std@9.0.0': {}
 
+  '@rumsan/prisma@1.0.140':
+    dependencies:
+      '@rumsan/sdk': 0.1.107
+
+  '@rumsan/sdk@0.1.107': {}
+
   '@safe-global/safe-apps-provider@0.18.5(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2)':
     dependencies:
       '@safe-global/safe-apps-sdk': 9.1.0(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.24.2)
@@ -17801,7 +17819,6 @@ snapshots:
       '@prisma/engines': 6.11.1
     optionalDependencies:
       typescript: 5.8.2
-    optional: true
 
   prisma@6.11.1(typescript@5.8.3):
     dependencies:
