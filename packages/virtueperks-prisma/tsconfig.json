@@ -2,8 +2,8 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
-    "module": "NodeNext",
-    "moduleResolution": "nodenext",
+    "module": "ESNext", // Changed from NodeNext to ESNext
+    "moduleResolution": "node", // Changed from nodenext to node
     "declaration": true,
     "sourceMap": true,
     "esModuleInterop": true,
@@ -17,8 +17,11 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@client/*": ["./client/*"] // Added alias for client directory
+    }
   },
-  "include": ["./src", "./prisma"],
+  "include": ["./src", "./prisma", "./client"], // Added client directory
   "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
 }
