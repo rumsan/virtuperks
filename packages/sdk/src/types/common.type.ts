@@ -7,3 +7,9 @@ export type CommonFields = {
   transactionHash: string;
   __typename: string;
 };
+
+export type CommonVirtualPerks = {
+  ciud: string;
+  createdBy: string;
+  updatedBy: string;
+}
