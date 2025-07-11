@@ -21,6 +21,11 @@
       "require": "./dist/types/index.js",
       "types": "./dist/types/index.d.ts"
     },
+     "./types/*": {
+      "import": "./dist/types/*.js",
+      "require": "./dist/types/*.js",
+      "types": "./dist/types/*.d.ts"
+    },
     "./constants": {
       "import": "./dist/constants/events.js",
       "require": "./dist/constants/events.js",

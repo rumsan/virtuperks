@@ -20,7 +20,7 @@ model Reward {
   cuid        String       @id @unique @default(cuid())
   title       String       @db.VarChar(255)
   description String
-  tokens      BigInt
+  tokens      Int
   category    String?      @db.VarChar(100)
   isActive    Boolean      @default(true)
   imageUrl    String?      @db.VarChar(255)
@@ -31,15 +31,16 @@ model Reward {
 }
 
 model Redemption {
-  id              Int              @id @default(autoincrement())
+  cuid              Int              @id @default(autoincrement())
   userAddress     String           @db.VarChar(42)
   rewardId        String
   reward          Reward           @relation(fields: [rewardId], references: [cuid])
-  tokens          BigInt
+  tokens          Int
   transactionHash String?          @db.VarChar(66)
   status          RedemptionStatus @default(PENDING)
   taskId          String?          @db.VarChar(66)
-  redeemedAt      DateTime         @default(now())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 enum RedemptionStatus {
