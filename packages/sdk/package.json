@@ -11,15 +11,26 @@
     "typescript": "latest"
   },
   "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
     "./type": {
       "import": "./dist/types/index.js",
+      "require": "./dist/types/index.js",
       "types": "./dist/types/index.d.ts"
     },
-    "./constant": {
+     "./types/*": {
+      "import": "./dist/types/*.js",
+      "require": "./dist/types/*.js",
+      "types": "./dist/types/*.d.ts"
+    },
+    "./constants": {
       "import": "./dist/constants/events.js",
+      "require": "./dist/constants/events.js",
       "types": "./dist/constants/events.d.ts"
     }
-    
    
     
   }

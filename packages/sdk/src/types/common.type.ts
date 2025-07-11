@@ -7,3 +7,9 @@ export type CommonFields = {
   transactionHash: string;
   __typename: string;
 };
+
+export type VirtueperkCommonField = {
+  cuid: string;
+  createdBy: string;
+  updatedBy: string;
+}
