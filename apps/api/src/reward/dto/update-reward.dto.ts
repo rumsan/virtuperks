@@ -1,10 +1,7 @@
-export interface UpdateRewardDto {
-    title?: string;
-    description?: string;
-    tokens: number;
-    category?: string;
-    isActive?: boolean;
-    imageUrl?: string;
-    stock?: number;
-  }
+import { PartialType } from '@nestjs/swagger';
+import { CreateRewardDto } from './create-reward.dto';
+
+
+export class UpdateRewardDto extends PartialType(CreateRewardDto) {
   
+}

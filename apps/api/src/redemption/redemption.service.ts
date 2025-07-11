@@ -1,13 +1,21 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '@rumsan/prisma';
 import { CreateRedemptionDto } from './dto/create-redemption.dto';
 
 @Injectable()
 export class RedemptionService {
+  constructor(private prisma: PrismaService) {}
+
   findAll() {
-    return [{ id: 1, user: 'Ngima', reward: 'Free Coffee' }];
+    return this.prisma.redemption.findMany();
   }
 
-  create(dto: CreateRedemptionDto) {
-    return  "hello"
+  async create(dto: CreateRedemptionDto) {
+    const redemption = await this.prisma.redemption.create({
+      data: dto,
+    });
+  
+    return redemption;
   }
+  
 }

@@ -23,9 +23,10 @@ export class RewardController {
   }
 
   @Put(':cuid')
-  update(@Param('cuid') cuid: string, @Body() dto: UpdateRewardDto) {
-    return this.rewardService.update(cuid, dto);
-  }
+update(@Param('cuid') cuid: string, @Body() dto: UpdateRewardDto) {
+  return this.rewardService.update(cuid, dto);
+}
+
 
   @Delete(':cuid')
   delete(@Param('cuid') cuid: string) {
