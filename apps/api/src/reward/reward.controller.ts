@@ -18,8 +18,8 @@ export class RewardController {
   }
 
   @Post()
-  create(@Body() dto: CreateRewardDto) {
-    return this.rewardService.create(dto);
+  create(@Body() payload: CreateRewardDto) {
+    return this.rewardService.create(payload);
   }
 
   @Put(':cuid')

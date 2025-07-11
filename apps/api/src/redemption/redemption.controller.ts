@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { RedemptionService } from './redemption.service';
+import { CreateRedemptionDto } from './dto/create-redemption.dto';
 
 @Controller('redemption')
 export class RedemptionController {
@@ -11,7 +12,7 @@ export class RedemptionController {
   }
 
   @Post()
-  create(@Body() body: any) {
-    return this.redemptionService.create(body);
+  create(@Body() payload: CreateRedemptionDto) {
+    return this.redemptionService.create(payload);
   }
 }

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { CreateRedemptionDto } from './dto/create-redemption.dto';
 
 @Injectable()
 export class RedemptionService {
@@ -6,7 +7,7 @@ export class RedemptionService {
     return [{ id: 1, user: 'Ngima', reward: 'Free Coffee' }];
   }
 
-  create(data: any) {
-    return { message: 'Redemption created', data };
+  create(dto: CreateRedemptionDto) {
+    return  "hello"
   }
 }
