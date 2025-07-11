@@ -8,8 +8,8 @@ export type CommonFields = {
   __typename: string;
 };
 
-export type CommonVirtualPerks = {
-  ciud: string;
+export type VirtueperkCommonField = {
+  cuid: string;
   createdBy: string;
   updatedBy: string;
 }

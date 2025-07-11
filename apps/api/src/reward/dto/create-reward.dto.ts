@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import type { Reward } from '@sdk/src/types/reward.type';
+import { CreateReward } from '@workspace/sdk/type';
 import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class CreateRewardDto implements Omit<Reward, 'cuid' | 'createdAt' | 'updatedAt' | 'redemptions'> {
+export class CreateRewardDto implements CreateReward {
   @ApiProperty()
   @IsString()
   title: string;
@@ -13,7 +13,7 @@ export class CreateRewardDto implements Omit<Reward, 'cuid' | 'createdAt' | 'upd
 
   @ApiProperty()
   @IsNumber()
-  tokens: number; // Note: change to string if your schema uses BigInt
+  tokens: number; 
 
   @ApiProperty({ required: false })
   @IsOptional()

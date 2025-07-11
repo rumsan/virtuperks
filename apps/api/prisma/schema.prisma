@@ -39,7 +39,8 @@ model Redemption {
   transactionHash String?          @db.VarChar(66)
   status          RedemptionStatus @default(PENDING)
   taskId          String?          @db.VarChar(66)
-  redeemedAt      DateTime         @default(now())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 enum RedemptionStatus {

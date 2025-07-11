@@ -1,15 +1,20 @@
-import type { Redemption } from "./redemption.type";
+import { VirtueperkCommonField } from "./common.type";
+import { Redemption } from "./redemption.type";
 
-export interface Reward {
-  cuid: string;
+
+export type  RewardBase  = {
+
   title: string;
   description: string;
-  tokens: bigint;
+  tokens: number;
   category?: string;
   isActive: boolean;
   imageUrl?: string;
   stock?: number;
-  createdAt: Date;
-  updatedAt: Date;
+
   redemptions?: Redemption[]; 
 }
+
+export type Reward = RewardBase & VirtueperkCommonField
+export type CreateReward = RewardBase
+export type EditReward= Partial<CreateReward>

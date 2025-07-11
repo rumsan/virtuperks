@@ -1,15 +1,20 @@
-import type { Reward } from "./reward.type";
+import { VirtueperkCommonField } from "./common.type";
+import { RedemptionStatus } from "./enums";
 
-export interface Redemption {
-  id: number;
+
+export type  RedemptionBase = {
+
   userAddress: string;
   rewardId: string;
-  reward?: Reward;  
-  tokens: bigint;
+  tokens: number;
   transactionHash?: string;
   status: RedemptionStatus;
   taskId?: string;
-  redeemedAt: Date;
+  
 }
 
-export type RedemptionStatus = "PENDING" | "COMPLETED";
+
+export type Redemption = RedemptionBase & VirtueperkCommonField
+
+export type CreateRedemption = RedemptionBase
+export  type EditRedemption = Partial<CreateRedemption>
