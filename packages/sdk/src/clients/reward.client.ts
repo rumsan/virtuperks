@@ -1,5 +1,5 @@
-// import { Pagination } from '@rumsan/sdk/types';
 import { AxiosInstance, AxiosRequestConfig } from 'axios';
+import { Pagination } from '../types/pagination.type';
 import { CreateReward, EditReward, Reward } from '../types/reward.type';
 import { formatResponse } from '../utils/formatResponse.utils';
 
@@ -17,20 +17,20 @@ import { formatResponse } from '../utils/formatResponse.utils';
       return formatResponse<Reward>(response);
     }
   
-    // async list(data?: Pagination, config?: AxiosRequestConfig) {
-    //   const response = await this._client.get(`${this._prefix}`, {
-    //     params: data,
-    //     ...config,
-    //   });
-    //   return formatResponse<Reward[]>(response);
-    // }
+    async list(data?: Pagination, config?: AxiosRequestConfig) {
+      const response = await this._client.get(`${this._prefix}`, {
+        params: data,
+        ...config,
+      });
+      return formatResponse<Reward[]>(response);
+    }
   
     
-     // Fetch all available rewards
-  async list(config?: AxiosRequestConfig) {
-    const response = await this._client.get(`${this._prefix}`, config);
-    return formatResponse<Reward[]>(response);
-    }
+  //    // Fetch all available rewards
+  // async list(config?: AxiosRequestConfig) {
+  //   const response = await this._client.get(`${this._prefix}`, config);
+  //   return formatResponse<Reward[]>(response);
+  //   }
     
     async get(id: string, config?: AxiosRequestConfig) {
       const response = await this._client.get(`${this._prefix}/${id}`, config);
