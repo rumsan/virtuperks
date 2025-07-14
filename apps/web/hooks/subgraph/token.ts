@@ -2,8 +2,10 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
+  useReadRewardTokenBalanceOf,
   useWriteRewardManagementDisburseTokensToTask,
   useWriteRewardManagementTransferToken,
+  useWriteRewardTokenTransfer,
 } from "../wagmi/contracts";
 
 export const useDisburseTokenToTask = () => {
@@ -135,3 +137,65 @@ export const useGetDisbursements = (
     },
   });
 };
+
+
+
+export const useRedeemToken = () => {
+  const { writeContractAsync } = useWriteRewardTokenTransfer()
+
+  const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN;
+  const adminAddress = process.env.NEXT_PUBLIC_ADMIN_ADDRESS;
+
+  const mutation = useMutation({
+    mutationFn: async ({
+      amount,
+   
+    }: {
+      amount: number;
+  
+    }) => {
+      const result = await writeContractAsync({
+        address: tokenAddress as `0x${string}`,
+        args: [
+          adminAddress as `0x${string}`,
+          BigInt(amount),
+        ],
+      });
+      return result;
+    },
+  });
+
+  return {
+    tokenRedeem: mutation.mutateAsync,
+    redeemPending: mutation.isPending,
+    redeemSuccess: mutation.isSuccess,
+    redeemError: mutation.isError,
+  };
+};
+
+
+export const useCheckParticipantBalance = (participantAddress:string) => {
+
+
+
+  const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN;
+
+
+  const { data, isError, isLoading } = useReadRewardTokenBalanceOf({
+      
+    address: tokenAddress as `0x${string}`,
+    args:[participantAddress as `0x${string}`]
+
+
+
+  })
+  return {
+    balance: data,
+    isError,
+    isLoading,
+}
+  
+
+ 
+};
+
