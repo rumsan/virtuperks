@@ -1,4 +1,7 @@
-import { useCheckParticipantBalance, useRedeemToken } from "@/hooks/subgraph/token";
+import {
+  useCheckParticipantBalance,
+  useRedeemToken,
+} from "@/hooks/subgraph/token";
 import { DepartmentDetails } from "@workspace/sdk/type";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -19,17 +22,16 @@ import {
 } from "@workspace/ui/components/dialog";
 import { useToast } from "@workspace/ui/hooks/use-toast";
 
+import { getCategoryIcon } from "@/utils/rewardIcon";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { Reward } from "../../../type/token.marketplace";
-import { getCategoryIcon } from "@/utils/rewardIcon";
 
 interface DepartmentListCardProps {
   router: AppRouterInstance;
   entityList: DepartmentDetails[];
 }
-
 
 const TokenMarketListCard = ({}) => {
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
@@ -40,7 +42,6 @@ const TokenMarketListCard = ({}) => {
   const { tokenRedeem, redeemPending, redeemError } = useRedeemToken();
 
   const handlePurchase = async (reward: Reward) => {
-
     try {
       if (!address) {
         toast({
@@ -81,13 +82,22 @@ const TokenMarketListCard = ({}) => {
     }
   };
 
-  const rewards = [
+  const categoryBgMap: Record<string, string> = {
+    Entertainment: "bg-purple-100",
+    "Food & Beverage": "bg-orange-100",
+    Utilities: "bg-blue-100",
+    Shopping: "bg-green-100",
+    Transportation: "bg-yellow-100",
+  };
+
+  const rewards: Reward[] = [
     {
       id: 1,
       title: "Movie Ticket",
       description: "Premium cinema experience",
       tokens: 20,
       category: "Entertainment",
+      image: "https://assets.rumsan.net/rumsan-test/cinema-ticket.jpg",
     },
     {
       id: 2,
@@ -95,6 +105,7 @@ const TokenMarketListCard = ({}) => {
       description: "Premium coffee blend",
       tokens: 150,
       category: "Food & Beverage",
+      image: "https://assets.rumsan.net/rumsan-test/coffee-.jpg",
     },
     {
       id: 3,
@@ -102,6 +113,7 @@ const TokenMarketListCard = ({}) => {
       description: "Mobile recharge service",
       tokens: 200,
       category: "Utilities",
+      image: "https://assets.rumsan.net/rumsan-test/mobile-topup.png",
     },
     {
       id: 4,
@@ -109,34 +121,7 @@ const TokenMarketListCard = ({}) => {
       description: "Universal gift voucher",
       tokens: 1000,
       category: "Shopping",
-    },
-    {
-      id: 5,
-      title: "Taxi Ride",
-      description: "City transportation service",
-      tokens: 300,
-      category: "Transportation",
-    },
-    {
-      id: 6,
-      title: "Restaurant Meal",
-      description: "Fine dining experience",
-      tokens: 800,
-      category: "Food & Beverage",
-    },
-    {
-      id: 7,
-      title: "Shopping Voucher",
-      description: "Retail store credit",
-      tokens: 600,
-      category: "Shopping",
-    },
-    {
-      id: 8,
-      title: "Gaming Credits",
-      description: "In-game currency",
-      tokens: 250,
-      category: "Entertainment",
+      image: "https://assets.rumsan.net/rumsan-test/gift-card.jpg",
     },
   ];
 
@@ -157,23 +142,41 @@ const TokenMarketListCard = ({}) => {
             key={item.id}
             className="hover:shadow-md transition cursor-pointer flex flex-col justify-between"
           >
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                {/* Category Icon on the left */}
-                <div>{getCategoryIcon(item.category)}</div>
+            <CardHeader className="p-0">
+              <div className="relative w-full h-48 overflow-hidden rounded-t-lg">
+                {/* Image fills the card top area */}
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  loading="lazy"
+                  className="w-full h-full object-cover"
+                />
 
-                {/* Category badge on the right */}
-                <span className="bg-[#F1F5F9] text-[#334155] text-xs font-medium px-3 py-1 rounded-full">
-                  {item.category}
-                </span>
+                {/* Icon + Category - fixed top-left */}
+                <div
+                  className={`absolute top-2 left-2 z-10 flex items-center gap-2 px-2 py-1 rounded-full shadow-sm 
+    ${categoryBgMap[item.category] || "bg-gray-100"} 
+    backdrop-blur-sm`}
+                >
+                  {getCategoryIcon(item.category)}
+                  <span className="text-xs font-medium text-[#334155]">
+                    {item.category}
+                  </span>
+                </div>
+
+                {/* Optional gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none rounded-t-lg" />
               </div>
 
-              <CardTitle className="text-lg text-[#0F172A] mt-2">
-                {item.title}
-              </CardTitle>
-              <CardDescription className="text-sm text-[#64748B]">
-                {item.description}
-              </CardDescription>
+              {/* Title + Description */}
+              <div className="px-4 pt-3 pb-2">
+                <CardTitle className="text-lg text-[#0F172A]">
+                  {item.title}
+                </CardTitle>
+                <CardDescription className="text-sm text-[#64748B]">
+                  {item.description}
+                </CardDescription>
+              </div>
             </CardHeader>
 
             <CardContent className="mt-auto">
@@ -230,7 +233,11 @@ const TokenMarketListCard = ({}) => {
                         <Button
                           className="bg-[#297AD6] hover:bg-[#1E61B4] text-white"
                           onClick={() => handlePurchase(item)}
-                          disabled={redeemPending || !balance || balance < BigInt(item.tokens)}
+                          disabled={
+                            redeemPending ||
+                            !balance ||
+                            balance < BigInt(item.tokens)
+                          }
                         >
                           {redeemPending ? "Processing..." : "Confirm Purchase"}
                         </Button>
