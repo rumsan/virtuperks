@@ -2,7 +2,8 @@ import {
   useCheckParticipantBalance,
   useRedeemToken,
 } from "@/hooks/subgraph/token";
-import { DepartmentDetails } from "@workspace/sdk/type";
+import { PATHS } from "@/routes/paths";
+import { getCategoryIcon } from "@/utils/rewardIcon";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -21,17 +22,10 @@ import {
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { useToast } from "@workspace/ui/hooks/use-toast";
-
-import { getCategoryIcon } from "@/utils/rewardIcon";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { Reward } from "../../../type/token.marketplace";
-
-interface DepartmentListCardProps {
-  router: AppRouterInstance;
-  entityList: DepartmentDetails[];
-}
 
 const TokenMarketListCard = ({}) => {
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
@@ -40,6 +34,7 @@ const TokenMarketListCard = ({}) => {
   const { balance } = useCheckParticipantBalance(address as `0x${string}`);
   const { toast } = useToast();
   const { tokenRedeem, redeemPending, redeemError } = useRedeemToken();
+  const router = useRouter();
 
   const handlePurchase = async (reward: Reward) => {
     try {
@@ -141,6 +136,10 @@ const TokenMarketListCard = ({}) => {
           <Card
             key={item.id}
             className="hover:shadow-md transition cursor-pointer flex flex-col justify-between"
+            onClick={() =>
+              item.id &&
+              router.push(PATHS.TOKENMARKETPLACE.DETAILS(item.id.toString()))
+            }
           >
             <CardHeader className="p-0">
               <div className="relative w-full h-48 overflow-hidden rounded-t-lg">
