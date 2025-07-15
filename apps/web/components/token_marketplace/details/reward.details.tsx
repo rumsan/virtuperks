@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@workspace/ui/components/button";
 import { useEffect, useState } from "react";
 
 type RedemptionStatus = "completed" | "pending";
@@ -72,31 +71,31 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
 
     setRedemptions([
       {
-        name: "John Doe",
+        name: "Wallet Address",
         date: "9/12/2024",
         status: "completed",
         txnId: "TXN09834",
       },
       {
-        name: "Jane Smith",
+        name: "Wallet Address",
         date: "9/12/2024",
         status: "completed",
         txnId: "TXN09833",
       },
       {
-        name: "Mike Johnson",
+        name: "Wallet Address",
         date: "9/12/2024",
         status: "pending",
         txnId: "TXN09832",
       },
       {
-        name: "Sarah Wilson",
+        name: "Wallet Address",
         date: "9/12/2024",
         status: "completed",
         txnId: "TXN09831",
       },
       {
-        name: "David Brown",
+        name: "Wallet Address",
         date: "9/12/2024",
         status: "completed",
         txnId: "TXN09830",
@@ -170,7 +169,6 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
           <div className="text-blue-600 text-2xl font-bold text-center my-2">
             🔵 {reward.tokens}
           </div>
-          <Button className="w-full text-sm py-2">Redeem Now</Button>
           <p className="text-[10px] text-gray-500 text-center mt-1">
             By redeeming, you agree to the terms.
           </p>

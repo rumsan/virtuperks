@@ -16,7 +16,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -189,49 +188,49 @@ const TokenMarketListCard = ({}) => {
                 </div>
 
                 {/* Trigger Dialog */}
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button
-                      className="bg-[#297AD6] hover:bg-[#1E61B4] text-white"
-                      onClick={() => setSelectedReward(item)}
-                    >
-                      Redeem
-                    </Button>
-                  </DialogTrigger>
+                <div onClick={(e) => e.stopPropagation()}>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        className="bg-[#297AD6] hover:bg-[#1E61B4] text-white"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedReward(item);
+                        }}
+                      >
+                        Redeem
+                      </Button>
+                    </DialogTrigger>
 
-                  {selectedReward?.id === item.id && (
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                          {getCategoryIcon(item.category)} Confirm Redemption
-                        </DialogTitle>
-                        <DialogDescription>
-                          Are you sure you want to buy this service?
-                        </DialogDescription>
-                      </DialogHeader>
+                    {selectedReward?.id === item.id && (
+                      <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                          <DialogTitle className="flex items-center gap-2">
+                            {getCategoryIcon(item.category)} Confirm Redemption
+                          </DialogTitle>
+                          <DialogDescription>
+                            Are you sure you want to buy this service?
+                          </DialogDescription>
+                        </DialogHeader>
 
-                      <div className="bg-[#F8FAFC] rounded-lg p-4 mt-4 space-y-1">
-                        <p className="text-sm font-semibold text-[#0F172A]">
-                          {item.title}
-                        </p>
-                        <p className="text-sm text-[#64748B]">
-                          {item.description}
-                        </p>
-                        <p className="text-sm font-medium text-[#297AD6] mt-1">
-                          ● {item.tokens} tokens
-                        </p>
-                      </div>
+                        <div className="bg-[#F8FAFC] rounded-lg p-4 mt-4 space-y-1">
+                          <p className="text-sm font-semibold text-[#0F172A]">
+                            {item.title}
+                          </p>
+                          <p className="text-sm text-[#64748B]">
+                            {item.description}
+                          </p>
+                          <p className="text-sm font-medium text-[#297AD6] mt-1">
+                            ● {item.tokens} tokens
+                          </p>
+                        </div>
 
-                      <DialogFooter className="mt-6 flex justify-end gap-2">
-                        <Button
-                          variant="outline"
-                          onClick={() => setSelectedReward(null)}
-                        >
-                          Cancel
-                        </Button>
                         <Button
                           className="bg-[#297AD6] hover:bg-[#1E61B4] text-white"
-                          onClick={() => handlePurchase(item)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePurchase(item);
+                          }}
                           disabled={
                             redeemPending ||
                             !balance ||
@@ -240,10 +239,10 @@ const TokenMarketListCard = ({}) => {
                         >
                           {redeemPending ? "Processing..." : "Confirm Purchase"}
                         </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  )}
-                </Dialog>
+                      </DialogContent>
+                    )}
+                  </Dialog>
+                </div>
               </div>
             </CardContent>
           </Card>
