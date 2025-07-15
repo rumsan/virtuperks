@@ -31,7 +31,8 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
     {
       id: 1,
       title: "Movie Ticket",
-      description: "Premium cinema experience",
+      description:
+        "Premium cinema experience with comfortable seating and latest sound technology",
       tokens: 20,
       category: "Entertainment",
       image: "https://assets.rumsan.net/rumsan-test/cinema-ticket.jpg",
@@ -88,6 +89,18 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
         status: "pending",
         txnId: "TXN09832",
       },
+      {
+        name: "Sarah Wilson",
+        date: "9/12/2024",
+        status: "completed",
+        txnId: "TXN09831",
+      },
+      {
+        name: "David Brown",
+        date: "9/12/2024",
+        status: "completed",
+        txnId: "TXN09830",
+      },
     ]);
   }, [rewardId]);
 
@@ -106,86 +119,93 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 max-w-6xl mx-auto space-y-6">
       <button
         onClick={() => router.push("/token_marketplace")}
-        className="text-blue-600 text-sm"
+        className="text-blue-600 text-sm font-medium"
       >
-        &lt; Back to Marketplace
+        &larr; Back to Marketplace
       </button>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Image and Description */}
-        <div className="col-span-2 border rounded-lg p-4">
-          <div className="h-48 overflow-hidden rounded mb-4">
+        {/* Left Section: Details */}
+        <div className="md:col-span-2 border border-gray-200 rounded-lg p-5 bg-white">
+          <div className="bg-gray-100 rounded-lg h-48 flex items-center justify-center mb-5">
             <img
               src={reward.image}
               alt={reward.title}
-              className="w-full h-full object-cover rounded"
+              className="object-cover h-full w-full rounded-lg"
             />
           </div>
           <h2 className="text-xl font-semibold mb-2">{reward.title}</h2>
           <p className="text-gray-600 mb-4">{reward.description}</p>
 
-          <div className="text-sm text-gray-700 space-y-1">
-            <p>
-              <strong>Category:</strong> {reward.category}
-            </p>
-            <p>
-              <strong>Validity:</strong> 6 months from redemption
-            </p>
-            <p>
-              <strong>What's Included:</strong> Premium benefits may vary
-            </p>
-            <p>
-              <strong>Terms & Conditions:</strong> Subject to availability
-            </p>
+          <div className="grid grid-cols-2 gap-4 text-sm text-gray-700 mb-2">
+            <div>
+              <p className="font-medium">Validity</p>
+              <p>6 months from redemption</p>
+            </div>
+            <div>
+              <p className="font-medium">Locations</p>
+              <p>Available at all premium cinema chains</p>
+            </div>
+            <div>
+              <p className="font-medium">What's Included</p>
+              <ul className="list-disc list-inside">
+                <li>Premium seating</li>
+                <li>Complimentary popcorn</li>
+                <li>Priority booking</li>
+              </ul>
+            </div>
+            <div>
+              <p className="font-medium">Terms & Conditions</p>
+              <p>Valid for any movie, any time. Subject to availability.</p>
+            </div>
           </div>
         </div>
 
-        {/* Redeem Section */}
-        <div className="border rounded-lg p-4">
-          <div className="text-center mb-4">
-            <h3 className="text-lg font-semibold">Redeem Token</h3>
-            <div className="text-blue-600 text-3xl font-bold my-2">
-              🔵 {reward.tokens}
-            </div>
-            <Button className="w-full">Redeem Now</Button>
-            <p className="text-xs text-gray-500 mt-2">
-              By redeeming, you agree to the terms and conditions.
-            </p>
+        {/* Right Section: Redeem Box (Condensed) */}
+        <div className="border border-gray-200 rounded-lg p-3 bg-white flex flex-col justify-between h-48">
+          <h3 className="text-base font-semibold text-center">Redeem Token</h3>
+          <div className="text-blue-600 text-2xl font-bold text-center my-2">
+            🔵 {reward.tokens}
           </div>
+          <Button className="w-full text-sm py-2">Redeem Now</Button>
+          <p className="text-[10px] text-gray-500 text-center mt-1">
+            By redeeming, you agree to the terms.
+          </p>
         </div>
       </div>
 
       {/* Redemption History */}
-      <div className="border rounded-lg p-4">
-        <h3 className="text-lg font-semibold mb-3">Redemption History</h3>
+      <div className="border border-gray-200 rounded-lg p-5 bg-white">
+        <h3 className="text-lg font-semibold mb-4">Redemption History</h3>
+        <p className="text-sm text-gray-500 mb-3">
+          Recent redemptions for this token
+        </p>
         <div className="space-y-3">
           {redemptions.map((r, idx) => (
             <div
               key={idx}
-              className="flex items-center justify-between p-3 rounded border"
+              className="flex items-center justify-between p-4 rounded border border-gray-200 bg-gray-50"
             >
-              <div className="flex items-center space-x-3">
-                <div
-                  className={`px-2 py-1 rounded text-xs font-medium 
-                    ${
-                      r.status === "completed"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
+              <div className="flex items-center gap-3">
+                <span
+                  className={`text-xs px-2 py-1 rounded-full font-medium ${
+                    r.status === "completed"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-yellow-100 text-yellow-800"
+                  }`}
                 >
                   {r.status}
-                </div>
+                </span>
                 <div>
                   <p className="font-semibold">{r.name}</p>
                   <p className="text-xs text-gray-500">{r.date}</p>
                 </div>
               </div>
               <div className="text-xs text-gray-600 text-right">
-                Transaction ID
-                <br />
+                <p className="text-gray-400">Transaction ID</p>
                 <strong>{r.txnId}</strong>
               </div>
             </div>
