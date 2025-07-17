@@ -4,6 +4,8 @@ import {
 } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
 import { getCategoryIcon } from "@/utils/rewardIcon";
+// import { hasRole } from "@/utils/roles";
+import { DialogButton } from "@/components/common/ui/dialog";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -21,19 +23,26 @@ import {
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { useToast } from "@workspace/ui/hooks/use-toast";
+import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { Reward } from "../../../type/token.marketplace";
 
-const TokenMarketListCard = ({}) => {
+const TokenMarketListCard = () => {
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { address } = useAccount();
   const { balance } = useCheckParticipantBalance(address as `0x${string}`);
   const { toast } = useToast();
-  const { tokenRedeem, redeemPending, redeemError } = useRedeemToken();
+  const { tokenRedeem, redeemPending } = useRedeemToken();
   const router = useRouter();
+
+  // ✅ Check if user has Admin role
+  // const hasEntityOwnerRole = hasRole({
+  //   role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
+  // });
 
   const handlePurchase = async (reward: Reward) => {
     try {
@@ -45,29 +54,24 @@ const TokenMarketListCard = ({}) => {
         });
         return;
       }
-
       if (!balance || balance < BigInt(reward.tokens)) {
         toast({
           title: "Insufficient Balance",
-          description: "You don't have enough tokens for this purchase",
+          description: "Not enough tokens",
           variant: "destructive",
         });
         return;
       }
 
-      await tokenRedeem({
-        amount: reward.tokens,
-      });
+      await tokenRedeem({ amount: reward.tokens });
 
       toast({
         title: "Purchase Successful",
         description: `You have redeemed ${reward.title}`,
         variant: "success",
       });
-
       setSelectedReward(null);
     } catch (error: any) {
-      console.error("Purchase failed:", error);
       toast({
         title: "Purchase Failed",
         description: error.message || "Failed to complete purchase",
@@ -131,18 +135,25 @@ const TokenMarketListCard = ({}) => {
 
       {/* Grid of Rewards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+        <Card
+          className="w-full flex flex-col items-center justify-center text-green-500 bg-green-50 border border-dashed border-green-300 cursor-pointer hover:shadow-lg hover:text-green-600 transition"
+          onClick={() => setIsDialogOpen(true)}
+        >
+          <Plus size={36} />
+          <span className="text-center text-base mt-2">Add Token</span>
+        </Card>
+
+        {/* Rewards List */}
         {rewards.map((item) => (
           <Card
             key={item.id}
             className="hover:shadow-md transition cursor-pointer flex flex-col justify-between"
             onClick={() =>
-              item.id &&
               router.push(PATHS.TOKENMARKETPLACE.DETAILS(item.id.toString()))
             }
           >
             <CardHeader className="p-0">
               <div className="relative w-full h-48 overflow-hidden rounded-t-lg">
-                {/* Image fills the card top area */}
                 <img
                   src={item.image}
                   alt={item.title}
@@ -150,23 +161,17 @@ const TokenMarketListCard = ({}) => {
                   className="w-full h-full object-cover"
                 />
 
-                {/* Icon + Category - fixed top-left */}
                 <div
-                  className={`absolute top-2 left-2 z-10 flex items-center gap-2 px-2 py-1 rounded-full shadow-sm 
-    ${categoryBgMap[item.category] || "bg-gray-100"} 
-    backdrop-blur-sm`}
+                  className={`absolute top-2 left-2 z-10 flex items-center gap-2 px-2 py-1 rounded-full shadow-sm ${categoryBgMap[item.category] || "bg-gray-100"} backdrop-blur-sm`}
                 >
                   {getCategoryIcon(item.category)}
                   <span className="text-xs font-medium text-[#334155]">
                     {item.category}
                   </span>
                 </div>
-
-                {/* Optional gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none rounded-t-lg" />
               </div>
 
-              {/* Title + Description */}
               <div className="px-4 pt-3 pb-2">
                 <CardTitle className="text-lg text-[#0F172A]">
                   {item.title}
@@ -187,7 +192,6 @@ const TokenMarketListCard = ({}) => {
                   ●{item.tokens}
                 </div>
 
-                {/* Trigger Dialog */}
                 <div onClick={(e) => e.stopPropagation()}>
                   <Dialog>
                     <DialogTrigger asChild>
@@ -248,6 +252,21 @@ const TokenMarketListCard = ({}) => {
           </Card>
         ))}
       </div>
+
+      {/* Dialog for Adding Token */}
+      <DialogButton
+        isOpen={isDialogOpen}
+        setIsOpen={setIsDialogOpen}
+        title="Add New Token"
+        subTitle="Fill in the details to create a new token"
+        buttonName="Create Token"
+        submitType="CreateReward"
+        inputLabel="Reward Name"
+        inputPlaceholder="Enter reward name"
+        // handleApplyTaskLogic={async (data) => {
+        //   // console.log("New Token Data:", data);
+        // }}
+      />
     </div>
   );
 };
