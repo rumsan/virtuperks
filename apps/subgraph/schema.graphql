@@ -309,3 +309,23 @@ type TokenTransferred @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+type RewardRedemptionCreated @entity(immutable: true) {
+  id: Bytes!
+  rewardRedemption: Bytes! # address
+  appId: Bytes! # bytes32
+  name: String! # string
+  tokensRequired: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type RewardRedeemed @entity(immutable: true) {
+  id: Bytes!
+  from: Bytes! # address
+  amount: BigInt! # uint256
+  status: Int! # uint8
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "rewardRedemption",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "appId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokensRequired",
+        "type": "uint256"
+      }
+    ],
+    "name": "RewardRedemptionCreated",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "_appId", "type": "bytes32" },
+      { "internalType": "address", "name": "_registry", "type": "address" },
+      { "internalType": "address", "name": "_token", "type": "address" },
+      { "internalType": "string", "name": "_name", "type": "string" },
+      {
+        "internalType": "uint256",
+        "name": "_tokensRequired",
+        "type": "uint256"
+      }
+    ],
+    "name": "createRewardRedemption",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

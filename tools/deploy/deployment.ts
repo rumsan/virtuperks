@@ -138,7 +138,7 @@ class SeedProject extends commonLib {
     registry: Addressable | string,
     token: Addressable | string,
     name: string,
-    tokensRequired: number | string
+    tokensRequired: number | bigint
   ) {
     const rewardRedemption = await this.deployContract('RewardRedemption', [
       appId,
@@ -186,7 +186,7 @@ async function main() {
 
   // Deploy RewardRedemption contract
   const redemptionName = 'Rumsan Redemption';
-  const tokensRequired = 1000; // Example value, adjust as needed
+  const tokensRequired = 100; // Example value, adjust as needed
   await seedProject.deployRewardRedemption(
     RUMSAN_APP_ID,
     accessManagerV2.contract.target as string,

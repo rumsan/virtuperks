@@ -1299,6 +1299,181 @@ export const rewardManagementFactoryAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// RewardRedemptinFactory
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const rewardRedemptinFactoryAbi = [
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'rewardRedemption',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      {name: 'appId', internalType: 'bytes32', type: 'bytes32', indexed: true},
+      {name: 'name', internalType: 'string', type: 'string', indexed: false},
+      {
+        name: 'tokensRequired',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'RewardRedemptionCreated',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {name: '_appId', internalType: 'bytes32', type: 'bytes32'},
+      {name: '_registry', internalType: 'address', type: 'address'},
+      {name: '_token', internalType: 'address', type: 'address'},
+      {name: '_name', internalType: 'string', type: 'string'},
+      {name: '_tokensRequired', internalType: 'uint256', type: 'uint256'},
+    ],
+    name: 'createRewardRedemption',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// RewardRedemption
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const rewardRedemptionAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      {name: '_appId', internalType: 'bytes32', type: 'bytes32'},
+      {name: '_registry', internalType: 'address', type: 'address'},
+      {name: '_token', internalType: 'address', type: 'address'},
+      {name: '_name', internalType: 'string', type: 'string'},
+      {name: '_tokensRequired', internalType: 'uint256', type: 'uint256'},
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'error',
+    inputs: [{name: 'target', internalType: 'address', type: 'address'}],
+    name: 'AddressEmptyCode',
+  },
+  {type: 'error', inputs: [], name: 'FailedCall'},
+  {type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall'},
+  {
+    type: 'error',
+    inputs: [{name: 'token', internalType: 'address', type: 'address'}],
+    name: 'SafeERC20FailedOperation',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {name: 'from', internalType: 'address', type: 'address', indexed: true},
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'status',
+        internalType: 'enum IRewardRedemption.RedemptionStatus',
+        type: 'uint8',
+        indexed: false,
+      },
+    ],
+    name: 'RewardRedeemed',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'DEFAULT_ADMIN_ROLE',
+    outputs: [{name: '', internalType: 'bytes32', type: 'bytes32'}],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'app',
+    outputs: [
+      {name: '', internalType: 'contract IAppRegistry', type: 'address'},
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'appId',
+    outputs: [{name: '', internalType: 'bytes32', type: 'bytes32'}],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{name: 'data', internalType: 'bytes[]', type: 'bytes[]'}],
+    name: 'multicall',
+    outputs: [{name: 'results', internalType: 'bytes[]', type: 'bytes[]'}],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'name',
+    outputs: [{name: '', internalType: 'string', type: 'string'}],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{name: 'amount', internalType: 'uint256', type: 'uint256'}],
+    name: 'redeem',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {name: '', internalType: 'bytes32', type: 'bytes32'},
+      {name: '', internalType: 'address', type: 'address'},
+    ],
+    name: 'redemptions',
+    outputs: [
+      {
+        name: 'status',
+        internalType: 'enum IRewardRedemption.RedemptionStatus',
+        type: 'uint8',
+      },
+      {name: 'from', internalType: 'address', type: 'address'},
+      {name: 'amount', internalType: 'uint256', type: 'uint256'},
+      {name: 'timestamp', internalType: 'uint256', type: 'uint256'},
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'token',
+    outputs: [{name: '', internalType: 'contract IERC20', type: 'address'}],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'tokensRequired',
+    outputs: [{name: '', internalType: 'uint256', type: 'uint256'}],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{name: 'user', internalType: 'address', type: 'address'}],
+    name: 'updateRedemptionStatus',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // React
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2592,4 +2767,195 @@ export const useWatchRewardManagementFactoryRewardManagementCreatedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: rewardManagementFactoryAbi,
     eventName: 'RewardManagementCreated',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardRedemptinFactoryAbi}__
+ */
+export const useWriteRewardRedemptinFactory =
+  /*#__PURE__*/ createUseWriteContract({abi: rewardRedemptinFactoryAbi})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardRedemptinFactoryAbi}__ and `functionName` set to `"createRewardRedemption"`
+ */
+export const useWriteRewardRedemptinFactoryCreateRewardRedemption =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: rewardRedemptinFactoryAbi,
+    functionName: 'createRewardRedemption',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardRedemptinFactoryAbi}__
+ */
+export const useSimulateRewardRedemptinFactory =
+  /*#__PURE__*/ createUseSimulateContract({abi: rewardRedemptinFactoryAbi})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardRedemptinFactoryAbi}__ and `functionName` set to `"createRewardRedemption"`
+ */
+export const useSimulateRewardRedemptinFactoryCreateRewardRedemption =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: rewardRedemptinFactoryAbi,
+    functionName: 'createRewardRedemption',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardRedemptinFactoryAbi}__
+ */
+export const useWatchRewardRedemptinFactoryEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({abi: rewardRedemptinFactoryAbi})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardRedemptinFactoryAbi}__ and `eventName` set to `"RewardRedemptionCreated"`
+ */
+export const useWatchRewardRedemptinFactoryRewardRedemptionCreatedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: rewardRedemptinFactoryAbi,
+    eventName: 'RewardRedemptionCreated',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardRedemptionAbi}__
+ */
+export const useReadRewardRedemption = /*#__PURE__*/ createUseReadContract({
+  abi: rewardRedemptionAbi,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"DEFAULT_ADMIN_ROLE"`
+ */
+export const useReadRewardRedemptionDefaultAdminRole =
+  /*#__PURE__*/ createUseReadContract({
+    abi: rewardRedemptionAbi,
+    functionName: 'DEFAULT_ADMIN_ROLE',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"app"`
+ */
+export const useReadRewardRedemptionApp = /*#__PURE__*/ createUseReadContract({
+  abi: rewardRedemptionAbi,
+  functionName: 'app',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"appId"`
+ */
+export const useReadRewardRedemptionAppId = /*#__PURE__*/ createUseReadContract(
+  {abi: rewardRedemptionAbi, functionName: 'appId'},
+)
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"name"`
+ */
+export const useReadRewardRedemptionName = /*#__PURE__*/ createUseReadContract({
+  abi: rewardRedemptionAbi,
+  functionName: 'name',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"redemptions"`
+ */
+export const useReadRewardRedemptionRedemptions =
+  /*#__PURE__*/ createUseReadContract({
+    abi: rewardRedemptionAbi,
+    functionName: 'redemptions',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"token"`
+ */
+export const useReadRewardRedemptionToken = /*#__PURE__*/ createUseReadContract(
+  {abi: rewardRedemptionAbi, functionName: 'token'},
+)
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"tokensRequired"`
+ */
+export const useReadRewardRedemptionTokensRequired =
+  /*#__PURE__*/ createUseReadContract({
+    abi: rewardRedemptionAbi,
+    functionName: 'tokensRequired',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardRedemptionAbi}__
+ */
+export const useWriteRewardRedemption = /*#__PURE__*/ createUseWriteContract({
+  abi: rewardRedemptionAbi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"multicall"`
+ */
+export const useWriteRewardRedemptionMulticall =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: rewardRedemptionAbi,
+    functionName: 'multicall',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"redeem"`
+ */
+export const useWriteRewardRedemptionRedeem =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: rewardRedemptionAbi,
+    functionName: 'redeem',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"updateRedemptionStatus"`
+ */
+export const useWriteRewardRedemptionUpdateRedemptionStatus =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: rewardRedemptionAbi,
+    functionName: 'updateRedemptionStatus',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardRedemptionAbi}__
+ */
+export const useSimulateRewardRedemption =
+  /*#__PURE__*/ createUseSimulateContract({abi: rewardRedemptionAbi})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"multicall"`
+ */
+export const useSimulateRewardRedemptionMulticall =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: rewardRedemptionAbi,
+    functionName: 'multicall',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"redeem"`
+ */
+export const useSimulateRewardRedemptionRedeem =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: rewardRedemptionAbi,
+    functionName: 'redeem',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"updateRedemptionStatus"`
+ */
+export const useSimulateRewardRedemptionUpdateRedemptionStatus =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: rewardRedemptionAbi,
+    functionName: 'updateRedemptionStatus',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardRedemptionAbi}__
+ */
+export const useWatchRewardRedemptionEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({abi: rewardRedemptionAbi})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `eventName` set to `"RewardRedeemed"`
+ */
+export const useWatchRewardRedemptionRewardRedeemedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: rewardRedemptionAbi,
+    eventName: 'RewardRedeemed',
   })

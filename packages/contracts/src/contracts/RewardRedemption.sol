@@ -18,7 +18,7 @@ contract RewardRedemption is IRewardRedemption, Multicall, ReentrancyGuard {
 
     bytes32 public appId;
     string public name;
-    uint8 public tokensRequired;
+    uint256 public tokensRequired;
     bytes32 public constant DEFAULT_ADMIN_ROLE = 0x00;
     mapping(bytes32 => mapping(address => Redemption)) public redemptions;
 
@@ -33,7 +33,7 @@ contract RewardRedemption is IRewardRedemption, Multicall, ReentrancyGuard {
         address _registry,
         address _token,
         string memory _name,
-        uint8 _tokensRequired
+        uint256 _tokensRequired
     ) {
         appId = _appId;
         app = IAppRegistry(_registry);

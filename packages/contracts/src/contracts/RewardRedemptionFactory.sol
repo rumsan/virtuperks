@@ -12,7 +12,7 @@ contract RewardRedemptionFactory is IRewardRedemptionFactory {
         address _registry,
         address _token,
         string memory _name,
-        uint8 _tokensRequired
+        uint256 _tokensRequired
     ) public {
         RewardRedemption reward = new RewardRedemption(
             _appId,
