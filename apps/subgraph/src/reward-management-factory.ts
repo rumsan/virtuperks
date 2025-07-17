@@ -25,3 +25,5 @@ event.params.rewardManagement
   RewardManagement.create(event.params.rewardManagement);
   log.debug("entityTemplateAdded: {}", [entity.rewardManagement.toHexString()]);
 }
+
+

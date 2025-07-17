@@ -12,6 +12,12 @@
     },
     "RewardManagement": {
       "address": "0xc48198ff655F8148276b0fB5aa6feCa4fBf9341B"
+    },
+    "RewardRedemptionFactory": {
+      "address": "0x68aa5B1be4Fa3809E4Dc42F0cf84EDE4eD1466b5"
+    },
+    "RewardRedemption": {
+      "address": "0xB505009ce0d013073d30360b0Ea94FA10B404AB0"
     }
   }
 }
