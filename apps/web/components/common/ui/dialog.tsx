@@ -84,9 +84,13 @@ export const DialogButton = ({
     if (submitType === "directdisburse" && !formData.to.trim()) {
       return "Recipient address is required";
     }
-    if (submitType === "CreateReward" && !formData.remarks.trim()) {
-      return "Remarks are required";
+    if (
+      submitType === "CreateReward" &&
+      (!formData.name.trim() || !formData.amount.trim())
+    ) {
+      return "Reward name and amount are required";
     }
+
     return null;
   };
 
