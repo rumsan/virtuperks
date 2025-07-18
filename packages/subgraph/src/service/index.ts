@@ -12,7 +12,8 @@ import {
   getTaskCreatedById,
   getTaskCreation,
   RewardManagementQueries,
-  TokenQueries
+  TokenQueries,
+  GetRewards
 } from '../queries';
 
 
@@ -197,6 +198,24 @@ export class SubgraphService {
       );
       return { data: null, error };
     }
+  }
+
+  // reward sevice function
+  async getRewards (){
+
+try {
+  const { data, error } = await this.subgraphQuery.query(GetRewards, {});
+return { data, error };
+
+
+}catch(error) {
+    console.error('Error fetching rewards:', error);
+    return { data: null, error };
+
+
+
+
+}
   }
   
   

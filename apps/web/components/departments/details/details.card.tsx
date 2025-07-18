@@ -45,7 +45,7 @@ export default function DepartmentDetailsCard({
   //useGetEntityOwners get all the entity Owners
   const { getEntityOwners } = useGetEntityOwners(entity?.entityId);
 
-  console.log("Entity Owner: ", getEntityOwners);
+
 
   const {
     directTransfer,

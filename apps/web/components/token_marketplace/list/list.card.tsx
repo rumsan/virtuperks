@@ -28,21 +28,53 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { Reward } from "../../../type/token.marketplace";
+import { useCreateReward, useGetRewards } from "@/hooks/subgraph/token-marketplace";
 
 const TokenMarketListCard = () => {
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+
   const { address } = useAccount();
   const { balance } = useCheckParticipantBalance(address as `0x${string}`);
   const { toast } = useToast();
   const { tokenRedeem, redeemPending } = useRedeemToken();
+  // hook to fetch rewards
+  const data = useGetRewards()
+
   const router = useRouter();
 
   // ✅ Check if user has Admin role
   // const hasEntityOwnerRole = hasRole({
   //   role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
   // });
+  const {AddReward, rewardPending}= useCreateReward()
+
+  const handleRewardAdd = async (data: any) => {
+    try {
+  await AddReward({
+      name: data.name,
+      amount: data.amount,
+  });
+       setIsDialogOpen(false);
+            toast({
+              title: "Token transfered Successfully!.",
+              variant: "success",
+            });
+    
+
+
+
+}
+catch (error: any) {
+  
+
+
+
+
+}
+
+  }
 
   const handlePurchase = async (reward: Reward) => {
     try {
@@ -254,7 +286,9 @@ const TokenMarketListCard = () => {
       </div>
 
       {/* Dialog for Adding Token */}
-      <DialogButton
+
+          
+<DialogButton
         isOpen={isDialogOpen}
         setIsOpen={setIsDialogOpen}
         title="Add New Token"
@@ -263,10 +297,20 @@ const TokenMarketListCard = () => {
         submitType="CreateReward"
         inputLabel="Reward Name"
         inputPlaceholder="Enter reward name"
-        // handleApplyTaskLogic={async (data) => {
-        //   // console.log("New Token Data:", data);
-        // }}
+        handleApplyTaskLogic={handleRewardAdd}
+        
       />
+
+
+
+
+
+
+        
+        
+        
+        
+     
     </div>
   );
 };
