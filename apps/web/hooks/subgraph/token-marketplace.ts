@@ -3,7 +3,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
 import {
   
-  useWriteRewardRedemptinFactoryCreateRewardRedemption
+  useWriteRewardRedemptinFactoryCreateRewardRedemption,
+  useWriteRewardRedemptionRedeem
 } from "../wagmi/contracts";
 
 export const useCreateReward = () => {
@@ -54,6 +55,42 @@ export const useGetRewards = () => {
       return rewards;
     },
   });
+}
+
+
+export const useRedeemReward= () => {
+  
+  const queryClient = useQueryClient();
+  const { writeContractAsync } = useWriteRewardRedemptionRedeem();
+ 
+  
+  const mutation = useMutation({
+    mutationFn: async ({rewardAddress, amount}:{rewardAddress:string, amount:number}) => {
+      const result = await writeContractAsync({
+        address: rewardAddress as `0x${string}`,
+        args: [BigInt(amount)],
+
+
+
+      })
+      return result;
+      
+
+    },
+    onSuccess: (result, variable) => {
+     // queryClient.invalidateQueries(["rewardRedemptionList"]);
+    },
+
+})
+
+  return {
+   RewardRedeem:mutation.mutateAsync,
+   RedeemPending: mutation.isPending,
+  RedeemSuccess: mutation.isSuccess,
+}
+
+
+
 }
 
 

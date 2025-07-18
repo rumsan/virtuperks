@@ -28,7 +28,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { Reward } from "../../../type/token.marketplace";
-import { useCreateReward, useGetRewards } from "@/hooks/subgraph/token-marketplace";
+import { useCreateReward, useGetRewards, useRedeemReward } from "@/hooks/subgraph/token-marketplace";
 
 const TokenMarketListCard = () => {
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
@@ -37,10 +37,13 @@ const TokenMarketListCard = () => {
 
   const { address } = useAccount();
   const { balance } = useCheckParticipantBalance(address as `0x${string}`);
+  console.log(balance, 'balance')
   const { toast } = useToast();
-  const { tokenRedeem, redeemPending } = useRedeemToken();
+ const {RewardRedeem, RedeemPending} = useRedeemReward()
   // hook to fetch rewards
   const data = useGetRewards()
+  console.log("Rewards Data:", data.data?.data?.rewardRedemptionCreateds);
+  const allRewards = data.data?.data?.rewardRedemptionCreateds || [];
 
   const router = useRouter();
 
@@ -76,7 +79,8 @@ catch (error: any) {
 
   }
 
-  const handlePurchase = async (reward: Reward) => {
+  const handlePurchase = async (reward: any) => {
+   console.log(reward,'rewardinghhfhhff')
     try {
       if (!address) {
         toast({
@@ -86,7 +90,7 @@ catch (error: any) {
         });
         return;
       }
-      if (!balance || balance < BigInt(reward.tokens)) {
+      if (!balance || balance < BigInt(reward.tokensRequired)) {
         toast({
           title: "Insufficient Balance",
           description: "Not enough tokens",
@@ -95,7 +99,7 @@ catch (error: any) {
         return;
       }
 
-      await tokenRedeem({ amount: reward.tokens });
+      await RewardRedeem({ rewardAddress: reward.rewardRedemption, amount: reward.tokensRequired });
 
       toast({
         title: "Purchase Successful",
@@ -176,12 +180,12 @@ catch (error: any) {
         </Card>
 
         {/* Rewards List */}
-        {rewards.map((item) => (
+        {allRewards.map((item:any) => (
           <Card
             key={item.id}
             className="hover:shadow-md transition cursor-pointer flex flex-col justify-between"
             onClick={() =>
-              router.push(PATHS.TOKENMARKETPLACE.DETAILS(item.id.toString()))
+              router.push(PATHS.TOKENMARKETPLACE.DETAILS(item.rewardRedemption))
             }
           >
             <CardHeader className="p-0">
@@ -221,7 +225,7 @@ catch (error: any) {
 
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-2 text-[#297AD6] text-xl font-bold">
-                  ●{item.tokens}
+                  ●{item.tokensRequired}
                 </div>
 
                 <div onClick={(e) => e.stopPropagation()}>
@@ -257,7 +261,7 @@ catch (error: any) {
                             {item.description}
                           </p>
                           <p className="text-sm font-medium text-[#297AD6] mt-1">
-                            ● {item.tokens} tokens
+                            ● {item.tokensRequired} tokens
                           </p>
                         </div>
 
@@ -268,12 +272,12 @@ catch (error: any) {
                             handlePurchase(item);
                           }}
                           disabled={
-                            redeemPending ||
+                            RedeemPending ||
                             !balance ||
                             balance < BigInt(item.tokens)
                           }
                         >
-                          {redeemPending ? "Processing..." : "Confirm Purchase"}
+                          {RedeemPending ? "Processing..." : "Confirm Purchase"}
                         </Button>
                       </DialogContent>
                     )}
