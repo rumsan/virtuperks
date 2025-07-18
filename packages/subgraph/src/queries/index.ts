@@ -859,3 +859,21 @@ export const GetRewardManagementDisbursements = `
       }
   }
 `;
+
+
+
+//for the reward Redemption
+export const GetRewards = `
+    query GetRewards {
+      rewardRedemptionCreateds(first: 100, orderBy: blockTimestamp, orderDirection: desc) {
+        id
+        rewardRedemption
+        appId
+        name
+        tokensRequired
+        blockNumber
+        blockTimestamp
+        transactionHash
+      }
+    }
+  `;
