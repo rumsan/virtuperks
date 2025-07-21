@@ -1,8 +1,6 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAccount } from "wagmi";
 import {
-  
   useWriteRewardRedemptinFactoryCreateRewardRedemption,
   useWriteRewardRedemptionRedeem,
   useWriteRewardTokenApprove
@@ -53,6 +51,20 @@ export const useGetRewards = () => {
     queryKey: ["rewardsList"],
     queryFn: async () => {
       const rewards = await queryService?.getRewards()
+      return rewards;
+    },
+  });
+}
+
+
+
+export const useGetRedeemedReward = () => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["redeemedRewardsList"],
+    queryFn: async () => {
+      const rewards = await queryService?.getRedeemedReward()
       return rewards;
     },
   });

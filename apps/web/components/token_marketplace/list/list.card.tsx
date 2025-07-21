@@ -8,6 +8,7 @@ import { getCategoryIcon } from "@/utils/rewardIcon";
 import { DialogButton } from "@/components/common/ui/dialog";
 import {
   useCreateReward,
+  useGetRedeemedReward,
   useGetRewards,
 } from "@/hooks/subgraph/token-marketplace";
 import { Button } from "@workspace/ui/components/button";
@@ -48,9 +49,13 @@ const TokenMarketListCard = () => {
   // hook to fetch rewards
   const tokenData = useGetRewards();
 
+  // hook to fetch redeemed rewards with status
+  const redeemedReward = useGetRedeemedReward()
+  
+
   const tokenList = tokenData?.data?.data?.rewardRedemptionCreateds;
 
-  console.log("Data: ", tokenList);
+ // console.log("Data: ", tokenList);
 
   const router = useRouter();
 
