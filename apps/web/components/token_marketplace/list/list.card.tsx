@@ -6,6 +6,10 @@ import { PATHS } from "@/routes/paths";
 import { getCategoryIcon } from "@/utils/rewardIcon";
 // import { hasRole } from "@/utils/roles";
 import { DialogButton } from "@/components/common/ui/dialog";
+import {
+  useCreateReward,
+  useGetRewards,
+} from "@/hooks/subgraph/token-marketplace";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -23,24 +27,28 @@ import {
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { useToast } from "@workspace/ui/hooks/use-toast";
-import { Plus } from "lucide-react";
+import { Coins, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { Reward } from "../../../type/token.marketplace";
-import { useCreateReward, useGetRewards } from "@/hooks/subgraph/token-marketplace";
+import { Reward, RewardRedemption } from "../../../type/token.marketplace";
+import { imageMap } from "./imgLink";
 
 const TokenMarketListCard = () => {
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-
   const { address } = useAccount();
   const { balance } = useCheckParticipantBalance(address as `0x${string}`);
   const { toast } = useToast();
   const { tokenRedeem, redeemPending } = useRedeemToken();
+
   // hook to fetch rewards
-  const data = useGetRewards()
+  const tokenData = useGetRewards();
+
+  const tokenList = tokenData?.data?.data?.rewardRedemptionCreateds;
+
+  console.log("Data: ", tokenList);
 
   const router = useRouter();
 
@@ -48,33 +56,21 @@ const TokenMarketListCard = () => {
   // const hasEntityOwnerRole = hasRole({
   //   role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
   // });
-  const {AddReward, rewardPending}= useCreateReward()
+  const { AddReward, rewardPending } = useCreateReward();
 
   const handleRewardAdd = async (data: any) => {
     try {
-  await AddReward({
-      name: data.name,
-      amount: data.amount,
-  });
-       setIsDialogOpen(false);
-            toast({
-              title: "Token transfered Successfully!.",
-              variant: "success",
-            });
-    
-
-
-
-}
-catch (error: any) {
-  
-
-
-
-
-}
-
-  }
+      await AddReward({
+        name: data.name,
+        amount: data.amount,
+      });
+      setIsDialogOpen(false);
+      toast({
+        title: "Token transfered Successfully!.",
+        variant: "success",
+      });
+    } catch (error: any) {}
+  };
 
   const handlePurchase = async (reward: Reward) => {
     try {
@@ -114,46 +110,29 @@ catch (error: any) {
 
   const categoryBgMap: Record<string, string> = {
     Entertainment: "bg-purple-100",
-    "Food & Beverage": "bg-orange-100",
+    Food_Beverage: "bg-orange-100",
     Utilities: "bg-blue-100",
     Shopping: "bg-green-100",
     Transportation: "bg-yellow-100",
   };
 
-  const rewards: Reward[] = [
-    {
-      id: 1,
-      title: "Movie Ticket",
-      description: "Premium cinema experience",
-      tokens: 20,
+  function getImageForTitle(title: string): string {
+    return (
+      imageMap[title] ||
+      "https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg"
+    );
+  }
+
+  const mappedRewards: Reward[] = (tokenList || []).map(
+    (item: RewardRedemption) => ({
+      id: item.id,
+      title: item.name,
+      description: "Token reward",
+      tokens: parseInt(item.tokensRequired),
       category: "Entertainment",
-      image: "https://assets.rumsan.net/rumsan-test/cinema-ticket.jpg",
-    },
-    {
-      id: 2,
-      title: "Coffee",
-      description: "Premium coffee blend",
-      tokens: 150,
-      category: "Food & Beverage",
-      image: "https://assets.rumsan.net/rumsan-test/coffee-.jpg",
-    },
-    {
-      id: 3,
-      title: "Mobile TopUp",
-      description: "Mobile recharge service",
-      tokens: 200,
-      category: "Utilities",
-      image: "https://assets.rumsan.net/rumsan-test/mobile-topup.png",
-    },
-    {
-      id: 4,
-      title: "Gift Card",
-      description: "Universal gift voucher",
-      tokens: 1000,
-      category: "Shopping",
-      image: "https://assets.rumsan.net/rumsan-test/gift-card.jpg",
-    },
-  ];
+      image: getImageForTitle(item.name),
+    }),
+  );
 
   return (
     <div className="w-full p-4 mt-10">
@@ -176,7 +155,7 @@ catch (error: any) {
         </Card>
 
         {/* Rewards List */}
-        {rewards.map((item) => (
+        {mappedRewards.map((item: Reward) => (
           <Card
             key={item.id}
             className="hover:shadow-md transition cursor-pointer flex flex-col justify-between"
@@ -221,7 +200,8 @@ catch (error: any) {
 
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-2 text-[#297AD6] text-xl font-bold">
-                  ●{item.tokens}
+                  <Coins size={18} strokeWidth={2.65} />
+                  {item.tokens}
                 </div>
 
                 <div onClick={(e) => e.stopPropagation()}>
@@ -262,7 +242,7 @@ catch (error: any) {
                         </div>
 
                         <Button
-                          className="bg-[#297AD6] hover:bg-[#1E61B4] text-white"
+                          className="w-[170px] flex justify-center items-center gap-2 bg-[#297AD6] hover:bg-[#1E61B4] text-white"
                           onClick={(e) => {
                             e.stopPropagation();
                             handlePurchase(item);
@@ -273,7 +253,33 @@ catch (error: any) {
                             balance < BigInt(item.tokens)
                           }
                         >
-                          {redeemPending ? "Processing..." : "Confirm Purchase"}
+                          {redeemPending ? (
+                            <>
+                              <svg
+                                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                />
+                                <path
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                />
+                              </svg>
+                              Processing...
+                            </>
+                          ) : (
+                            "Confirm Purchase"
+                          )}
                         </Button>
                       </DialogContent>
                     )}
@@ -287,30 +293,17 @@ catch (error: any) {
 
       {/* Dialog for Adding Token */}
 
-          
-<DialogButton
+      <DialogButton
         isOpen={isDialogOpen}
         setIsOpen={setIsDialogOpen}
         title="Add New Token"
         subTitle="Fill in the details to create a new token"
-        buttonName="Create Token"
+        buttonName={rewardPending ? "Processing..." : "Create Token"}
         submitType="CreateReward"
         inputLabel="Reward Name"
         inputPlaceholder="Enter reward name"
         handleApplyTaskLogic={handleRewardAdd}
-        
       />
-
-
-
-
-
-
-        
-        
-        
-        
-     
     </div>
   );
 };

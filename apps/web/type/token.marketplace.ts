@@ -7,3 +7,18 @@ export type Reward = {
   category: string;
   image: string;
 };
+
+export type RewardRedemption = {
+  id: string;
+  name: string;
+  tokensRequired: string;
+  appId: string;
+  rewardRedemption: string;
+  transactionHash: string;
+  blockNumber: string;
+  blockTimestamp: string;
+};
+
+export type RewardsQueryResult = {
+  rewardRedemptionCreateds: RewardRedemption[];
+};
