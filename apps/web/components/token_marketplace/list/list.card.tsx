@@ -274,7 +274,7 @@ catch (error: any) {
                           disabled={
                             RedeemPending ||
                             !balance ||
-                            balance < BigInt(item.tokens)
+                            balance < BigInt(item.tokensRequired)
                           }
                         >
                           {RedeemPending ? "Processing..." : "Confirm Purchase"}

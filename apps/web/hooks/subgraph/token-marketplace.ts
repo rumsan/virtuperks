@@ -4,7 +4,8 @@ import { useAccount } from "wagmi";
 import {
   
   useWriteRewardRedemptinFactoryCreateRewardRedemption,
-  useWriteRewardRedemptionRedeem
+  useWriteRewardRedemptionRedeem,
+  useWriteRewardTokenApprove
 } from "../wagmi/contracts";
 
 export const useCreateReward = () => {
@@ -68,7 +69,7 @@ export const useRedeemReward= () => {
     mutationFn: async ({rewardAddress, amount}:{rewardAddress:string, amount:number}) => {
       const result = await writeContractAsync({
         address: rewardAddress as `0x${string}`,
-        args: [BigInt(amount)],
+        args: [],
 
 
 
@@ -88,6 +89,43 @@ export const useRedeemReward= () => {
    RedeemPending: mutation.isPending,
   RedeemSuccess: mutation.isSuccess,
 }
+
+
+
+}
+
+
+export const useApproveReward =()=>{
+  const rewardToken = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
+  
+  const { writeContractAsync } = useWriteRewardTokenApprove();
+  const mutation = useMutation({
+    mutationFn: async ({rewardAddress,value}:{rewardAddress:string, value:number}) => {
+      
+      const result = await writeContractAsync({
+
+address:rewardToken,
+args:[ rewardAddress as `0x${string}`, BigInt(value)]
+
+        
+      })
+      return result 
+
+
+    },
+    onSuccess: (result, variable) => { 
+      
+}
+    
+
+ })
+  return {
+  
+    ApproveReward:mutation.mutateAsync,
+    ApprovePending: mutation.isPending,
+    ApproveSuccess: mutation.isSuccess,
+}
+
 
 
 

@@ -1363,11 +1363,6 @@ export const rewardRedemptionAbi = [
   {type: 'error', inputs: [], name: 'FailedCall'},
   {type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall'},
   {
-    type: 'error',
-    inputs: [{name: 'token', internalType: 'address', type: 'address'}],
-    name: 'SafeERC20FailedOperation',
-  },
-  {
     type: 'event',
     anonymous: false,
     inputs: [
@@ -1412,6 +1407,26 @@ export const rewardRedemptionAbi = [
   },
   {
     type: 'function',
+    inputs: [],
+    name: 'getContractBalance',
+    outputs: [{name: '', internalType: 'uint256', type: 'uint256'}],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{name: 'user', internalType: 'address', type: 'address'}],
+    name: 'getRedemptionStatus',
+    outputs: [
+      {
+        name: '',
+        internalType: 'enum IRewardRedemption.RedemptionStatus',
+        type: 'uint8',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     inputs: [{name: 'data', internalType: 'bytes[]', type: 'bytes[]'}],
     name: 'multicall',
     outputs: [{name: 'results', internalType: 'bytes[]', type: 'bytes[]'}],
@@ -1426,7 +1441,7 @@ export const rewardRedemptionAbi = [
   },
   {
     type: 'function',
-    inputs: [{name: 'amount', internalType: 'uint256', type: 'uint256'}],
+    inputs: [],
     name: 'redeem',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -2844,6 +2859,24 @@ export const useReadRewardRedemptionApp = /*#__PURE__*/ createUseReadContract({
 export const useReadRewardRedemptionAppId = /*#__PURE__*/ createUseReadContract(
   {abi: rewardRedemptionAbi, functionName: 'appId'},
 )
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"getContractBalance"`
+ */
+export const useReadRewardRedemptionGetContractBalance =
+  /*#__PURE__*/ createUseReadContract({
+    abi: rewardRedemptionAbi,
+    functionName: 'getContractBalance',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"getRedemptionStatus"`
+ */
+export const useReadRewardRedemptionGetRedemptionStatus =
+  /*#__PURE__*/ createUseReadContract({
+    abi: rewardRedemptionAbi,
+    functionName: 'getRedemptionStatus',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"name"`

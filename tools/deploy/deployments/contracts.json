@@ -1,30 +1,30 @@
 {
   "rumsanForwarder": {
-    "address": "0xBff608F9AB6c2c187F87a61B1d48876A6E054e42",
-    "startBlock": 28481732
+    "address": "0xB22f8a218e6db944C7c330aDF97f7de424E50603",
+    "startBlock": 28658230
   },
   "accessManagerV2": {
-    "address": "0x3d148250A8e0662fE2e1046B28C94C52F48D0049",
-    "startBlock": 28481735
+    "address": "0x1e852a207967b45A9215B23D39e2BA3C48D82A8d",
+    "startBlock": 28658232
   },
   "rewardToken": {
-    "address": "0x7b37f61b3cd357f82c736543B0E8d19e92f26EDE",
-    "startBlock": 28481758
+    "address": "0x0f53A850186Ee1e06E72975fc5bC4199512C4387",
+    "startBlock": 28658254
   },
   "entity": {
-    "address": "0x231B4593D945710A67c59153d5EC47da65B4d760",
-    "startBlock": 28481761
+    "address": "0xc680129E74fE3102Cb0a65d0c6FA2218b54dde28",
+    "startBlock": 28658258
   },
   "entityFactory": {
-    "address": "0xCC07B32ca1B38eC67Fa4c010B04600ba372a4de3",
-    "startBlock": 28481766
+    "address": "0x78E1AB7DC45475A9651B3852e1dF644451CeaB78",
+    "startBlock": 28658262
   },
   "rewardRedemption": {
-    "address": "0xB505009ce0d013073d30360b0Ea94FA10B404AB0",
-    "startBlock": 28481772
+    "address": "0xFddCE7266dAAcA51f096f045809583a2Ce5aa17f",
+    "startBlock": 28658266
   },
   "rewardRedemptionFactory": {
-    "address": "0x68aa5B1be4Fa3809E4Dc42F0cf84EDE4eD1466b5",
-    "startBlock": 28481774
+    "address": "0x31992b9C2313Ca8Be0656e2fDA748F70b50D0E91",
+    "startBlock": 28658268
   }
 }
