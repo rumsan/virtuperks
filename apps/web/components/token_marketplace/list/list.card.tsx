@@ -42,7 +42,7 @@ const TokenMarketListCard = () => {
 
   const { address } = useAccount();
   const { balance } = useCheckParticipantBalance(address as `0x${string}`);
-  console.log(balance, 'balance')
+  console.log(balance, "balance");
   const { toast } = useToast();
   const { tokenRedeem, redeemPending } = useRedeemToken();
 
@@ -50,12 +50,11 @@ const TokenMarketListCard = () => {
   const tokenData = useGetRewards();
 
   // hook to fetch redeemed rewards with status
-  const redeemedReward = useGetRedeemedReward()
-  
+  const redeemedReward = useGetRedeemedReward();
 
   const tokenList = tokenData?.data?.data?.rewardRedemptionCreateds;
 
- // console.log("Data: ", tokenList);
+  // console.log("Data: ", tokenList);
 
   const router = useRouter();
 
@@ -80,7 +79,7 @@ const TokenMarketListCard = () => {
   };
 
   const handlePurchase = async (reward: any) => {
-   console.log(reward,'rewardinghhfhhff')
+    console.log(reward, "rewardinghhfhhff");
     try {
       if (!address) {
         toast({
@@ -99,7 +98,7 @@ const TokenMarketListCard = () => {
         return;
       }
 
-    //  await RewardRedeem({ rewardAddress: reward.rewardRedemption, amount: reward.tokensRequired });
+      //  await RewardRedeem({ rewardAddress: reward.rewardRedemption, amount: reward.tokensRequired });
 
       toast({
         title: "Purchase Successful",
@@ -131,16 +130,14 @@ const TokenMarketListCard = () => {
     );
   }
 
-  const mappedRewards: Reward[] = (tokenList || []).map(
-    (item: any) => ({
-      id: item.id,
-      title: item.name,
-      description: "Token reward",
-      tokens: parseInt(item.tokensRequired),
-      category: "Entertainment",
-      image: getImageForTitle(item.name),
-    }),
-  );
+  const mappedRewards: Reward[] = (tokenList || []).map((item: any) => ({
+    id: item.id,
+    title: item.name,
+    description: "Token reward",
+    tokens: parseInt(item.tokensRequired),
+    category: "Entertainment",
+    image: getImageForTitle(item.name),
+  }));
 
   return (
     <div className="w-full p-4 mt-10">
@@ -163,7 +160,7 @@ const TokenMarketListCard = () => {
         </Card>
 
         {/* Rewards List */}
-        {mappedRewards.map((item:any) => (
+        {mappedRewards.map((item: any) => (
           <Card
             key={item.id}
             className="hover:shadow-md transition cursor-pointer flex flex-col justify-between"
