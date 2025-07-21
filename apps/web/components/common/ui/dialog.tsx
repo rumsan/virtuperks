@@ -34,6 +34,7 @@ type DialogButtonProps = {
     name?: string;
   }) => Promise<void>;
   isDisabled?: boolean;
+  isLoading?: boolean;
 };
 
 export const DialogButton = ({
