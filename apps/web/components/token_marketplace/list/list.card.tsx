@@ -31,7 +31,8 @@ import { Coins, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { Reward, RewardRedemption } from "../../../type/token.marketplace";
+
+import { Reward } from "@workspace/sdk/type";
 import { imageMap } from "./imgLink";
 
 const TokenMarketListCard = () => {
@@ -93,7 +94,7 @@ const TokenMarketListCard = () => {
         return;
       }
 
-      await RewardRedeem({ rewardAddress: reward.rewardRedemption, amount: reward.tokensRequired });
+    //  await RewardRedeem({ rewardAddress: reward.rewardRedemption, amount: reward.tokensRequired });
 
       toast({
         title: "Purchase Successful",
@@ -126,7 +127,7 @@ const TokenMarketListCard = () => {
   }
 
   const mappedRewards: Reward[] = (tokenList || []).map(
-    (item: RewardRedemption) => ({
+    (item: any) => ({
       id: item.id,
       title: item.name,
       description: "Token reward",
@@ -157,7 +158,7 @@ const TokenMarketListCard = () => {
         </Card>
 
         {/* Rewards List */}
-        {mappedRewards.map((item: Reward) => (
+        {mappedRewards.map((item:any) => (
           <Card
             key={item.id}
             className="hover:shadow-md transition cursor-pointer flex flex-col justify-between"
@@ -169,7 +170,7 @@ const TokenMarketListCard = () => {
               <div className="relative w-full h-48 overflow-hidden rounded-t-lg">
                 <img
                   src={item.image}
-                  alt={item.title}
+                  alt={item.name}
                   loading="lazy"
                   className="w-full h-full object-cover"
                 />
