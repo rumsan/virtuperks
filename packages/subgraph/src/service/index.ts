@@ -5,15 +5,16 @@ import {
   GetCombineParticipantsByTask,
   getOpenTasks,
   getParticipantTasks,
+  GetRedeemedReward,
   GetRewardManagement,
   GetRewardManagementCreatedByAddress,
   GetRewardManagementDisbursements,
   GetRewardManagementTokenTransfers,
+  GetRewards,
   getTaskCreatedById,
   getTaskCreation,
   RewardManagementQueries,
-  TokenQueries,
-  GetRewards
+  TokenQueries
 } from '../queries';
 
 
@@ -205,6 +206,24 @@ export class SubgraphService {
 
 try {
   const { data, error } = await this.subgraphQuery.query(GetRewards, {});
+return { data, error };
+
+
+}catch(error) {
+    console.error('Error fetching rewards:', error);
+    return { data: null, error };
+
+
+
+
+}
+  }
+
+    // service to get redeemed rewards
+  async getRedeemedReward (){
+
+try {
+  const { data, error } = await this.subgraphQuery.query(GetRedeemedReward, {});
 return { data, error };
 
 

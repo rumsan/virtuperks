@@ -8,6 +8,7 @@ import { getCategoryIcon } from "@/utils/rewardIcon";
 import { DialogButton } from "@/components/common/ui/dialog";
 import {
   useCreateReward,
+  useGetRedeemedReward,
   useGetRewards,
 } from "@/hooks/subgraph/token-marketplace";
 import { Button } from "@workspace/ui/components/button";
@@ -31,7 +32,8 @@ import { Coins, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { Reward, RewardRedemption } from "../../../type/token.marketplace";
+
+import { Reward } from "@workspace/sdk/type";
 import { imageMap } from "./imgLink";
 
 const TokenMarketListCard = () => {
@@ -40,15 +42,19 @@ const TokenMarketListCard = () => {
 
   const { address } = useAccount();
   const { balance } = useCheckParticipantBalance(address as `0x${string}`);
+  console.log(balance, "balance");
   const { toast } = useToast();
   const { tokenRedeem, redeemPending } = useRedeemToken();
 
   // hook to fetch rewards
   const tokenData = useGetRewards();
 
+  // hook to fetch redeemed rewards with status
+  const redeemedReward = useGetRedeemedReward();
+
   const tokenList = tokenData?.data?.data?.rewardRedemptionCreateds;
 
-  console.log("Data: ", tokenList);
+  // console.log("Data: ", tokenList);
 
   const router = useRouter();
 
@@ -72,7 +78,8 @@ const TokenMarketListCard = () => {
     } catch (error: any) {}
   };
 
-  const handlePurchase = async (reward: Reward) => {
+  const handlePurchase = async (reward: any) => {
+    console.log(reward, "rewardinghhfhhff");
     try {
       if (!address) {
         toast({
@@ -82,7 +89,7 @@ const TokenMarketListCard = () => {
         });
         return;
       }
-      if (!balance || balance < BigInt(reward.tokens)) {
+      if (!balance || balance < BigInt(reward.tokensRequired)) {
         toast({
           title: "Insufficient Balance",
           description: "Not enough tokens",
@@ -91,7 +98,7 @@ const TokenMarketListCard = () => {
         return;
       }
 
-      await tokenRedeem({ amount: reward.tokens });
+      //  await RewardRedeem({ rewardAddress: reward.rewardRedemption, amount: reward.tokensRequired });
 
       toast({
         title: "Purchase Successful",
@@ -123,16 +130,14 @@ const TokenMarketListCard = () => {
     );
   }
 
-  const mappedRewards: Reward[] = (tokenList || []).map(
-    (item: RewardRedemption) => ({
-      id: item.id,
-      title: item.name,
-      description: "Token reward",
-      tokens: parseInt(item.tokensRequired),
-      category: "Entertainment",
-      image: getImageForTitle(item.name),
-    }),
-  );
+  const mappedRewards: Reward[] = (tokenList || []).map((item: any) => ({
+    id: item.id,
+    title: item.name,
+    description: "Token reward",
+    tokens: parseInt(item.tokensRequired),
+    category: "Entertainment",
+    image: getImageForTitle(item.name),
+  }));
 
   return (
     <div className="w-full p-4 mt-10">
@@ -155,19 +160,19 @@ const TokenMarketListCard = () => {
         </Card>
 
         {/* Rewards List */}
-        {mappedRewards.map((item: Reward) => (
+        {mappedRewards.map((item: any) => (
           <Card
             key={item.id}
             className="hover:shadow-md transition cursor-pointer flex flex-col justify-between"
             onClick={() =>
-              router.push(PATHS.TOKENMARKETPLACE.DETAILS(item.id.toString()))
+              router.push(PATHS.TOKENMARKETPLACE.DETAILS(item.rewardRedemption))
             }
           >
             <CardHeader className="p-0">
               <div className="relative w-full h-48 overflow-hidden rounded-t-lg">
                 <img
                   src={item.image}
-                  alt={item.title}
+                  alt={item.name}
                   loading="lazy"
                   className="w-full h-full object-cover"
                 />
@@ -237,7 +242,7 @@ const TokenMarketListCard = () => {
                             {item.description}
                           </p>
                           <p className="text-sm font-medium text-[#297AD6] mt-1">
-                            ● {item.tokens} tokens
+                            ● {item.tokensRequired} tokens
                           </p>
                         </div>
 
@@ -248,9 +253,9 @@ const TokenMarketListCard = () => {
                             handlePurchase(item);
                           }}
                           disabled={
-                            redeemPending ||
+                            RedeemPending ||
                             !balance ||
-                            balance < BigInt(item.tokens)
+                            balance < BigInt(item.tokensRequired)
                           }
                         >
                           {redeemPending ? (
