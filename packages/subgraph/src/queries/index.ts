@@ -877,3 +877,20 @@ export const GetRewards = `
       }
     }
   `;
+
+  
+export const getRewardById = `
+  query GetRewardById($id: ID!) {
+    rewardRedemptionCreated(id: $id) {
+      id
+      rewardRedemption
+      appId
+      name
+      tokensRequired
+      blockNumber
+      blockTimestamp
+      transactionHash
+    }
+  }
+`;
+

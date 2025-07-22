@@ -5,15 +5,16 @@ import {
   GetCombineParticipantsByTask,
   getOpenTasks,
   getParticipantTasks,
+  getRewardById,
   GetRewardManagement,
   GetRewardManagementCreatedByAddress,
   GetRewardManagementDisbursements,
   GetRewardManagementTokenTransfers,
+  GetRewards,
   getTaskCreatedById,
   getTaskCreation,
   RewardManagementQueries,
-  TokenQueries,
-  GetRewards
+  TokenQueries
 } from '../queries';
 
 
@@ -55,7 +56,6 @@ export class SubgraphService {
 
   // RewardManagement Related Services
   async getAllTasks() {
-    
     const { data, error } = await this.subgraphQuery.query(getTaskCreation, {});
     return { data, error };
   }
@@ -202,21 +202,29 @@ export class SubgraphService {
 
   // reward sevice function
   async getRewards (){
-
 try {
   const { data, error } = await this.subgraphQuery.query(GetRewards, {});
 return { data, error };
-
-
 }catch(error) {
     console.error('Error fetching rewards:', error);
     return { data: null, error };
-
-
-
-
 }
   }
-  
+
+
+  async getRewardById(id: string) {
+    try {
+      const { data, error } = await this.subgraphQuery.query(getRewardById, { id });
+        return { data, error };
+    } catch (error) {
+        console.error('Error fetching reward by ID:', error);
+        return { data: null, error };
+    }
+  }
   
 }
+
+
+
+
+
