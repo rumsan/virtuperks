@@ -46,6 +46,22 @@ export const useGetRewards = () => {
   });
 };
 
+export const useGetRewardById = (id: string) => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["rewardById", id],
+    queryFn: async () => {
+      if (!queryService) {
+        throw new Error("Subgraph query service is not initialized.");
+      }
+      const rewardDetail = await queryService.getRewardById(id);
+      return rewardDetail;
+    },
+    enabled: !!id && !!queryService,
+  });
+};
+
 export const useGetRedeemedReward = () => {
   const { queryService } = useGraphService();
 

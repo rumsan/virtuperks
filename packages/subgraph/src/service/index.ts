@@ -6,6 +6,7 @@ import {
   getOpenTasks,
   getParticipantTasks,
   GetRedeemedReward,
+  getRewardById,
   GetRewardManagement,
   GetRewardManagementCreatedByAddress,
   GetRewardManagementDisbursements,
@@ -56,7 +57,6 @@ export class SubgraphService {
 
   // RewardManagement Related Services
   async getAllTasks() {
-    
     const { data, error } = await this.subgraphQuery.query(getTaskCreation, {});
     return { data, error };
   }
@@ -203,20 +203,24 @@ export class SubgraphService {
 
   // reward sevice function
   async getRewards (){
-
 try {
   const { data, error } = await this.subgraphQuery.query(GetRewards, {});
 return { data, error };
-
-
 }catch(error) {
     console.error('Error fetching rewards:', error);
     return { data: null, error };
-
-
-
-
 }
+  }
+
+
+  async getRewardById(id: string) {
+    try {
+      const { data, error } = await this.subgraphQuery.query(getRewardById, { id });
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching reward by ID:', error);
+      return { data: null, error };
+    }
   }
 
     // service to get redeemed rewards
@@ -225,17 +229,14 @@ return { data, error };
 try {
   const { data, error } = await this.subgraphQuery.query(GetRedeemedReward, {});
 return { data, error };
-
-
 }catch(error) {
     console.error('Error fetching rewards:', error);
     return { data: null, error };
-
-
-
-
 }
-  }
-  
-  
+  } 
 }
+
+
+
+
+
