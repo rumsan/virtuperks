@@ -5,6 +5,7 @@ import {
   GetCombineParticipantsByTask,
   getOpenTasks,
   getParticipantTasks,
+  GetRedeemedReward,
   getRewardById,
   GetRewardManagement,
   GetRewardManagementCreatedByAddress,
@@ -215,13 +216,24 @@ return { data, error };
   async getRewardById(id: string) {
     try {
       const { data, error } = await this.subgraphQuery.query(getRewardById, { id });
-        return { data, error };
+      return { data, error };
     } catch (error) {
-        console.error('Error fetching reward by ID:', error);
-        return { data: null, error };
+      console.error('Error fetching reward by ID:', error);
+      return { data: null, error };
     }
   }
-  
+
+    // service to get redeemed rewards
+  async getRedeemedReward (){
+
+try {
+  const { data, error } = await this.subgraphQuery.query(GetRedeemedReward, {});
+return { data, error };
+}catch(error) {
+    console.error('Error fetching rewards:', error);
+    return { data: null, error };
+}
+  } 
 }
 
 

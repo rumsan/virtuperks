@@ -5,6 +5,7 @@ import {
 } from "@/hooks/subgraph/token";
 import {
   useCreateReward,
+  useGetRedeemedReward,
   useGetRewards,
 } from "@/hooks/subgraph/token-marketplace";
 import { PATHS } from "@/routes/paths";
@@ -25,16 +26,27 @@ import { useAccount } from "wagmi";
 import { Reward, RewardRedemption } from "../../../type/token.marketplace";
 import { imageMap } from "../img/imgLink";
 
+import { Reward } from "@workspace/sdk/type";
+import { imageMap } from "./imgLink";
+
 const TokenMarketListCard = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { address } = useAccount();
   const { balance } = useCheckParticipantBalance(address as `0x${string}`);
+  console.log(balance, "balance");
   const { toast } = useToast();
   const { tokenRedeem, redeemPending } = useRedeemToken();
 
   const tokenData = useGetRewards();
   const tokenList = tokenData?.data?.data?.rewardRedemptionCreateds || [];
+
+  // hook to fetch redeemed rewards with status
+  const redeemedReward = useGetRedeemedReward();
+
+  const tokenList = tokenData?.data?.data?.rewardRedemptionCreateds;
+
+  // console.log("Data: ", tokenList);
 
   const router = useRouter();
   const { AddReward, rewardPending } = useCreateReward();
@@ -101,7 +113,7 @@ const TokenMarketListCard = () => {
         </Card>
 
         {/* Rewards List */}
-        {mappedRewards.map((item: Reward) => (
+        {mappedRewards.map((item: any) => (
           <Card
             key={item.id}
             className="hover:shadow-md transition cursor-pointer flex flex-col justify-between"
@@ -111,7 +123,7 @@ const TokenMarketListCard = () => {
               <div className="relative w-full h-48 overflow-hidden rounded-t-lg">
                 <img
                   src={item.image}
-                  alt={item.title}
+                  alt={item.name}
                   loading="lazy"
                   className="w-full h-full object-cover"
                 />

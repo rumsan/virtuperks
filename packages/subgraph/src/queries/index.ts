@@ -894,3 +894,17 @@ export const getRewardById = `
   }
 `;
 
+//for the reward Redeem
+export const GetRedeemedReward = `
+ query GetRedeemedRewards {
+      rewardRedeemeds(first: 100, orderBy: blockTimestamp, orderDirection: desc) {
+        id
+        from
+        amount
+        status
+        blockNumber
+        blockTimestamp
+        transactionHash
+      }
+    }
+`;

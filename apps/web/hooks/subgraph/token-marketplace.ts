@@ -1,6 +1,10 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useWriteRewardRedemptinFactoryCreateRewardRedemption } from "../wagmi/contracts";
+import {
+  useWriteRewardRedemptinFactoryCreateRewardRedemption,
+  useWriteRewardRedemptionRedeem,
+  useWriteRewardTokenApprove,
+} from "../wagmi/contracts";
 
 export const useCreateReward = () => {
   const queryClient = useQueryClient();
@@ -56,4 +60,73 @@ export const useGetRewardById = (id: string) => {
     },
     enabled: !!id && !!queryService,
   });
+};
+
+export const useGetRedeemedReward = () => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["redeemedRewardsList"],
+    queryFn: async () => {
+      const rewards = await queryService?.getRedeemedReward();
+      return rewards;
+    },
+  });
+};
+
+export const useRedeemReward = () => {
+  const queryClient = useQueryClient();
+  const { writeContractAsync } = useWriteRewardRedemptionRedeem();
+
+  const mutation = useMutation({
+    mutationFn: async ({
+      rewardAddress,
+      amount,
+    }: {
+      rewardAddress: string;
+      amount: number;
+    }) => {
+      const result = await writeContractAsync({
+        address: rewardAddress as `0x${string}`,
+        args: [],
+      });
+      return result;
+    },
+    onSuccess: (result, variable) => {
+      // queryClient.invalidateQueries(["rewardRedemptionList"]);
+    },
+  });
+
+  return {
+    RewardRedeem: mutation.mutateAsync,
+    RedeemPending: mutation.isPending,
+    RedeemSuccess: mutation.isSuccess,
+  };
+};
+
+export const useApproveReward = () => {
+  const rewardToken = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
+
+  const { writeContractAsync } = useWriteRewardTokenApprove();
+  const mutation = useMutation({
+    mutationFn: async ({
+      rewardAddress,
+      value,
+    }: {
+      rewardAddress: string;
+      value: number;
+    }) => {
+      const result = await writeContractAsync({
+        address: rewardToken,
+        args: [rewardAddress as `0x${string}`, BigInt(value)],
+      });
+      return result;
+    },
+    onSuccess: (result, variable) => {},
+  });
+  return {
+    ApproveReward: mutation.mutateAsync,
+    ApprovePending: mutation.isPending,
+    ApproveSuccess: mutation.isSuccess,
+  };
 };

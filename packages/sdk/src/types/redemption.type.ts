@@ -14,6 +14,7 @@ export type  RedemptionBase = {
 }
 
 
+
 export type Redemption = RedemptionBase & VirtueperkCommonField
 
 export type CreateRedemption = RedemptionBase
