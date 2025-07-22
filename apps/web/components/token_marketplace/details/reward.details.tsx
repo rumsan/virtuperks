@@ -1,6 +1,9 @@
 "use client";
 
-import { useGetRewardById } from "@/hooks/subgraph/token-marketplace";
+import {
+  useGetRedeemedReward,
+  useGetRewardById,
+} from "@/hooks/subgraph/token-marketplace";
 import { useEffect, useState } from "react";
 import { imageMap } from "../img/imgLink";
 
@@ -35,6 +38,10 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   const [step, setStep] = useState<Step>("approve");
   const [loading, setLoading] = useState(false);
   const [approvalHash, setApprovalHash] = useState<string | null>(null);
+
+  // hook to fetch redeemed rewards with status
+  const redeemedReward = useGetRedeemedReward();
+  // console.log("Redeem Reward: ", redeemedReward);
 
   // Mock redemption history (replace with API call)
   useEffect(() => {

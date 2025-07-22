@@ -5,7 +5,6 @@ import {
 } from "@/hooks/subgraph/token";
 import {
   useCreateReward,
-  useGetRedeemedReward,
   useGetRewards,
 } from "@/hooks/subgraph/token-marketplace";
 import { PATHS } from "@/routes/paths";
@@ -26,8 +25,8 @@ import { useAccount } from "wagmi";
 import { Reward, RewardRedemption } from "../../../type/token.marketplace";
 import { imageMap } from "../img/imgLink";
 
-import { Reward } from "@workspace/sdk/type";
-import { imageMap } from "./imgLink";
+// import { Reward, RewardRedemption } from "@workspace/sdk/type";
+// import { imageMap } from "./imgLink";
 
 const TokenMarketListCard = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -40,13 +39,6 @@ const TokenMarketListCard = () => {
 
   const tokenData = useGetRewards();
   const tokenList = tokenData?.data?.data?.rewardRedemptionCreateds || [];
-
-  // hook to fetch redeemed rewards with status
-  const redeemedReward = useGetRedeemedReward();
-
-  const tokenList = tokenData?.data?.data?.rewardRedemptionCreateds;
-
-  // console.log("Data: ", tokenList);
 
   const router = useRouter();
   const { AddReward, rewardPending } = useCreateReward();
