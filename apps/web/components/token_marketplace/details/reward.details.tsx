@@ -39,7 +39,7 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   const { data: rewardDetail, isLoading, error } = useGetRewardById(rewardId);
   const [step, setStep] = useState<Step>("approve");
   const [approvalHash, setApprovalHash] = useState<string | null>(null);
-
+  const [redeemTxHash, setRedeemTxHash] = useState<string | null>(null);
   const { ApproveReward, ApprovePending, ApproveSuccess } = useApproveReward();
   const { RewardRedeem, RedeemPending, RedeemSuccess } = useRedeemReward();
 
@@ -95,6 +95,7 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
         rewardAddress: rewardRaw.rewardRedemption,
       });
       console.log("Redeem TX:", txHash);
+      setRedeemTxHash(txHash);
       setStep("completed");
     } catch (err) {
       console.error("Redeem failed:", err);
@@ -165,75 +166,79 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
               By redeeming, you agree to the terms.
             </p>
 
-            {/* Step 1: Approve */}
-            {step === "approve" && (
-              <button
-                onClick={handleApprove}
-                disabled={ApprovePending}
-                className={`mt-2 py-1.5 px-3 rounded-lg text-sm font-medium transition text-white ${
-                  ApprovePending
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
-                }`}
-              >
-                {ApprovePending
-                  ? "Approving... Please confirm in wallet"
-                  : "Step 1: Approve Token Spending"}
-              </button>
-            )}
-
-            {/* Approval Success */}
-            {step === "redeem" && approvalHash && (
-              <>
-                <div className="p-2 mt-3 bg-green-50 border border-green-200 rounded text-xs text-green-700 text-center">
-                  Approval successful! You can now redeem the reward.
-                  <div className="text-gray-500 text-[10px]">
-                    {approvalHash}
-                  </div>
+            <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded text-xs text-green-700 text-center min-h-[130px] flex flex-col justify-between">
+              {/* Step 1: Approve */}
+              {step === "approve" && (
+                <div className="p-2 mt-3 text-sm text-center min-h-[130px] flex flex-col justify-between">
+                  <p className="font-semibold mb-1">
+                    Please approve token spending to continue.
+                  </p>
+                  <button
+                    onClick={handleApprove}
+                    disabled={ApprovePending}
+                    className={`py-1.5 px-3 rounded-lg text-sm font-medium transition text-white ${
+                      ApprovePending
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-700"
+                    }`}
+                  >
+                    {ApprovePending
+                      ? "Approving... Please confirm in wallet"
+                      : "Step 1: Approve Token Spending"}
+                  </button>
                 </div>
-                <button
-                  onClick={handleRedeem}
-                  disabled={RedeemPending}
-                  className={`mt-2 py-1.5 px-3 rounded-lg text-sm font-medium transition text-white ${
-                    RedeemPending
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-green-600 hover:bg-green-700"
-                  }`}
-                >
-                  {RedeemPending ? "Redeeming..." : "Step 2: Redeem Reward"}
-                </button>
-              </>
-            )}
+              )}
 
-            {/* Completed */}
-            {step === "completed" && (
-              <div className="flex flex-col gap-4 mt-3">
-                <div className="p-3 border border-green-300 bg-green-50 text-green-800 text-sm rounded-md">
-                  <div className="flex items-start gap-2">
-                    <span>✅</span>
-                    <div>
-                      <p>
-                        Redemption successful! Your reward will be processed
-                        shortly.
-                      </p>
-                      <p className="text-green-700 text-xs mt-1">
-                        {/* Display Redeem TX hash */}
-                      </p>
+              {/* Approval Success */}
+              {step === "redeem" && approvalHash && (
+                <>
+                  <div>
+                    Approval successful! You can now redeem the reward.
+                    <div className="text-gray-500 text-[10px] break-all mt-1">
+                      {approvalHash}
                     </div>
                   </div>
-                </div>
+                  <button
+                    onClick={handleRedeem}
+                    disabled={RedeemPending}
+                    className={`mt-2 py-1.5 px-3 rounded-lg text-sm font-medium transition text-white ${
+                      RedeemPending
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-green-600 hover:bg-green-700"
+                    }`}
+                  >
+                    {RedeemPending ? "Redeeming..." : "Step 2: Redeem Reward"}
+                  </button>
+                </>
+              )}
 
-                <button
-                  onClick={() => {
-                    setStep("approve");
-                    setApprovalHash(null);
-                  }}
-                  className="w-full py-2 px-4 rounded-md text-sm font-medium text-white bg-gray-700 hover:bg-gray-800 transition"
-                >
-                  Redeem Another Reward
-                </button>
-              </div>
-            )}
+              {/* Completed */}
+              {step === "completed" && (
+                <>
+                  <div className="flex flex-col items-center gap-2">
+                    <p>
+                      Redemption successful! Your reward will be processed
+                      shortly.
+                    </p>
+                    {redeemTxHash && (
+                      <p className="text-green-700 text-xs mt-1 break-all">
+                        {redeemTxHash}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => {
+                      setStep("approve");
+                      setApprovalHash(null);
+                      setRedeemTxHash(null);
+                    }}
+                    className="mt-2 py-1.5 px-3 rounded-lg text-sm font-medium transition text-white bg-gray-700 hover:bg-gray-800"
+                  >
+                    Redeem Another Reward
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
