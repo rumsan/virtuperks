@@ -1,38 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@rumsan/prisma';
-import { UserFilterDto } from './dto/list-user.dto'; 
-import { UpdateRewardDto } from './dto/update-users.dto';
 
 @Injectable()
-export class RewardService {
+export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll() {
-    const rewards = await this.prisma. user.findMany();
-    return rewards
+    const users = await this.prisma.user.findMany({
+      select:{
+        cuid:true,
+        wallet: true,
+        details: {
+          select: {
+            cuid:true,
+            name:true 
+          }
+        }
+      }
+    });
+    return users
   }
 
-  // async findOne(cuid: string) {
-  //   const reward = await this.prisma.reward.findUnique({ where: { cuid } });
-  //   return reward;
-  // }
-
-  // async create(dto: CreateRewardDto) {
-  //   const reward = await this.prisma.reward.create({ data: dto });
-  //   return reward;
-  // }
-
-  // async update(cuid: string, dto: UpdateRewardDto) {
-  //   const reward = await this.prisma.reward.update({
-  //     where: { cuid },
-  //     data: dto,
-  //   });
-  //   return reward;
-  // }
   
-
-  // async delete(cuid: string) {
-  //   const reward = await this.prisma.reward.delete({ where: { cuid } });
-  //   return { message: `Reward Deleted Successfully!` };
-  // }
 }
