@@ -1,10 +1,12 @@
 "use client";
 
 import {
-  useGetRedeemedReward,
+  useApproveReward,
   useGetRewardById,
+  useRedeemReward,
 } from "@/hooks/subgraph/token-marketplace";
-import { useEffect, useState } from "react";
+import { Coins } from "lucide-react";
+import { useState } from "react";
 import { imageMap } from "../img/imgLink";
 import RedemptionHistory from "./redemption.history";
 
@@ -35,33 +37,11 @@ type Step = "approve" | "redeem" | "completed";
 
 const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   const { data: rewardDetail, isLoading, error } = useGetRewardById(rewardId);
-
-  const {
-    data: redeemedRewardsData,
-    isLoading: redeemedLoading,
-    error: redeemedError,
-  } = useGetRedeemedReward();
-
-  console.log("Redemption history data:", redeemedRewardsData);
-
-  const [redemptions, setRedemptions] = useState<Redemption[]>([]);
   const [step, setStep] = useState<Step>("approve");
-  const [loading, setLoading] = useState(false);
   const [approvalHash, setApprovalHash] = useState<string | null>(null);
 
-  // Map redeemedRewardsData to redemptions state
-  useEffect(() => {
-    if (redeemedRewardsData?.data?.rewardRedeemeds) {
-      const mappedRedemptions: Redemption[] =
-        redeemedRewardsData.data.rewardRedeemeds.map((r: any) => ({
-          name: r.from || "Wallet Address",
-          date: new Date(Number(r.blockTimestamp) * 1000).toLocaleDateString(),
-          status: r.status === 1 ? "completed" : "pending",
-          txnId: r.transactionHash,
-        }));
-      setRedemptions(mappedRedemptions);
-    }
-  }, [redeemedRewardsData]);
+  const { ApproveReward, ApprovePending, ApproveSuccess } = useApproveReward();
+  const { RewardRedeem, RedeemPending, RedeemSuccess } = useRedeemReward();
 
   if (isLoading)
     return <p className="p-6 text-gray-500">Loading reward details...</p>;
@@ -96,23 +76,29 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
     image: getImageForTitle(rewardRaw.name),
   };
 
-  // Step Handlers
   const handleApprove = async () => {
-    setLoading(true);
-    setTimeout(() => {
-      setApprovalHash("0xc77417ff150b8");
+    try {
+      const txHash = await ApproveReward({
+        rewardAddress: rewardRaw.rewardRedemption,
+        value: reward.tokens,
+      });
+      setApprovalHash(txHash);
       setStep("redeem");
-      setLoading(false);
-    }, 2000);
+    } catch (err) {
+      console.error("Approval failed:", err);
+    }
   };
 
   const handleRedeem = async () => {
-    setLoading(true);
-    setTimeout(() => {
+    try {
+      const txHash = await RewardRedeem({
+        rewardAddress: rewardRaw.rewardRedemption,
+      });
+      console.log("Redeem TX:", txHash);
       setStep("completed");
-      alert("Reward redeemed successfully!");
-      setLoading(false);
-    }, 2000);
+    } catch (err) {
+      console.error("Redeem failed:", err);
+    }
   };
 
   return (
@@ -130,13 +116,24 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
         <div className="flex-[2] border border-gray-200 rounded-lg p-5 bg-white">
           <div className="bg-gray-100 rounded-lg h-48 flex items-center justify-center mb-5">
             <img
-              src={reward.image}
-              alt={reward.title}
+              src={getImageForTitle(rewardRaw.name)}
+              alt={rewardRaw.name}
               className="object-cover h-full w-full rounded-lg"
             />
           </div>
-          <h2 className="text-xl font-semibold mb-2">{reward.title}</h2>
-          <p className="text-gray-600 mb-4">{reward.description}</p>
+          <h2 className="text-xl font-semibold mb-2">
+            Title: {rewardRaw.name}
+          </h2>
+          <p className="text-gray-600 mb-4">
+            Description: {reward.description}
+          </p>
+          <div className="text-gray-600 mb-4 flex items-center gap-2">
+            <span>Token:</span>
+            <span className="text-blue-600 flex items-center gap-1">
+              {parseInt(rewardRaw.tokensRequired, 10)}
+              <Coins size={18} strokeWidth={2.65} />
+            </span>
+          </div>
 
           <div className="grid grid-cols-2 gap-4 text-sm text-gray-700 mb-2">
             <div>
@@ -144,20 +141,12 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
               <p>6 months from redemption</p>
             </div>
             <div>
-              <p className="font-medium">Locations</p>
-              <p>Available at all premium cinema chains</p>
-            </div>
-            <div>
-              <p className="font-medium">What's Included</p>
+              <p className="font-medium">Rules & Regulations</p>
               <ul className="list-disc list-inside">
-                <li>Premium seating</li>
-                <li>Complimentary popcorn</li>
-                <li>Priority booking</li>
+                <li>Non-transferable and cannot be exchanged for cash.</li>
+                <li>Valid only within the redemption period.</li>
+                <li>Subject to availability and venue policies.</li>
               </ul>
-            </div>
-            <div>
-              <p className="font-medium">Terms & Conditions</p>
-              <p>Valid for any movie, any time. Subject to availability.</p>
             </div>
           </div>
         </div>
@@ -168,9 +157,10 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
             <h3 className="text-lg font-semibold text-center mb-1">
               Redeem Token
             </h3>
-            <div className="text-blue-600 text-2xl font-bold text-center my-2">
-              🔵 {reward.tokens}
+            <div className="text-blue-600 text-2xl font-bold text-center my-2 flex items-center justify-center gap-2">
+              {reward.tokens} <Coins size={24} strokeWidth={2.65} />
             </div>
+
             <p className="text-[11px] text-gray-500 text-center mt-1">
               By redeeming, you agree to the terms.
             </p>
@@ -179,14 +169,14 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
             {step === "approve" && (
               <button
                 onClick={handleApprove}
-                disabled={loading}
+                disabled={ApprovePending}
                 className={`mt-2 py-1.5 px-3 rounded-lg text-sm font-medium transition text-white ${
-                  loading
+                  ApprovePending
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-blue-600 hover:bg-blue-700"
                 }`}
               >
-                {loading
+                {ApprovePending
                   ? "Approving... Please confirm in wallet"
                   : "Step 1: Approve Token Spending"}
               </button>
@@ -203,14 +193,14 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
                 </div>
                 <button
                   onClick={handleRedeem}
-                  disabled={loading}
+                  disabled={RedeemPending}
                   className={`mt-2 py-1.5 px-3 rounded-lg text-sm font-medium transition text-white ${
-                    loading
+                    RedeemPending
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-green-600 hover:bg-green-700"
                   }`}
                 >
-                  {loading ? "Redeeming..." : "Step 2: Redeem Reward"}
+                  {RedeemPending ? "Redeeming..." : "Step 2: Redeem Reward"}
                 </button>
               </>
             )}
@@ -227,7 +217,7 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
                         shortly.
                       </p>
                       <p className="text-green-700 text-xs mt-1">
-                        0xd24688c3c1481
+                        {/* Display Redeem TX hash */}
                       </p>
                     </div>
                   </div>

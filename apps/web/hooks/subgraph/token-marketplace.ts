@@ -79,13 +79,7 @@ export const useRedeemReward = () => {
   const { writeContractAsync } = useWriteRewardRedemptionRedeem();
 
   const mutation = useMutation({
-    mutationFn: async ({
-      rewardAddress,
-      amount,
-    }: {
-      rewardAddress: string;
-      amount: number;
-    }) => {
+    mutationFn: async ({ rewardAddress }: { rewardAddress: string }) => {
       const result = await writeContractAsync({
         address: rewardAddress as `0x${string}`,
         args: [],
