@@ -6,6 +6,7 @@ import {
 } from "@/hooks/subgraph/token-marketplace";
 import { useEffect, useState } from "react";
 import { imageMap } from "../img/imgLink";
+import RedemptionHistory from "./redemption.history";
 
 type RedemptionStatus = "completed" | "pending";
 
@@ -248,67 +249,7 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
       </div>
 
       {/* Redemption History */}
-      <div className="border border-gray-200 shadow-sm rounded-xl p-6 bg-white">
-        <h3 className="text-lg font-bold mb-4">Redemption History</h3>
-        <p className="text-sm text-gray-500 mb-4">
-          Recent redemptions for this token
-        </p>
-
-        {redeemedLoading && (
-          <p className="text-gray-500 text-sm">Loading redemption history...</p>
-        )}
-
-        {redeemedError && (
-          <p className="text-red-600 text-sm">
-            Failed to load redemption history.
-          </p>
-        )}
-
-        {!redeemedLoading && !redeemedError && (
-          <div className="space-y-3">
-            {redemptions.length === 0 ? (
-              <p className="text-gray-500 text-sm">
-                No redemption history found.
-              </p>
-            ) : (
-              redemptions.map((r, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center justify-between p-4 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 transition"
-                >
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`text-xs px-2 py-1 rounded-full font-medium ${
-                        r.status === "completed"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {r.status}
-                    </span>
-                    <div>
-                      <p className="font-semibold text-gray-800">
-                        {r.name
-                          ? `${r.name.slice(0, 20)} . . . ${r.name.slice(-4)}`
-                          : "Unknown"}
-                      </p>
-                      <p className="text-xs text-gray-500">{r.date}</p>
-                    </div>
-                  </div>
-                  <div className="text-xs text-gray-600 text-right">
-                    <p className="text-gray-400">Transaction ID</p>
-                    <strong>
-                      {r.txnId
-                        ? `${r.txnId.slice(0, 15)} . . . ${r.txnId.slice(-4)}`
-                        : "N/A"}
-                    </strong>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        )}
-      </div>
+      <RedemptionHistory />
     </div>
   );
 };
