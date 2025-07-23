@@ -4,8 +4,7 @@ import { EventEmitterModule } from "@nestjs/event-emitter";
 import { PrismaService } from '@rumsan/prisma';
 
 import { ListenerModule } from "src/listeners/listener.module";
-import { RedemptionModule } from "src/redemption/redemption.module";
-import { RewardModule } from "src/reward/reward.module";
+import { RewardModule } from "src/users/users.module";
 
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
@@ -20,7 +19,7 @@ import { AppService } from "./app.service";
 
     ListenerModule,
     RewardModule,           
-    RedemptionModule       
+      
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

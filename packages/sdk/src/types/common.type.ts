@@ -9,7 +9,11 @@ export type CommonFields = {
 };
 
 export type VirtueperkCommonField = {
+  id?: number
   cuid: string;
-  createdBy?: string;
-  updatedBy?: string;
+  deletedAt?: Date;
+  updatedAt: Date;
+  createdAt: Date;
+  createdBy: string;
+  updatedBy: string;
 }

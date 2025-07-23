@@ -13,38 +13,60 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        Int          @id @default(autoincrement())
+  cuid      String       @unique @default(cuid())
+  gender    Gender       @default(UNKNOWN)
+  email     String?
+  phone     String?
+  wallet    String?
+  notes     String?      @db.Text()
+  sessionId String?
+  details   UserDetails? @relation("UserDetails")
 
+  ManagedUsers UserDetails[] @relation("Manager")
 
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt()
+  deletedAt DateTime?
+  createdBy String?
+  updatedBy String?
 
-model Reward {
-  cuid        String       @id @unique @default(cuid())
-  title       String       @db.VarChar(255)
-  description String
-  tokens      Int
-  category    String?      @db.VarChar(100)
-  isActive    Boolean      @default(true)
-  imageUrl    String?      @db.VarChar(255)
-  stock       Int?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  redemptions Redemption[]
+  @@index([wallet])
+  @@map("tbl_users")
 }
 
-model Redemption {
-  cuid              Int              @id @default(autoincrement())
-  userAddress     String           @db.VarChar(42)
-  rewardId        String
-  reward          Reward           @relation(fields: [rewardId], references: [cuid])
-  tokens          Int
-  transactionHash String?          @db.VarChar(66)
-  status          RedemptionStatus @default(PENDING)
-  taskId          String?          @db.VarChar(66)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+model UserDetails {
+  cuid             String    @unique
+  name             String?
+  departmentId     String?
+  salary           Float     @default(0)
+  userType         UserType?
+  managerId        String?
+  isApproved       Boolean   @default(false)
+  extras           Json?     @db.JsonB()
+  timeoffAllowance Json?     @db.JsonB()
+
+  Manager   User?    @relation("Manager", fields: [managerId], references: [cuid], map: "UserDetails_Manager_fkey")
+  User      User     @relation("UserDetails", fields: [cuid], references: [cuid], map: "UserDetails_User_fkey")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  @@map("tbl_users_details")
 }
 
-enum RedemptionStatus {
-  PENDING
-  COMPLETED
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  UNKNOWN
 }
 
+enum UserType {
+  EMPLOYEE
+  VOLUNTEER
+  CONTRACTOR
+  INTERN
+}
