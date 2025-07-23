@@ -34,50 +34,33 @@ type Step = "approve" | "redeem" | "completed";
 
 const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   const { data: rewardDetail, isLoading, error } = useGetRewardById(rewardId);
+
+  const {
+    data: redeemedRewardsData,
+    isLoading: redeemedLoading,
+    error: redeemedError,
+  } = useGetRedeemedReward();
+
+  console.log("Redemption history data:", redeemedRewardsData);
+
   const [redemptions, setRedemptions] = useState<Redemption[]>([]);
   const [step, setStep] = useState<Step>("approve");
   const [loading, setLoading] = useState(false);
   const [approvalHash, setApprovalHash] = useState<string | null>(null);
 
-  // hook to fetch redeemed rewards with status
-  const redeemedReward = useGetRedeemedReward();
-  // console.log("Redeem Reward: ", redeemedReward);
-
-  // Mock redemption history (replace with API call)
+  // Map redeemedRewardsData to redemptions state
   useEffect(() => {
-    setRedemptions([
-      {
-        name: "Wallet Address",
-        date: "9/12/2024",
-        status: "completed",
-        txnId: "TXN09834",
-      },
-      {
-        name: "Wallet Address",
-        date: "9/12/2024",
-        status: "completed",
-        txnId: "TXN09833",
-      },
-      {
-        name: "Wallet Address",
-        date: "9/12/2024",
-        status: "pending",
-        txnId: "TXN09832",
-      },
-      {
-        name: "Wallet Address",
-        date: "9/12/2024",
-        status: "completed",
-        txnId: "TXN09831",
-      },
-      {
-        name: "Wallet Address",
-        date: "9/12/2024",
-        status: "completed",
-        txnId: "TXN09830",
-      },
-    ]);
-  }, []);
+    if (redeemedRewardsData?.data?.rewardRedeemeds) {
+      const mappedRedemptions: Redemption[] =
+        redeemedRewardsData.data.rewardRedeemeds.map((r: any) => ({
+          name: r.from || "Wallet Address",
+          date: new Date(Number(r.blockTimestamp) * 1000).toLocaleDateString(),
+          status: r.status === 1 ? "completed" : "pending",
+          txnId: r.transactionHash,
+        }));
+      setRedemptions(mappedRedemptions);
+    }
+  }, [redeemedRewardsData]);
 
   if (isLoading)
     return <p className="p-6 text-gray-500">Loading reward details...</p>;
@@ -119,7 +102,7 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
       setApprovalHash("0xc77417ff150b8");
       setStep("redeem");
       setLoading(false);
-    }, 2000); // Simulating approval
+    }, 2000);
   };
 
   const handleRedeem = async () => {
@@ -128,7 +111,7 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
       setStep("completed");
       alert("Reward redeemed successfully!");
       setLoading(false);
-    }, 2000); // Simulating redemption
+    }, 2000);
   };
 
   return (
@@ -244,16 +227,15 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
                       </p>
                       <p className="text-green-700 text-xs mt-1">
                         0xd24688c3c1481
-                      </p>{" "}
-                      {/* or use dynamic hash */}
+                      </p>
                     </div>
                   </div>
                 </div>
 
                 <button
                   onClick={() => {
-                    setStep("approve"); // reset to start
-                    setApprovalHash(null); // clear hash
+                    setStep("approve");
+                    setApprovalHash(null);
                   }}
                   className="w-full py-2 px-4 rounded-md text-sm font-medium text-white bg-gray-700 hover:bg-gray-800 transition"
                 >
@@ -271,34 +253,61 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
         <p className="text-sm text-gray-500 mb-4">
           Recent redemptions for this token
         </p>
-        <div className="space-y-3">
-          {redemptions.map((r, idx) => (
-            <div
-              key={idx}
-              className="flex items-center justify-between p-4 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 transition"
-            >
-              <div className="flex items-center gap-3">
-                <span
-                  className={`text-xs px-2 py-1 rounded-full font-medium ${
-                    r.status === "completed"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}
+
+        {redeemedLoading && (
+          <p className="text-gray-500 text-sm">Loading redemption history...</p>
+        )}
+
+        {redeemedError && (
+          <p className="text-red-600 text-sm">
+            Failed to load redemption history.
+          </p>
+        )}
+
+        {!redeemedLoading && !redeemedError && (
+          <div className="space-y-3">
+            {redemptions.length === 0 ? (
+              <p className="text-gray-500 text-sm">
+                No redemption history found.
+              </p>
+            ) : (
+              redemptions.map((r, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center justify-between p-4 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 transition"
                 >
-                  {r.status}
-                </span>
-                <div>
-                  <p className="font-semibold text-gray-800">{r.name}</p>
-                  <p className="text-xs text-gray-500">{r.date}</p>
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full font-medium ${
+                        r.status === "completed"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
+                      {r.status}
+                    </span>
+                    <div>
+                      <p className="font-semibold text-gray-800">
+                        {r.name
+                          ? `${r.name.slice(0, 20)} . . . ${r.name.slice(-4)}`
+                          : "Unknown"}
+                      </p>
+                      <p className="text-xs text-gray-500">{r.date}</p>
+                    </div>
+                  </div>
+                  <div className="text-xs text-gray-600 text-right">
+                    <p className="text-gray-400">Transaction ID</p>
+                    <strong>
+                      {r.txnId
+                        ? `${r.txnId.slice(0, 15)} . . . ${r.txnId.slice(-4)}`
+                        : "N/A"}
+                    </strong>
+                  </div>
                 </div>
-              </div>
-              <div className="text-xs text-gray-600 text-right">
-                <p className="text-gray-400">Transaction ID</p>
-                <strong>{r.txnId}</strong>
-              </div>
-            </div>
-          ))}
-        </div>
+              ))
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
