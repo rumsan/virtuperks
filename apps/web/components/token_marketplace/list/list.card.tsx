@@ -22,11 +22,9 @@ import { Coins, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { Reward, RewardRedemption } from "../../../type/token.marketplace";
+// import { Reward, RewardRedemption } from "../../../type/token.marketplace";
+import { Reward, RewardRedemption } from "@workspace/sdk/type";
 import { imageMap } from "../img/imgLink";
-
-// import { Reward, RewardRedemption } from "@workspace/sdk/type";
-// import { imageMap } from "./imgLink";
 
 const TokenMarketListCard = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -78,7 +76,7 @@ const TokenMarketListCard = () => {
     id: item.id,
     title: item.name,
     description: "Token reward",
-    tokens: parseInt(item.tokensRequired),
+    tokens: item.tokensRequired,
     category: "Entertainment",
     image: getImageForTitle(item.name),
   }));

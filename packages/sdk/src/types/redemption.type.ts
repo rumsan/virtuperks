@@ -1,21 +1,20 @@
-import { VirtueperkCommonField } from "./common.type";
-import { RedemptionStatus } from "./enums";
+ import { CommonFields } from "./common.type";
 
+export type RewardBase = {
+  rewardRedemption: string;   
+  appId?: string;
+  name: string;
+  tokensRequired: bigint;
+  image?: string;
+};
 
-export type  RedemptionBase = {
-
-  userAddress: string;
+export type RewardRedemptionBase = {
+  name: string;
   rewardId: string;
-  tokens: number;
-  transactionHash?: string;
-  status: RedemptionStatus;
-  taskId?: string;
-  
-}
+  appId: string;
+  tokensRequired: number;
+};
 
+export type RewardRedemption = RewardRedemptionBase & CommonFields;
 
-
-export type Redemption = RedemptionBase & VirtueperkCommonField
-
-export type CreateRedemption = RedemptionBase
-export  type EditRedemption = Partial<CreateRedemption>
+export type Reward = RewardBase & CommonFields;
