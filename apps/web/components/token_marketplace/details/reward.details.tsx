@@ -5,33 +5,11 @@ import {
   useGetRewardById,
   useRedeemReward,
 } from "@/hooks/subgraph/token-marketplace";
+import type { Reward, RewardDetailsProps } from "@/type/token.marketplace";
 import { Coins } from "lucide-react";
 import { useState } from "react";
 import { imageMap } from "../img/imgLink";
 import RedemptionHistory from "./redemption.history";
-
-type RedemptionStatus = "completed" | "pending";
-
-interface Redemption {
-  name: string;
-  date: string;
-  status: RedemptionStatus;
-  txnId: string;
-}
-
-interface Reward {
-  id: string;
-  title: string;
-  description: string;
-  tokens: number;
-  category: string;
-  image: string;
-}
-
-interface RewardDetailsProps {
-  rewardId: string;
-  router: any;
-}
 
 type Step = "approve" | "redeem" | "completed";
 

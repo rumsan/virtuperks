@@ -1,5 +1,6 @@
 "use client";
 
+import { DataTablePagination } from "@/components/common/list/list.pagination";
 import { useGetRedeemedReward } from "@/hooks/subgraph/token-marketplace";
 import {
   flexRender,
@@ -16,7 +17,7 @@ const RedemptionHistory = () => {
 
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 7,
+    pageSize: 10,
   });
 
   const table = useReactTable({
@@ -43,7 +44,8 @@ const RedemptionHistory = () => {
   }
 
   return (
-    <main className="flex flex-col gap-4 p-6 bg-white rounded-xl ">
+    <main className="flex flex-col gap-4 p-6 bg-white rounded-xl">
+      {/* Header Section */}
       <div className="flex flex-col gap-1">
         <h3 className="text-xl font-bold">Redemption History</h3>
         <p className="text-sm text-gray-500">
@@ -51,15 +53,22 @@ const RedemptionHistory = () => {
         </p>
       </div>
 
-      <div className=" ">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50 sticky top-0">
+      {/* Table Container */}
+      <div className="border rounded-lg min-h-[490px]">
+        <table className="min-w-full table-fixed divide-y divide-gray-200">
+          <thead className="bg-gray-50">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
+                {headerGroup.headers.map((header, index) => (
                   <th
                     key={header.id}
-                    className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                    className={`
+                  px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider
+                  ${index === 0 ? "w-[200px]" : ""}
+                  ${index === 1 ? "w-[180px]" : ""}
+                  ${index === 2 ? "w-[160px]" : ""}
+                  ${index === 3 ? "w-[100px]" : ""}
+                `}
                   >
                     {header.isPlaceholder
                       ? null
@@ -72,12 +81,13 @@ const RedemptionHistory = () => {
               </tr>
             ))}
           </thead>
+
           <tbody className="bg-white divide-y divide-gray-100">
             {table.getRowModel().rows.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="text-center py-4 text-gray-500 text-sm"
+                  className="text-center py-12 text-gray-500 text-sm"
                 >
                   No redemption history found.
                 </td>
@@ -85,10 +95,16 @@ const RedemptionHistory = () => {
             ) : (
               table.getRowModel().rows.map((row) => (
                 <tr key={row.id} className="hover:bg-gray-50 transition-colors">
-                  {row.getVisibleCells().map((cell) => (
+                  {row.getVisibleCells().map((cell, index) => (
                     <td
                       key={cell.id}
-                      className="px-4 py-3 text-sm text-gray-700"
+                      className={`
+                    px-4 py-3 text-sm text-gray-700 truncate
+                    ${index === 0 ? "w-[200px]" : ""}
+                    ${index === 1 ? "w-[180px]" : ""}
+                    ${index === 2 ? "w-[160px]" : ""}
+                    ${index === 3 ? "w-[100px]" : ""}
+                  `}
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -103,13 +119,14 @@ const RedemptionHistory = () => {
         </table>
       </div>
 
-      {/* <div className="mt-4">
+      {/* Pagination Section */}
+      <div className="mt-4">
         <DataTablePagination
           table={table}
           pagination={pagination}
           setPagination={setPagination}
         />
-      </div> */}
+      </div>
     </main>
   );
 };
