@@ -1,14 +1,19 @@
+import hasRole from "@/utils/role";
 import { ColumnDef } from "@tanstack/react-table";
+import { RewardRedemption } from "@workspace/sdk/type";
+import { CircleCheck } from "lucide-react";
 
-interface TokenReward {
-  status: number;
-  from: string;
-  blockTimestamp: string | number;
-  transactionHash: string;
-  [key: string]: any;
-}
+export function useColumns(
+  updateStatus: (params: {
+    userAddress: string;
+    rewardAddress: string;
+  }) => void,
+  isUpdating: boolean,
+): ColumnDef<RewardRedemption>[] {
+  const hasDefaultAdminRole = hasRole({
+    role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
+  });
 
-export function useColumns(): ColumnDef<TokenReward>[] {
   return [
     {
       header: "Status",
@@ -48,7 +53,7 @@ export function useColumns(): ColumnDef<TokenReward>[] {
       cell: ({ row }) => {
         const timestamp = Number(row.original.blockTimestamp) * 1000;
         const date = new Date(timestamp);
-        return date.toLocaleDateString(); // Could use toLocaleString() for full date/time
+        return date.toLocaleDateString();
       },
     },
     {
@@ -58,6 +63,41 @@ export function useColumns(): ColumnDef<TokenReward>[] {
         const txnId = row.original.transactionHash;
         return txnId ? `${txnId.slice(0, 12)}...${txnId.slice(-4)}` : "N/A";
       },
+    },
+    {
+      header: () => <div className="text-center w-full">Action</div>,
+      id: "action",
+      cell: ({ row }) =>
+        hasDefaultAdminRole ? (
+          <div className="flex justify-center items-center w-full">
+            <button
+              onClick={() => {
+                // console.log("User:", row.original.from);
+                // console.log(
+                //   "Reward:",
+                //   row.original.rewardRedemption.rewardRedemption,
+                // );
+                updateStatus({
+                  userAddress: row.original.from,
+                  rewardAddress: row.original.rewardRedemption.rewardRedemption,
+                });
+              }}
+              disabled={isUpdating}
+              className={`p-1.5 rounded-full transition ${
+                isUpdating
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-green-100"
+              }`}
+              title="Mark as Completed"
+            >
+              <CircleCheck className="text-green-800" />
+            </button>
+          </div>
+        ) : (
+          <div className="flex justify-center items-center w-full">
+            <CircleCheck className="text-green-800 opacity-20" />
+          </div>
+        ),
     },
   ];
 }

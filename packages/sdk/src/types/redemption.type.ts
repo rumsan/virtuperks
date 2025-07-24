@@ -27,5 +27,9 @@ export type CreateRedemption = {
 };
 
 
-export type RewardRedemption = RewardRedemptionBase & CommonFields;
+export type RewardRedemption = RewardRedemptionBase & CommonFields & {
+  status: number;   
+  from: string;
+};
+
 

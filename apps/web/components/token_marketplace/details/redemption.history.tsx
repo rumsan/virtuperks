@@ -1,7 +1,10 @@
 "use client";
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
-import { useGetRedeemedReward } from "@/hooks/subgraph/token-marketplace";
+import {
+  useGetRedeemedReward,
+  useUpdateRedemptionStatus,
+} from "@/hooks/subgraph/token-marketplace";
 import {
   flexRender,
   getCoreRowModel,
@@ -13,7 +16,14 @@ import { useColumns } from "./redemption.column";
 
 const RedemptionHistory = () => {
   const { data, isLoading, error } = useGetRedeemedReward();
-  const columns = useColumns();
+  console.log("Data: ", data);
+  const {
+    UpdateRedeemStatus: updateStatus,
+    UpdateRedeemPending: isUpdating,
+    UpdateRedeemSuccess: updateSuccess,
+  } = useUpdateRedemptionStatus();
+
+  const columns = useColumns(updateStatus, isUpdating);
 
   const [pagination, setPagination] = useState({
     pageIndex: 0,

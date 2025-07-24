@@ -5,21 +5,26 @@ import {
   useGetRewardById,
   useRedeemReward,
 } from "@/hooks/subgraph/token-marketplace";
-import type { Reward, RewardDetailsProps } from "@/type/token.marketplace";
 import { Coins } from "lucide-react";
+import { NextRouter } from "next/router";
 import { useState } from "react";
 import { imageMap } from "../img/imgLink";
 import RedemptionHistory from "./redemption.history";
 
 type Step = "approve" | "redeem" | "completed";
 
+interface RewardDetailsProps {
+  rewardId: string;
+  router: NextRouter;
+}
+
 const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   const { data: rewardDetail, isLoading, error } = useGetRewardById(rewardId);
   const [step, setStep] = useState<Step>("approve");
   const [approvalHash, setApprovalHash] = useState<string | null>(null);
   const [redeemTxHash, setRedeemTxHash] = useState<string | null>(null);
-  const { ApproveReward, ApprovePending, ApproveSuccess } = useApproveReward();
-  const { RewardRedeem, RedeemPending, RedeemSuccess } = useRedeemReward();
+  const { ApproveReward, ApprovePending } = useApproveReward();
+  const { RewardRedeem, RedeemPending } = useRedeemReward();
 
   if (isLoading)
     return <p className="p-6 text-gray-500">Loading reward details...</p>;
@@ -40,25 +45,19 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
     );
   }
 
+  const rewardRaw = rewardDetail.data.rewardRedemptionCreated;
+
   const getImageForTitle = (title: string) =>
     imageMap[title] ||
     "https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg";
 
-  const rewardRaw = rewardDetail.data.rewardRedemptionCreated;
-  const reward: Reward = {
-    id: rewardRaw.id,
-    title: rewardRaw.name,
-    description: "Token reward",
-    tokens: parseInt(rewardRaw.tokensRequired, 10),
-    category: "Entertainment",
-    image: getImageForTitle(rewardRaw.name),
-  };
+  const tokensRequired = parseInt(rewardRaw.tokensRequired, 10);
 
   const handleApprove = async () => {
     try {
       const txHash = await ApproveReward({
         rewardAddress: rewardRaw.rewardRedemption,
-        value: reward.tokens,
+        value: tokensRequired,
       });
       setApprovalHash(txHash);
       setStep("redeem");
@@ -72,7 +71,6 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
       const txHash = await RewardRedeem({
         rewardAddress: rewardRaw.rewardRedemption,
       });
-      console.log("Redeem TX:", txHash);
       setRedeemTxHash(txHash);
       setStep("completed");
     } catch (err) {
@@ -103,13 +101,11 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
           <h2 className="text-xl font-semibold mb-2">
             Title: {rewardRaw.name}
           </h2>
-          <p className="text-gray-600 mb-4">
-            Description: {reward.description}
-          </p>
+          <p className="text-gray-600 mb-4">Description: Token reward</p>
           <div className="text-gray-600 mb-4 flex items-center gap-2">
             <span>Token:</span>
             <span className="text-blue-600 flex items-center gap-1">
-              {parseInt(rewardRaw.tokensRequired, 10)}
+              {tokensRequired}
               <Coins size={18} strokeWidth={2.65} />
             </span>
           </div>
@@ -137,7 +133,7 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
               Redeem Token
             </h3>
             <div className="text-blue-600 text-2xl font-bold text-center my-2 flex items-center justify-center gap-2">
-              {reward.tokens} <Coins size={24} strokeWidth={2.65} />
+              {tokensRequired} <Coins size={24} strokeWidth={2.65} />
             </div>
 
             <p className="text-[11px] text-gray-500 text-center mt-1">

@@ -904,6 +904,10 @@ export const GetRedeemedReward = `
         status
         blockNumber
         blockTimestamp
+        rewardRedemption{
+rewardRedemption
+name
+}
         transactionHash
       }
     }

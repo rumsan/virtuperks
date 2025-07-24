@@ -1,14 +1,12 @@
 import { DialogButton } from "@/components/common/ui/dialog";
-import {
-  useCheckParticipantBalance,
-  useRedeemToken,
-} from "@/hooks/subgraph/token";
+import { useCheckParticipantBalance } from "@/hooks/subgraph/token";
 import {
   useCreateReward,
   useGetRewards,
 } from "@/hooks/subgraph/token-marketplace";
 import { PATHS } from "@/routes/paths";
 import { getCategoryIcon } from "@/utils/rewardIcon";
+import { Reward, RewardRedemption } from "@workspace/sdk/type";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -22,8 +20,6 @@ import { Coins, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAccount } from "wagmi";
-// import { Reward, RewardRedemption } from "../../../type/token.marketplace";
-import { Reward, RewardRedemption } from "@workspace/sdk/type";
 import { imageMap } from "../img/imgLink";
 
 const TokenMarketListCard = () => {
@@ -31,10 +27,7 @@ const TokenMarketListCard = () => {
 
   const { address } = useAccount();
   const { balance } = useCheckParticipantBalance(address as `0x${string}`);
-  console.log(balance, "balance");
   const { toast } = useToast();
-  const { tokenRedeem, redeemPending } = useRedeemToken();
-
   const tokenData = useGetRewards();
   const tokenList = tokenData?.data?.data?.rewardRedemptionCreateds || [];
 
