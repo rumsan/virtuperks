@@ -1,4 +1,5 @@
  import { CommonFields } from "./common.type";
+import { RedemptionStatus } from "./enums";
 
 export type RewardBase = {
   rewardRedemption: string;   
@@ -15,6 +16,16 @@ export type RewardRedemptionBase = {
   tokensRequired: number;
 };
 
+
+export type CreateRedemption = {
+  userAddress: string;
+  rewardId: string;
+  tokens: number;
+  transactionHash?: string;
+  status: RedemptionStatus;
+  taskId?: string;
+};
+
+
 export type RewardRedemption = RewardRedemptionBase & CommonFields;
 
-export type Reward = RewardBase & CommonFields;

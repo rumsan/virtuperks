@@ -13,10 +13,17 @@ export type Reward = RewardBaseFields & {
   rewardRedemptionId: string;
 } & CommonFields;
 
-
-export type RewardRedemption = {
-  rewardId: string;
-  userAddress: string;
+export type CreateReward = {
+  name: string;
   tokensRequired: number;
-  status: "pending" | "completed";
-} & CommonFields;
+  appId?: string;
+  image?: string;
+};
+
+
+// export type RewardRedemption = {
+//   rewardId: string;
+//   userAddress: string;
+//   tokensRequired: number;
+//   status: "pending" | "completed";
+// } & CommonFields;
