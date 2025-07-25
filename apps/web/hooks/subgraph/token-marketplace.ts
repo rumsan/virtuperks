@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   useWriteRewardRedemptinFactoryCreateRewardRedemption,
   useWriteRewardRedemptionRedeem,
+  useWriteRewardRedemptionUpdateRedemptionStatus,
   useWriteRewardTokenApprove,
 } from "../wagmi/contracts";
 
@@ -79,13 +80,7 @@ export const useRedeemReward = () => {
   const { writeContractAsync } = useWriteRewardRedemptionRedeem();
 
   const mutation = useMutation({
-    mutationFn: async ({
-      rewardAddress,
-      amount,
-    }: {
-      rewardAddress: string;
-      amount: number;
-    }) => {
+    mutationFn: async ({ rewardAddress }: { rewardAddress: string }) => {
       const result = await writeContractAsync({
         address: rewardAddress as `0x${string}`,
         args: [],
@@ -128,5 +123,33 @@ export const useApproveReward = () => {
     ApproveReward: mutation.mutateAsync,
     ApprovePending: mutation.isPending,
     ApproveSuccess: mutation.isSuccess,
+  };
+};
+
+export const useUpdateRedemptionStatus = () => {
+  const { writeContractAsync } =
+    useWriteRewardRedemptionUpdateRedemptionStatus();
+
+  const mutation = useMutation({
+    mutationFn: async ({
+      userAddress,
+      rewardAddress,
+    }: {
+      userAddress: string;
+      rewardAddress: string;
+    }) => {
+      const result = await writeContractAsync({
+        address: rewardAddress as `0x${string}`,
+        args: [userAddress as `0x${string}`],
+      });
+      return result;
+    },
+    onSuccess: (result, variable) => {},
+  });
+
+  return {
+    UpdateRedeemStatus: mutation.mutateAsync,
+    UpdateRedeemPending: mutation.isPending,
+    UpdateRedeemSuccess: mutation.isSuccess,
   };
 };

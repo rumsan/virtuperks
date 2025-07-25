@@ -1,15 +1,29 @@
-import { CommonFields} from "./common.type";
+import { CommonFields } from "./common.type";
 
 
-
-export type RewardBase = {
-  rewardRedemption: string;
-  appId?: string;
+interface RewardBaseFields {
   name: string;
+  appId?: string;
   tokensRequired: bigint;
   image?: string;
-
-
 }
-export type Reward = RewardBase & CommonFields 
 
+
+export type Reward = RewardBaseFields & {
+  rewardRedemptionId: string;
+} & CommonFields;
+
+export type CreateReward = {
+  name: string;
+  tokensRequired: number;
+  appId?: string;
+  image?: string;
+};
+
+
+// export type RewardRedemption = {
+//   rewardId: string;
+//   userAddress: string;
+//   tokensRequired: number;
+//   status: "pending" | "completed";
+// } & CommonFields;

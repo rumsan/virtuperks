@@ -1,7 +1,6 @@
 export type Reward = {
-  id: number;
+  id: string;
   title: string;
-  // icon: LucideIcon;
   description: string;
   tokens: number;
   category: string;
@@ -22,3 +21,17 @@ export type RewardRedemption = {
 export type RewardsQueryResult = {
   rewardRedemptionCreateds: RewardRedemption[];
 };
+
+export type RedemptionStatus = "completed" | "pending";
+
+export interface Redemption {
+  name: string;
+  date: string;
+  status: RedemptionStatus;
+  txnId: string;
+}
+
+export interface RewardDetailsProps {
+  rewardId: string;
+  router: any;
+}

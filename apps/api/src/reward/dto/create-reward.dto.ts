@@ -3,6 +3,10 @@ import { CreateReward } from '@workspace/sdk/type';
 import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateRewardDto implements CreateReward {
+  name: string;
+  tokensRequired: number;
+  appId?: string | undefined;
+  image?: string | undefined;
   @ApiProperty()
   @IsString()
   title: string;
