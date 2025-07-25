@@ -13,10 +13,21 @@ import {
 } from "@tanstack/react-table";
 import { useState } from "react";
 import { useColumns } from "./redemption.column";
+interface RedemptionHistoryProps {
+  rewardId: string;
+}
 
-const RedemptionHistory = () => {
-  const { data, isLoading, error } = useGetRedeemedReward();
-  console.log("Data: ", data);
+const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
+  const {
+    data: redeemedReward,
+    isLoading,
+    error,
+  } = useGetRedeemedReward(rewardId);
+
+  const getRedeemedRewardList =
+    redeemedReward?.data?.rewardRedemptionCreateds[0].rewardRedeemedEvents ||
+    [];
+
   const {
     UpdateRedeemStatus: updateStatus,
     UpdateRedeemPending: isUpdating,
@@ -31,7 +42,7 @@ const RedemptionHistory = () => {
   });
 
   const table = useReactTable({
-    data: data?.data?.rewardRedeemeds || [],
+    data: getRedeemedRewardList,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),

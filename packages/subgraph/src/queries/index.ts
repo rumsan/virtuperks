@@ -916,6 +916,9 @@ query GetRedeemedRewards($rewardRedemption: Bytes!) {
     ) {
       id
       from
+      rewardRedemption {
+      rewardRedemption
+      }
       amount
       status
       blockNumber
