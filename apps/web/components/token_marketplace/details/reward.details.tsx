@@ -1,86 +1,43 @@
 "use client";
 
 import {
-  useGetRedeemedReward,
+  useApproveReward,
   useGetRewardById,
+  useRedeemReward,
 } from "@/hooks/subgraph/token-marketplace";
-import { useEffect, useState } from "react";
+import { Coins } from "lucide-react";
+import { NextRouter } from "next/router";
+import { useState } from "react";
 import { imageMap } from "../img/imgLink";
+import RedemptionHistory from "./redemption.history";
 
-type RedemptionStatus = "completed" | "pending";
-
-interface Redemption {
-  name: string;
-  date: string;
-  status: RedemptionStatus;
-  txnId: string;
-}
-
-interface Reward {
-  id?: string;
-  title: string;
-  description: string;
-  tokens: number;
-  category: string;
-  image: string;
-}
+type Step = "approve" | "redeem" | "completed";
 
 interface RewardDetailsProps {
   rewardId: string;
-  router: any;
+  router: NextRouter;
 }
-
-type Step = "approve" | "redeem" | "completed";
 
 const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   const { data: rewardDetail, isLoading, error } = useGetRewardById(rewardId);
 
-  const [redemptions, setRedemptions] = useState<Redemption[]>([]);
+
   const [step, setStep] = useState<Step>("approve");
   const [loading, setLoading] = useState(false);
   const [approvalHash, setApprovalHash] = useState<string | null>(null); 
 
 
   // hook to fetch redeemed rewards with status
-  const redeemedReward = useGetRedeemedReward(rewardId);
-  console.log("Redeemed Reward: ", redeemedReward?.data?.data);
+ // const redeemedReward = useGetRedeemedReward(rewardId);
+  //console.log("Redeemed Reward: ", redeemedReward?.data?.data);
   // console.log("Redeem Reward: ", redeemedReward);
 
   // Mock redemption history (replace with API call)
-  useEffect(() => {
-    setRedemptions([
-      {
-        name: "Wallet Address",
-        date: "9/12/2024",
-        status: "completed",
-        txnId: "TXN09834",
-      },
-      {
-        name: "Wallet Address",
-        date: "9/12/2024",
-        status: "completed",
-        txnId: "TXN09833",
-      },
-      {
-        name: "Wallet Address",
-        date: "9/12/2024",
-        status: "pending",
-        txnId: "TXN09832",
-      },
-      {
-        name: "Wallet Address",
-        date: "9/12/2024",
-        status: "completed",
-        txnId: "TXN09831",
-      },
-      {
-        name: "Wallet Address",
-        date: "9/12/2024",
-        status: "completed",
-        txnId: "TXN09830",
-      },
-    ]);
-  }, []);
+ 
+
+  const [redeemTxHash, setRedeemTxHash] = useState<string | null>(null);
+  const { ApproveReward, ApprovePending } = useApproveReward();
+  const { RewardRedeem, RedeemPending } = useRedeemReward();
 
   if (isLoading)
     return <p className="p-6 text-gray-500">Loading reward details...</p>;
@@ -101,39 +58,37 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
     );
   }
 
+  const rewardRaw = rewardDetail.data.rewardRedemptionCreated;
+
   const getImageForTitle = (title: string) =>
     imageMap[title] ||
     "https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg";
 
-  const rewardRaw = rewardDetail.data.rewardRedemptionCreateds;
-  console.log("Reward Raw Data: ", rewardRaw);
-  
-  const reward: Reward = {
-    id: rewardRaw.id,
-    title: rewardRaw.name,
-    description: "Token reward",
-    tokens: parseInt(rewardRaw.tokensRequired, 10),
-    category: "Entertainment",
-    image: getImageForTitle(rewardRaw.name),
-  };
+  const tokensRequired = parseInt(rewardRaw.tokensRequired, 10);
 
-  // Step Handlers
   const handleApprove = async () => {
-    setLoading(true);
-    setTimeout(() => {
-      setApprovalHash("0xc77417ff150b8");
+    try {
+      const txHash = await ApproveReward({
+        rewardAddress: rewardRaw.rewardRedemption,
+        value: tokensRequired,
+      });
+      setApprovalHash(txHash);
       setStep("redeem");
-      setLoading(false);
-    }, 2000); // Simulating approval
+    } catch (err) {
+      console.error("Approval failed:", err);
+    }
   };
 
   const handleRedeem = async () => {
-    setLoading(true);
-    setTimeout(() => {
+    try {
+      const txHash = await RewardRedeem({
+        rewardAddress: rewardRaw.rewardRedemption,
+      });
+      setRedeemTxHash(txHash);
       setStep("completed");
-      alert("Reward redeemed successfully!");
-      setLoading(false);
-    }, 2000); // Simulating redemption
+    } catch (err) {
+      console.error("Redeem failed:", err);
+    }
   };
 
   return (
@@ -151,13 +106,22 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
         <div className="flex-[2] border border-gray-200 rounded-lg p-5 bg-white">
           <div className="bg-gray-100 rounded-lg h-48 flex items-center justify-center mb-5">
             <img
-              src={reward.image}
-              alt={reward.title}
+              src={getImageForTitle(rewardRaw.name)}
+              alt={rewardRaw.name}
               className="object-cover h-full w-full rounded-lg"
             />
           </div>
-          <h2 className="text-xl font-semibold mb-2">{reward.title}</h2>
-          <p className="text-gray-600 mb-4">{reward.description}</p>
+          <h2 className="text-xl font-semibold mb-2">
+            Title: {rewardRaw.name}
+          </h2>
+          <p className="text-gray-600 mb-4">Description: Token reward</p>
+          <div className="text-gray-600 mb-4 flex items-center gap-2">
+            <span>Token:</span>
+            <span className="text-blue-600 flex items-center gap-1">
+              {tokensRequired}
+              <Coins size={18} strokeWidth={2.65} />
+            </span>
+          </div>
 
           <div className="grid grid-cols-2 gap-4 text-sm text-gray-700 mb-2">
             <div>
@@ -165,20 +129,12 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
               <p>6 months from redemption</p>
             </div>
             <div>
-              <p className="font-medium">Locations</p>
-              <p>Available at all premium cinema chains</p>
-            </div>
-            <div>
-              <p className="font-medium">What's Included</p>
+              <p className="font-medium">Rules & Regulations</p>
               <ul className="list-disc list-inside">
-                <li>Premium seating</li>
-                <li>Complimentary popcorn</li>
-                <li>Priority booking</li>
+                <li>Non-transferable and cannot be exchanged for cash.</li>
+                <li>Valid only within the redemption period.</li>
+                <li>Subject to availability and venue policies.</li>
               </ul>
-            </div>
-            <div>
-              <p className="font-medium">Terms & Conditions</p>
-              <p>Valid for any movie, any time. Subject to availability.</p>
             </div>
           </div>
         </div>
@@ -189,122 +145,93 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
             <h3 className="text-lg font-semibold text-center mb-1">
               Redeem Token
             </h3>
-            <div className="text-blue-600 text-2xl font-bold text-center my-2">
-              🔵 {reward.tokens}
+            <div className="text-blue-600 text-2xl font-bold text-center my-2 flex items-center justify-center gap-2">
+              {tokensRequired} <Coins size={24} strokeWidth={2.65} />
             </div>
+
             <p className="text-[11px] text-gray-500 text-center mt-1">
               By redeeming, you agree to the terms.
             </p>
 
-            {/* Step 1: Approve */}
-            {step === "approve" && (
-              <button
-                onClick={handleApprove}
-                disabled={loading}
-                className={`mt-2 py-1.5 px-3 rounded-lg text-sm font-medium transition text-white ${
-                  loading
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
-                }`}
-              >
-                {loading
-                  ? "Approving... Please confirm in wallet"
-                  : "Step 1: Approve Token Spending"}
-              </button>
-            )}
-
-            {/* Approval Success */}
-            {step === "redeem" && approvalHash && (
-              <>
-                <div className="p-2 mt-3 bg-green-50 border border-green-200 rounded text-xs text-green-700 text-center">
-                  Approval successful! You can now redeem the reward.
-                  <div className="text-gray-500 text-[10px]">
-                    {approvalHash}
-                  </div>
+            <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded text-xs text-green-700 text-center min-h-[130px] flex flex-col justify-between">
+              {/* Step 1: Approve */}
+              {step === "approve" && (
+                <div className="p-2 mt-3 text-sm text-center min-h-[130px] flex flex-col justify-between">
+                  <p className="font-semibold mb-1">
+                    Please approve token spending to continue.
+                  </p>
+                  <button
+                    onClick={handleApprove}
+                    disabled={ApprovePending}
+                    className={`py-1.5 px-3 rounded-lg text-sm font-medium transition text-white ${
+                      ApprovePending
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-700"
+                    }`}
+                  >
+                    {ApprovePending
+                      ? "Approving... Please confirm in wallet"
+                      : "Step 1: Approve Token Spending"}
+                  </button>
                 </div>
-                <button
-                  onClick={handleRedeem}
-                  disabled={loading}
-                  className={`mt-2 py-1.5 px-3 rounded-lg text-sm font-medium transition text-white ${
-                    loading
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-green-600 hover:bg-green-700"
-                  }`}
-                >
-                  {loading ? "Redeeming..." : "Step 2: Redeem Reward"}
-                </button>
-              </>
-            )}
+              )}
 
-            {/* Completed */}
-            {step === "completed" && (
-              <div className="flex flex-col gap-4 mt-3">
-                <div className="p-3 border border-green-300 bg-green-50 text-green-800 text-sm rounded-md">
-                  <div className="flex items-start gap-2">
-                    <span>✅</span>
-                    <div>
-                      <p>
-                        Redemption successful! Your reward will be processed
-                        shortly.
-                      </p>
-                      <p className="text-green-700 text-xs mt-1">
-                        0xd24688c3c1481
-                      </p>{" "}
-                      {/* or use dynamic hash */}
+              {/* Approval Success */}
+              {step === "redeem" && approvalHash && (
+                <>
+                  <div>
+                    Approval successful! You can now redeem the reward.
+                    <div className="text-gray-500 text-[10px] break-all mt-1">
+                      {approvalHash}
                     </div>
                   </div>
-                </div>
+                  <button
+                    onClick={handleRedeem}
+                    disabled={RedeemPending}
+                    className={`mt-2 py-1.5 px-3 rounded-lg text-sm font-medium transition text-white ${
+                      RedeemPending
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-green-600 hover:bg-green-700"
+                    }`}
+                  >
+                    {RedeemPending ? "Redeeming..." : "Step 2: Redeem Reward"}
+                  </button>
+                </>
+              )}
 
-                <button
-                  onClick={() => {
-                    setStep("approve"); // reset to start
-                    setApprovalHash(null); // clear hash
-                  }}
-                  className="w-full py-2 px-4 rounded-md text-sm font-medium text-white bg-gray-700 hover:bg-gray-800 transition"
-                >
-                  Redeem Another Reward
-                </button>
-              </div>
-            )}
+              {/* Completed */}
+              {step === "completed" && (
+                <>
+                  <div className="flex flex-col items-center gap-2">
+                    <p>
+                      Redemption successful! Your reward will be processed
+                      shortly.
+                    </p>
+                    {redeemTxHash && (
+                      <p className="text-green-700 text-xs mt-1 break-all">
+                        {redeemTxHash}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => {
+                      setStep("approve");
+                      setApprovalHash(null);
+                      setRedeemTxHash(null);
+                    }}
+                    className="mt-2 py-1.5 px-3 rounded-lg text-sm font-medium transition text-white bg-gray-700 hover:bg-gray-800"
+                  >
+                    Redeem Another Reward
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Redemption History */}
-      <div className="border border-gray-200 shadow-sm rounded-xl p-6 bg-white">
-        <h3 className="text-lg font-bold mb-4">Redemption History</h3>
-        <p className="text-sm text-gray-500 mb-4">
-          Recent redemptions for this token
-        </p>
-        <div className="space-y-3">
-          {redemptions.map((r, idx) => (
-            <div
-              key={idx}
-              className="flex items-center justify-between p-4 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 transition"
-            >
-              <div className="flex items-center gap-3">
-                <span
-                  className={`text-xs px-2 py-1 rounded-full font-medium ${
-                    r.status === "completed"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}
-                >
-                  {r.status}
-                </span>
-                <div>
-                  <p className="font-semibold text-gray-800">{r.name}</p>
-                  <p className="text-xs text-gray-500">{r.date}</p>
-                </div>
-              </div>
-              <div className="text-xs text-gray-600 text-right">
-                <p className="text-gray-400">Transaction ID</p>
-                <strong>{r.txnId}</strong>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <RedemptionHistory />
     </div>
   );
 };
