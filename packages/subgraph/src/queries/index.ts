@@ -880,8 +880,8 @@ export const GetRewards = `
 
   
 export const getRewardById = `
-  query GetRewardById($id: ID!) {
-    rewardRedemptionCreated(id: $id) {
+  query GetRewardById($rewardRedemption: Bytes!) {
+    rewardRedemptionCreateds(where: { rewardRedemption: $rewardRedemption }) {
       id
       rewardRedemption
       appId
@@ -896,19 +896,35 @@ export const getRewardById = `
 
 //for the reward Redeem
 export const GetRedeemedReward = `
- query GetRedeemedRewards {
-      rewardRedeemeds(first: 100, orderBy: blockTimestamp, orderDirection: desc) {
-        id
-        from
-        amount
-        status
-        blockNumber
-        blockTimestamp
-        rewardRedemption{
-rewardRedemption
-name
-}
-        transactionHash
+query GetRedeemedRewards($rewardRedemption: Bytes!) {
+  rewardRedemptionCreateds(
+    where: { rewardRedemption: $rewardRedemption },
+    first: 1
+  ) {
+    id
+    rewardRedemption
+    appId
+    name
+    tokensRequired
+    blockNumber
+    blockTimestamp
+    transactionHash
+    rewardRedeemedEvents(
+      first: 100,
+      orderBy: blockTimestamp,
+      orderDirection: desc
+    ) {
+      id
+      from
+      rewardRedemption {
+      rewardRedemption
       }
+      amount
+      status
+      blockNumber
+      blockTimestamp
+      transactionHash
     }
+  }
+}
 `;

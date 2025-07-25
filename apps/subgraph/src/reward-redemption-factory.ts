@@ -7,7 +7,7 @@ export function handleRewardRedemptionCreated(
   event: RewardRedemptionCreatedEvent,
 ): void {
   let entity = new RewardRedemptionCreated(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
+    event.params.rewardRedemption,
   )
   entity.rewardRedemption = event.params.rewardRedemption
   entity.appId = event.params.appId
@@ -20,7 +20,6 @@ export function handleRewardRedemptionCreated(
 
   entity.save()
 
-  entity.save()
       log.debug("EntityTaskManagerCreated: {}", [entity.rewardRedemption.toHexString()]);
   
     RewardRedemption.create(event.params.rewardRedemption);

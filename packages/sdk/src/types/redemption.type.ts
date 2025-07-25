@@ -12,6 +12,7 @@ export type RewardBase = {
 export type RewardRedemptionBase = {
   name: string;
   rewardId: string;
+
   appId: string;
   tokensRequired: number;
 };
@@ -30,6 +31,7 @@ export type CreateRedemption = {
 export type RewardRedemption = RewardRedemptionBase & CommonFields & {
   status: number;   
   from: string;
+  
 };
 
 

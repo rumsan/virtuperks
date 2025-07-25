@@ -319,9 +319,12 @@ type RewardRedemptionCreated @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  rewardRedeemedEvents: [RewardRedeemed!] @derivedFrom(field: "rewardRedemption") 
+ 
 }
 type RewardRedeemed @entity(immutable: true) {
   id: Bytes!
+  rewardRedemption: RewardRedemptionCreated
   from: Bytes! # address
   amount: BigInt! # uint256
   status: Int! # uint8
