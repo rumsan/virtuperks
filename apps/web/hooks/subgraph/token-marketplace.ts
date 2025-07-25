@@ -62,13 +62,13 @@ export const useGetRewardById = (id: string) => {
   });
 };
 
-export const useGetRedeemedReward = () => {
+export const useGetRedeemedReward = (rewardRedemption:string) => {
   const { queryService } = useGraphService();
 
   return useQuery({
     queryKey: ["redeemedRewardsList"],
     queryFn: async () => {
-      const rewards = await queryService?.getRedeemedReward();
+      const rewards = await queryService?.getRedeemedReward(rewardRedemption);
       return rewards;
     },
   });

@@ -33,7 +33,7 @@ const TokenMarketListCard = () => {
 
   const { address } = useAccount();
   const { balance } = useCheckParticipantBalance(address as `0x${string}`);
-  console.log(balance, "balance");
+
   const { toast } = useToast();
   const { tokenRedeem, redeemPending } = useRedeemToken();
 
@@ -67,22 +67,14 @@ const TokenMarketListCard = () => {
     Transportation: "bg-yellow-100",
   };
 
-  function getImageForTitle(title: string): string {
-    return (
-      imageMap[title] ||
-      "https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg"
-    );
-  }
+  // function getImageForTitle(title: string): string {
+  //   return (
+  //     imageMap[title] ||
+  //     "https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg"
+  //   );
+  // }
 
-  const mappedRewards: Reward[] = tokenList.map((item: RewardRedemption) => ({
-    id: item.id,
-    title: item.name,
-    description: "Token reward",
-    tokens: parseInt(item.tokensRequired),
-    category: "Entertainment",
-    image: getImageForTitle(item.name),
-  }));
-
+  
   return (
     <div className="w-full p-4 mt-10">
       {/* Title and Description */}
@@ -105,16 +97,16 @@ const TokenMarketListCard = () => {
         </Card>
 
         {/* Rewards List */}
-        {mappedRewards.map((item: any) => (
+        {tokenList.map((item: any) => (
           <Card
             key={item.id}
             className="hover:shadow-md transition cursor-pointer flex flex-col justify-between"
-            onClick={() => handleCardClick(item.id.toString())}
+            onClick={() => handleCardClick(item.rewardRedemption)}
           >
             <CardHeader className="p-0">
               <div className="relative w-full h-48 overflow-hidden rounded-t-lg">
                 <img
-                  src={item.image}
+                  src={"https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg"}
                   alt={item.name}
                   loading="lazy"
                   className="w-full h-full object-cover"
@@ -126,7 +118,7 @@ const TokenMarketListCard = () => {
                 >
                   {getCategoryIcon(item.category)}
                   <span className="text-xs font-medium text-[#334155]">
-                    {item.category}
+                    {"Entertainment"}
                   </span>
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none rounded-t-lg" />
@@ -134,10 +126,10 @@ const TokenMarketListCard = () => {
 
               <div className="px-4 pt-3 pb-2">
                 <CardTitle className="text-lg text-[#0F172A]">
-                  {item.title}
+                  {item.name}
                 </CardTitle>
                 <CardDescription className="text-sm text-[#64748B]">
-                  {item.description}
+                  {"Reward Description"}
                 </CardDescription>
               </div>
             </CardHeader>
@@ -150,7 +142,7 @@ const TokenMarketListCard = () => {
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-2 text-[#297AD6] text-xl font-bold">
                   <Coins size={18} strokeWidth={2.65} />
-                  {item.tokens}
+                  {parseInt(item.tokensRequired)}
                 </div>
 
                 {/* Button also navigates */}

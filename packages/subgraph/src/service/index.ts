@@ -213,9 +213,9 @@ return { data, error };
   }
 
 
-  async getRewardById(id: string) {
+  async getRewardById(rewardRedemption: string) {
     try {
-      const { data, error } = await this.subgraphQuery.query(getRewardById, { id });
+      const { data, error } = await this.subgraphQuery.query(getRewardById, {rewardRedemption });
       return { data, error };
     } catch (error) {
       console.error('Error fetching reward by ID:', error);
@@ -224,10 +224,10 @@ return { data, error };
   }
 
     // service to get redeemed rewards
-  async getRedeemedReward (){
+  async getRedeemedReward (rewardRedemption: string) {
 
 try {
-  const { data, error } = await this.subgraphQuery.query(GetRedeemedReward, {});
+  const { data, error } = await this.subgraphQuery.query(GetRedeemedReward, {rewardRedemption});
 return { data, error };
 }catch(error) {
     console.error('Error fetching rewards:', error);

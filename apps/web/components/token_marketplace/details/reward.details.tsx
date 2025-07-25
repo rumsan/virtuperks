@@ -17,7 +17,7 @@ interface Redemption {
 }
 
 interface Reward {
-  id: string;
+  id?: string;
   title: string;
   description: string;
   tokens: number;
@@ -34,13 +34,16 @@ type Step = "approve" | "redeem" | "completed";
 
 const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   const { data: rewardDetail, isLoading, error } = useGetRewardById(rewardId);
+
   const [redemptions, setRedemptions] = useState<Redemption[]>([]);
   const [step, setStep] = useState<Step>("approve");
   const [loading, setLoading] = useState(false);
-  const [approvalHash, setApprovalHash] = useState<string | null>(null);
+  const [approvalHash, setApprovalHash] = useState<string | null>(null); 
+
 
   // hook to fetch redeemed rewards with status
-  const redeemedReward = useGetRedeemedReward();
+  const redeemedReward = useGetRedeemedReward(rewardId);
+  console.log("Redeemed Reward: ", redeemedReward?.data?.data);
   // console.log("Redeem Reward: ", redeemedReward);
 
   // Mock redemption history (replace with API call)
@@ -102,7 +105,9 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
     imageMap[title] ||
     "https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg";
 
-  const rewardRaw = rewardDetail.data.rewardRedemptionCreated;
+  const rewardRaw = rewardDetail.data.rewardRedemptionCreateds;
+  console.log("Reward Raw Data: ", rewardRaw);
+  
   const reward: Reward = {
     id: rewardRaw.id,
     title: rewardRaw.name,
