@@ -11,20 +11,25 @@ export const useCreateReward = () => {
   const queryClient = useQueryClient();
   const { writeContractAsync } =
     useWriteRewardRedemptinFactoryCreateRewardRedemption();
+
   const appId = (process.env.NEXT_PUBLIC_APP_ID as `0x${string}`) || "0x";
   const registry = process.env.NEXT_PUBLIC_APPREGISTRY as `0x${string}`;
   const token = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
 
   const mutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: { name: string; amount: number }) => {
       const result = await writeContractAsync({
         address: process.env.NEXT_PUBLIC_REDEMPTION_FACTORY as `0x${string}`,
         args: [appId, registry, token, data.name, BigInt(data.amount)],
       });
       return result;
     },
-    onSuccess: (result, variable) => {
-      // queryClient.invalidateQueries(["rewardRedemptionList"]);
+
+    onSuccess: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 9000));
+      await queryClient.invalidateQueries({
+        queryKey: ["rewardsList"],
+      });
     },
   });
 
@@ -63,7 +68,7 @@ export const useGetRewardById = (id: string) => {
   });
 };
 
-export const useGetRedeemedReward = (rewardRedemption:string) => {
+export const useGetRedeemedReward = (rewardRedemption: string) => {
   const { queryService } = useGraphService();
 
   return useQuery({
