@@ -138,28 +138,17 @@ export const useGetDisbursements = (
   });
 };
 
-
-
 export const useRedeemToken = () => {
-  const { writeContractAsync } = useWriteRewardTokenTransfer()
+  const { writeContractAsync } = useWriteRewardTokenTransfer();
 
   const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN;
   const adminAddress = process.env.NEXT_PUBLIC_ADMIN_ADDRESS;
 
   const mutation = useMutation({
-    mutationFn: async ({
-      amount,
-   
-    }: {
-      amount: number;
-  
-    }) => {
+    mutationFn: async ({ amount }: { amount: number }) => {
       const result = await writeContractAsync({
         address: tokenAddress as `0x${string}`,
-        args: [
-          adminAddress as `0x${string}`,
-          BigInt(amount),
-        ],
+        args: [adminAddress as `0x${string}`, BigInt(amount)],
       });
       return result;
     },
@@ -173,29 +162,16 @@ export const useRedeemToken = () => {
   };
 };
 
-
-export const useCheckParticipantBalance = (participantAddress:string) => {
-
-
-
+export const useCheckParticipantBalance = (participantAddress: string) => {
   const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN;
 
-
   const { data, isError, isLoading } = useReadRewardTokenBalanceOf({
-      
     address: tokenAddress as `0x${string}`,
-    args:[participantAddress as `0x${string}`]
-
-
-
-  })
+    args: [participantAddress as `0x${string}`],
+  });
   return {
-    balance: data,
+    participantTotalToken: data,
     isError,
     isLoading,
-}
-  
-
- 
+  };
 };
-
