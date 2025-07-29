@@ -32,6 +32,8 @@ type DialogButtonProps = {
     to?: string;
     remarks?: string;
     name?: string;
+    ownerAddress?: string;
+    category?: string;
   }) => Promise<void>;
   isDisabled?: boolean;
   isLoading?: boolean;
@@ -55,12 +57,16 @@ export const DialogButton = ({
     to: string;
     remarks: string;
     name: string;
+    ownerAddress: string;
+    category: string;
   }>({
     completionUrl: "",
     amount: "",
     to: "",
     remarks: "",
     name: "",
+    ownerAddress: "",
+    category: "",
   });
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
@@ -87,9 +93,12 @@ export const DialogButton = ({
     }
     if (
       submitType === "CreateReward" &&
-      (!formData.name.trim() || !formData.amount.trim())
+      (!formData.name.trim() ||
+        !formData.amount.trim() ||
+        !formData.ownerAddress.trim() ||
+        !formData.category.trim())
     ) {
-      return "Reward name and amount are required";
+      return "Reward name, amount, category, and owner Address are required";
     }
 
     return null;
@@ -123,8 +132,10 @@ export const DialogButton = ({
         };
       } else if (submitType === "CreateReward") {
         submitData = {
-          name: formData.name?.trim(),
+          name: formData.name.trim(),
           amount: formData.amount.trim(),
+          ownerAddress: formData.ownerAddress.trim(),
+          category: formData.category.trim(),
         };
       }
 
@@ -135,6 +146,8 @@ export const DialogButton = ({
         to: "",
         remarks: "",
         name: "",
+        ownerAddress: "",
+        category: "",
       });
       setIsOpen(false);
     } catch (error) {
@@ -265,35 +278,39 @@ export const DialogButton = ({
       return (
         <div className="py-4 space-y-4">
           <div>
-            <Label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Reward Name
-            </Label>
+            <Label htmlFor="name">Reward Name</Label>
             <Input
               id="name"
-              type="text"
               value={formData.name}
               onChange={handleInputChange("name")}
               placeholder="Enter reward name"
-              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-gray-900 ${error ? "border-red-600" : ""}`}
             />
           </div>
           <div>
-            <Label
-              htmlFor="amount"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Amount
-            </Label>
+            <Label htmlFor="amount">Amount</Label>
             <Input
               id="amount"
-              type="text"
               value={formData.amount}
               onChange={handleInputChange("amount")}
               placeholder="Enter reward amount"
-              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-gray-900 ${error ? "border-red-600" : ""}`}
+            />
+          </div>
+          <div>
+            <Label htmlFor="ownerAddress">Owner Address</Label>
+            <Input
+              id="ownerAddress"
+              value={formData.ownerAddress}
+              onChange={handleInputChange("ownerAddress")}
+              placeholder="Enter owner Address"
+            />
+          </div>
+          <div>
+            <Label htmlFor="category">Category</Label>
+            <Input
+              id="category"
+              value={formData.category}
+              onChange={handleInputChange("category")}
+              placeholder="Enter reward category"
             />
           </div>
         </div>
@@ -315,6 +332,8 @@ export const DialogButton = ({
             to: "",
             remarks: "",
             name: "",
+            ownerAddress: "",
+            category: "",
           });
           setError(null);
         }
@@ -353,7 +372,7 @@ export const DialogButton = ({
               (submitType === "CreateReward" &&
                 (!formData.amount.trim() || !formData.name.trim()))
             }
-            className="bg-green-500 text-white hover:bg-green-600 disabled:bg-gray-400 disabled:text-gray-200"
+            className="bg-blue-500 text-white hover:bg-blue-800 disabled:bg-gray-400 disabled:text-gray-200"
           >
             {isDisabled ? "Processing..." : buttonName}
           </Button>

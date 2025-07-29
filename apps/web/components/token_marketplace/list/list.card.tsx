@@ -6,7 +6,6 @@ import {
 } from "@/hooks/subgraph/token-marketplace";
 import { PATHS } from "@/routes/paths";
 import { getCategoryIcon } from "@/utils/rewardIcon";
-import { Reward, RewardRedemption } from "@workspace/sdk/type";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -20,7 +19,6 @@ import { Coins, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { imageMap } from "../img/imgLink";
 
 const TokenMarketListCard = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -30,13 +28,19 @@ const TokenMarketListCard = () => {
   const { toast } = useToast();
   const tokenData = useGetRewards();
   const tokenList = tokenData?.data?.data?.rewardRedemptionCreateds || [];
+  console.log("Token Data: ", tokenList);
 
   const router = useRouter();
   const { AddReward, rewardPending } = useCreateReward();
 
   const handleRewardAdd = async (data: any) => {
     try {
-      await AddReward({ name: data.name, amount: data.amount });
+      await AddReward({
+        name: data.name,
+        amount: data.amount,
+        ownerAddress: data.ownerAddress,
+        category: data.category,
+      });
       setIsDialogOpen(false);
       toast({
         title: "Token transferred successfully!",
@@ -65,7 +69,6 @@ const TokenMarketListCard = () => {
   //   );
   // }
 
-  
   return (
     <div className="w-full p-4 mt-10">
       {/* Title and Description */}
@@ -97,7 +100,9 @@ const TokenMarketListCard = () => {
             <CardHeader className="p-0">
               <div className="relative w-full h-48 overflow-hidden rounded-t-lg">
                 <img
-                  src={"https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg"}
+                  src={
+                    "https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg"
+                  }
                   alt={item.name}
                   loading="lazy"
                   className="w-full h-full object-cover"

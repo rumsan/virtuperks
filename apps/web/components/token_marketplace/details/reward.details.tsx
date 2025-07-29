@@ -2,22 +2,20 @@
 
 import {
   useApproveReward,
-  useGetRedeemedReward,
   useGetRewardById,
   useRedeemReward,
 } from "@/hooks/subgraph/token-marketplace";
 import { Coins } from "lucide-react";
-import { NextRouter } from "next/router";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 import { imageMap } from "../img/imgLink";
 import RedemptionHistory from "./redemption.history";
-import { formatTokenAmount } from "@/utils/formatDate";
 
 type Step = "approve" | "redeem" | "completed";
 
-interface RewardDetailsProps {
+export interface RewardDetailsProps {
   rewardId: string;
-  router: NextRouter;
+  router: AppRouterInstance;
 }
 
 const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
@@ -28,7 +26,6 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   const [approvalHash, setApprovalHash] = useState<string | null>(null);
 
   // hook to fetch redeemed rewards with status
-  
 
   const [redeemTxHash, setRedeemTxHash] = useState<string | null>(null);
   const { ApproveReward, ApprovePending } = useApproveReward();
@@ -55,12 +52,9 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
 
   const rewardRaw = rewardDetail?.data?.rewardRedemptionCreateds[0];
 
-
   const getImageForTitle = (title: string) =>
     imageMap[title] ||
     "https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg";
-
-
 
   const handleApprove = async () => {
     try {
@@ -227,7 +221,7 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
       </div>
 
       {/* Redemption History */}
-      <RedemptionHistory rewardId={ rewardId} />
+      <RedemptionHistory rewardId={rewardId} />
     </div>
   );
 };
