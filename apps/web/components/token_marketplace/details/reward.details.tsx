@@ -1,17 +1,17 @@
 "use client";
 
+import { useCheckParticipantBalance } from "@/hooks/subgraph/token";
 import {
   useApproveReward,
-  useGetRedeemedReward,
   useGetRewardById,
   useRedeemReward,
 } from "@/hooks/subgraph/token-marketplace";
 import { Coins } from "lucide-react";
 import { NextRouter } from "next/router";
 import { useState } from "react";
+import { useAccount } from "wagmi";
 import { imageMap } from "../img/imgLink";
 import RedemptionHistory from "./redemption.history";
-import { formatTokenAmount } from "@/utils/formatDate";
 
 type Step = "approve" | "redeem" | "completed";
 
@@ -22,13 +22,17 @@ interface RewardDetailsProps {
 
 const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   const { data: rewardDetail, isLoading, error } = useGetRewardById(rewardId);
+  const { address, isConnected } = useAccount();
+  //hook to check participant balance
+  const { participantTotalToken, isError } = useCheckParticipantBalance(
+    address as `0x${string}`,
+  );
 
   const [step, setStep] = useState<Step>("approve");
   const [loading, setLoading] = useState(false);
   const [approvalHash, setApprovalHash] = useState<string | null>(null);
 
   // hook to fetch redeemed rewards with status
-  
 
   const [redeemTxHash, setRedeemTxHash] = useState<string | null>(null);
   const { ApproveReward, ApprovePending } = useApproveReward();
@@ -55,12 +59,9 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
 
   const rewardRaw = rewardDetail?.data?.rewardRedemptionCreateds[0];
 
-
   const getImageForTitle = (title: string) =>
     imageMap[title] ||
     "https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg";
-
-
 
   const handleApprove = async () => {
     try {
@@ -227,7 +228,7 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
       </div>
 
       {/* Redemption History */}
-      <RedemptionHistory rewardId={ rewardId} />
+      <RedemptionHistory rewardId={rewardId} />
     </div>
   );
 };
