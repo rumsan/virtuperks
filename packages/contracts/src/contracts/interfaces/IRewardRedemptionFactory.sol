@@ -4,8 +4,20 @@ pragma solidity 0.8.20;
 interface IRewardRedemptionFactory {
     event RewardRedemptionCreated(
         address rewardRedemption,
-        bytes32 indexed appId,
         string name,
-        uint256 tokensRequired
+        uint256 tokensRequired,
+        string category,
+        bytes32 rewardId
     );
+
+
+
+    struct Reward {
+        string name;
+        uint256 tokensRequired;
+        string category;
+        address owner;
+       
+    }
+    
 }

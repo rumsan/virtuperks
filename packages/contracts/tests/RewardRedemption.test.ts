@@ -1,7 +1,4 @@
-import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers';
-
 import { expect } from "chai";
-import { ethers } from "hardhat";
 import { deployRewardManagementFixture } from "./fixtures/RewardRedemptionFixture"; // Adjust path as needed
 
 describe("RewardRedemption Integration", function () {
@@ -30,76 +27,74 @@ describe("RewardRedemption Integration", function () {
   });
 
   it("should transfer tokens to participant1 and allow them to redeem", async function () {
+    const startingBalance = await rewardToken.balanceOf(participant1.address);
+    const tokensRequired = await rewardRedemption.tokensRequired();
     
-      const startingBalance = await rewardToken.balanceOf(participant1.address);
-        await rewardToken.connect(participant1).approve(rewardRedemption.target, 10);
-   
+    await rewardToken.connect(participant1).approve(rewardRedemption.target, tokensRequired);
     expect(startingBalance).to.equal(1000n);
 
-
     // Redeem tokens
-    const tx = await rewardRedemption.connect(participant1).redeem(10);
-    await tx.wait();
+    await rewardRedemption.connect(participant1).redeem();
 
-    // Participant1's balance should decrease by 10
+    // Participant1's balance should decrease by tokensRequired
     const afterRedeemBalance = await rewardToken.balanceOf(participant1.address);
-    expect(afterRedeemBalance).to.equal(990n);
+    expect(afterRedeemBalance).to.equal(startingBalance - tokensRequired);
 
-    // Redemption status should be pending
-    const appId = fixture.APP_ID;
-    const redemption = await rewardRedemption.redemptions(appId, participant1.address);
+    // Check redemption status
+    const redemption = await rewardRedemption.redemptions(fixture.APP_ID, participant1.address);
     expect(redemption.status).to.equal(0); // RedemptionStatus.PENDING
-    expect(redemption.amount).to.equal(10n);
+    expect(redemption.amount).to.equal(tokensRequired);
     expect(redemption.from).to.equal(participant1.address);
   });
 
-    it("admin can update redemption status to REDEEMED", async function () {
-      
-        
-
-
-    // / Participant1 approves and redeems
-    await rewardToken.connect(participant1).approve(rewardRedemption.target, 10);
-    await rewardRedemption.connect(participant1).redeem(10);
+  it("admin can update redemption status to REDEEMED", async function () {
+    // Get tokensRequired from contract
+    const tokensRequired = await rewardRedemption.tokensRequired();
+    
+    // Participant1 approves and redeems
+    await rewardToken.connect(participant1).approve(rewardRedemption.target, tokensRequired);
+    await rewardRedemption.connect(participant1).redeem(); // Remove the parameter
 
     // Status should be pending
     let redemption = await rewardRedemption.redemptions(fixture.APP_ID, participant1.address);
     expect(redemption.status).to.equal(0);
 
     // Admin updates status to REDEEMED (status 1)
-    await rewardRedemption.connect(admin1).updateRedemptionStatus(participant1.address);
+    await rewardRedemption.connect(user1).updateRedemptionStatus(participant1.address);
     redemption = await rewardRedemption.redemptions(fixture.APP_ID, participant1.address);
     expect(redemption.status).to.equal(1);
   });
 
   it("should not allow redemption of zero tokens", async function () {
-    await rewardToken.connect(participant1).approve(rewardRedemption.target, 0);
+    // This test needs to be modified since we can't set token amount
     await expect(
-      rewardRedemption.connect(participant1).redeem(0)
-    ).to.be.revertedWith("Amount must be greater than zero");
+      rewardRedemption.connect(participant1).redeem()
+    ).to.be.revertedWith("Insufficient token allowance");
   });
 
   it("should not allow others to update redemption status", async function () {
-    await rewardToken.connect(participant1).approve(rewardRedemption.target, 10);
-    await rewardRedemption.connect(participant1).redeem(10);
+    const tokensRequired = await rewardRedemption.tokensRequired();
+    await rewardToken.connect(participant1).approve(rewardRedemption.target, tokensRequired);
+    await rewardRedemption.connect(participant1).redeem(); // Remove the parameter
 
     // user2 (not admin) tries to update
     await expect(
       rewardRedemption.connect(fixture.user2).updateRedemptionStatus(participant1.address)
-    ).to.be.revertedWith("Not authorized");
+    ).to.be.revertedWith("Only owner can call this function");
   });
 
   it("should emit RewardRedeemed event on redeem and on status update", async function () {
-    await rewardToken.connect(participant1).approve(rewardRedemption.target, 10);
+    const tokensRequired = await rewardRedemption.tokensRequired();
+    await rewardToken.connect(participant1).approve(rewardRedemption.target, tokensRequired);
 
     // Redeem should emit
-    await expect(rewardRedemption.connect(participant1).redeem(10))
+    await expect(rewardRedemption.connect(participant1).redeem())
       .to.emit(rewardRedemption, "RewardRedeemed")
-      .withArgs(participant1.address, 10, 0);
+      .withArgs(participant1.address, tokensRequired, 0);
 
     // Status update should emit
-    await expect(rewardRedemption.connect(admin1).updateRedemptionStatus(participant1.address))
+    await expect(rewardRedemption.connect(user1).updateRedemptionStatus(participant1.address))
       .to.emit(rewardRedemption, "RewardRedeemed")
-      .withArgs(participant1.address, 10,1 );
+      .withArgs(participant1.address, tokensRequired, 1);
   });
 });
