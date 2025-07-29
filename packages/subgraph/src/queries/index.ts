@@ -868,9 +868,10 @@ export const GetRewards = `
       rewardRedemptionCreateds(first: 100, orderBy: blockTimestamp, orderDirection: desc) {
         id
         rewardRedemption
-        appId
+        rewardId
         name
         tokensRequired
+        category
         blockNumber
         blockTimestamp
         transactionHash
@@ -884,9 +885,10 @@ export const getRewardById = `
     rewardRedemptionCreateds(where: { rewardRedemption: $rewardRedemption }) {
       id
       rewardRedemption
-      appId
+      rewardId
       name
       tokensRequired
+      category
       blockNumber
       blockTimestamp
       transactionHash

@@ -25,6 +25,11 @@
           "internalType": "uint256",
           "name": "_tokensRequired",
           "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "_category",
+          "type": "string"
         }
       ],
       "stateMutability": "nonpayable",
@@ -49,6 +54,17 @@
     {
       "inputs": [],
       "name": "ReentrancyGuardReentrantCall",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "SafeERC20FailedOperation",
       "type": "error"
     },
     {
@@ -78,7 +94,7 @@
     },
     {
       "inputs": [],
-      "name": "DEFAULT_ADMIN_ROLE",
+      "name": "OWNER",
       "outputs": [
         {
           "internalType": "bytes32",
@@ -110,6 +126,19 @@
           "internalType": "bytes32",
           "name": "",
           "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "category",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
         }
       ],
       "stateMutability": "view",

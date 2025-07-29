@@ -1313,12 +1313,23 @@ export const rewardRedemptinFactoryAbi = [
         type: 'address',
         indexed: false,
       },
-      {name: 'appId', internalType: 'bytes32', type: 'bytes32', indexed: true},
       {name: 'name', internalType: 'string', type: 'string', indexed: false},
       {
         name: 'tokensRequired',
         internalType: 'uint256',
         type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'category',
+        internalType: 'string',
+        type: 'string',
+        indexed: false,
+      },
+      {
+        name: 'rewardId',
+        internalType: 'bytes32',
+        type: 'bytes32',
         indexed: false,
       },
     ],
@@ -1327,15 +1338,37 @@ export const rewardRedemptinFactoryAbi = [
   {
     type: 'function',
     inputs: [
+      {name: 'rewardId', internalType: 'bytes32', type: 'bytes32'},
       {name: '_appId', internalType: 'bytes32', type: 'bytes32'},
       {name: '_registry', internalType: 'address', type: 'address'},
       {name: '_token', internalType: 'address', type: 'address'},
       {name: '_name', internalType: 'string', type: 'string'},
       {name: '_tokensRequired', internalType: 'uint256', type: 'uint256'},
+      {name: '_category', internalType: 'string', type: 'string'},
+      {name: '_owner', internalType: 'address', type: 'address'},
     ],
     name: 'createRewardRedemption',
     outputs: [],
     stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{name: 'rewardId', internalType: 'bytes32', type: 'bytes32'}],
+    name: 'getRewardOwners',
+    outputs: [{name: '', internalType: 'address', type: 'address'}],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{name: '', internalType: 'bytes32', type: 'bytes32'}],
+    name: 'rewards',
+    outputs: [
+      {name: 'name', internalType: 'string', type: 'string'},
+      {name: 'tokensRequired', internalType: 'uint256', type: 'uint256'},
+      {name: 'category', internalType: 'string', type: 'string'},
+      {name: 'owner', internalType: 'address', type: 'address'},
+    ],
+    stateMutability: 'view',
   },
 ] as const
 
@@ -1352,6 +1385,7 @@ export const rewardRedemptionAbi = [
       {name: '_token', internalType: 'address', type: 'address'},
       {name: '_name', internalType: 'string', type: 'string'},
       {name: '_tokensRequired', internalType: 'uint256', type: 'uint256'},
+      {name: '_category', internalType: 'string', type: 'string'},
     ],
     stateMutability: 'nonpayable',
   },
@@ -1362,6 +1396,11 @@ export const rewardRedemptionAbi = [
   },
   {type: 'error', inputs: [], name: 'FailedCall'},
   {type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall'},
+  {
+    type: 'error',
+    inputs: [{name: 'token', internalType: 'address', type: 'address'}],
+    name: 'SafeERC20FailedOperation',
+  },
   {
     type: 'event',
     anonymous: false,
@@ -1385,7 +1424,7 @@ export const rewardRedemptionAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'DEFAULT_ADMIN_ROLE',
+    name: 'OWNER',
     outputs: [{name: '', internalType: 'bytes32', type: 'bytes32'}],
     stateMutability: 'view',
   },
@@ -1403,6 +1442,13 @@ export const rewardRedemptionAbi = [
     inputs: [],
     name: 'appId',
     outputs: [{name: '', internalType: 'bytes32', type: 'bytes32'}],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'category',
+    outputs: [{name: '', internalType: 'string', type: 'string'}],
     stateMutability: 'view',
   },
   {
@@ -2785,6 +2831,30 @@ export const useWatchRewardManagementFactoryRewardManagementCreatedEvent =
   })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardRedemptinFactoryAbi}__
+ */
+export const useReadRewardRedemptinFactory =
+  /*#__PURE__*/ createUseReadContract({abi: rewardRedemptinFactoryAbi})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardRedemptinFactoryAbi}__ and `functionName` set to `"getRewardOwners"`
+ */
+export const useReadRewardRedemptinFactoryGetRewardOwners =
+  /*#__PURE__*/ createUseReadContract({
+    abi: rewardRedemptinFactoryAbi,
+    functionName: 'getRewardOwners',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardRedemptinFactoryAbi}__ and `functionName` set to `"rewards"`
+ */
+export const useReadRewardRedemptinFactoryRewards =
+  /*#__PURE__*/ createUseReadContract({
+    abi: rewardRedemptinFactoryAbi,
+    functionName: 'rewards',
+  })
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardRedemptinFactoryAbi}__
  */
 export const useWriteRewardRedemptinFactory =
@@ -2837,13 +2907,11 @@ export const useReadRewardRedemption = /*#__PURE__*/ createUseReadContract({
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"DEFAULT_ADMIN_ROLE"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"OWNER"`
  */
-export const useReadRewardRedemptionDefaultAdminRole =
-  /*#__PURE__*/ createUseReadContract({
-    abi: rewardRedemptionAbi,
-    functionName: 'DEFAULT_ADMIN_ROLE',
-  })
+export const useReadRewardRedemptionOwner = /*#__PURE__*/ createUseReadContract(
+  {abi: rewardRedemptionAbi, functionName: 'OWNER'},
+)
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"app"`
@@ -2859,6 +2927,15 @@ export const useReadRewardRedemptionApp = /*#__PURE__*/ createUseReadContract({
 export const useReadRewardRedemptionAppId = /*#__PURE__*/ createUseReadContract(
   {abi: rewardRedemptionAbi, functionName: 'appId'},
 )
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"category"`
+ */
+export const useReadRewardRedemptionCategory =
+  /*#__PURE__*/ createUseReadContract({
+    abi: rewardRedemptionAbi,
+    functionName: 'category',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardRedemptionAbi}__ and `functionName` set to `"getContractBalance"`

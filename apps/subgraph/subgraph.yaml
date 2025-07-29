@@ -8,9 +8,9 @@ dataSources:
     name: AppRegistry
     network: base-sepolia
     source:
-      address: "0x1e852a207967b45A9215B23D39e2BA3C48D82A8d"
+      address: "0x2968354EbB080CB14583D9C7C556D111F76ddFAB"
       abi: AppRegistry
-      startBlock: 28658232
+      startBlock: 29007523
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -46,9 +46,9 @@ dataSources:
     name: RewardToken
     network: base-sepolia
     source:
-      address: "0x0f53A850186Ee1e06E72975fc5bC4199512C4387"
+      address: "0x006b4507F31dCCD67b7266324960C36E74Bb1015"
       abi: RewardToken
-      startBlock: 28658254
+      startBlock: 29007548
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -69,9 +69,9 @@ dataSources:
     name: RewardManagementFactory
     network: base-sepolia
     source:
-      address: "0x78E1AB7DC45475A9651B3852e1dF644451CeaB78"
+      address: "0x2cBe6aEa856c66B98ee32Ba7bE15715b77fA9991"
       abi: RewardManagementFactory
-      startBlock: 28658262
+      startBlock: 29007553
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -89,9 +89,9 @@ dataSources:
     name: RewardRedemptionFactory
     network: base-sepolia
     source:
-      address: "0x31992b9C2313Ca8Be0656e2fDA748F70b50D0E91"
+      address: "0xC4515Df5d8718A7210b70Edab3EBC4Bbe711a176"
       abi: RewardRedemptionFactory
-      startBlock: 28658268
+      startBlock: 29007562
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -102,7 +102,7 @@ dataSources:
         - name: RewardRedemptionFactory
           file: ./abis/RewardRedemptionFactory.json
       eventHandlers:
-        - event: RewardRedemptionCreated(address,indexed bytes32,string,uint256)
+        - event: RewardRedemptionCreated(address,string,uint256,string,bytes32)
           handler: handleRewardRedemptionCreated
       file: ./src/reward-redemption-factory.ts
 templates:

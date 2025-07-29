@@ -18,21 +18,25 @@ contract RewardRedemption is IRewardRedemption, Multicall, ReentrancyGuard {
 
     bytes32 public appId;
     string public name;
+    string public category;
     uint256 public tokensRequired;
-    bytes32 public constant DEFAULT_ADMIN_ROLE = 0x00;
+    bytes32 public immutable OWNER;
     mapping(bytes32 => mapping(address => Redemption)) public redemptions;
 
-    modifier onlyAdmin() {
-        require(app.hasRole(appId, DEFAULT_ADMIN_ROLE, msg.sender), "Not authorized");
-        _;
-    }
+ 
+     
+
+
+    
 
     constructor(
         bytes32 _appId,
         address _registry,
         address _token,
         string memory _name,
-        uint256 _tokensRequired
+        uint256 _tokensRequired,
+        string memory _category
+        
     ) {
         require(_token != address(0), "Invalid token address");
         require(_registry != address(0), "Invalid registry address");
@@ -43,13 +47,20 @@ contract RewardRedemption is IRewardRedemption, Multicall, ReentrancyGuard {
         token = IERC20(_token);
         name = _name;
         tokensRequired = _tokensRequired;
+        category = _category;
+        OWNER = keccak256(abi.encodePacked(address(this)));
+    }
+
+     modifier onlyOwner() {
+        require(app.hasRole(appId, OWNER, msg.sender), "Only owner can call this function");
+        _;
     }
 
     //Accept token transfers for funding
     function redeem() external nonReentrant {
         require(tokensRequired > 0, "Invalid token amount");
 
-        // Check token allowance
+       // Check token allowance
         require(
             token.allowance(msg.sender, address(this)) >= tokensRequired,
             "Insufficient token allowance"
@@ -59,8 +70,9 @@ contract RewardRedemption is IRewardRedemption, Multicall, ReentrancyGuard {
         require(token.balanceOf(msg.sender) >= tokensRequired, "Insufficient token balance");
 
         // Transfer tokens
-        bool success = token.transferFrom(msg.sender, address(this), tokensRequired);
-        require(success, "Token transfer failed");
+        
+     token.safeTransferFrom(msg.sender, address(this), tokensRequired);
+     
 
         redemptions[appId][msg.sender] = Redemption({
             status: RedemptionStatus.PENDING,
@@ -73,7 +85,7 @@ contract RewardRedemption is IRewardRedemption, Multicall, ReentrancyGuard {
     }
 
     // Admin updates status to REDEEMED or FAILED after off-chain fulfillment
-    function updateRedemptionStatus(address user) external onlyAdmin {
+    function updateRedemptionStatus(address user) external onlyOwner {
         Redemption storage redemption = redemptions[appId][user];
         require(redemption.from != address(0), "No redemption found");
         require(redemption.status == RedemptionStatus.PENDING, "Redemption not pending");
