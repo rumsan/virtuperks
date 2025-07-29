@@ -30,13 +30,13 @@ contract RewardRedemptionFactory is IRewardRedemptionFactory {
     bytes32 ownerRole = reward.OWNER();
      IAppRegistry appRegistry = IAppRegistry(_registry);
      appRegistry.grantRole(_appId, ownerRole, _owner);
-rewards[rewardId] = Reward({
+  rewards[rewardId] = Reward({
             name: _name,
             tokensRequired: _tokensRequired,
             category: _category,
             owner: _owner
         });
-      emit RewardRedemptionCreated(address(reward), _appId, _name, _tokensRequired, _category);
+      emit RewardRedemptionCreated(address(reward), _name, _tokensRequired, _category, rewardId);
         
     }
      // Public function to get entityOwners for a RewardManagement contract

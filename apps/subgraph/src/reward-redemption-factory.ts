@@ -10,9 +10,11 @@ export function handleRewardRedemptionCreated(
     event.params.rewardRedemption,
   )
   entity.rewardRedemption = event.params.rewardRedemption
-  entity.appId = event.params.appId
   entity.name = event.params.name
   entity.tokensRequired = event.params.tokensRequired
+  entity.category = event.params.category
+  entity.rewardId = event.params.rewardId
+  
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
