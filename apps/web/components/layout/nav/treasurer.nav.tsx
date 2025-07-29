@@ -8,6 +8,7 @@ import {
 import { ConnectKitButton } from "connectkit";
 import {
   Coins,
+  Layers,
   LayoutDashboard,
   LayoutList,
   ShoppingBag,
@@ -79,6 +80,14 @@ export default function TreasurerNav({ children }: PropsWithChildren) {
             <Layers size={18} strokeWidth={2.65} />
             Token Management
           </Link> */}
+
+          <Link
+            href="/tasks"
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASKS)}`}
+          >
+            <Layers size={18} strokeWidth={2.65} />
+            Task Management
+          </Link>
           <Link
             href="/token_marketplace"
             className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TOKEN_MARKETPLACE)}`}
