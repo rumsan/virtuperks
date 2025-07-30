@@ -929,3 +929,33 @@ query GetRedeemedRewards($rewardRedemption: Bytes!) {
   }
 }
 `;
+
+export const GetRedeemedRewardsByParticipant = `
+query GetRedeemedRewardsByParticipant($participant: Bytes!) {
+  rewardRedeemeds(
+    where: { from: $participant },
+    first: 100,
+    orderBy: blockTimestamp,
+    orderDirection: desc
+  ) {
+    id
+    from
+    amount
+    status
+    blockNumber
+    blockTimestamp
+    transactionHash
+    rewardRedemption {
+      id
+      rewardRedemption
+      name
+      tokensRequired
+      category
+      rewardId
+      blockNumber
+      blockTimestamp
+      transactionHash
+    }
+  }
+}
+`
