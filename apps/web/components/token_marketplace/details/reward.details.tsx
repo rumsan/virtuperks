@@ -1,5 +1,6 @@
 "use client";
 
+import { useCheckParticipantBalance } from "@/hooks/subgraph/token";
 import {
   useApproveReward,
   useGetRewardById,
@@ -8,6 +9,7 @@ import {
 import { Coins } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
+import { useAccount } from "wagmi";
 import { imageMap } from "../img/imgLink";
 import RedemptionHistory from "./redemption.history";
 
@@ -20,6 +22,11 @@ export interface RewardDetailsProps {
 
 const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   const { data: rewardDetail, isLoading, error } = useGetRewardById(rewardId);
+  const { address, isConnected } = useAccount();
+  //hook to check participant balance
+  const { participantTotalToken, isError } = useCheckParticipantBalance(
+    address as `0x${string}`,
+  );
 
   const [step, setStep] = useState<Step>("approve");
   const [loading, setLoading] = useState(false);
