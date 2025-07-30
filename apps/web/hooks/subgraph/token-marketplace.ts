@@ -23,7 +23,7 @@ export const useCreateReward = () => {
       name: string;
       amount: number;
       category: string;
-      owner: string;
+      ownerAddress: string;
     }) => {
       const result = await writeContractAsync({
         address: process.env.NEXT_PUBLIC_REDEMPTION_FACTORY as `0x${string}`,
@@ -35,7 +35,7 @@ export const useCreateReward = () => {
           data.name,
           BigInt(data.amount),
           data.category as `0x${string}`,
-          data.owner as `0x${string}`,
+          data.ownerAddress as `0x${string}`,
         ],
       });
       return result;
