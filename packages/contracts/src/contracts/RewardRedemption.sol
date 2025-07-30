@@ -81,7 +81,7 @@ contract RewardRedemption is IRewardRedemption, Multicall, ReentrancyGuard {
             timestamp: block.timestamp
         });
 
-        emit RewardRedeemed(msg.sender, tokensRequired, RedemptionStatus.PENDING);
+        emit RewardRedeem(msg.sender, tokensRequired, RedemptionStatus.PENDING);
     }
 
     // Admin updates status to REDEEMED or FAILED after off-chain fulfillment
@@ -92,7 +92,7 @@ contract RewardRedemption is IRewardRedemption, Multicall, ReentrancyGuard {
         redemption.status = RedemptionStatus.REDEEMED; // or RedemptionStatus.FAILED based on logic
 
         // Re-emit event with new status
-        emit RewardRedeemed(user, redemption.amount, RedemptionStatus.REDEEMED);
+        emit RewardReleased(user, redemption.amount, RedemptionStatus.REDEEMED);
     }
 
     function getRedemptionStatus(address user) external view returns (RedemptionStatus) {

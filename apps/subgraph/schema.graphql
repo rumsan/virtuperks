@@ -320,10 +320,9 @@ type RewardRedemptionCreated @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
-  rewardRedeemedEvents: [RewardRedeemed!] @derivedFrom(field: "rewardRedemption") 
  
 }
-type RewardRedeemed @entity(immutable: true) {
+type RewardRedeem @entity(immutable: false) {
   id: Bytes!
   rewardRedemption: RewardRedemptionCreated
   from: Bytes! # address
@@ -333,3 +332,29 @@ type RewardRedeemed @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+
+type RewardReleased @entity(immutable: true) {
+  id: Bytes!
+  rewardRedemption: RewardRedemptionCreated
+  from: Bytes! # address
+  amount: BigInt! # uint256
+  status: Int! # uint8
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RedemptionStatus @entity(immutable: false) {
+  id: Bytes!
+  rewardRedemption: RewardRedemptionCreated
+  from: Bytes! # address
+  amount: BigInt! # uint256
+  status: Int! # uint8
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+
+

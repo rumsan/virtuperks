@@ -21,7 +21,13 @@ enum RedemptionStatus {
 
 
 
-event RewardRedeemed(
+event RewardRedeem(
+        address indexed from,
+        uint256 amount,
+        RedemptionStatus status
+    );
+
+event RewardReleased(
         address indexed from,
         uint256 amount,
         RedemptionStatus status

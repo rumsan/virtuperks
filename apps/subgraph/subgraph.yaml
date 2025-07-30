@@ -8,9 +8,9 @@ dataSources:
     name: AppRegistry
     network: base-sepolia
     source:
-      address: "0x2968354EbB080CB14583D9C7C556D111F76ddFAB"
+      address: "0xc1402b965763A328aD6eaaB60A8a63Ef35c71852"
       abi: AppRegistry
-      startBlock: 29007523
+      startBlock: 29051542
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -46,9 +46,9 @@ dataSources:
     name: RewardToken
     network: base-sepolia
     source:
-      address: "0x006b4507F31dCCD67b7266324960C36E74Bb1015"
+      address: "0xf3Cb032c99cF8389EA43B9aA8F6d3c4c0a01D6Ef"
       abi: RewardToken
-      startBlock: 29007548
+      startBlock: 29051565
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -69,9 +69,9 @@ dataSources:
     name: RewardManagementFactory
     network: base-sepolia
     source:
-      address: "0x2cBe6aEa856c66B98ee32Ba7bE15715b77fA9991"
+      address: "0xC8caCc8ABa880EcA0C04f4227A6E52f7392034F9"
       abi: RewardManagementFactory
-      startBlock: 29007553
+      startBlock: 29051571
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -89,9 +89,9 @@ dataSources:
     name: RewardRedemptionFactory
     network: base-sepolia
     source:
-      address: "0xC4515Df5d8718A7210b70Edab3EBC4Bbe711a176"
+      address: "0xc5BDc402efCD8df316F25Ef037bF62CE7fe53045"
       abi: RewardRedemptionFactory
-      startBlock: 29007562
+      startBlock: 29051578
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -180,11 +180,14 @@ templates:
       apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
-        - RewardRedeemed
+        - RewardRedeem
+        - RewardReleased
       abis:
         - name: RewardRedemption
           file: ./abis/RewardRedemption.json
       eventHandlers:
-        - event: RewardRedeemed(indexed address,uint256,uint8)
-          handler: handleRewardRedeemed
+        - event: RewardRedeem(indexed address,uint256,uint8)
+          handler: handleRewardRedeem
+        - event: RewardReleased(indexed address,uint256,uint8)
+          handler: handleRewardReleased
       file: ./src/reward-redemption.ts

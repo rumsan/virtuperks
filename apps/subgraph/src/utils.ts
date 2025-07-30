@@ -1,5 +1,5 @@
 import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
-import { ParticipantTaskStatus, TaskCreated, TaskDetail, TaskIdMapping } from "../generated/schema";
+import { ParticipantTaskStatus, RedemptionStatus, RewardRedemptionCreated, TaskCreated, TaskDetail, TaskIdMapping } from "../generated/schema";
 import { RewardManagement } from "../generated/templates/RewardManagement/RewardManagement";
 
 
@@ -95,4 +95,52 @@ export function updateParticipantTaskStatus(
     taskId.toHexString(),
     status
   ]);
+}
+
+
+
+export function updateRedemptionStatus(
+  participant: Bytes,
+  rewardRedemptionAddress: Bytes,
+  amount: BigInt,
+  status: i32,
+  blockNumber: BigInt,
+  blockTimestamp: BigInt,
+  transactionHash: Bytes
+): void {
+  
+  let id = participant.concat(transactionHash);
+  
+  // Create a new entity - immutable entities can't be updated
+  let statusEntity = new RedemptionStatus(id);
+  
+  // Set basic fields
+  statusEntity.from = participant;
+  statusEntity.amount = amount;
+  statusEntity.status = status;
+  statusEntity.blockNumber = blockNumber;
+  statusEntity.blockTimestamp = blockTimestamp;
+  statusEntity.transactionHash = transactionHash;
+  
+  // Link to the reward redemption contract
+  let rewardRedemption = RewardRedemptionCreated.load(rewardRedemptionAddress);
+  if (rewardRedemption) {
+    statusEntity.rewardRedemption = rewardRedemption.id;
+    log.info("Linked RedemptionStatus to RewardRedemptionCreated: {}", [rewardRedemptionAddress.toHexString()]);
+  } else {
+    log.error("No RewardRedemptionCreated found for address: {}", [rewardRedemptionAddress.toHexString()]);
+  }
+  
+  // Save the entity
+  statusEntity.save();
+  
+  log.info(
+    "Created RedemptionStatus: participant={}, contract={}, status={}, txHash={}",
+    [
+      participant.toHexString(),
+      rewardRedemptionAddress.toHexString(),
+      status.toString(),
+      transactionHash.toHexString()
+    ]
+  );
 }

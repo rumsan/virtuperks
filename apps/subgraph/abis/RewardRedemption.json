@@ -1,5 +1,5 @@
 [
-{
+  {
       "inputs": [
         {
           "internalType": "bytes32",
@@ -89,7 +89,32 @@
           "type": "uint8"
         }
       ],
-      "name": "RewardRedeemed",
+      "name": "RewardRedeem",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "enum IRewardRedemption.RedemptionStatus",
+          "name": "status",
+          "type": "uint8"
+        }
+      ],
+      "name": "RewardReleased",
       "type": "event"
     },
     {
@@ -287,7 +312,7 @@
           "name": "user",
           "type": "address"
         }
-      ],
+        ],
       "name": "updateRedemptionStatus",
       "outputs": [],
       "stateMutability": "nonpayable",
