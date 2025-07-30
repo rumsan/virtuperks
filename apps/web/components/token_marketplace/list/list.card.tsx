@@ -7,7 +7,7 @@ import {
 } from "@/hooks/subgraph/token-marketplace";
 import { PATHS } from "@/routes/paths";
 import { getCategoryIcon } from "@/utils/rewardIcon";
-import { Reward, RewardRedemption } from "@workspace/sdk/type";
+import { createId } from "@paralleldrive/cuid2";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -17,29 +17,47 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { useToast } from "@workspace/ui/hooks/use-toast";
+import { toUtf8Bytes } from "ethers";
 import { Coins, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { keccak256 } from "viem";
 import { useAccount } from "wagmi";
-import { imageMap } from "../img/imgLink";
+import { categoryColorMap } from "../img/imgLink";
 import { add } from "date-fns";
 
 const TokenMarketListCard = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { address } = useAccount();
-  //const { balance } = useCheckParticipantBalance(address as `0x${string}`);
+  const { participantTotalToken } = useCheckParticipantBalance(
+    address as `0x${string}`,
+  );
+
   const { toast } = useToast();
   const tokenData = useGetRewards();
   const tokenList = tokenData?.data?.data?.rewardRedemptionCreateds || [];
-
-
+  console.log("Token Data: ++", tokenList);
+  // const totalRewards = tokenList.length;
+  const affordableRewards = tokenList.filter(
+    (item: any) =>
+      parseInt(item.tokensRequired) <= (participantTotalToken ?? 0),
+  ).length;
   const router = useRouter();
   const { AddReward, rewardPending } = useCreateReward();
 
   const handleRewardAdd = async (data: any) => {
     try {
-    //  await AddReward({ name: data.name, amount: data.amount });
+      const cuid = createId();
+      const rewardId = keccak256(toUtf8Bytes(cuid));
+
+      await AddReward({
+        rewardId: rewardId,
+        name: data.name,
+        amount: data.amount,
+        category: data.category,
+        ownerAddress: data.ownerAddress,
+      });
       setIsDialogOpen(false);
       toast({
         title: "Token transferred successfully!",
@@ -50,25 +68,8 @@ const TokenMarketListCard = () => {
 
   const handleCardClick = (rewardId: string) => {
     router.push(PATHS.TOKENMARKETPLACE.DETAILS(rewardId));
-    console.log("RewardId: ", rewardId);
   };
 
-  const categoryBgMap: Record<string, string> = {
-    Entertainment: "bg-purple-100",
-    Food_Beverage: "bg-orange-100",
-    Utilities: "bg-blue-100",
-    Shopping: "bg-green-100",
-    Transportation: "bg-yellow-100",
-  };
-
-  // function getImageForTitle(title: string): string {
-  //   return (
-  //     imageMap[title] ||
-  //     "https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg"
-  //   );
-  // }
-
-  
   return (
     <div className="w-full p-4 mt-10">
       {/* Title and Description */}
@@ -77,6 +78,31 @@ const TokenMarketListCard = () => {
         <p className="text-[#64748B] text-sm mt-2">
           Redeem your tokens for amazing services and rewards
         </p>
+      </div>
+
+      {/* Stats Summary */}
+      <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+          <p className="text-sm text-gray-500">Total Rewards</p>
+          <p className="text-xl font-semibold text-[#0F172A]">
+            {tokenList.length}
+          </p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+          <p className="text-sm text-gray-500">Affordable Rewards</p>
+          <p className="text-xl font-semibold text-[#0F172A]">
+            {affordableRewards}
+          </p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm flex items-center gap-2">
+          <div>
+            <p className="text-sm text-gray-500">Available Tokens</p>
+            <p className="text-xl font-semibold text-[#0F172A]">
+              {participantTotalToken}
+              <Coins size={20} className="text-[#297AD6]" />
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Grid of Rewards */}
@@ -98,23 +124,32 @@ const TokenMarketListCard = () => {
             onClick={() => handleCardClick(item.rewardRedemption)}
           >
             <CardHeader className="p-0">
-              <div className="relative w-full h-48 overflow-hidden rounded-t-lg">
+              <div className="relative w-full h-36 overflow-hidden rounded-t-lg">
                 <img
-                  src={"https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg"}
+                  src={
+                    categoryColorMap[item.category]?.image ||
+                    "https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg"
+                  }
                   alt={item.name}
                   loading="lazy"
                   className="w-full h-full object-cover"
                 />
+
                 <div
-                  className={`absolute top-2 left-2 z-10 flex items-center gap-2 px-2 py-1 rounded-full shadow-sm ${
-                    categoryBgMap[item.category] || "bg-gray-100"
-                  } backdrop-blur-sm`}
+                  className={`absolute top-2 left-2 z-10 flex items-center gap-2 px-2 py-1 rounded-full shadow-sm backdrop-blur-sm ${
+                    categoryColorMap[item.category]?.bg || "bg-gray-100"
+                  }`}
                 >
                   {getCategoryIcon(item.category)}
-                  <span className="text-xs font-medium text-[#334155]">
-                    {"Entertainment"}
+                  <span
+                    className={`text-xs font-medium ${
+                      categoryColorMap[item.category]?.text || "text-gray-700"
+                    }`}
+                  >
+                    {item.category}
                   </span>
                 </div>
+
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none rounded-t-lg" />
               </div>
 

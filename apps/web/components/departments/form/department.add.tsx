@@ -60,7 +60,10 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
   const createEntityButton = async (data: Department) => {
     if (departmentPending) return;
     try {
-      departmentAdd(data);
+      departmentAdd({
+        ...data,
+        entityOwners: data.entityOwners as readonly `0x${string}`[],
+      });
     } catch (err) {
       console.error("Failed to create entity:", err);
     }
