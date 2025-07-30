@@ -78,6 +78,13 @@ export const DialogButton = ({
       setError(null);
     };
 
+  const categoryOptions = [
+    "Food and Beverages",
+    "Entertainment and Sports",
+    "Gift Hampers",
+    "Vouchers",
+  ];
+
   const validateInputs = () => {
     if (submitType === "Complete" && !formData.completionUrl.trim()) {
       return "Completion URL is required";
@@ -140,7 +147,7 @@ export const DialogButton = ({
       }
 
       await handleApplyTaskLogic?.(submitData);
-      
+
       setFormData({
         completionUrl: "",
         amount: "",
@@ -307,12 +314,21 @@ export const DialogButton = ({
           </div>
           <div>
             <Label htmlFor="category">Category</Label>
-            <Input
+            <select
               id="category"
               value={formData.category}
-              onChange={handleInputChange("category")}
-              placeholder="Enter reward category"
-            />
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, category: e.target.value }))
+              }
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+            >
+              <option value="">Select category</option>
+              {categoryOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       );

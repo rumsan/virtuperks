@@ -8,9 +8,10 @@ import {
 } from "@/hooks/subgraph/token-marketplace";
 import { Coins } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import Image from "next/image";
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { imageMap } from "../img/imgLink";
+import { categoryColorMap } from "../img/imgLink";
 import RedemptionHistory from "./redemption.history";
 
 type Step = "approve" | "redeem" | "completed";
@@ -59,10 +60,6 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
 
   const rewardRaw = rewardDetail?.data?.rewardRedemptionCreateds[0];
 
-  const getImageForTitle = (title: string) =>
-    imageMap[title] ||
-    "https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg";
-
   const handleApprove = async () => {
     try {
       const txHash = await ApproveReward({
@@ -102,10 +99,21 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
         {/* Left Section */}
         <div className="flex-[2] border border-gray-200 rounded-lg p-5 bg-white">
           <div className="bg-gray-100 rounded-lg h-48 flex items-center justify-center mb-5">
-            <img
+            {/* <img
               src={getImageForTitle(rewardRaw.name)}
               alt={rewardRaw.name}
               className="object-cover h-full w-full rounded-lg"
+            /> */}
+
+            <Image
+              src={
+                categoryColorMap[rewardRaw.category]?.image ??
+                "https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg"
+              }
+              alt={rewardRaw.name}
+              width={400}
+              height={300}
+              className="w-full h-full object-cover rounded-lg"
             />
           </div>
           <h2 className="text-xl font-semibold mb-2">
@@ -139,8 +147,17 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
         {/* Right Section */}
         <div className="flex-[1] flex">
           <div className="w-full border border-gray-200 shadow-sm rounded-xl p-4 bg-white mx-auto flex flex-col justify-between h-[50%] md:h-auto md:self-start">
+            {/* Available Tokens Section */}
+            <div className="mb-4 p-3 text-center border-b border-gray-300">
+              <p className="text-sm font-semibold text-gray-500 mb-1">
+                Available Tokens
+              </p>
+              <div className="flex justify-center items-center text-blue-700 text-2xl font-bold gap-2">
+                {participantTotalToken ?? 0} <Coins size={24} />
+              </div>
+            </div>
             <h3 className="text-lg font-semibold text-center mb-1">
-              Redeem Token
+              Token Required to Redeem
             </h3>
             <div className="text-blue-600 text-2xl font-bold text-center my-2 flex items-center justify-center gap-2">
               {rewardRaw.tokensRequired} <Coins size={24} strokeWidth={2.65} />
