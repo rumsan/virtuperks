@@ -905,7 +905,6 @@ query GetRedeemedRewards($rewardRedemption: Bytes!) {
   ) {
     id
     rewardRedemption
-    appId
     name
     tokensRequired
     blockNumber
