@@ -2,6 +2,7 @@ import { DialogButton } from "@/components/common/ui/dialog";
 import { useCheckParticipantBalance } from "@/hooks/subgraph/token";
 import {
   useCreateReward,
+  useGetRedeemedRewardByParticiant,
   useGetRewards,
 } from "@/hooks/subgraph/token-marketplace";
 import { PATHS } from "@/routes/paths";
@@ -23,6 +24,7 @@ import { useState } from "react";
 import { keccak256 } from "viem";
 import { useAccount } from "wagmi";
 import { categoryColorMap } from "../img/imgLink";
+import { add } from "date-fns";
 
 const TokenMarketListCard = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
