@@ -1,6 +1,7 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  useReadRewardRedemptinFactoryGetRewardOwners,
   useWriteRewardRedemptinFactoryCreateRewardRedemption,
   useWriteRewardRedemptionRedeem,
   useWriteRewardRedemptionUpdateRedemptionStatus,
@@ -187,4 +188,21 @@ export const useGetRedeemedRewardByParticiant = (
       return rewards;
     },
   });
+};
+
+export const useGetRewardOwner = (rewardId: string) => {
+  const redemptionFactory = process.env
+    .NEXT_PUBLIC_REDEMPTION_FACTORY as `0x${string}`;
+
+  const { data, isError, isLoading } =
+    useReadRewardRedemptinFactoryGetRewardOwners({
+      address: redemptionFactory,
+      args: [rewardId as `0x${string}`],
+    });
+
+  return {
+    getRewardOwner: data,
+    isError,
+    isLoading,
+  };
 };
