@@ -17,7 +17,7 @@ export const categoryColorMap: Record<
     text: "text-green-800",
     image: "https://example.com/gift-hampers-icon.png",
   },
-  Vouchers: {
+  "Mobile-TopUp": {
     bg: "bg-blue-100",
     text: "text-blue-800",
     image: "https://assets.rumsan.net/rumsan-test/gift-card.jpg",

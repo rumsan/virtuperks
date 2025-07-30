@@ -1,3 +1,4 @@
+import { categoryColorMap } from "@/components/token_marketplace/img/imgLink";
 import { Button } from "@workspace/ui/components/button";
 import {
   Dialog,
@@ -77,13 +78,6 @@ export const DialogButton = ({
       setFormData((prev) => ({ ...prev, [field]: e.target.value }));
       setError(null);
     };
-
-  const categoryOptions = [
-    "Food and Beverages",
-    "Entertainment and Sports",
-    "Gift Hampers",
-    "Vouchers",
-  ];
 
   const validateInputs = () => {
     if (submitType === "Complete" && !formData.completionUrl.trim()) {
@@ -323,11 +317,13 @@ export const DialogButton = ({
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
             >
               <option value="">Select category</option>
-              {categoryOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
+              {Object.entries(categoryColorMap).map(
+                ([category, { bg, text }]) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ),
+              )}
             </select>
           </div>
         </div>

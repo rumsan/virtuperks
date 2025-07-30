@@ -93,11 +93,11 @@ const TokenMarketListCard = () => {
           </p>
         </div>
         <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm flex items-center gap-2">
-          <Coins size={20} className="text-[#297AD6]" />
           <div>
             <p className="text-sm text-gray-500">Available Tokens</p>
             <p className="text-xl font-semibold text-[#0F172A]">
               {participantTotalToken}
+              <Coins size={20} className="text-[#297AD6]" />
             </p>
           </div>
         </div>
