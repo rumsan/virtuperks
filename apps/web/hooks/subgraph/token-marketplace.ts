@@ -1,12 +1,12 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  useReadRewardRedemptinFactoryGetRewardOwners,
   useWriteRewardRedemptinFactoryCreateRewardRedemption,
   useWriteRewardRedemptionRedeem,
   useWriteRewardRedemptionUpdateRedemptionStatus,
   useWriteRewardTokenApprove,
 } from "../wagmi/contracts";
-import RewardDetails from "@/components/token_marketplace/details/reward.details";
 
 export const useCreateReward = () => {
   const queryClient = useQueryClient();
@@ -18,7 +18,13 @@ export const useCreateReward = () => {
   const token = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
 
   const mutation = useMutation({
-    mutationFn: async (data: { rewardId: string; name: string; amount: number; category: string,owner:string}) => {
+    mutationFn: async (data: {
+      rewardId: string;
+      name: string;
+      amount: number;
+      category: string;
+      owner: string;
+    }) => {
       const result = await writeContractAsync({
         address: process.env.NEXT_PUBLIC_REDEMPTION_FACTORY as `0x${string}`,
         args: [
@@ -166,5 +172,37 @@ export const useUpdateRedemptionStatus = () => {
     UpdateRedeemStatus: mutation.mutateAsync,
     UpdateRedeemPending: mutation.isPending,
     UpdateRedeemSuccess: mutation.isSuccess,
+  };
+};
+
+export const useGetRedeemedRewardByParticiant = (
+  participantAddress: string,
+) => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["redeemedRewardsByParticipant", participantAddress],
+    queryFn: async () => {
+      const rewards =
+        await queryService?.getRedeemedRewardsByParticipant(participantAddress);
+      return rewards;
+    },
+  });
+};
+
+export const useGetRewardOwner = (rewardId: string) => {
+  const redemptionFactory = process.env
+    .NEXT_PUBLIC_REDEMPTION_FACTORY as `0x${string}`;
+
+  const { data, isError, isLoading } =
+    useReadRewardRedemptinFactoryGetRewardOwners({
+      address: redemptionFactory,
+      args: [rewardId as `0x${string}`],
+    });
+
+  return {
+    getRewardOwner: data,
+    isError,
+    isLoading,
   };
 };

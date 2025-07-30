@@ -6,6 +6,7 @@ import {
   getOpenTasks,
   getParticipantTasks,
   GetRedeemedReward,
+  GetRedeemedRewardsByParticipant,
   getRewardById,
   GetRewardManagement,
   GetRewardManagementCreatedByAddress,
@@ -234,6 +235,20 @@ return { data, error };
     return { data: null, error };
 }
   } 
+
+  //service to get redeemed rewards by participant address
+  async getRedeemedRewardsByParticipant(participantAddress: string) {
+    try {
+      const { data, error } = await this.subgraphQuery.query(
+        GetRedeemedRewardsByParticipant,
+        { participant: participantAddress }
+      );
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching redeemed rewards by participant:', error);
+      return { data: null, error };
+    }
+  }
 }
 
 

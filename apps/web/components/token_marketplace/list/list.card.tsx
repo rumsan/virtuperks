@@ -2,6 +2,7 @@ import { DialogButton } from "@/components/common/ui/dialog";
 import { useCheckParticipantBalance } from "@/hooks/subgraph/token";
 import {
   useCreateReward,
+  useGetRedeemedRewardByParticiant,
   useGetRewards,
 } from "@/hooks/subgraph/token-marketplace";
 import { PATHS } from "@/routes/paths";
@@ -21,22 +22,24 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { imageMap } from "../img/imgLink";
+import { add } from "date-fns";
 
 const TokenMarketListCard = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { address } = useAccount();
-  const { balance } = useCheckParticipantBalance(address as `0x${string}`);
+  //const { balance } = useCheckParticipantBalance(address as `0x${string}`);
   const { toast } = useToast();
   const tokenData = useGetRewards();
   const tokenList = tokenData?.data?.data?.rewardRedemptionCreateds || [];
+
 
   const router = useRouter();
   const { AddReward, rewardPending } = useCreateReward();
 
   const handleRewardAdd = async (data: any) => {
     try {
-      await AddReward({ name: data.name, amount: data.amount });
+    //  await AddReward({ name: data.name, amount: data.amount });
       setIsDialogOpen(false);
       toast({
         title: "Token transferred successfully!",
