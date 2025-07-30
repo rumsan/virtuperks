@@ -140,6 +140,7 @@ export const DialogButton = ({
       }
 
       await handleApplyTaskLogic?.(submitData);
+      
       setFormData({
         completionUrl: "",
         amount: "",

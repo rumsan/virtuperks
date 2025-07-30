@@ -6,6 +6,7 @@ import {
 } from "@/hooks/subgraph/token-marketplace";
 import { PATHS } from "@/routes/paths";
 import { getCategoryIcon } from "@/utils/rewardIcon";
+import { createId } from "@paralleldrive/cuid2";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -15,9 +16,11 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { useToast } from "@workspace/ui/hooks/use-toast";
+import { toUtf8Bytes } from "ethers";
 import { Coins, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { keccak256 } from "viem";
 import { useAccount } from "wagmi";
 
 const TokenMarketListCard = () => {
@@ -28,18 +31,22 @@ const TokenMarketListCard = () => {
   const { toast } = useToast();
   const tokenData = useGetRewards();
   const tokenList = tokenData?.data?.data?.rewardRedemptionCreateds || [];
-  console.log("Token Data: ", tokenList);
+ 
 
   const router = useRouter();
   const { AddReward, rewardPending } = useCreateReward();
 
   const handleRewardAdd = async (data: any) => {
     try {
+      const cuid = createId();
+      const rewardId = keccak256(toUtf8Bytes(cuid));
+
       await AddReward({
+        rewardId: rewardId,
         name: data.name,
         amount: data.amount,
-        ownerAddress: data.ownerAddress,
         category: data.category,
+        ownerAddress: data.ownerAddress,
       });
       setIsDialogOpen(false);
       toast({
@@ -51,7 +58,6 @@ const TokenMarketListCard = () => {
 
   const handleCardClick = (rewardId: string) => {
     router.push(PATHS.TOKENMARKETPLACE.DETAILS(rewardId));
-    console.log("RewardId: ", rewardId);
   };
 
   const categoryBgMap: Record<string, string> = {

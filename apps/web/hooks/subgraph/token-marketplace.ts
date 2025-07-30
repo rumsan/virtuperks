@@ -6,7 +6,6 @@ import {
   useWriteRewardRedemptionUpdateRedemptionStatus,
   useWriteRewardTokenApprove,
 } from "../wagmi/contracts";
-import RewardDetails from "@/components/token_marketplace/details/reward.details";
 
 export const useCreateReward = () => {
   const queryClient = useQueryClient();
@@ -18,7 +17,13 @@ export const useCreateReward = () => {
   const token = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
 
   const mutation = useMutation({
-    mutationFn: async (data: { rewardId: string; name: string; amount: number; category: string,owner:string}) => {
+    mutationFn: async (data: {
+      rewardId: string;
+      name: string;
+      amount: number;
+      category: string;
+      ownerAddress: string;
+    }) => {
       const result = await writeContractAsync({
         address: process.env.NEXT_PUBLIC_REDEMPTION_FACTORY as `0x${string}`,
         args: [
@@ -29,7 +34,7 @@ export const useCreateReward = () => {
           data.name,
           BigInt(data.amount),
           data.category as `0x${string}`,
-          data.owner as `0x${string}`,
+          data.ownerAddress as `0x${string}`,
         ],
       });
       return result;
