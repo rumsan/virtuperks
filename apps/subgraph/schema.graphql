@@ -71,3 +71,286 @@ type RoleRevoked @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+type Approval @entity(immutable: true) {
+  id: Bytes!
+  owner: Bytes! # address
+  spender: Bytes! # address
+  value: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Transfer @entity(immutable: true) {
+  id: Bytes!
+  from: Bytes! # address
+  to: Bytes! # address
+  value: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type RewardManagementCreated @entity {
+  id: Bytes!
+  rewardManagement: Bytes! # address
+  registry: Bytes! # address
+  appId: Bytes! # bytes32
+  name: String! # string
+  entityId: Bytes! # bytes32
+  tasks: [TaskCreated!] @derivedFrom(field: "rewardManagement")
+  tokenTransfers: [TokenTransferred!] @derivedFrom(field: "rewardManagement")
+  disbursements: [DisbursementToTask!] @derivedFrom(field: "rewardManagement")
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type AdditionalDisbursementToTask @entity(immutable: true) {
+  id: Bytes!
+  taskId: Bytes! # bytes32
+  amount: BigInt! # uint256
+  remarks: String! # string
+  disbursedBy: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ContractPaused @entity(immutable: true) {
+  id: Bytes!
+  by: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ContractUnpaused @entity(immutable: true) {
+  id: Bytes!
+  by: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type DisbursementToTask @entity(immutable: true) {
+  id: Bytes!
+  taskId: Bytes! # bytes32
+  amount: BigInt! # uint256
+  disbursedBy: Bytes! # address
+  rewardManagement: RewardManagementCreated
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type EtherWithdrawn @entity(immutable: true) {
+  id: Bytes!
+  to: Bytes! # address
+  amount: BigInt! # uint256
+  by: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ParticipantApplied @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  participant: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  taskDetail: TaskDetail
+}
+
+type ParticipantRemovedFromWhitelist @entity(immutable: true) {
+  id: Bytes!
+  taskId: Bytes! # bytes32
+  participant: Bytes! # address
+  by: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ParticipantWhitelisted @entity(immutable: true) {
+  id: Bytes!
+  taskId: Bytes! # bytes32
+  participant: Bytes! # address
+  by: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskAccepted @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  participant: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  taskDetail: TaskDetail
+}
+
+type TaskApproved @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  approver: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  taskDetail: TaskDetail
+}
+
+type TaskClosed @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  closedBy: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskCompleted @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  participant: Bytes! # address
+  blockNumber: BigInt!
+  completionUrl: String  # string
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  taskDetail: TaskDetail
+}
+
+type TaskDetail @entity {
+  id: Bytes!
+
+  name: String!
+  detailsUrl: String!
+  owner: Bytes!
+  expiryDate: BigInt!
+  rewardToken: Bytes!
+  totalRewardAmount: BigInt!
+  isOpen: Boolean!
+  requireApproval: Boolean!
+  isWhitelisted: Boolean!
+  isTokenDisbursed: Boolean!
+  maxParticipants: BigInt!
+  acceptedParticipantCount: BigInt!
+  verifiedParticipants: [Bytes!]!
+  createdAt: BigInt
+  task: TaskCreated
+}
+
+type TaskCreated @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  taskDetail: TaskDetail
+  createdBy: Bytes! # address
+  rewardManagement: RewardManagementCreated
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ParticipantTaskStatus @entity(immutable: false) {
+  id: Bytes! 
+  participant: Bytes! 
+  taskId: Bytes! 
+  status: String! 
+  lastUpdatedBlock: BigInt! 
+  lastUpdatedTimestamp: BigInt!
+  taskDetail: TaskDetail
+  completionUrl: String # string
+  rewardManagement: RewardManagementCreated
+}
+
+type TaskIdMapping @entity {
+  id: Bytes! # internal_id (event.params.id)
+  taskCreated: TaskCreated!
+}
+
+type TaskDetailsUpdated @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  updatedBy: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskVerified @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  participant: Bytes! # address
+  verifier: Bytes! # address
+  status: String # string
+  taskDetail: TaskDetail
+  completionUrl: String # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TokenTransferred @entity(immutable: true) {
+  id: Bytes!
+  token: Bytes! # address
+  to: Bytes! # address
+  amount: BigInt! # uint256
+  remarks: String! # string
+  transferredBy: Bytes! # address
+  rewardManagement: RewardManagementCreated
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RewardRedemptionCreated @entity(immutable: true) {
+  id: Bytes!
+  rewardRedemption: Bytes! # address
+  name: String! # string
+  tokensRequired: BigInt! # uint256
+  category: String! # string
+  rewardId: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+type RewardRedeem @entity(immutable: true) {
+  id: Bytes!
+  rewardRedemption: RewardRedemptionCreated
+  user: Bytes! # address
+  amount: BigInt! # uint256
+  status: Int! # uint8
+  redemptionId: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RewardReleased @entity(immutable: true) {
+  id: Bytes!
+  rewardRedemption: RewardRedemptionCreated
+  user: Bytes! # address
+  amount: BigInt! # uint256
+  status: Int! # uint8
+  redemptionId: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+
+type RedemptionStatus @entity(immutable: false) {
+  id: Bytes!
+  redemptionId: BigInt! # uint256
+  rewardRedemption: RewardRedemptionCreated
+  from: Bytes! # address
+  amount: BigInt! # uint256
+  status: Int! # uint8
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+

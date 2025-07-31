@@ -28,7 +28,7 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
   //   redeemedReward?.data?.rewardRedemptionCreateds[0].rewardRedeemedEvents ||
   //   [];
   const getRedeemReward = useGetRedeemedReward(rewardId);
-console.log("getRedeemReward-----------", getRedeemReward?.data?.data);
+console.log("getRedeemReward77777-----------", getRedeemReward?.data?.data);
 
 
 

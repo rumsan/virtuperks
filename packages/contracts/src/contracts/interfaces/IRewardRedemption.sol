@@ -2,9 +2,7 @@
 pragma solidity 0.8.20;
 
 interface IRewardRedemption {
-
-enum RedemptionStatus {
-
+    enum RedemptionStatus {
         PENDING,
         REDEEMED,
         FAILED
@@ -17,20 +15,17 @@ enum RedemptionStatus {
         uint256 timestamp;
     }
 
-
-
-
-
-event RewardRedeem(
-        address indexed from,
+    event RewardRedeem(
+        address indexed user,
         uint256 amount,
-        RedemptionStatus status
+        RedemptionStatus status,
+        uint256 redemptionId
     );
 
-event RewardReleased(
-        address indexed from,
+    event RewardReleased(
+        address indexed user,
         uint256 amount,
-        RedemptionStatus status
+        RedemptionStatus status,
+        uint256 redemptionId
     );
-   
 }

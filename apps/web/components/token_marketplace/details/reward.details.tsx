@@ -30,8 +30,9 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
     address as `0x${string}`,
   );
 // hookto get redeemed rewards by participant
-  const getParticipantReward = useGetRedeemedRewardByParticiant(address as `0x${string}`);
-  const redeemedRewardsByParticipant = getParticipantReward?.data?.data?.rewardRedeemeds || [];
+ const getParticipantReward = useGetRedeemedRewardByParticiant(address as `0x${string}`);
+  const redeemedRewardsByParticipant = getParticipantReward?.data?.data?.redemptionStatuses || [];
+ console.log("redeemedRewardsByParticipantalhfahfahf", redeemedRewardsByParticipant);
  
 
   const [step, setStep] = useState<Step>("approve");

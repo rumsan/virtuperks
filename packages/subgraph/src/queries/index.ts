@@ -896,40 +896,6 @@ export const getRewardById = `
   }
 `;
 
-//for the reward Redeem
-// export const GetRedeemedReward = `
-// query GetRedeemedRewards($rewardRedemption: Bytes!) {
-//   rewardRedemptionCreateds(
-//     where: { rewardRedemption: $rewardRedemption },
-//     first: 1
-//   ) {
-//     id
-//     rewardRedemption
-//     name
-//     tokensRequired
-//     blockNumber
-//     blockTimestamp
-//     transactionHash
-//     rewardRedeemedEvents(
-//       first: 100,
-//       orderBy: blockTimestamp,
-//       orderDirection: desc
-//     ) {
-//       id
-//       from
-//       rewardRedemption {
-//       rewardRedemption
-//       }
-//       amount
-//       status
-//       blockNumber
-//       blockTimestamp
-//       transactionHash
-//     }
-//   }
-// }
-// `;
-
 
 export const GetRedeemedReward = `
 query GetRedemptionStatuses($rewardRedemption: Bytes!) {
@@ -939,10 +905,12 @@ query GetRedemptionStatuses($rewardRedemption: Bytes!) {
 rewardRedemption: $rewardRedemption
       
     },
+    first: 100,
     orderBy: blockTimestamp,
     orderDirection: desc
   ) {
     id
+    redemptionId
     from
     amount
     status
@@ -952,6 +920,7 @@ rewardRedemption: $rewardRedemption
       name
       tokensRequired
       category
+      rewardRedemption
     }
   }
 }
@@ -959,13 +928,14 @@ rewardRedemption: $rewardRedemption
 
 export const GetRedeemedRewardsByParticipant = `
 query GetRedeemedRewardsByParticipant($participant: Bytes!) {
-  rewardRedeemeds(
+  redemptionStatuses(
     where: { from: $participant },
     first: 100,
     orderBy: blockTimestamp,
     orderDirection: desc
   ) {
     id
+    redemptionId
     from
     amount
     status
@@ -979,9 +949,6 @@ query GetRedeemedRewardsByParticipant($participant: Bytes!) {
       tokensRequired
       category
       rewardId
-      blockNumber
-      blockTimestamp
-      transactionHash
     }
   }
 }
