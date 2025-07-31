@@ -40,6 +40,104 @@ const dummyAll = [
     transactionHash: "0xHASH2",
     rewardRedemption: { rewardRedemption: "0xREWARD2" },
   },
+  {
+    status: 1,
+    from: "0xUSER_A",
+    blockTimestamp: "1722430000",
+    transactionHash: "0xHASH1",
+    rewardRedemption: { rewardRedemption: "0xREWARD1" },
+  },
+  {
+    status: 0,
+    from: "0xUSER_B",
+    blockTimestamp: "1722435000",
+    transactionHash: "0xHASH2",
+    rewardRedemption: { rewardRedemption: "0xREWARD2" },
+  },
+  {
+    status: 1,
+    from: "0xUSER_A",
+    blockTimestamp: "1722430000",
+    transactionHash: "0xHASH1",
+    rewardRedemption: { rewardRedemption: "0xREWARD1" },
+  },
+  {
+    status: 0,
+    from: "0xUSER_B",
+    blockTimestamp: "1722435000",
+    transactionHash: "0xHASH2",
+    rewardRedemption: { rewardRedemption: "0xREWARD2" },
+  },
+  {
+    status: 1,
+    from: "0xUSER_A",
+    blockTimestamp: "1722430000",
+    transactionHash: "0xHASH1",
+    rewardRedemption: { rewardRedemption: "0xREWARD1" },
+  },
+  {
+    status: 0,
+    from: "0xUSER_B",
+    blockTimestamp: "1722435000",
+    transactionHash: "0xHASH2",
+    rewardRedemption: { rewardRedemption: "0xREWARD2" },
+  },
+  {
+    status: 1,
+    from: "0xUSER_A",
+    blockTimestamp: "1722430000",
+    transactionHash: "0xHASH1",
+    rewardRedemption: { rewardRedemption: "0xREWARD1" },
+  },
+  {
+    status: 0,
+    from: "0xUSER_B",
+    blockTimestamp: "1722435000",
+    transactionHash: "0xHASH2",
+    rewardRedemption: { rewardRedemption: "0xREWARD2" },
+  },
+  {
+    status: 1,
+    from: "0xUSER_A",
+    blockTimestamp: "1722430000",
+    transactionHash: "0xHASH1",
+    rewardRedemption: { rewardRedemption: "0xREWARD1" },
+  },
+  {
+    status: 0,
+    from: "0xUSER_B",
+    blockTimestamp: "1722435000",
+    transactionHash: "0xHASH2",
+    rewardRedemption: { rewardRedemption: "0xREWARD2" },
+  },
+  {
+    status: 1,
+    from: "0xUSER_A",
+    blockTimestamp: "1722430000",
+    transactionHash: "0xHASH1",
+    rewardRedemption: { rewardRedemption: "0xREWARD1" },
+  },
+  {
+    status: 0,
+    from: "0xUSER_B",
+    blockTimestamp: "1722435000",
+    transactionHash: "0xHASH2",
+    rewardRedemption: { rewardRedemption: "0xREWARD2" },
+  },
+  {
+    status: 1,
+    from: "0xUSER_A",
+    blockTimestamp: "1722430000",
+    transactionHash: "0xHASH1",
+    rewardRedemption: { rewardRedemption: "0xREWARD1" },
+  },
+  {
+    status: 0,
+    from: "0xUSER_B",
+    blockTimestamp: "1722435000",
+    transactionHash: "0xHASH2",
+    rewardRedemption: { rewardRedemption: "0xREWARD2" },
+  },
 ];
 
 const dummyMine = [
@@ -118,7 +216,12 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
 
         <TabsContent value={tab}>
           {/* Table Container */}
-          <div className="border rounded-lg min-h-[490px]">
+          <div
+            className="border rounded-lg"
+            style={{
+              minHeight: `${pagination.pageSize * 48 + 56}px`,
+            }}
+          >
             <table className="min-w-full table-fixed divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -126,13 +229,7 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
                     {headerGroup.headers.map((header, index) => (
                       <th
                         key={header.id}
-                        className={`
-                        px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider
-                        ${index === 0 ? "w-[200px]" : ""}
-                        ${index === 1 ? "w-[180px]" : ""}
-                        ${index === 2 ? "w-[160px]" : ""}
-                        ${index === 3 ? "w-[100px]" : ""}
-                      `}
+                        className={`px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider h-[48px]`}
                       >
                         {header.isPlaceholder
                           ? null
@@ -145,7 +242,6 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
                   </tr>
                 ))}
               </thead>
-
               <tbody className="bg-white divide-y divide-gray-100">
                 {table.getRowModel().rows.length === 0 ? (
                   <tr>
@@ -165,13 +261,7 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
                       {row.getVisibleCells().map((cell, index) => (
                         <td
                           key={cell.id}
-                          className={`
-                          px-4 py-3 text-sm text-gray-700 truncate
-                          ${index === 0 ? "w-[200px]" : ""}
-                          ${index === 1 ? "w-[180px]" : ""}
-                          ${index === 2 ? "w-[160px]" : ""}
-                          ${index === 3 ? "w-[100px]" : ""}
-                        `}
+                          className="px-4 py-3 text-sm text-gray-700 truncate min-h-[48px] h-[48px] align-middle"
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
@@ -186,7 +276,7 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
             </table>
           </div>
 
-          {/* Pagination Section */}
+          {/* Pagination */}
           <div className="mt-4">
             <DataTablePagination
               table={table}

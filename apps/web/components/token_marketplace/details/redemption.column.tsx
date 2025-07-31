@@ -1,13 +1,12 @@
 import hasRole from "@/utils/role";
 import { ColumnDef } from "@tanstack/react-table";
-import { RewardRedemption } from "@workspace/sdk/type";
 import { CircleCheck } from "lucide-react";
 
-interface ExtendedRewardRedemption extends RewardRedemption {
-  rewardRedemption: {
-    rewardRedemption: string;
-  };
-}
+// interface ExtendedRewardRedemption extends RewardRedemption {
+//   rewardRedemption: {
+//     rewardRedemption: string;
+//   };
+// }
 
 export function useColumns<
   T extends {
