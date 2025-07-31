@@ -1,12 +1,12 @@
 {
   "name": "@workspace/sdk",
   "main": "index.js",
-
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch --preserveWatchOutput"
   },
   "devDependencies": {
+    "@types/node": "^20.0.0",
     "@workspace/typescript-config": "workspace:*",
     "typescript": "latest"
   },
@@ -31,7 +31,5 @@
       "require": "./dist/constants/events.js",
       "types": "./dist/constants/events.d.ts"
     }
-   
-    
   }
 }
