@@ -91,7 +91,6 @@ contract RewardRedemption is IRewardRedemption, Multicall, ReentrancyGuard {
         require(redemption.status == RedemptionStatus.PENDING, "Redemption not pending");
         redemption.status = RedemptionStatus.REDEEMED; // or RedemptionStatus.FAILED based on logic
 
-        // Re-emit event with new status
         emit RewardReleased(user, redemption.amount, RedemptionStatus.REDEEMED);
     }
 

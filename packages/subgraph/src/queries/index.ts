@@ -935,9 +935,9 @@ export const GetRedeemedReward = `
 query GetRedemptionStatuses($rewardRedemption: Bytes!) {
   redemptionStatuses(
     where: {
-      rewardRedemption_: {
-        rewardRedemption: $rewardRedemption
-      }
+    
+rewardRedemption: $rewardRedemption
+      
     },
     orderBy: blockTimestamp,
     orderDirection: desc

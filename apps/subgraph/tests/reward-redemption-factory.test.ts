@@ -6,7 +6,7 @@ import {
   beforeAll,
   afterAll
 } from "matchstick-as/assembly/index"
-import { Address, Bytes, BigInt } from "@graphprotocol/graph-ts"
+import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts"
 import { RewardRedemptionCreated } from "../generated/schema"
 import { RewardRedemptionCreated as RewardRedemptionCreatedEvent } from "../generated/RewardRedemptionFactory/RewardRedemptionFactory"
 import { handleRewardRedemptionCreated } from "../src/reward-redemption-factory"
@@ -20,14 +20,16 @@ describe("Describe entity assertions", () => {
     let rewardRedemption = Address.fromString(
       "0x0000000000000000000000000000000000000001"
     )
-    let appId = Bytes.fromI32(1234567890)
     let name = "Example string value"
     let tokensRequired = BigInt.fromI32(234)
+    let category = "Example string value"
+    let rewardId = Bytes.fromI32(1234567890)
     let newRewardRedemptionCreatedEvent = createRewardRedemptionCreatedEvent(
       rewardRedemption,
-      appId,
       name,
-      tokensRequired
+      tokensRequired,
+      category,
+      rewardId
     )
     handleRewardRedemptionCreated(newRewardRedemptionCreatedEvent)
   })
@@ -52,12 +54,6 @@ describe("Describe entity assertions", () => {
     assert.fieldEquals(
       "RewardRedemptionCreated",
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
-      "appId",
-      "1234567890"
-    )
-    assert.fieldEquals(
-      "RewardRedemptionCreated",
-      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
       "name",
       "Example string value"
     )
@@ -66,6 +62,18 @@ describe("Describe entity assertions", () => {
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
       "tokensRequired",
       "234"
+    )
+    assert.fieldEquals(
+      "RewardRedemptionCreated",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "category",
+      "Example string value"
+    )
+    assert.fieldEquals(
+      "RewardRedemptionCreated",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "rewardId",
+      "1234567890"
     )
 
     // More assert options:

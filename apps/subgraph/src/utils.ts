@@ -1,5 +1,5 @@
 import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
-import { ParticipantTaskStatus, RedemptionStatus, RewardRedemptionCreated, TaskCreated, TaskDetail, TaskIdMapping } from "../generated/schema";
+import { ParticipantTaskStatus,RedemptionStatus,RewardRedemptionCreated,TaskCreated, TaskDetail, TaskIdMapping } from "../generated/schema";
 import { RewardManagement } from "../generated/templates/RewardManagement/RewardManagement";
 
 
@@ -97,8 +97,6 @@ export function updateParticipantTaskStatus(
   ]);
 }
 
-
-
 export function updateRedemptionStatus(
   participant: Bytes,
   rewardRedemptionAddress: Bytes,
@@ -144,3 +142,4 @@ export function updateRedemptionStatus(
     ]
   );
 }
+

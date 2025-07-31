@@ -1,28 +1,56 @@
 import { newMockEvent } from "matchstick-as"
 import { ethereum, Address, BigInt } from "@graphprotocol/graph-ts"
-import { RewardRedeemed } from "../generated/RewardRedemption/RewardRedemption"
+import {
+  RewardRedeem,
+  RewardReleased
+} from "../generated/RewardRedemption/RewardRedemption"
 
-export function createRewardRedeemedEvent(
+export function createRewardRedeemEvent(
   from: Address,
   amount: BigInt,
   status: i32
-): RewardRedeemed {
-  let rewardRedeemedEvent = changetype<RewardRedeemed>(newMockEvent())
+): RewardRedeem {
+  let rewardRedeemEvent = changetype<RewardRedeem>(newMockEvent())
 
-  rewardRedeemedEvent.parameters = new Array()
+  rewardRedeemEvent.parameters = new Array()
 
-  rewardRedeemedEvent.parameters.push(
+  rewardRedeemEvent.parameters.push(
     new ethereum.EventParam("from", ethereum.Value.fromAddress(from))
   )
-  rewardRedeemedEvent.parameters.push(
+  rewardRedeemEvent.parameters.push(
     new ethereum.EventParam("amount", ethereum.Value.fromUnsignedBigInt(amount))
   )
-  rewardRedeemedEvent.parameters.push(
+  rewardRedeemEvent.parameters.push(
     new ethereum.EventParam(
       "status",
       ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(status))
     )
   )
 
-  return rewardRedeemedEvent
+  return rewardRedeemEvent
+}
+
+export function createRewardReleasedEvent(
+  from: Address,
+  amount: BigInt,
+  status: i32
+): RewardReleased {
+  let rewardReleasedEvent = changetype<RewardReleased>(newMockEvent())
+
+  rewardReleasedEvent.parameters = new Array()
+
+  rewardReleasedEvent.parameters.push(
+    new ethereum.EventParam("from", ethereum.Value.fromAddress(from))
+  )
+  rewardReleasedEvent.parameters.push(
+    new ethereum.EventParam("amount", ethereum.Value.fromUnsignedBigInt(amount))
+  )
+  rewardReleasedEvent.parameters.push(
+    new ethereum.EventParam(
+      "status",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(status))
+    )
+  )
+
+  return rewardReleasedEvent
 }

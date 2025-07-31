@@ -169,7 +169,7 @@ templates:
         - event: TokenTransferred(indexed address,indexed address,uint256,string,indexed address)
           handler: handleTokenTransferred
       file: ./src/reward-management.ts
-
+  
   - kind: ethereum
     name: RewardRedemption
     network: base-sepolia
