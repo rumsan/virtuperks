@@ -379,6 +379,9 @@ importers:
 
   packages/sdk:
     devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.17.28
       '@workspace/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
@@ -398,6 +401,9 @@ importers:
         specifier: ^4.2.1
         version: 4.2.2(@urql/core@5.1.1(graphql@16.10.0))(react@19.0.0)
     devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.17.28
       '@workspace/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
