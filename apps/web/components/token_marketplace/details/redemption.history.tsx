@@ -24,9 +24,13 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
     error,
   } = useGetRedeemedReward(rewardId);
 
-  const getRedeemedRewardList =
-    redeemedReward?.data?.rewardRedemptionCreateds[0].rewardRedeemedEvents ||
-    [];
+  // const getRedeemedRewardList =
+  //   redeemedReward?.data?.rewardRedemptionCreateds[0].rewardRedeemedEvents ||
+  //   [];
+  const getRedeemReward = useGetRedeemedReward(rewardId);
+console.log("getRedeemReward77777-----------", getRedeemReward?.data?.data);
+
+
 
   const {
     UpdateRedeemStatus: updateStatus,
@@ -42,7 +46,7 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
   });
 
   const table = useReactTable({
-    data: getRedeemedRewardList,
+    data: [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),

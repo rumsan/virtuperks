@@ -1,5 +1,5 @@
 import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
-import { ParticipantTaskStatus, TaskCreated, TaskDetail, TaskIdMapping } from "../generated/schema";
+import { ParticipantTaskStatus, RedemptionStatus, RewardRedemptionCreated, TaskCreated, TaskDetail, TaskIdMapping } from "../generated/schema";
 import { RewardManagement } from "../generated/templates/RewardManagement/RewardManagement";
 
 
@@ -96,3 +96,52 @@ export function updateParticipantTaskStatus(
     status
   ]);
 }
+
+
+export function updateRedemptionStatus(
+  participant: Bytes,
+  rewardRedemptionAddress: Bytes,
+  amount: BigInt,
+  status: i32,
+  redemptionId: BigInt,
+  blockNumber: BigInt,
+  blockTimestamp: BigInt,
+  transactionHash: Bytes
+): void {
+  // Create a unique ID based on participant and redemptionId only
+  let id = participant.concat(Bytes.fromUTF8(redemptionId.toString()));
+  
+  let statusEntity = RedemptionStatus.load(id);
+  if (!statusEntity) {
+    statusEntity = new RedemptionStatus(id);
+    statusEntity.redemptionId = redemptionId;
+    statusEntity.from = participant;
+    statusEntity.amount = amount;
+  }
+  
+  // Update the status and timestamps
+  statusEntity.status = status;
+  statusEntity.blockNumber = blockNumber;
+  statusEntity.blockTimestamp = blockTimestamp;
+  statusEntity.transactionHash = transactionHash;
+  
+  let rewardRedemption = RewardRedemptionCreated.load(rewardRedemptionAddress);
+  if (rewardRedemption) {
+    statusEntity.rewardRedemption = rewardRedemption.id;
+  }
+  
+  statusEntity.save();
+  
+  log.info(
+    "Updated RedemptionStatus: participant={}, redemptionId={}, status={}", 
+    [
+      participant.toHexString(),
+      redemptionId.toString(),
+      status.toString()
+    ]
+  );
+}
+
+
+
+
