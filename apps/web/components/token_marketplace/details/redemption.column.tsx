@@ -3,20 +3,27 @@ import { ColumnDef } from "@tanstack/react-table";
 import { RewardRedemption } from "@workspace/sdk/type";
 import { CircleCheck } from "lucide-react";
 
-// Update the type to match the actual data structure
 interface ExtendedRewardRedemption extends RewardRedemption {
   rewardRedemption: {
     rewardRedemption: string;
   };
 }
 
-export function useColumns(
+export function useColumns<
+  T extends {
+    status: number;
+    from: string;
+    blockTimestamp: string;
+    transactionHash: string;
+    rewardRedemption: { rewardRedemption: string };
+  },
+>(
   updateStatus: (params: {
     userAddress: string;
     rewardAddress: string;
   }) => void,
   isUpdating: boolean,
-): ColumnDef<ExtendedRewardRedemption>[] {
+): ColumnDef<T>[] {
   const hasDefaultAdminRole = hasRole({
     role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
   });
@@ -26,8 +33,6 @@ export function useColumns(
       header: "Status",
       accessorKey: "status",
       cell: ({ row }) => {
-        
-
         const status = row.original.status === 1 ? "completed" : "pending";
         return (
           <span

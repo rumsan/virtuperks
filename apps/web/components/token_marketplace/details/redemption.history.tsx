@@ -11,11 +11,46 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@workspace/ui/components/tabs";
 import { useState } from "react";
 import { useColumns } from "./redemption.column";
+
 interface RedemptionHistoryProps {
   rewardId: string;
 }
+
+// Dummy Data
+const dummyAll = [
+  {
+    status: 1,
+    from: "0xUSER_A",
+    blockTimestamp: "1722430000",
+    transactionHash: "0xHASH1",
+    rewardRedemption: { rewardRedemption: "0xREWARD1" },
+  },
+  {
+    status: 0,
+    from: "0xUSER_B",
+    blockTimestamp: "1722435000",
+    transactionHash: "0xHASH2",
+    rewardRedemption: { rewardRedemption: "0xREWARD2" },
+  },
+];
+
+const dummyMine = [
+  {
+    status: 1,
+    from: "0xMY_WALLET",
+    blockTimestamp: "1722431000",
+    transactionHash: "0xHASH_MY1",
+    rewardRedemption: { rewardRedemption: "0xMY_REWARD" },
+  },
+];
 
 const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
   const {
@@ -24,22 +59,22 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
     error,
   } = useGetRedeemedReward(rewardId);
 
-  const getRedeemedRewardList =
-    redeemedReward?.data?.rewardRedemptionCreateds[0].rewardRedeemedEvents ||
-    [];
-
   const {
     UpdateRedeemStatus: updateStatus,
     UpdateRedeemPending: isUpdating,
     UpdateRedeemSuccess: updateSuccess,
   } = useUpdateRedemptionStatus();
 
-  const columns = useColumns(updateStatus, isUpdating);
+  const columns = useColumns<(typeof dummyAll)[0]>(updateStatus, isUpdating);
 
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
   });
+
+  const [tab, setTab] = useState<"all" | "mine">("all");
+
+  const getRedeemedRewardList = tab === "all" ? dummyAll : dummyMine;
 
   const table = useReactTable({
     data: getRedeemedRewardList,
@@ -74,80 +109,93 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
         </p>
       </div>
 
-      {/* Table Container */}
-      <div className="border rounded-lg min-h-[490px]">
-        <table className="min-w-full table-fixed divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header, index) => (
-                  <th
-                    key={header.id}
-                    className={`
-                  px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider
-                  ${index === 0 ? "w-[200px]" : ""}
-                  ${index === 1 ? "w-[180px]" : ""}
-                  ${index === 2 ? "w-[160px]" : ""}
-                  ${index === 3 ? "w-[100px]" : ""}
-                `}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </th>
+      {/* Tabs */}
+      <Tabs value={tab} onValueChange={(v) => setTab(v as "all" | "mine")}>
+        <TabsList className="mb-2">
+          <TabsTrigger value="all">All History</TabsTrigger>
+          <TabsTrigger value="mine">My History</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value={tab}>
+          {/* Table Container */}
+          <div className="border rounded-lg min-h-[490px]">
+            <table className="min-w-full table-fixed divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header, index) => (
+                      <th
+                        key={header.id}
+                        className={`
+                        px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider
+                        ${index === 0 ? "w-[200px]" : ""}
+                        ${index === 1 ? "w-[180px]" : ""}
+                        ${index === 2 ? "w-[160px]" : ""}
+                        ${index === 3 ? "w-[100px]" : ""}
+                      `}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                      </th>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </thead>
+              </thead>
 
-          <tbody className="bg-white divide-y divide-gray-100">
-            {table.getRowModel().rows.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={columns.length}
-                  className="text-center py-12 text-gray-500 text-sm"
-                >
-                  No redemption history found.
-                </td>
-              </tr>
-            ) : (
-              table.getRowModel().rows.map((row) => (
-                <tr key={row.id} className="hover:bg-gray-50 transition-colors">
-                  {row.getVisibleCells().map((cell, index) => (
+              <tbody className="bg-white divide-y divide-gray-100">
+                {table.getRowModel().rows.length === 0 ? (
+                  <tr>
                     <td
-                      key={cell.id}
-                      className={`
-                    px-4 py-3 text-sm text-gray-700 truncate
-                    ${index === 0 ? "w-[200px]" : ""}
-                    ${index === 1 ? "w-[180px]" : ""}
-                    ${index === 2 ? "w-[160px]" : ""}
-                    ${index === 3 ? "w-[100px]" : ""}
-                  `}
+                      colSpan={columns.length}
+                      className="text-center py-12 text-gray-500 text-sm"
                     >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
+                      No redemption history found.
                     </td>
-                  ))}
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+                  </tr>
+                ) : (
+                  table.getRowModel().rows.map((row) => (
+                    <tr
+                      key={row.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      {row.getVisibleCells().map((cell, index) => (
+                        <td
+                          key={cell.id}
+                          className={`
+                          px-4 py-3 text-sm text-gray-700 truncate
+                          ${index === 0 ? "w-[200px]" : ""}
+                          ${index === 1 ? "w-[180px]" : ""}
+                          ${index === 2 ? "w-[160px]" : ""}
+                          ${index === 3 ? "w-[100px]" : ""}
+                        `}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
 
-      {/* Pagination Section */}
-      <div className="mt-4">
-        <DataTablePagination
-          table={table}
-          pagination={pagination}
-          setPagination={setPagination}
-        />
-      </div>
+          {/* Pagination Section */}
+          <div className="mt-4">
+            <DataTablePagination
+              table={table}
+              pagination={pagination}
+              setPagination={setPagination}
+            />
+          </div>
+        </TabsContent>
+      </Tabs>
     </main>
   );
 };
