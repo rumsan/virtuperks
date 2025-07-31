@@ -33,6 +33,7 @@ export default function DepartmentDetailsCard({
   router,
 }: DepartmentDetailsCardProps) {
   const { data: entity, isLoading, isError, error } = useGetEntityById(cuid.id);
+console.log("Entity Data: ", entity);
 
   const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
     entity?.rewardManagement,
@@ -77,7 +78,7 @@ export default function DepartmentDetailsCard({
         to: data.to,
         amount: data.amount,
         remarks: data.remarks,
-        entityId: entity.id,
+        entityId: entity.rewardManagement,
       });
       setIsOpen(false);
       toast({

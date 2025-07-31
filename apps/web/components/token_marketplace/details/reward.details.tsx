@@ -3,7 +3,6 @@
 import { useCheckParticipantBalance } from "@/hooks/subgraph/token";
 import {
   useApproveReward,
-  useGetRedeemedRewardByParticiant,
   useGetRewardById,
   useRedeemReward,
 } from "@/hooks/subgraph/token-marketplace";
@@ -29,10 +28,6 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   const { participantTotalToken, isError } = useCheckParticipantBalance(
     address as `0x${string}`,
   );
-// hookto get redeemed rewards by participant
-  const getParticipantReward = useGetRedeemedRewardByParticiant(address as `0x${string}`);
-  const redeemedRewardsByParticipant = getParticipantReward?.data?.data?.rewardRedeemeds || [];
- 
 
   const [step, setStep] = useState<Step>("approve");
   const [loading, setLoading] = useState(false);

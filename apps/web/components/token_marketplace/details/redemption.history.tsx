@@ -3,6 +3,7 @@
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import {
   useGetRedeemedReward,
+  useGetRedeemedRewardByParticiant,
   useUpdateRedemptionStatus,
 } from "@/hooks/subgraph/token-marketplace";
 import {
@@ -18,6 +19,7 @@ import {
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
 import { useState } from "react";
+import { useAccount } from "wagmi";
 import { useColumns } from "./redemption.column";
 
 interface RedemptionHistoryProps {
@@ -151,11 +153,29 @@ const dummyMine = [
 ];
 
 const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
+  const { address, isConnected } = useAccount();
   const {
     data: redeemedReward,
     isLoading,
     error,
   } = useGetRedeemedReward(rewardId);
+
+  // const getRedeemedRewardList =
+  //   redeemedReward?.data?.rewardRedemptionCreateds[0].rewardRedeemedEvents ||
+  //   [];
+  const getRedeemReward = useGetRedeemedReward(rewardId);
+  console.log("getRedeemReward77777-----------", getRedeemReward?.data?.data);
+
+  // hookto get redeemed rewards by participant
+  const getParticipantReward = useGetRedeemedRewardByParticiant(
+    address as `0x${string}`,
+  );
+  const redeemedRewardsByParticipant =
+    getParticipantReward?.data?.data?.redemptionStatuses || [];
+  console.log(
+    "redeemedRewardsByParticipantalhfahfahf",
+    redeemedRewardsByParticipant,
+  );
 
   const {
     UpdateRedeemStatus: updateStatus,
@@ -175,7 +195,7 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
   const getRedeemedRewardList = tab === "all" ? dummyAll : dummyMine;
 
   const table = useReactTable({
-    data: getRedeemedRewardList,
+    data: [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
