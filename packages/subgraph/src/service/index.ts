@@ -5,6 +5,7 @@ import {
   GetCombineParticipantsByTask,
   getOpenTasks,
   getParticipantTasks,
+  getParticipantTaskStatistics,
   GetRedeemedReward,
   GetRedeemedRewardsByParticipant,
   getRewardById,
@@ -164,6 +165,21 @@ export class SubgraphService {
     } catch (error) {
 
       console.error('Error fetching rewardManagementCreated by address:', error);
+      return { data: null, error };
+    }
+  }
+
+  // service function to get participant task statistics
+
+  async getParticipantTaskStatistics(participantAddress: string) {
+    try {
+      const { data, error } = await this.subgraphQuery.query(
+        getParticipantTaskStatistics,
+        { participant: participantAddress }
+      );
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching participant task statistics:', error);
       return { data: null, error };
     }
   }
