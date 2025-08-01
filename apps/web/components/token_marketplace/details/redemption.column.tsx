@@ -1,6 +1,6 @@
 import hasRole from "@/utils/role";
 import { ColumnDef } from "@tanstack/react-table";
-import { CircleCheck } from "lucide-react";
+import { CircleCheck, Loader } from "lucide-react";
 
 // interface ExtendedRewardRedemption extends RewardRedemption {
 //   rewardRedemption: {
@@ -23,7 +23,7 @@ export function useColumns<
     rewardAddress: string;
     redemptionId: string;
   }) => void,
-  isUpdating: boolean,
+  updatingId: string | null,
 ): ColumnDef<T>[] {
   const hasDefaultAdminRole = hasRole({
     role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
@@ -84,6 +84,7 @@ export function useColumns<
       id: "action",
       cell: ({ row }) => {
         const isCompleted = row.original.status === 1;
+        const isButtonLoading = updatingId === row.original.redemptionId;
 
         return hasDefaultAdminRole ? (
           <div className="flex justify-center items-center w-full">
@@ -95,15 +96,19 @@ export function useColumns<
                   redemptionId: row.original.redemptionId,
                 });
               }}
-              disabled={isUpdating || isCompleted}
+              disabled={isButtonLoading || isCompleted}
               className={`p-1.5 rounded-full transition ${
-                isUpdating || isCompleted
+                isButtonLoading || isCompleted
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:bg-green-100"
               }`}
               title={isCompleted ? "Already Completed" : "Mark as Completed"}
             >
-              <CircleCheck className="text-green-800" />
+              {isButtonLoading ? (
+                <Loader className="w-4 h-4 text-green-800 animate-spin" />
+              ) : (
+                <CircleCheck className="text-green-800" />
+              )}
             </button>
           </div>
         ) : (

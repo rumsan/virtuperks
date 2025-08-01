@@ -113,7 +113,7 @@ export const useRedeemReward = () => {
         queryClient.invalidateQueries({
           queryKey: ["redeemedRewardsList"],
         });
-      }, 5000);
+      }, 3000);
     },
   });
 
@@ -178,7 +178,7 @@ export const useUpdateRedemptionStatus = () => {
         queryClient.invalidateQueries({
           queryKey: ["redeemedRewardsList"],
         });
-      }, 5000);
+      }, 3000);
     },
   });
 

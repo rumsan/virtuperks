@@ -39,13 +39,27 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
   const redeemedRewardsByParticipant =
     getParticipantReward?.data?.data?.redemptionStatuses ?? [];
 
-
-  const { UpdateRedeemStatus: updateStatus, UpdateRedeemPending: isUpdating } =
+  const { UpdateRedeemStatus: rawUpdateStatus, UpdateRedeemPending } =
     useUpdateRedemptionStatus();
+
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  const updateStatus = async (params: {
+    userAddress: string;
+    rewardAddress: string;
+    redemptionId: string;
+  }) => {
+    setUpdatingId(params.redemptionId);
+    try {
+      await rawUpdateStatus(params);
+    } finally {
+      setUpdatingId(null);
+    }
+  };
 
   const columns = useColumns<(typeof allRedemptions)[0]>(
     updateStatus,
-    isUpdating,
+    updatingId,
   );
 
   const [paginationAll, setPaginationAll] = useState({
