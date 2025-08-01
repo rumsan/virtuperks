@@ -1,22 +1,30 @@
 import hasRole from "@/utils/role";
 import { ColumnDef } from "@tanstack/react-table";
-import { RewardRedemption } from "@workspace/sdk/type";
-import { CircleCheck } from "lucide-react";
+import { CircleCheck, Loader } from "lucide-react";
 
-// Update the type to match the actual data structure
-interface ExtendedRewardRedemption extends RewardRedemption {
-  rewardRedemption: {
-    rewardRedemption: string;
-  };
-}
+// interface ExtendedRewardRedemption extends RewardRedemption {
+//   rewardRedemption: {
+//     rewardRedemption: string;
+//   };
+// }
 
-export function useColumns(
+export function useColumns<
+  T extends {
+    redemptionId: string;
+    status: number;
+    from: string;
+    blockTimestamp: string;
+    transactionHash: string;
+    rewardRedemption: { rewardRedemption: string };
+  },
+>(
   updateStatus: (params: {
     userAddress: string;
     rewardAddress: string;
+    redemptionId: string;
   }) => void,
-  isUpdating: boolean,
-): ColumnDef<ExtendedRewardRedemption>[] {
+  updatingId: string | null,
+): ColumnDef<T>[] {
   const hasDefaultAdminRole = hasRole({
     role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
   });
@@ -26,8 +34,6 @@ export function useColumns(
       header: "Status",
       accessorKey: "status",
       cell: ({ row }) => {
-        
-
         const status = row.original.status === 1 ? "completed" : "pending";
         return (
           <span
@@ -76,32 +82,41 @@ export function useColumns(
     {
       header: () => <div className="text-center w-full">Action</div>,
       id: "action",
-      cell: ({ row }) =>
-        hasDefaultAdminRole ? (
+      cell: ({ row }) => {
+        const isCompleted = row.original.status === 1;
+        const isButtonLoading = updatingId === row.original.redemptionId;
+
+        return hasDefaultAdminRole ? (
           <div className="flex justify-center items-center w-full">
             <button
               onClick={() => {
                 updateStatus({
                   userAddress: row.original.from,
                   rewardAddress: row.original.rewardRedemption.rewardRedemption,
+                  redemptionId: row.original.redemptionId,
                 });
               }}
-              disabled={isUpdating}
+              disabled={isButtonLoading || isCompleted}
               className={`p-1.5 rounded-full transition ${
-                isUpdating
+                isButtonLoading || isCompleted
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:bg-green-100"
               }`}
-              title="Mark as Completed"
+              title={isCompleted ? "Already Completed" : "Mark as Completed"}
             >
-              <CircleCheck className="text-green-800" />
+              {isButtonLoading ? (
+                <Loader className="w-4 h-4 text-green-800 animate-spin" />
+              ) : (
+                <CircleCheck className="text-green-800" />
+              )}
             </button>
           </div>
         ) : (
           <div className="flex justify-center items-center w-full">
             <CircleCheck className="text-green-800 opacity-20" />
           </div>
-        ),
+        );
+      },
     },
   ];
 }

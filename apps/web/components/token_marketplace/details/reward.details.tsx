@@ -3,7 +3,6 @@
 import { useCheckParticipantBalance } from "@/hooks/subgraph/token";
 import {
   useApproveReward,
-  useGetRedeemedRewardByParticiant,
   useGetRewardById,
   useRedeemReward,
 } from "@/hooks/subgraph/token-marketplace";
@@ -29,11 +28,6 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   const { participantTotalToken, isError } = useCheckParticipantBalance(
     address as `0x${string}`,
   );
-// hookto get redeemed rewards by participant
- const getParticipantReward = useGetRedeemedRewardByParticiant(address as `0x${string}`);
-  const redeemedRewardsByParticipant = getParticipantReward?.data?.data?.redemptionStatuses || [];
- console.log("redeemedRewardsByParticipantalhfahfahf", redeemedRewardsByParticipant);
- 
 
   const [step, setStep] = useState<Step>("approve");
   const [loading, setLoading] = useState(false);
@@ -75,7 +69,7 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
       setApprovalHash(txHash);
       setStep("redeem");
     } catch (err) {
-      console.error("Approval failed:", err);
+      // console.error("Approval failed:", err);
     }
   };
 
@@ -87,7 +81,7 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
       setRedeemTxHash(txHash);
       setStep("completed");
     } catch (err) {
-      console.error("Redeem failed:", err);
+      // console.error("Redeem failed:", err);
     }
   };
 

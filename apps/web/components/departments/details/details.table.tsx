@@ -49,9 +49,6 @@ const DepartmentDetailsTable = <T extends { type?: string }>({
   const disbursementList =
     disbursementData?.rewardManagementCreateds?.[0]?.disbursements ?? [];
 
-  console.log("Transfer List: ", transferList);
-  console.log("Disbursement List: ", disbursementList);
-
   const transferColumns = useColumns("transfer");
   const disbursementColumns = useColumns("disbursement");
 

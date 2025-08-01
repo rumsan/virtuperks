@@ -3,6 +3,7 @@
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import {
   useGetRedeemedReward,
+  useGetRedeemedRewardByParticiant,
   useUpdateRedemptionStatus,
 } from "@/hooks/subgraph/token-marketplace";
 import {
@@ -11,56 +12,96 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@workspace/ui/components/tabs";
 import { useState } from "react";
+import { useAccount } from "wagmi";
 import { useColumns } from "./redemption.column";
+
 interface RedemptionHistoryProps {
   rewardId: string;
 }
 
 const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
-  const {
-    data: redeemedReward,
-    isLoading,
-    error,
-  } = useGetRedeemedReward(rewardId);
+  const { address, isConnected } = useAccount();
 
-  // const getRedeemedRewardList =
-  //   redeemedReward?.data?.rewardRedemptionCreateds[0].rewardRedeemedEvents ||
-  //   [];
   const getRedeemReward = useGetRedeemedReward(rewardId);
-console.log("getRedeemReward77777-----------", getRedeemReward?.data?.data);
+  const getParticipantReward = useGetRedeemedRewardByParticiant(
+    address as `0x${string}`,
+  );
 
+  const allRedemptions = getRedeemReward?.data?.data?.redemptionStatuses ?? [];
 
+  const redeemedRewardsByParticipant =
+    getParticipantReward?.data?.data?.redemptionStatuses ?? [];
 
-  const {
-    UpdateRedeemStatus: updateStatus,
-    UpdateRedeemPending: isUpdating,
-    UpdateRedeemSuccess: updateSuccess,
-  } = useUpdateRedemptionStatus();
+  const { UpdateRedeemStatus: rawUpdateStatus, UpdateRedeemPending } =
+    useUpdateRedemptionStatus();
 
-  const columns = useColumns(updateStatus, isUpdating);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  const [pagination, setPagination] = useState({
+  const updateStatus = async (params: {
+    userAddress: string;
+    rewardAddress: string;
+    redemptionId: string;
+  }) => {
+    setUpdatingId(params.redemptionId);
+    try {
+      await rawUpdateStatus(params);
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const columns = useColumns<(typeof allRedemptions)[0]>(
+    updateStatus,
+    updatingId,
+  );
+
+  const [paginationAll, setPaginationAll] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [paginationMine, setPaginationMine] = useState({
     pageIndex: 0,
     pageSize: 10,
   });
 
-  const table = useReactTable({
-    data: [],
+  const [tab, setTab] = useState<"all" | "mine">("all");
+
+  const tableAll = useReactTable({
+    data: allRedemptions,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    state: { pagination },
-    onPaginationChange: setPagination,
+    state: { pagination: paginationAll },
+    onPaginationChange: setPaginationAll,
+    pageCount: Math.ceil(allRedemptions.length / paginationAll.pageSize),
   });
 
-  if (isLoading) {
+  const tableMine = useReactTable({
+    data: redeemedRewardsByParticipant,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    state: { pagination: paginationMine },
+    onPaginationChange: setPaginationMine,
+    pageCount: Math.ceil(
+      redeemedRewardsByParticipant.length / paginationMine.pageSize,
+    ),
+  });
+
+  if (getRedeemReward.isLoading || getParticipantReward.isLoading) {
     return (
       <p className="text-gray-500 text-sm p-6">Loading redemption history...</p>
     );
   }
 
-  if (error) {
+  if (getRedeemReward.error || getParticipantReward.error) {
     return (
       <p className="text-red-600 text-sm p-6">
         Failed to load redemption history.
@@ -78,80 +119,159 @@ console.log("getRedeemReward77777-----------", getRedeemReward?.data?.data);
         </p>
       </div>
 
-      {/* Table Container */}
-      <div className="border rounded-lg min-h-[490px]">
-        <table className="min-w-full table-fixed divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header, index) => (
-                  <th
-                    key={header.id}
-                    className={`
-                  px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider
-                  ${index === 0 ? "w-[200px]" : ""}
-                  ${index === 1 ? "w-[180px]" : ""}
-                  ${index === 2 ? "w-[160px]" : ""}
-                  ${index === 3 ? "w-[100px]" : ""}
-                `}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </th>
+      {/* Tabs */}
+      <Tabs
+        value={tab}
+        onValueChange={(v) => {
+          setTab(v as "all" | "mine");
+          // Reset pagination for the newly selected tab
+          if (v === "all") setPaginationAll((p) => ({ ...p, pageIndex: 0 }));
+          if (v === "mine") setPaginationMine((p) => ({ ...p, pageIndex: 0 }));
+        }}
+      >
+        <TabsList className="mb-2">
+          <TabsTrigger value="all">All History</TabsTrigger>
+          <TabsTrigger value="mine">My History</TabsTrigger>
+        </TabsList>
+
+        {/* All History Tab */}
+        <TabsContent value="all">
+          <div
+            className="border rounded-lg"
+            style={{ minHeight: `${paginationAll.pageSize * 48 + 56}px` }}
+          >
+            <table className="min-w-full table-fixed divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                {tableAll.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th
+                        key={header.id}
+                        className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider h-[48px]"
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                      </th>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </thead>
-
-          <tbody className="bg-white divide-y divide-gray-100">
-            {table.getRowModel().rows.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={columns.length}
-                  className="text-center py-12 text-gray-500 text-sm"
-                >
-                  No redemption history found.
-                </td>
-              </tr>
-            ) : (
-              table.getRowModel().rows.map((row) => (
-                <tr key={row.id} className="hover:bg-gray-50 transition-colors">
-                  {row.getVisibleCells().map((cell, index) => (
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-100">
+                {tableAll.getRowModel().rows.length === 0 ? (
+                  <tr>
                     <td
-                      key={cell.id}
-                      className={`
-                    px-4 py-3 text-sm text-gray-700 truncate
-                    ${index === 0 ? "w-[200px]" : ""}
-                    ${index === 1 ? "w-[180px]" : ""}
-                    ${index === 2 ? "w-[160px]" : ""}
-                    ${index === 3 ? "w-[100px]" : ""}
-                  `}
+                      colSpan={columns.length}
+                      className="text-center py-12 text-gray-500 text-sm"
                     >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
+                      No redemption history found.
                     </td>
-                  ))}
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+                  </tr>
+                ) : (
+                  tableAll.getRowModel().rows.map((row) => (
+                    <tr
+                      key={row.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <td
+                          key={cell.id}
+                          className="px-4 py-3 text-sm text-gray-700 truncate min-h-[48px] h-[48px] align-middle"
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
 
-      {/* Pagination Section */}
-      <div className="mt-4">
-        <DataTablePagination
-          table={table}
-          pagination={pagination}
-          setPagination={setPagination}
-        />
-      </div>
+          <div className="mt-4">
+            <DataTablePagination
+              table={tableAll}
+              pagination={paginationAll}
+              setPagination={setPaginationAll}
+            />
+          </div>
+        </TabsContent>
+
+        {/* My History Tab */}
+        <TabsContent value="mine">
+          <div
+            className="border rounded-lg"
+            style={{ minHeight: `${paginationMine.pageSize * 48 + 56}px` }}
+          >
+            <table className="min-w-full table-fixed divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                {tableMine.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th
+                        key={header.id}
+                        className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider h-[48px]"
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-100">
+                {tableMine.getRowModel().rows.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={columns.length}
+                      className="text-center py-12 text-gray-500 text-sm"
+                    >
+                      No redemption history found.
+                    </td>
+                  </tr>
+                ) : (
+                  tableMine.getRowModel().rows.map((row) => (
+                    <tr
+                      key={row.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <td
+                          key={cell.id}
+                          className="px-4 py-3 text-sm text-gray-700 truncate min-h-[48px] h-[48px] align-middle"
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-4">
+            <DataTablePagination
+              table={tableMine}
+              pagination={paginationMine}
+              setPagination={setPaginationMine}
+            />
+          </div>
+        </TabsContent>
+      </Tabs>
     </main>
   );
 };
