@@ -5,10 +5,14 @@ import {
   GetCombineParticipantsByTask,
   getOpenTasks,
   getParticipantTasks,
+  GetRedeemedReward,
+  GetRedeemedRewardsByParticipant,
+  getRewardById,
   GetRewardManagement,
   GetRewardManagementCreatedByAddress,
   GetRewardManagementDisbursements,
   GetRewardManagementTokenTransfers,
+  GetRewards,
   getTaskCreatedById,
   getTaskCreation,
   RewardManagementQueries,
@@ -54,7 +58,6 @@ export class SubgraphService {
 
   // RewardManagement Related Services
   async getAllTasks() {
-    
     const { data, error } = await this.subgraphQuery.query(getTaskCreation, {});
     return { data, error };
   }
@@ -198,6 +201,57 @@ export class SubgraphService {
       return { data: null, error };
     }
   }
-  
-  
+
+  // reward sevice function
+  async getRewards (){
+try {
+  const { data, error } = await this.subgraphQuery.query(GetRewards, {});
+return { data, error };
+}catch(error) {
+    console.error('Error fetching rewards:', error);
+    return { data: null, error };
 }
+  }
+
+
+  async getRewardById(rewardRedemption: string) {
+    try {
+      const { data, error } = await this.subgraphQuery.query(getRewardById, {rewardRedemption });
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching reward by ID:', error);
+      return { data: null, error };
+    }
+  }
+
+    // service to get redeemed rewards
+  async getRedeemedReward (rewardRedemption: string) {
+
+try {
+  const { data, error } = await this.subgraphQuery.query(GetRedeemedReward, {rewardRedemption});
+return { data, error };
+}catch(error) {
+    console.error('Error fetching rewards:', error);
+    return { data: null, error };
+}
+  } 
+
+  //service to get redeemed rewards by participant address
+  async getRedeemedRewardsByParticipant(participantAddress: string) {
+    try {
+      const { data, error } = await this.subgraphQuery.query(
+        GetRedeemedRewardsByParticipant,
+        { participant: participantAddress }
+      );
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching redeemed rewards by participant:', error);
+      return { data: null, error };
+    }
+  }
+}
+
+
+
+
+

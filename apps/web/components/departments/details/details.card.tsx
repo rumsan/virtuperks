@@ -9,7 +9,6 @@ import {
 } from "@/hooks/subgraph/entity";
 import { useDirectTokenTransfer } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
-import hasRole from "@/utils/role";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -34,6 +33,7 @@ export default function DepartmentDetailsCard({
   router,
 }: DepartmentDetailsCardProps) {
   const { data: entity, isLoading, isError, error } = useGetEntityById(cuid.id);
+console.log("Entity Data: ", entity);
 
   const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
     entity?.rewardManagement,
@@ -42,10 +42,8 @@ export default function DepartmentDetailsCard({
   const { totalAllocatedTokens } = useCheckTotalAllocatedTokens(
     entity?.rewardManagement,
   );
-  //useGetEntityOwners get all the entity Owners
-  const { getEntityOwners } = useGetEntityOwners(entity?.entityId);
 
-  console.log("Entity Owner: ", getEntityOwners);
+  const { getEntityOwners } = useGetEntityOwners(entity?.entityId);
 
   const {
     directTransfer,
@@ -80,7 +78,7 @@ export default function DepartmentDetailsCard({
         to: data.to,
         amount: data.amount,
         remarks: data.remarks,
-        entityId: entity.id,
+        entityId: entity.rewardManagement,
       });
       setIsOpen(false);
       toast({
@@ -96,30 +94,26 @@ export default function DepartmentDetailsCard({
     }
   };
 
-  const roleCheck = hasRole({
-    role: process.env.NEXT_PUBLIC_MINTER_ROLE || "",
-  });
-  const hasTreasurerRole = typeof roleCheck === "boolean" ? roleCheck : false;
-
-  const getTransferButton = () => {
-    if (directTransferPending) {
-      return (
-        <Button
-          variant="outline"
-          className="h-12 w-48 flex items-center justify-center"
-          style={{
-            border: "1px solid #03AB65",
-          }}
-          disabled
-        >
-          <span className="text-[#03AB65] flex items-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Processing...
-          </span>
-        </Button>
-      );
-    }
-  };
+  const getTransferButton = () => (
+    <Button
+      variant="outline"
+      className="h-12 w-48 flex items-center justify-center"
+      style={{
+        border: "1px solid #03AB65",
+      }}
+      disabled={directTransferPending}
+      onClick={() => !directTransferPending && setIsOpen(true)}
+    >
+      <span className="text-[#03AB65] flex items-center gap-2">
+        {directTransferPending ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Plus size={16} strokeWidth={2.75} />
+        )}
+        {directTransferPending ? "Processing..." : "Transfer Token"}
+      </span>
+    </Button>
+  );
 
   return (
     <>
@@ -131,35 +125,33 @@ export default function DepartmentDetailsCard({
               Detailed view of the selected department
             </h3>
           </div>
-          {hasTreasurerRole && (
-            <div className="flex gap-10">
-              {getTransferButton()}
+          <div className="flex gap-10">
+            {getTransferButton()}
 
-              {!directTransferPending && isOpen && (
-                <DialogButton
-                  isOpen={isOpen}
-                  setIsOpen={setIsOpen}
-                  title="Are you sure you want to transfer token amount?"
-                  subTitle="This action cannot be undone"
-                  buttonName="Transfer Token"
-                  submitType="directdisburse"
-                  handleApplyTaskLogic={handleDialogAction}
-                />
-              )}
+            {!directTransferPending && (
+              <DialogButton
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+                title="Are you sure you want to transfer token amount?"
+                subTitle="This action cannot be undone"
+                buttonName={directTransferPending ? "Processing..." : "Transfer Token"}
+                submitType="directdisburse"
+                handleApplyTaskLogic={handleDialogAction}
+              />
+            )}
 
-              <Button
-                className="h-12 w-48 fw-[600] flex items-center justify-center"
-                variant="default"
-                type="button"
-                onClick={() =>
-                  router.push(PATHS.TREASURER.CREATE(entity.rewardManagement))
-                }
-              >
-                <Plus size={22} strokeWidth={2.75} />
-                <span className="ml-2">Allocate Token</span>
-              </Button>
-            </div>
-          )}
+            <Button
+              className="h-12 w-48 fw-[600] flex items-center justify-center"
+              variant="default"
+              type="button"
+              onClick={() =>
+                router.push(PATHS.TREASURER.CREATE(entity.rewardManagement))
+              }
+            >
+              <Plus size={22} strokeWidth={2.75} />
+              <span className="ml-2">Allocate Token</span>
+            </Button>
+          </div>
         </div>
       </div>
 

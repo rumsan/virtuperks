@@ -1,0 +1,107 @@
+import hasRole from "@/utils/role";
+import { ColumnDef } from "@tanstack/react-table";
+import { RewardRedemption } from "@workspace/sdk/type";
+import { CircleCheck } from "lucide-react";
+
+// Update the type to match the actual data structure
+interface ExtendedRewardRedemption extends RewardRedemption {
+  rewardRedemption: {
+    rewardRedemption: string;
+  };
+}
+
+export function useColumns(
+  updateStatus: (params: {
+    userAddress: string;
+    rewardAddress: string;
+  }) => void,
+  isUpdating: boolean,
+): ColumnDef<ExtendedRewardRedemption>[] {
+  const hasDefaultAdminRole = hasRole({
+    role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
+  });
+
+  return [
+    {
+      header: "Status",
+      accessorKey: "status",
+      cell: ({ row }) => {
+        
+
+        const status = row.original.status === 1 ? "completed" : "pending";
+        return (
+          <span
+            className={`px-2 py-1 text-xs font-medium rounded-full ${
+              status === "completed"
+                ? "bg-green-100 text-green-700"
+                : "bg-yellow-100 text-yellow-700"
+            }`}
+          >
+            {status}
+          </span>
+        );
+      },
+    },
+    {
+      header: "Wallet",
+      accessorKey: "from",
+      cell: ({ row }) => {
+        const wallet = row.original.from;
+        return (
+          <span className="font-medium text-gray-800">
+            {wallet
+              ? `${wallet.slice(0, 10)}...${wallet.slice(-4)}`
+              : "Unknown"}
+          </span>
+        );
+      },
+    },
+    {
+      header: "Date",
+      accessorKey: "blockTimestamp",
+      cell: ({ row }) => {
+        const timestamp = Number(row.original.blockTimestamp) * 1000;
+        const date = new Date(timestamp);
+        return date.toLocaleDateString();
+      },
+    },
+    {
+      header: "Transaction ID",
+      accessorKey: "transactionHash",
+      cell: ({ row }) => {
+        const txnId = row.original.transactionHash;
+        return txnId ? `${txnId.slice(0, 12)}...${txnId.slice(-4)}` : "N/A";
+      },
+    },
+    {
+      header: () => <div className="text-center w-full">Action</div>,
+      id: "action",
+      cell: ({ row }) =>
+        hasDefaultAdminRole ? (
+          <div className="flex justify-center items-center w-full">
+            <button
+              onClick={() => {
+                updateStatus({
+                  userAddress: row.original.from,
+                  rewardAddress: row.original.rewardRedemption.rewardRedemption,
+                });
+              }}
+              disabled={isUpdating}
+              className={`p-1.5 rounded-full transition ${
+                isUpdating
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-green-100"
+              }`}
+              title="Mark as Completed"
+            >
+              <CircleCheck className="text-green-800" />
+            </button>
+          </div>
+        ) : (
+          <div className="flex justify-center items-center w-full">
+            <CircleCheck className="text-green-800 opacity-20" />
+          </div>
+        ),
+    },
+  ];
+}

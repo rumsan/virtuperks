@@ -52,5 +52,6 @@ export const PATHS = {
 
   TOKENMARKETPLACE: {
     HOME: `${ROOTS.TOKENMARKETPLACE}`,
+    DETAILS: (cuid: string) => `${ROOTS.TOKENMARKETPLACE}/${cuid}`,
   },
 };

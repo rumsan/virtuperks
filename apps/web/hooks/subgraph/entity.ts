@@ -25,32 +25,39 @@ export const useGetAllEntity = () => {
 
 export const useDepartmentAdd = () => {
   const queryClient = useQueryClient();
-  const { writeContractAsync } =
+  const { writeContractAsync, isPending, isSuccess } =
     useWriteRewardManagementFactoryCreateRewardManagement();
 
-  const appId = (process.env.NEXT_PUBLIC_APP_ID as `0x${string}`) || "0x";
-
   const mutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: {
+      name: string;
+      entityOwners: readonly `0x${string}`[];
+    }) => {
       const cuid = createId();
       const entityId = keccak256(toUtf8Bytes(cuid));
       const result = await writeContractAsync({
         address: process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}`,
         args: [
           entityId as `0x${string}`,
-          appId,
-
+          process.env.NEXT_PUBLIC_APP_ID as `0x${string}`,
           process.env.NEXT_PUBLIC_APPREGISTRY as `0x${string}`,
           {
-            name: data.name as string,
-            entityOwners: data.entityOwners as readonly `0x${string}`[],
+            name: data.name,
+            entityOwners: data.entityOwners,
           },
         ],
       });
-      return result;
+      return { result };
     },
-    onSuccess: (result, variable) => {},
+
+    onSuccess: async (resultObj) => {
+      await new Promise((resolve) => setTimeout(resolve, 9000));
+      await queryClient.invalidateQueries({
+        queryKey: ["entityList"],
+      });
+    },
   });
+
   return {
     departmentAdd: mutation.mutateAsync,
     departmentPending: mutation.isPending,

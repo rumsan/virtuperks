@@ -3,11 +3,12 @@ import { RewardManagementCreated as RewardManagementCreatedEvent } from "../gene
 import { RewardManagementCreated } from "../generated/schema";
 import { RewardManagement } from "../generated/templates";
 
+
 export function handleRewardManagementCreated(
   event: RewardManagementCreatedEvent,
 ): void {
   let entity = new RewardManagementCreated(
-event.params.rewardManagement
+    event.params.rewardManagement
   )
   entity.rewardManagement = event.params.rewardManagement
   entity.registry = event.params.registry
@@ -20,6 +21,8 @@ event.params.rewardManagement
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+   entity.save()
     log.debug("EntityTaskManagerCreated: {}", [entity.rewardManagement.toHexString()]);
 
   RewardManagement.create(event.params.rewardManagement);

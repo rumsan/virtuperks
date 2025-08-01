@@ -5,7 +5,8 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**", "build/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**", "build/**"],
+       "env": ["DATABASE_URL"]
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -25,6 +26,18 @@
         "tests/**/*.ts"
       ],
       "outputs": ["artifacts/**", "coverage/**"]
-    }
+    },
+      "db:generate": {
+    "cache": false,
+    "persistent": false
+    
+  },
+  "db:migrate": {
+    "cache": false,
+    "persistent": true 
+  },
+  "db:deploy": {
+    "cache": false
+  }
   }
 }
