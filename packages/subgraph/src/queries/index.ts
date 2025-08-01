@@ -777,9 +777,37 @@ export const GetRewardManagement = `
 `;
 
 
+//query to get the participant task statistic
 
-
-
+export const getParticipantTaskStatistics = `
+  query GetParticipantTaskStatistics($participant: Bytes!) {
+    
+    applied: participantTaskStatuses(
+      where: { participant: $participant, status: "PENDING" }
+    ) {
+      id
+    }
+    
+    accepted: participantTaskStatuses(
+      where: { participant: $participant, status: "ACCEPTED" }
+    ) {
+      id
+    }
+    
+    completed: participantTaskStatuses(
+      where: { participant: $participant, status: "COMPLETED" }
+    ) {
+      id
+    }
+    
+    verified: participantTaskStatuses(
+      where: { participant: $participant, status: "VERIFIED" }
+    ) {
+      id
+    }
+    
+  }
+`;
 
 
 
@@ -859,3 +887,97 @@ export const GetRewardManagementDisbursements = `
       }
   }
 `;
+
+
+
+//for the reward Redemption
+export const GetRewards = `
+    query GetRewards {
+      rewardRedemptionCreateds(first: 100, orderBy: blockTimestamp, orderDirection: desc) {
+        id
+        rewardRedemption
+        rewardId
+        name
+        tokensRequired
+        category
+        blockNumber
+        blockTimestamp
+        transactionHash
+      }
+    }
+  `;
+
+  
+export const getRewardById = `
+  query GetRewardById($rewardRedemption: Bytes!) {
+    rewardRedemptionCreateds(where: { rewardRedemption: $rewardRedemption }) {
+      id
+      rewardRedemption
+      rewardId
+      name
+      tokensRequired
+      category
+      blockNumber
+      blockTimestamp
+      transactionHash
+    }
+  }
+`;
+
+
+export const GetRedeemedReward = `
+query GetRedemptionStatuses($rewardRedemption: Bytes!) {
+  redemptionStatuses(
+    where: {
+    
+rewardRedemption: $rewardRedemption
+      
+    },
+    first: 100,
+    orderBy: blockTimestamp,
+    orderDirection: desc
+  ) {
+    id
+    redemptionId
+    from
+    amount
+    status
+    blockTimestamp
+    transactionHash
+    rewardRedemption {
+      name
+      tokensRequired
+      category
+      rewardRedemption
+    }
+  }
+}
+`;
+
+export const GetRedeemedRewardsByParticipant = `
+query GetRedeemedRewardsByParticipant($participant: Bytes!) {
+  redemptionStatuses(
+    where: { from: $participant },
+    first: 100,
+    orderBy: blockTimestamp,
+    orderDirection: desc
+  ) {
+    id
+    redemptionId
+    from
+    amount
+    status
+    blockNumber
+    blockTimestamp
+    transactionHash
+    rewardRedemption {
+      id
+      rewardRedemption
+      name
+      tokensRequired
+      category
+      rewardId
+    }
+  }
+}
+`

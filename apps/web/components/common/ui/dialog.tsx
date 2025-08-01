@@ -1,6 +1,4 @@
-
-
-
+import { categoryColorMap } from "@/components/token_marketplace/img/imgLink";
 import { Button } from "@workspace/ui/components/button";
 import {
   Dialog,
@@ -21,7 +19,12 @@ type DialogButtonProps = {
   title: string;
   subTitle: string;
   buttonName: string;
-  submitType?: "Apply" | "Complete" | "Disperse" | "directdisburse";
+  submitType?:
+    | "Apply"
+    | "Complete"
+    | "Disperse"
+    | "directdisburse"
+    | "CreateReward";
   inputLabel?: string;
   inputPlaceholder?: string;
   handleApplyTaskLogic?: (data?: {
@@ -29,8 +32,12 @@ type DialogButtonProps = {
     amount?: string;
     to?: string;
     remarks?: string;
+    name?: string;
+    ownerAddress?: string;
+    category?: string;
   }) => Promise<void>;
   isDisabled?: boolean;
+  isLoading?: boolean;
 };
 
 export const DialogButton = ({
@@ -50,30 +57,51 @@ export const DialogButton = ({
     amount: string;
     to: string;
     remarks: string;
+    name: string;
+    ownerAddress: string;
+    category: string;
   }>({
     completionUrl: "",
     amount: "",
     to: "",
     remarks: "",
+    name: "",
+    ownerAddress: "",
+    category: "",
   });
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleInputChange = (field: keyof typeof formData) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, [field]: e.target.value }));
-    setError(null);
-  };
+  const handleInputChange =
+    (field: keyof typeof formData) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+      setError(null);
+    };
 
   const validateInputs = () => {
     if (submitType === "Complete" && !formData.completionUrl.trim()) {
       return "Completion URL is required";
     }
-    if ((submitType === "Disperse" || submitType === "directdisburse") && !formData.amount.trim()) {
+    if (
+      (submitType === "Disperse" || submitType === "directdisburse") &&
+      !formData.amount.trim()
+    ) {
       return "Amount is required";
     }
     if (submitType === "directdisburse" && !formData.to.trim()) {
       return "Recipient address is required";
     }
+    if (
+      submitType === "CreateReward" &&
+      (!formData.name.trim() ||
+        !formData.amount.trim() ||
+        !formData.ownerAddress.trim() ||
+        !formData.category.trim())
+    ) {
+      return "Reward name, amount, category, and owner Address are required";
+    }
+
     return null;
   };
 
@@ -91,7 +119,8 @@ export const DialogButton = ({
     }
 
     try {
-      let submitData: Parameters<NonNullable<typeof handleApplyTaskLogic>>[0] = {};
+      let submitData: Parameters<NonNullable<typeof handleApplyTaskLogic>>[0] =
+        {};
       if (submitType === "Complete") {
         submitData = { completionUrl: formData.completionUrl.trim() };
       } else if (submitType === "Disperse") {
@@ -102,21 +131,39 @@ export const DialogButton = ({
           to: formData.to.trim(),
           remarks: formData.remarks.trim(),
         };
+      } else if (submitType === "CreateReward") {
+        submitData = {
+          name: formData.name.trim(),
+          amount: formData.amount.trim(),
+          ownerAddress: formData.ownerAddress.trim(),
+          category: formData.category.trim(),
+        };
       }
 
       await handleApplyTaskLogic?.(submitData);
-      setFormData({ completionUrl: "", amount: "", to: "", remarks: "" });
+
+      setFormData({
+        completionUrl: "",
+        amount: "",
+        to: "",
+        remarks: "",
+        name: "",
+        ownerAddress: "",
+        category: "",
+      });
       setIsOpen(false);
     } catch (error) {
       console.error("Error:", error);
-      const errorMessage =
-        submitType === "Complete"
-          ? "Failed to submit completion URL"
-          : submitType === "Disperse"
-          ? "Failed to disperse amount"
-          : submitType === "directdisburse"
-          ? "Failed to process direct disbursement"
-          : "Failed to apply for task";
+      let errorMessage = "Failed to apply for task";
+      if (submitType === "Complete")
+        errorMessage = "Failed to submit completion URL";
+      else if (submitType === "Disperse")
+        errorMessage = "Failed to disperse amount";
+      else if (submitType === "directdisburse")
+        errorMessage = "Failed to process direct disbursement";
+      else if (submitType === "CreateReward")
+        errorMessage = "Failed to create reward";
+
       setError(errorMessage);
       toast({
         title: "Error",
@@ -130,7 +177,10 @@ export const DialogButton = ({
     if (submitType === "Complete") {
       return (
         <div className="py-4">
-          <Label htmlFor="completionUrl" className="block text-sm font-medium text-gray-700">
+          <Label
+            htmlFor="completionUrl"
+            className="block text-sm font-medium text-gray-700"
+          >
             {inputLabel}
           </Label>
           <Input
@@ -149,7 +199,10 @@ export const DialogButton = ({
     if (submitType === "Disperse") {
       return (
         <div className="py-4">
-          <Label htmlFor="amount" className="block text-sm font-medium text-gray-700">
+          <Label
+            htmlFor="amount"
+            className="block text-sm font-medium text-gray-700"
+          >
             Amount
           </Label>
           <Input
@@ -159,60 +212,124 @@ export const DialogButton = ({
             onChange={handleInputChange("amount")}
             placeholder="Enter amount to disperse"
             className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-gray-900 ${
-              error ? "border-red-600" : ""}`}
+              error ? "border-red-600" : ""
+            }`}
           />
         </div>
       );
     }
     if (submitType === "directdisburse") {
       return (
-            <div className="py-4 space-y-4">
-              <div>
-                <Label htmlFor="amount" className="block text-sm font-medium text-gray-700">
-                  Amount
-                </Label>
-                <Input
-                  id="amount"
-                  type="text"
-                  value={formData.amount}
-                  onChange={handleInputChange("amount")}
-                  placeholder="Enter amount"
-                  className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-gray-900 ${
-                    error ? "border-red-600" : ""
-                  }`}
-                />
-              </div>
-              <div>
-                <Label htmlFor="to" className="block text-sm font-medium text-gray-700">
-                  Recipient Address
-                </Label>
-                <Input
-                  id="to"
-                  type="text"
-                  value={formData.to}
-                  onChange={handleInputChange("to")}
-                  placeholder="Enter recipient address"
-                  className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-gray-900 ${
-                    error ? "border-red-600" : ""
-                  }`}
-                />
-              </div>
-              <div>
-                <Label htmlFor="remarks" className="block text-sm font-medium text-gray-700">
-                  Remarks
-                </Label>
-                <Input
-                  id="remarks"
-                  type="text"
-                  value={formData.remarks}
-                  onChange={handleInputChange("remarks")}
-                  placeholder="Enter remarks (optional)"
-                  className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-gray-900"
-                />
-              </div>
-            </div>
-          );
-        }
+        <div className="py-4 space-y-4">
+          <div>
+            <Label
+              htmlFor="amount"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Amount
+            </Label>
+            <Input
+              id="amount"
+              type="text"
+              value={formData.amount}
+              onChange={handleInputChange("amount")}
+              placeholder="Enter amount"
+              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-gray-900 ${
+                error ? "border-red-600" : ""
+              }`}
+            />
+          </div>
+          <div>
+            <Label
+              htmlFor="to"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Recipient Address
+            </Label>
+            <Input
+              id="to"
+              type="text"
+              value={formData.to}
+              onChange={handleInputChange("to")}
+              placeholder="Enter recipient address"
+              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-gray-900 ${
+                error ? "border-red-600" : ""
+              }`}
+            />
+          </div>
+          <div>
+            <Label
+              htmlFor="remarks"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Remarks
+            </Label>
+            <Input
+              id="remarks"
+              type="text"
+              value={formData.remarks}
+              onChange={handleInputChange("remarks")}
+              placeholder="Enter remarks (optional)"
+              className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-gray-900"
+            />
+          </div>
+        </div>
+      );
+    }
+    if (submitType === "CreateReward") {
+      return (
+        <div className="py-4 space-y-4">
+          <div>
+            <Label htmlFor="name">Reward Name</Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={handleInputChange("name")}
+              placeholder="Enter reward name"
+            />
+          </div>
+          <div>
+            <Label htmlFor="amount">Amount</Label>
+            <Input
+              id="amount"
+              value={formData.amount}
+              onChange={handleInputChange("amount")}
+              placeholder="Enter reward amount"
+            />
+          </div>
+          <div>
+            <Label htmlFor="ownerAddress">Owner Address</Label>
+            <Input
+              id="ownerAddress"
+              value={formData.ownerAddress}
+              onChange={handleInputChange("ownerAddress")}
+              placeholder="Enter owner Address"
+            />
+          </div>
+          <div>
+            <Label htmlFor="category">Category</Label>
+            <select
+              id="category"
+              value={formData.category}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, category: e.target.value }))
+              }
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+            >
+              <option value="">Select category</option>
+              {Object.entries(categoryColorMap).map(
+                ([category, { bg, text }]) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ),
+              )}
+            </select>
+          </div>
+        </div>
+      );
+    }
+
     return null;
   };
 
@@ -222,7 +339,15 @@ export const DialogButton = ({
       onOpenChange={(open) => {
         setIsOpen(open);
         if (!open) {
-          setFormData({ completionUrl: "", amount: "", to: "", remarks: "" });
+          setFormData({
+            completionUrl: "",
+            amount: "",
+            to: "",
+            remarks: "",
+            name: "",
+            ownerAddress: "",
+            category: "",
+          });
           setError(null);
         }
       }}
@@ -254,10 +379,13 @@ export const DialogButton = ({
             disabled={
               isDisabled ||
               (submitType === "Complete" && !formData.completionUrl.trim()) ||
-              ((submitType === "Disperse" || submitType === "directdisburse") && !formData.amount.trim()) ||
-              (submitType === "directdisburse" && !formData.to.trim())
+              ((submitType === "Disperse" || submitType === "directdisburse") &&
+                !formData.amount.trim()) ||
+              (submitType === "directdisburse" && !formData.to.trim()) ||
+              (submitType === "CreateReward" &&
+                (!formData.amount.trim() || !formData.name.trim()))
             }
-            className="bg-green-500 text-white hover:bg-green-600 disabled:bg-gray-400 disabled:text-gray-200"
+            className="bg-blue-500 text-white hover:bg-blue-800 disabled:bg-gray-400 disabled:text-gray-200"
           >
             {isDisabled ? "Processing..." : buttonName}
           </Button>

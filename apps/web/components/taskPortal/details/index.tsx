@@ -49,7 +49,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
       taskData?.internal_id,
       taskData?.rewardManagement?.rewardManagement,
     );
-  console.log("Participant Status:", participantStatus);
+
 
   const handleApplyTask = async () => {
     if (!isConnected) {

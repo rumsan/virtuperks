@@ -8,6 +8,7 @@ import {
   ParticipantApplied as ParticipantAppliedEvent,
   ParticipantRemovedFromWhitelist as ParticipantRemovedFromWhitelistEvent,
   ParticipantWhitelisted as ParticipantWhitelistedEvent,
+  RewardManagement,
   TaskAccepted as TaskAcceptedEvent,
   TaskApproved as TaskApprovedEvent,
   TaskClosed as TaskClosedEvent,
@@ -37,7 +38,6 @@ import {
   TaskVerified,
   TokenTransferred,
 } from "../generated/schema"
-import { RewardManagement } from "../generated/templates/RewardManagement/RewardManagement"
 import { fetchTaskDetails, updateParticipantTaskStatus } from "./utils"
 
 export function handleAdditionalDisbursementToTask(
@@ -95,6 +95,7 @@ export function handleDisbursementToTask(event: DisbursementToTaskEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+
     // Link to RewardManagement
   let rewardManagement = RewardManagementCreated.load(event.address);
   if (rewardManagement != null) {
@@ -130,6 +131,8 @@ export function handleParticipantApplied(event: ParticipantAppliedEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+
+
    // Create TaskDetail entity first
   let taskDetail = fetchTaskDetails(event.params.id, event.address);
   entity.taskDetail = taskDetail.id;
@@ -146,7 +149,6 @@ export function handleParticipantApplied(event: ParticipantAppliedEvent): void {
     taskDetail ? taskDetail.id : null
   );
 
- 
 }
 
 export function handleParticipantRemovedFromWhitelist(
@@ -193,8 +195,7 @@ export function handleTaskAccepted(event: TaskAcceptedEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
-
-   // Create TaskDetail entity first
+ // Create TaskDetail entity first
   let taskDetail = fetchTaskDetails(event.params.id, event.address);
   entity.taskDetail = taskDetail.id;
 
@@ -289,8 +290,7 @@ export function handleTaskCompleted(event: TaskCompletedEvent): void {
 }
 
 export function handleTaskCreated(event: TaskCreatedEvent): void {
-
- // Create TaskCreated entity
+  // Create TaskCreated entity
   let entityId = event.transaction.hash.concatI32(event.logIndex.toI32());
   const entity = new TaskCreated(
    entityId
@@ -329,11 +329,6 @@ let mapping = new TaskIdMapping(event.params.id)
   entity.transactionHash = event.transaction.hash;
 
   entity.save();
-
-
-
-
- 
 }
 
 export function handleTaskDetailsUpdated(event: TaskDetailsUpdatedEvent): void {

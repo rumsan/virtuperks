@@ -21,6 +21,7 @@
     "urql": "^4.2.1"
   },
   "devDependencies": {
+    "@types/node": "^20.0.0",
     "@workspace/typescript-config": "workspace:*",
     "typescript": "^5.0.0"
   }

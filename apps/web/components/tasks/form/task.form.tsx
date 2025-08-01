@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetAllEntity } from "@/hooks/subgraph/entity";
+import { useCheckTotalUnallocatedTokens, useGetAllEntity } from "@/hooks/subgraph/entity";
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
 import {
@@ -26,7 +26,7 @@ import {
 } from "@workspace/ui/components/select";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { isAddress } from "viem";
 
@@ -50,8 +50,10 @@ type EntityType = {
 };
 
 export default function TaskBaseForm({
+  mode,
   saveForm,
   form,
+  defaultValues,
   isPending,
 }: TaskFormProps) {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -60,6 +62,44 @@ export default function TaskBaseForm({
   const getAllEntity = useGetAllEntity();
   const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
 
+  const {  watch, formState: { errors }, setError, clearErrors } = form;
+  
+
+  const entityAddress = watch("entityAddress");
+  const totalRewardAmount = watch("totalRewardAmount");
+
+
+
+  const { unallocatedTokens } = useCheckTotalUnallocatedTokens(entityAddress ?? "");
+
+  
+  useEffect(() => {
+    if (entityAddress && totalRewardAmount && unallocatedTokens !== undefined) {
+      const amount = BigInt(totalRewardAmount || 0);
+      if (amount > unallocatedTokens) {
+        setError("totalRewardAmount", {
+          type: "manual",
+          message: `Insufficient tokens. Available: ${unallocatedTokens.toString()}`
+        });
+      } else {
+        clearErrors("totalRewardAmount");
+      }
+    }
+  }, [entityAddress, totalRewardAmount, unallocatedTokens, setError, clearErrors]);
+
+  // Add effect to set error when entity changes
+  useEffect(() => {
+    if (entityAddress && unallocatedTokens !== undefined) {
+      if (unallocatedTokens === BigInt(0)) {
+        setError("entityAddress", {
+          type: "manual",
+          message: "Selected entity has no tokens available. Please mint tokens first."
+        });
+      } else {
+        clearErrors("entityAddress");
+      }
+    }
+  }, [entityAddress, unallocatedTokens, setError, clearErrors]);
 
   const handleAddWallet = () => {
     if (currentWallet && isAddress(currentWallet)) {
@@ -79,11 +119,11 @@ export default function TaskBaseForm({
     form.setValue("whitelistedParticipants", filtered);
   };
 
-  const handleSubmit = form.handleSubmit(saveForm);
+  const handleSubmitForm = form.handleSubmit(saveForm);
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)}>
+      <form onSubmit={form.handleSubmit(handleSubmitForm)}>
         <div className="p-6">
           <div className="flex flex-col w-full gap-4 mb-5">
             <FormField
@@ -132,7 +172,9 @@ export default function TaskBaseForm({
                   <FormLabel>Select Entity</FormLabel>
                   <FormControl>
                     <Select
-                      onValueChange={(value) => field.onChange(value)}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                      }}
                       value={field.value}
                     >
                       <SelectTrigger>
@@ -144,13 +186,16 @@ export default function TaskBaseForm({
                             key={entity.id}
                             value={entity.rewardManagement}
                           >
-                            {entity.name}
+                            {entity.name} 
+                            {unallocatedTokens !== undefined && entity.rewardManagement === entityAddress && 
+                              ` (Available: ${unallocatedTokens.toString()} tokens)`
+                            }
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />

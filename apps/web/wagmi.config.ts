@@ -4,7 +4,9 @@ import {
   AppRegistryABI,
   RewardManagementABI,
   RewardManagementFactoryABI,
-  RewardTokenABI
+  RewardTokenABI,
+  RewardRedemptionABI,
+  RewardRedemptionFactoryABI,
 } from "@workspace/contracts/abis";
 
 import { Abi } from "viem";
@@ -27,6 +29,15 @@ export default defineConfig({
      {
       name: "RewardManagementFactory",
       abi: RewardManagementFactoryABI as Abi,
+    },
+     {
+      name: "RewardRedemption",
+      abi: RewardRedemptionABI as Abi,
+    },
+     
+{
+      name: "RewardRedemptinFactory",
+      abi: RewardRedemptionFactoryABI as Abi,
     },
   ],
   plugins: [react()],

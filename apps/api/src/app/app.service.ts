@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { EVENTS } from "@workspace/sdk/constant";
+import { EVENTS } from "@workspace/sdk/constants";
 import { allCaps } from 'node_modules/@workspace/sdk/dist';
 
 @Injectable()

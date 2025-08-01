@@ -131,13 +131,68 @@ class SeedProject extends commonLib {
       )
     return {entityFactory};
   }
+
+  //---------- New:Deploy RewardRedemption contract -----------
+  public async deployRewardRedemption(
+  appId: string,
+    registry: Addressable | string,
+    token: Addressable | string,
+    name: string,
+    tokensRequired: number | bigint,
+    category: string
+  ) {
+   
+    const rewardRedemption = await this.deployContract('RewardRedemption', [
+      appId,
+      registry,
+      token,
+      name,
+      tokensRequired,
+      category,
+    ]);
+    this.contracts['rewardRedemption'] = {
+      address: rewardRedemption.contract.target as string,
+      startBlock: rewardRedemption.blockNumber,
+    };
+    console.log('RewardRedemption Contract deployed', rewardRedemption.contract.target);
+   
+    return {rewardRedemption};
+  }
+
+   // ----------- NEW: Deploy RewardRedemptionFactory contract -------------
+  public async deployRewardRedemptionFactory(
+    appRegistry: string ,
+    appId:string ,
+
+
+
+  ) {
+    const rewardRedemptionFactory = await this.deployContract('RewardRedemptionFactory', []);
+    this.contracts['rewardRedemptionFactory'] = {
+      address: rewardRedemptionFactory.contract.target as string,
+      startBlock: rewardRedemptionFactory.blockNumber,
+    };
+    console.log('RewardRedemptionFactory Contract deployed', rewardRedemptionFactory.contract.target);
+      //assign default admin role to factory address 
+     const role = "0x0000000000000000000000000000000000000000000000000000000000000000"
+     await this.assignRole(
+       appRegistry,
+       appId,
+       role,
+       rewardRedemptionFactory.contract.target as string,
+      
+       
+      )
+    return { rewardRedemptionFactory };
+  }
+ 
 }
 
 async function main() {
   const seedProject = new SeedProject();
   const RUMSAN_APP_ID = ethers.id('RUMSAN_APP');
   const name = 'rumsan'
- const {accessManagerV2} =
+ const {accessManagerV2, rewardToken} =
    await seedProject.deployCommonContracts(RUMSAN_APP_ID);
   console.log('Common contracts deployed');
   await seedProject.deployEntityContract(
@@ -148,6 +203,26 @@ async function main() {
   );
  const {entityFactory}=  await seedProject.deployEntityContractFactory(accessManagerV2.contract.target as string, RUMSAN_APP_ID);
   console.log('deploy factory contract')
+
+  // Deploy RewardRedemption contract
+  const redemptionName = 'Rumsan Redemption';
+  const tokensRequired = 100; // Example value, adjust as needed
+  const category = 'General'; // Example category, adjust as needed
+  await seedProject.deployRewardRedemption(
+    RUMSAN_APP_ID,
+    accessManagerV2.contract.target as string,
+    rewardToken.contract.target as string,
+    redemptionName,
+    tokensRequired,
+    category
+  );
+
+  // Deploy RewardRedemptionFactory contract
+
+  await seedProject.deployRewardRedemptionFactory(
+    accessManagerV2.contract.target as string,
+    RUMSAN_APP_ID
+  );
 
   await seedProject.writeToDeploymentFile('contracts', seedProject.contracts);
 }

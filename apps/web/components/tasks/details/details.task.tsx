@@ -4,6 +4,7 @@ import { formatDate } from "@/utils/formatDate";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { ExternalLink, Timer, Trophy, UserRoundCog, Users } from "lucide-react";
 
+
 type TaskDetailsProps = {
   cuid: Cuid;
 };
