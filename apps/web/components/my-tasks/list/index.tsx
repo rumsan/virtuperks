@@ -2,7 +2,7 @@
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
-import { useGetTaskListByParticipant } from "@/hooks/subgraph/participant";
+import { useGetParticipantStatistic, useGetTaskListByParticipant } from "@/hooks/subgraph/participant";
 import { useWallet } from "@/providers/walletProvider";
 import {
   ColumnFiltersState,
@@ -52,11 +52,13 @@ export default function TaskListMain({ router }: TaskListMainProps) {
   });
 
   const { address } = useWallet();
+  const { applied, completed, verified } = useGetParticipantStatistic(address as `0x${string}`);
+
   const { data: myTaskList, isLoading } = useGetTaskListByParticipant(
     address as `0x${string}`,
   );
   const taskList = myTaskList?.data?.participantTaskStatuses;
-  console.log("Task List: ", myTaskList);
+
 
   const columns = useColumns();
 
@@ -118,7 +120,7 @@ export default function TaskListMain({ router }: TaskListMainProps) {
                 Owned
               </CardTitle>
               <CardFooter className="text-blue-500 text-2xl font-bold">
-                {"10"}
+                {verified}
               </CardFooter>
             </CardHeader>
           </Card>
@@ -130,7 +132,7 @@ export default function TaskListMain({ router }: TaskListMainProps) {
                 Participating
               </CardTitle>
               <CardFooter className="text-blue-500 text-2xl font-bold">
-                {"5"}
+                {applied}
               </CardFooter>
             </CardHeader>
           </Card>
@@ -142,7 +144,7 @@ export default function TaskListMain({ router }: TaskListMainProps) {
                 Total Task Completed
               </CardTitle>
               <CardFooter className="text-blue-500 text-2xl font-bold">
-                {"5"}
+                {completed}
               </CardFooter>
             </CardHeader>
           </Card>

@@ -781,14 +781,9 @@ export const GetRewardManagement = `
 
 export const getParticipantTaskStatistics = `
   query GetParticipantTaskStatistics($participant: Bytes!) {
-    all: participantTaskStatuses(
-      where: { participant: $participant }
-    ) {
-      id
-    }
     
     applied: participantTaskStatuses(
-      where: { participant: $participant, status: "APPLIED" }
+      where: { participant: $participant, status: "PENDING" }
     ) {
       id
     }
