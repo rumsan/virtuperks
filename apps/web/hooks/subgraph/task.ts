@@ -176,19 +176,4 @@ export const useIsTaskExpired = (taskId: string, entityId: string) => {
   };
 };
 
-export const useGetParticipantStatistic = (participantAddress: string) => {
-  const { queryService } = useGraphService();
 
-  return useQuery({
-    queryKey: ["participantStatistic", participantAddress],
-    queryFn: async () => {
-      if (!queryService) {
-        throw new Error("Subgraph query service is not initialized.");
-      }
-      const taskDetail =
-        await queryService?.getParticipantTaskStatistics(participantAddress);
-      return taskDetail;
-    },
-    enabled: !!participantAddress && !!queryService,
-  });
-};
