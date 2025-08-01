@@ -777,9 +777,42 @@ export const GetRewardManagement = `
 `;
 
 
+//query to get the participant task statistic
 
-
-
+export const getParticipantTaskStatistics = `
+  query GetParticipantTaskStatistics($participant: Bytes!) {
+    all: participantTaskStatuses(
+      where: { participant: $participant }
+    ) {
+      id
+    }
+    
+    applied: participantTaskStatuses(
+      where: { participant: $participant, status: "APPLIED" }
+    ) {
+      id
+    }
+    
+    accepted: participantTaskStatuses(
+      where: { participant: $participant, status: "ACCEPTED" }
+    ) {
+      id
+    }
+    
+    completed: participantTaskStatuses(
+      where: { participant: $participant, status: "COMPLETED" }
+    ) {
+      id
+    }
+    
+    verified: participantTaskStatuses(
+      where: { participant: $participant, status: "VERIFIED" }
+    ) {
+      id
+    }
+    
+  }
+`;
 
 
 
