@@ -69,7 +69,7 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
       setApprovalHash(txHash);
       setStep("redeem");
     } catch (err) {
-      console.error("Approval failed:", err);
+      // console.error("Approval failed:", err);
     }
   };
 
@@ -81,7 +81,7 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
       setRedeemTxHash(txHash);
       setStep("completed");
     } catch (err) {
-      console.error("Redeem failed:", err);
+      // console.error("Redeem failed:", err);
     }
   };
 
