@@ -10,6 +10,7 @@ import { CircleCheck } from "lucide-react";
 
 export function useColumns<
   T extends {
+    redemptionId: string;
     status: number;
     from: string;
     blockTimestamp: string;
@@ -20,6 +21,7 @@ export function useColumns<
   updateStatus: (params: {
     userAddress: string;
     rewardAddress: string;
+    redemptionId: string;
   }) => void,
   isUpdating: boolean,
 ): ColumnDef<T>[] {
@@ -80,23 +82,26 @@ export function useColumns<
     {
       header: () => <div className="text-center w-full">Action</div>,
       id: "action",
-      cell: ({ row }) =>
-        hasDefaultAdminRole ? (
+      cell: ({ row }) => {
+        const isCompleted = row.original.status === 1;
+
+        return hasDefaultAdminRole ? (
           <div className="flex justify-center items-center w-full">
             <button
               onClick={() => {
                 updateStatus({
                   userAddress: row.original.from,
                   rewardAddress: row.original.rewardRedemption.rewardRedemption,
+                  redemptionId: row.original.redemptionId,
                 });
               }}
-              disabled={isUpdating}
+              disabled={isUpdating || isCompleted}
               className={`p-1.5 rounded-full transition ${
-                isUpdating
+                isUpdating || isCompleted
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:bg-green-100"
               }`}
-              title="Mark as Completed"
+              title={isCompleted ? "Already Completed" : "Mark as Completed"}
             >
               <CircleCheck className="text-green-800" />
             </button>
@@ -105,7 +110,8 @@ export function useColumns<
           <div className="flex justify-center items-center w-full">
             <CircleCheck className="text-green-800 opacity-20" />
           </div>
-        ),
+        );
+      },
     },
   ];
 }

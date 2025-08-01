@@ -109,7 +109,11 @@ export const useRedeemReward = () => {
       return result;
     },
     onSuccess: (result, variable) => {
-      // queryClient.invalidateQueries(["rewardRedemptionList"]);
+      setTimeout(() => {
+        queryClient.invalidateQueries({
+          queryKey: ["redeemedRewardsList"],
+        });
+      }, 5000);
     },
   });
 
@@ -148,6 +152,8 @@ export const useApproveReward = () => {
 };
 
 export const useUpdateRedemptionStatus = () => {
+  const queryClient = useQueryClient();
+
   const { writeContractAsync } =
     useWriteRewardRedemptionUpdateRedemptionStatus();
 
@@ -155,17 +161,25 @@ export const useUpdateRedemptionStatus = () => {
     mutationFn: async ({
       userAddress,
       rewardAddress,
+      redemptionId,
     }: {
       userAddress: string;
       rewardAddress: string;
+      redemptionId: string;
     }) => {
       const result = await writeContractAsync({
         address: rewardAddress as `0x${string}`,
-        args: [userAddress as `0x${string}`],
+        args: [userAddress as `0x${string}`, BigInt(redemptionId)],
       });
       return result;
     },
-    onSuccess: (result, variable) => {},
+    onSuccess: (result, variable) => {
+      setTimeout(() => {
+        queryClient.invalidateQueries({
+          queryKey: ["redeemedRewardsList"],
+        });
+      }, 5000);
+    },
   });
 
   return {
