@@ -23,6 +23,7 @@
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@typechain/ethers-v6": "^0.5.1",
     "@typechain/hardhat": "^9.1.0",
+    "@types/node": "^24.1.0",
     "@workspace/typescript-config": "workspace:*",
     "chai": "^5.2.0",
     "dotenv": "^16.4.7",
