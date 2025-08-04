@@ -1,6 +1,5 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAccount } from "wagmi";
 import {
   useReadRewardManagementGetTask,
   useReadRewardManagementIsTaskExpired,
@@ -11,12 +10,10 @@ import {
 export const useTaskAdd = () => {
   const queryClient = useQueryClient();
   const { writeContractAsync } = useWriteRewardManagementCreateTask();
-  const { address, isConnected } = useAccount();
 
   const mutation = useMutation({
     mutationFn: async (data: any) => {
       const verifiedParticipants = data.verifiedParticipants || [];
-
       const result = await writeContractAsync({
         address: data.entityAddress as `0x${string}`,
         args: [
@@ -40,9 +37,14 @@ export const useTaskAdd = () => {
           data.whitelistedParticipants,
         ],
       });
-      return result;
+      return { result, entityAddress: data.entityAddress };
     },
-    onSuccess: (result, variable) => {},
+    onSuccess: async (resultObj) => {
+      await new Promise((resolve) => setTimeout(resolve, 9000));
+      await queryClient.invalidateQueries({
+        queryKey: ["taskList", resultObj.entityAddress],
+      });
+    },
   });
   return {
     taskAdd: mutation.mutateAsync,
@@ -173,3 +175,5 @@ export const useIsTaskExpired = (taskId: string, entityId: string) => {
     statusLoading: isLoading,
   };
 };
+
+

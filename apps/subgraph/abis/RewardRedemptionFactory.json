@@ -9,12 +9,6 @@
         "type": "address"
       },
       {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "appId",
-        "type": "bytes32"
-      },
-      {
         "indexed": false,
         "internalType": "string",
         "name": "name",
@@ -25,6 +19,18 @@
         "internalType": "uint256",
         "name": "tokensRequired",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "rewardId",
+        "type": "bytes32"
       }
     ],
     "name": "RewardRedemptionCreated",
@@ -32,6 +38,7 @@
   },
   {
     "inputs": [
+      { "internalType": "bytes32", "name": "rewardId", "type": "bytes32" },
       { "internalType": "bytes32", "name": "_appId", "type": "bytes32" },
       { "internalType": "address", "name": "_registry", "type": "address" },
       { "internalType": "address", "name": "_token", "type": "address" },
@@ -40,11 +47,38 @@
         "internalType": "uint256",
         "name": "_tokensRequired",
         "type": "uint256"
-      }
+      },
+      { "internalType": "string", "name": "_category", "type": "string" },
+      { "internalType": "address", "name": "_owner", "type": "address" }
     ],
     "name": "createRewardRedemption",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "rewardId", "type": "bytes32" }
+    ],
+    "name": "getRewardOwners",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "name": "rewards",
+    "outputs": [
+      { "internalType": "string", "name": "name", "type": "string" },
+      {
+        "internalType": "uint256",
+        "name": "tokensRequired",
+        "type": "uint256"
+      },
+      { "internalType": "string", "name": "category", "type": "string" },
+      { "internalType": "address", "name": "owner", "type": "address" }
+    ],
+    "stateMutability": "view",
     "type": "function"
   }
 ]

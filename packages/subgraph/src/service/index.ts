@@ -5,7 +5,9 @@ import {
   GetCombineParticipantsByTask,
   getOpenTasks,
   getParticipantTasks,
+  getParticipantTaskStatistics,
   GetRedeemedReward,
+  GetRedeemedRewardsByParticipant,
   getRewardById,
   GetRewardManagement,
   GetRewardManagementCreatedByAddress,
@@ -167,6 +169,21 @@ export class SubgraphService {
     }
   }
 
+  // service function to get participant task statistics
+
+  async getParticipantTaskStatistics(participantAddress: string) {
+    try {
+      const { data, error } = await this.subgraphQuery.query(
+        getParticipantTaskStatistics,
+        { participant: participantAddress }
+      );
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching participant task statistics:', error);
+      return { data: null, error };
+    }
+  }
+
 
   
   async getRewardManagementTokenTransfers(rewardManagementAddress: string) {
@@ -213,9 +230,9 @@ return { data, error };
   }
 
 
-  async getRewardById(id: string) {
+  async getRewardById(rewardRedemption: string) {
     try {
-      const { data, error } = await this.subgraphQuery.query(getRewardById, { id });
+      const { data, error } = await this.subgraphQuery.query(getRewardById, {rewardRedemption });
       return { data, error };
     } catch (error) {
       console.error('Error fetching reward by ID:', error);
@@ -224,16 +241,30 @@ return { data, error };
   }
 
     // service to get redeemed rewards
-  async getRedeemedReward (){
+  async getRedeemedReward (rewardRedemption: string) {
 
 try {
-  const { data, error } = await this.subgraphQuery.query(GetRedeemedReward, {});
+  const { data, error } = await this.subgraphQuery.query(GetRedeemedReward, {rewardRedemption});
 return { data, error };
 }catch(error) {
     console.error('Error fetching rewards:', error);
     return { data: null, error };
 }
   } 
+
+  //service to get redeemed rewards by participant address
+  async getRedeemedRewardsByParticipant(participantAddress: string) {
+    try {
+      const { data, error } = await this.subgraphQuery.query(
+        GetRedeemedRewardsByParticipant,
+        { participant: participantAddress }
+      );
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching redeemed rewards by participant:', error);
+      return { data: null, error };
+    }
+  }
 }
 
 

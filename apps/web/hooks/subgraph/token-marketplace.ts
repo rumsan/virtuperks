@@ -1,8 +1,10 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  useReadRewardRedemptinFactoryGetRewardOwners,
   useWriteRewardRedemptinFactoryCreateRewardRedemption,
   useWriteRewardRedemptionRedeem,
+  useWriteRewardRedemptionUpdateRedemptionStatus,
   useWriteRewardTokenApprove,
 } from "../wagmi/contracts";
 
@@ -10,20 +12,40 @@ export const useCreateReward = () => {
   const queryClient = useQueryClient();
   const { writeContractAsync } =
     useWriteRewardRedemptinFactoryCreateRewardRedemption();
+
   const appId = (process.env.NEXT_PUBLIC_APP_ID as `0x${string}`) || "0x";
   const registry = process.env.NEXT_PUBLIC_APPREGISTRY as `0x${string}`;
   const token = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
 
   const mutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: {
+      rewardId: string;
+      name: string;
+      amount: number;
+      category: string;
+      ownerAddress: string;
+    }) => {
       const result = await writeContractAsync({
         address: process.env.NEXT_PUBLIC_REDEMPTION_FACTORY as `0x${string}`,
-        args: [appId, registry, token, data.name, BigInt(data.amount)],
+        args: [
+          data.rewardId as `0x${string}`,
+          appId,
+          registry,
+          token,
+          data.name,
+          BigInt(data.amount),
+          data.category as `0x${string}`,
+          data.ownerAddress as `0x${string}`,
+        ],
       });
       return result;
     },
-    onSuccess: (result, variable) => {
-      // queryClient.invalidateQueries(["rewardRedemptionList"]);
+
+    onSuccess: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 9000));
+      await queryClient.invalidateQueries({
+        queryKey: ["rewardsList"],
+      });
     },
   });
 
@@ -62,13 +84,13 @@ export const useGetRewardById = (id: string) => {
   });
 };
 
-export const useGetRedeemedReward = () => {
+export const useGetRedeemedReward = (rewardRedemption: string) => {
   const { queryService } = useGraphService();
 
   return useQuery({
     queryKey: ["redeemedRewardsList"],
     queryFn: async () => {
-      const rewards = await queryService?.getRedeemedReward();
+      const rewards = await queryService?.getRedeemedReward(rewardRedemption);
       return rewards;
     },
   });
@@ -79,13 +101,7 @@ export const useRedeemReward = () => {
   const { writeContractAsync } = useWriteRewardRedemptionRedeem();
 
   const mutation = useMutation({
-    mutationFn: async ({
-      rewardAddress,
-      amount,
-    }: {
-      rewardAddress: string;
-      amount: number;
-    }) => {
+    mutationFn: async ({ rewardAddress }: { rewardAddress: string }) => {
       const result = await writeContractAsync({
         address: rewardAddress as `0x${string}`,
         args: [],
@@ -93,7 +109,11 @@ export const useRedeemReward = () => {
       return result;
     },
     onSuccess: (result, variable) => {
-      // queryClient.invalidateQueries(["rewardRedemptionList"]);
+      setTimeout(() => {
+        queryClient.invalidateQueries({
+          queryKey: ["redeemedRewardsList"],
+        });
+      }, 3000);
     },
   });
 
@@ -128,5 +148,75 @@ export const useApproveReward = () => {
     ApproveReward: mutation.mutateAsync,
     ApprovePending: mutation.isPending,
     ApproveSuccess: mutation.isSuccess,
+  };
+};
+
+export const useUpdateRedemptionStatus = () => {
+  const queryClient = useQueryClient();
+
+  const { writeContractAsync } =
+    useWriteRewardRedemptionUpdateRedemptionStatus();
+
+  const mutation = useMutation({
+    mutationFn: async ({
+      userAddress,
+      rewardAddress,
+      redemptionId,
+    }: {
+      userAddress: string;
+      rewardAddress: string;
+      redemptionId: string;
+    }) => {
+      const result = await writeContractAsync({
+        address: rewardAddress as `0x${string}`,
+        args: [userAddress as `0x${string}`, BigInt(redemptionId)],
+      });
+      return result;
+    },
+    onSuccess: (result, variable) => {
+      setTimeout(() => {
+        queryClient.invalidateQueries({
+          queryKey: ["redeemedRewardsList"],
+        });
+      }, 3000);
+    },
+  });
+
+  return {
+    UpdateRedeemStatus: mutation.mutateAsync,
+    UpdateRedeemPending: mutation.isPending,
+    UpdateRedeemSuccess: mutation.isSuccess,
+  };
+};
+
+export const useGetRedeemedRewardByParticiant = (
+  participantAddress: string,
+) => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["redeemedRewardsByParticipant", participantAddress],
+    queryFn: async () => {
+      const rewards =
+        await queryService?.getRedeemedRewardsByParticipant(participantAddress);
+      return rewards;
+    },
+  });
+};
+
+export const useGetRewardOwner = (rewardId: string) => {
+  const redemptionFactory = process.env
+    .NEXT_PUBLIC_REDEMPTION_FACTORY as `0x${string}`;
+
+  const { data, isError, isLoading } =
+    useReadRewardRedemptinFactoryGetRewardOwners({
+      address: redemptionFactory,
+      args: [rewardId as `0x${string}`],
+    });
+
+  return {
+    getRewardOwner: data,
+    isError,
+    isLoading,
   };
 };

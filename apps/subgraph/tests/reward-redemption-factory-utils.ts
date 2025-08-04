@@ -1,12 +1,13 @@
 import { newMockEvent } from "matchstick-as"
-import { ethereum, Address, Bytes, BigInt } from "@graphprotocol/graph-ts"
+import { ethereum, Address, BigInt, Bytes } from "@graphprotocol/graph-ts"
 import { RewardRedemptionCreated } from "../generated/RewardRedemptionFactory/RewardRedemptionFactory"
 
 export function createRewardRedemptionCreatedEvent(
   rewardRedemption: Address,
-  appId: Bytes,
   name: string,
-  tokensRequired: BigInt
+  tokensRequired: BigInt,
+  category: string,
+  rewardId: Bytes
 ): RewardRedemptionCreated {
   let rewardRedemptionCreatedEvent =
     changetype<RewardRedemptionCreated>(newMockEvent())
@@ -20,9 +21,6 @@ export function createRewardRedemptionCreatedEvent(
     )
   )
   rewardRedemptionCreatedEvent.parameters.push(
-    new ethereum.EventParam("appId", ethereum.Value.fromFixedBytes(appId))
-  )
-  rewardRedemptionCreatedEvent.parameters.push(
     new ethereum.EventParam("name", ethereum.Value.fromString(name))
   )
   rewardRedemptionCreatedEvent.parameters.push(
@@ -30,6 +28,12 @@ export function createRewardRedemptionCreatedEvent(
       "tokensRequired",
       ethereum.Value.fromUnsignedBigInt(tokensRequired)
     )
+  )
+  rewardRedemptionCreatedEvent.parameters.push(
+    new ethereum.EventParam("category", ethereum.Value.fromString(category))
+  )
+  rewardRedemptionCreatedEvent.parameters.push(
+    new ethereum.EventParam("rewardId", ethereum.Value.fromFixedBytes(rewardId))
   )
 
   return rewardRedemptionCreatedEvent

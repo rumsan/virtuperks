@@ -144,20 +144,28 @@ export async function deployRewardManagementFixture(): Promise<RewardManagementF
     // Deploy RewardRedemptionFactory
   const RewardRedemptionFactory = await ethers.getContractFactory('RewardRedemptionFactory');
   const rewardRedemptionFactory = await RewardRedemptionFactory.deploy();
-    await rewardRedemptionFactory.waitForDeployment();
+  await rewardRedemptionFactory.waitForDeployment();
+  
+  //grant DEFAULT_ADMIN_ROLE to factory contract so it can assign roles
+  await appRegistry.connect(admin1).grantRoleAdmin(APP_ID, DEFAULT_ADMIN_ROLE, rewardRedemptionFactory.target);
     
 
 
      // Deploy RewardRedemption through the factory
   const redemptionName = "Test Redemption";
+   const rewardId = ethers.id('mobile-recharge');
   const tokensRequired = 10;
+  const category = "Mobile Recharge";
 
   const redemptionTx = await rewardRedemptionFactory.connect(admin1).createRewardRedemption(
+    rewardId,
     APP_ID,
     appRegistry.target,
     rewardToken.target,
     redemptionName,
-    tokensRequired
+    tokensRequired,
+    category,
+    user1.address // Owner of the redemption
   );
   const redemptionReceipt = await redemptionTx.wait();
 
@@ -172,6 +180,10 @@ export async function deployRewardManagementFixture(): Promise<RewardManagementF
   // Get contract instance
   const RewardRedemption = await ethers.getContractFactory('RewardRedemption');
   const rewardRedemption = RewardRedemption.attach(rewardRedemptionAddress);
+
+  //call getEntityOwners to verify owners
+  const retrievedEntityOwners = await rewardRedemptionFactory.connect(admin1).getRewardOwners(rewardId);
+  console.log('Retrieved reward owners:', retrievedEntityOwners);
 
 
 

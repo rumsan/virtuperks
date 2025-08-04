@@ -18,21 +18,21 @@ contract RewardRedemption is IRewardRedemption, Multicall, ReentrancyGuard {
 
     bytes32 public appId;
     string public name;
+    string public category;
     uint256 public tokensRequired;
-    bytes32 public constant DEFAULT_ADMIN_ROLE = 0x00;
-    mapping(bytes32 => mapping(address => Redemption)) public redemptions;
+    bytes32 public immutable OWNER;
 
-    modifier onlyAdmin() {
-        require(app.hasRole(appId, DEFAULT_ADMIN_ROLE, msg.sender), "Not authorized");
-        _;
-    }
+    // Track redemption count per user
+    mapping(address => uint256) public userRedemptionCount;
+    mapping(bytes32 => mapping(address => mapping(uint256 => Redemption))) public redemptions;
 
     constructor(
         bytes32 _appId,
         address _registry,
         address _token,
         string memory _name,
-        uint256 _tokensRequired
+        uint256 _tokensRequired,
+        string memory _category
     ) {
         require(_token != address(0), "Invalid token address");
         require(_registry != address(0), "Invalid registry address");
@@ -43,9 +43,16 @@ contract RewardRedemption is IRewardRedemption, Multicall, ReentrancyGuard {
         token = IERC20(_token);
         name = _name;
         tokensRequired = _tokensRequired;
+        category = _category;
+        OWNER = keccak256(abi.encodePacked(address(this)));
     }
 
-    //Accept token transfers for funding
+    modifier onlyOwner() {
+        require(app.hasRole(appId, OWNER, msg.sender), "Only owner can call this function");
+        _;
+    }
+
+    // Accept token transfers for funding
     function redeem() external nonReentrant {
         require(tokensRequired > 0, "Invalid token amount");
 
@@ -59,32 +66,42 @@ contract RewardRedemption is IRewardRedemption, Multicall, ReentrancyGuard {
         require(token.balanceOf(msg.sender) >= tokensRequired, "Insufficient token balance");
 
         // Transfer tokens
-        bool success = token.transferFrom(msg.sender, address(this), tokensRequired);
-        require(success, "Token transfer failed");
+        token.safeTransferFrom(msg.sender, address(this), tokensRequired);
 
-        redemptions[appId][msg.sender] = Redemption({
+        // Get next redemption ID for this user
+        uint256 redemptionId = userRedemptionCount[msg.sender];
+        userRedemptionCount[msg.sender]++;
+
+        redemptions[appId][msg.sender][redemptionId] = Redemption({
             status: RedemptionStatus.PENDING,
             from: msg.sender,
             amount: tokensRequired,
             timestamp: block.timestamp
         });
 
-        emit RewardRedeemed(msg.sender, tokensRequired, RedemptionStatus.PENDING);
+        emit RewardRedeem(msg.sender, tokensRequired, RedemptionStatus.PENDING, redemptionId);
     }
 
     // Admin updates status to REDEEMED or FAILED after off-chain fulfillment
-    function updateRedemptionStatus(address user) external onlyAdmin {
-        Redemption storage redemption = redemptions[appId][user];
+    function updateRedemptionStatus(address user, uint256 redemptionId) external onlyOwner {
+        Redemption storage redemption = redemptions[appId][user][redemptionId];
         require(redemption.from != address(0), "No redemption found");
         require(redemption.status == RedemptionStatus.PENDING, "Redemption not pending");
         redemption.status = RedemptionStatus.REDEEMED; // or RedemptionStatus.FAILED based on logic
 
-        // Re-emit event with new status
-        emit RewardRedeemed(user, redemption.amount, RedemptionStatus.REDEEMED);
+        emit RewardReleased(user, redemption.amount, RedemptionStatus.REDEEMED, redemptionId);
     }
 
-    function getRedemptionStatus(address user) external view returns (RedemptionStatus) {
-        return redemptions[appId][user].status;
+    function getRedemptionStatus(
+        address user,
+        uint256 redemptionId
+    ) external view returns (RedemptionStatus) {
+        return redemptions[appId][user][redemptionId].status;
+    }
+
+    // Get total number of redemptions for a user
+    function getUserRedemptionCount(address user) external view returns (uint256) {
+        return userRedemptionCount[user];
     }
 
     function getContractBalance() external view returns (uint256) {
