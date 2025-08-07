@@ -6,6 +6,7 @@ import {
   useWriteRewardRedemptionRedeem,
   useWriteRewardRedemptionUpdateRedemptionStatus,
   useWriteRewardTokenApprove,
+  useReadRewardRedemptionOwner,
 } from "../wagmi/contracts";
 
 export const useCreateReward = () => {
@@ -218,5 +219,20 @@ export const useGetRewardOwner = (rewardId: string) => {
     getRewardOwner: data,
     isError,
     isLoading,
+  };
+};
+
+
+
+export const  usegetRewardOwner =(rewardId: string) =>{
+  const { data, isError, isLoading } =  useReadRewardRedemptionOwner({
+    address: rewardId as `0x${string}`,
+    args: [],
+  });
+
+  return {
+    rewardRole: data,
+    isError,
+    roleLoading: isLoading,
   };
 };
