@@ -185,7 +185,7 @@ export const useUpdateRedemptionStatus = () => {
 
   return {
     UpdateRedeemStatus: mutation.mutateAsync,
-    UpdateRedeemPending: mutation.isPending,
+    UpdateRedeemPending: mutation.isPending as any,
     UpdateRedeemSuccess: mutation.isSuccess,
   };
 };
@@ -224,7 +224,7 @@ export const useGetRewardOwner = (rewardId: string) => {
 
 
 
-export const  usegetRewardOwner =(rewardId: string) =>{
+export const  useGetRewardRole =(rewardId: string) =>{
   const { data, isError, isLoading } =  useReadRewardRedemptionOwner({
     address: rewardId as `0x${string}`,
     args: [],
