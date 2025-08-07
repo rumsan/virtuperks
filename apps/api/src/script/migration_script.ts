@@ -1,12 +1,17 @@
+import { Prisma, PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
+
 dotenv.config();
 
-import { PrismaClient as FinanceClient } from '../../prisma/finance_app/client';
-import { PrismaClient as VirtualClient, Prisma as VirtualPrisma } from '../../prisma/virtual-perks/client';
+//PrismaClient for Virtual Perks (target)
+const prismaVirtual = new PrismaClient({
+  datasources: { db: { url: process.env.VIRTUAL_PERKS_DATABASE_URL } }, 
+});
 
-// Instantiate Prisma clients
-const prismaRaman = new FinanceClient();
-const prismaVirtual = new VirtualClient();
+//PrismaClient for Finance App (source)
+const prismaRaman = new PrismaClient({
+  datasources: { db: { url: process.env.RAMAN_DATABASE_URL } }, 
+});
 
 async function testFinanceConnection() {
   try {
@@ -19,11 +24,11 @@ async function testFinanceConnection() {
 }
 
 async function migrateUsers() {
-  console.log("🚀 Starting user migration...");
+  console.log("Starting user migration...");
 
   // Fetch users with their details
   const users = await prismaRaman.user.findMany({ include: { details: true } });
-  console.log(`📥 Fetched ${users.length} users from source DB.`);
+  console.log(`Fetched ${users.length} users from source DB.`);
 
   // First pass: Insert basic user records (without details)
   for (const user of users) {
@@ -53,7 +58,7 @@ async function migrateUsers() {
 
     try {
       await prismaVirtual.user.update({
-        where: { id: user.id },
+        where: { cuid: user.cuid },    
         data: {
           details: {
             create: {
@@ -63,12 +68,8 @@ async function migrateUsers() {
               userType: details.userType,
               managerId: details.managerId,
               isApproved: details.isApproved,
-              extras: details.extras ?? VirtualPrisma.JsonNull,
-              timeoffAllowance: details.timeoffAllowance ?? VirtualPrisma.JsonNull,
-              createdAt: details.createdAt,
-              updatedAt: details.updatedAt,
-              createdBy: details.createdBy,
-              updatedBy: details.updatedBy,
+              extras: details.extras ?? Prisma.JsonNull,
+              timeoffAllowance: details.timeoffAllowance ?? Prisma.JsonNull,
             },
           },
         },

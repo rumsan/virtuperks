@@ -387,6 +387,13 @@ importers:
         version: 8.38.0(eslint@9.32.0(jiti@2.5.1))(typescript@5.9.2)
 
   packages/sdk:
+    dependencies:
+      '@rumsan/sdk':
+        specifier: ^0.2.10
+        version: 0.2.13(axios@1.11.0)
+      axios:
+        specifier: ^1.7.9
+        version: 1.11.0
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
@@ -2768,6 +2775,11 @@ packages:
 
   '@rumsan/sdk@0.1.107':
     resolution: {integrity: sha512-X8Qj1u5tTruwSEC9tXkvJ3/LDofdpFliq6t0WCnVtCcojtIm/nxwUlwB/To4vCcvnvTcVHGYu63oQRLL8y/Sdw==, tarball: https://npm.pkg.github.com/download/@rumsan/sdk/0.1.107/ecc06e617b87236aec6b1c2000f9e4aa4baa94b6}
+
+  '@rumsan/sdk@0.2.13':
+    resolution: {integrity: sha512-vHaIUxOLLTAD3ZA+BCs/HUvk0mUdlBya1EZPUl6WdYD7RWZRKYUtd1Xltu6t4scboYEzG8mEEZhl74asrlC/0Q==, tarball: https://npm.pkg.github.com/download/@rumsan/sdk/0.2.13/e0c8d1c5ab3a05932d7b138122220a230f8215f5}
+    peerDependencies:
+      axios: ^1.9.0
 
   '@safe-global/safe-apps-provider@0.18.6':
     resolution: {integrity: sha512-4LhMmjPWlIO8TTDC2AwLk44XKXaK6hfBTWyljDm0HQ6TWlOEijVWNrt2s3OCVMSxlXAcEzYfqyu1daHZooTC2Q==}
@@ -12528,6 +12540,10 @@ snapshots:
 
   '@rumsan/sdk@0.1.107': {}
 
+  '@rumsan/sdk@0.2.13(axios@1.11.0)':
+    dependencies:
+      axios: 1.11.0
+
   '@safe-global/safe-apps-provider@0.18.6(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)':
     dependencies:
       '@safe-global/safe-apps-sdk': 9.1.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
@@ -12571,7 +12587,7 @@ snapshots:
   '@scure/bip32@1.6.2':
     dependencies:
       '@noble/curves': 1.8.1
-      '@noble/hashes': 1.7.1
+      '@noble/hashes': 1.7.2
       '@scure/base': 1.2.6
 
   '@scure/bip32@1.7.0':
@@ -12592,7 +12608,7 @@ snapshots:
 
   '@scure/bip39@1.5.4':
     dependencies:
-      '@noble/hashes': 1.7.1
+      '@noble/hashes': 1.7.2
       '@scure/base': 1.2.6
 
   '@scure/bip39@1.6.0':
@@ -14297,7 +14313,7 @@ snapshots:
 
   axios@1.11.0:
     dependencies:
-      follow-redirects: 1.15.11(debug@4.4.0)
+      follow-redirects: 1.15.11(debug@4.4.1)
       form-data: 4.0.4
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
@@ -18278,7 +18294,7 @@ snapshots:
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
       '@noble/curves': 1.8.1
-      '@noble/hashes': 1.7.1
+      '@noble/hashes': 1.8.0
       '@scure/bip32': 1.6.2
       '@scure/bip39': 1.5.4
       abitype: 1.0.8(typescript@5.9.2)(zod@3.25.76)

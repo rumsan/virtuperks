@@ -1,6 +1,7 @@
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import { ListTable } from "@/components/common/list/list.table";
 // import { useGetAllParticipantsByRole } from "@/hooks/subgraph/participant";
+import { useUserByWallet } from "@/hooks/subgraph/participant";
 import { PATHS } from "@/routes/paths";
 import {
   ColumnFiltersState,
@@ -25,6 +26,11 @@ type ParticipantListProps = {
 };
 
 const ParticipantList = ({ router }: ParticipantListProps) => {
+  const {
+    data: participant,
+    isLoading,
+    error,
+  } = useUserByWallet("0xABC123...");
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -47,7 +53,7 @@ const ParticipantList = ({ router }: ParticipantListProps) => {
 
   const table = useReactTable({
     //data: AllParticipants || [],
-    data:  [],
+    data: [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

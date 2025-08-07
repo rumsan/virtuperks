@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-users.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -26,7 +27,12 @@ findByWallet(@Param('wallet') wallet: string) {
 @Post()
 create(@Body() dto: CreateUserDto) {
   return this.usersService.create(dto);
-}
+  }
+  
+  @Patch(':cuid')
+  update(@Param('cuid') cuid: string, @Body() dto: UpdateUserDto) {
+    return this.usersService.update(cuid, dto);
+  }
 
   
 }

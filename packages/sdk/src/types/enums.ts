@@ -14,7 +14,7 @@ export const UserType = {
 };
 
 
-type GenderType = 'MALE' | 'FEMALE' | 'OTHER' | 'UNKNOWN';
+export type GenderType = 'MALE' | 'FEMALE' | 'OTHER' | 'UNKNOWN';
 export const Gender = {
     MALE: 'MALE' as GenderType,
     FEMALE: 'FEMALE' as GenderType,
