@@ -91,7 +91,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
         toast({
           title: "Access Denied",
           description:
-            "You don't have permission to create tasks for this entity",
+            "Access Denied. Only the owner can create tasks.",
           variant: "destructive",
         });
         return;
