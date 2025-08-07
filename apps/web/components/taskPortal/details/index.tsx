@@ -22,6 +22,7 @@ import { useState } from "react";
 import { useAccount } from "wagmi";
 import TaskPortalParticipant from "./details.participant";
 import TaskPortalDetails from "./details.task";
+import { useGetWhiteListedParticipantByTask } from "@/hooks/subgraph/participant";
 
 type TaskPortalMainProps = {
   cuid: Cuid;
@@ -36,9 +37,13 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const { isConnected, address } = useAccount();
 
   const getTaskDetail = useGetTaskById(cuid.id);
+  
 
   const { toast } = useToast();
   const taskData = getTaskDetail?.data?.data?.taskCreated;
+  const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(taskData?.internal_id, false);
+
+  const whiteListedParticipants = getWhiteListedParticipants?.data?.data?.participantWhitelisteds || [];
 
   const { participateTask, participatePending, participateSuccess } =
     useParticipateTaskMutation();

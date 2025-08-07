@@ -22,6 +22,7 @@ import {
 import { User } from "lucide-react";
 import { useState } from "react";
 import { useHistoryColumns } from "./history.column";
+import { useGetWhiteListedParticipantByTask } from "@/hooks/subgraph/participant";
 type TaskPortalParticipantProps = { taskId: any };
 
 const TaskPortalParticipant = ({ taskId }: TaskPortalParticipantProps) => {
@@ -35,11 +36,15 @@ const TaskPortalParticipant = ({ taskId }: TaskPortalParticipantProps) => {
     pageIndex: 0,
     pageSize: 10,
   });
-    const getTaskDetail = useGetTaskDetailById(taskId.id);
+  const getTaskDetail = useGetTaskDetailById(taskId.id);
      
-  const taskData = getTaskDetail?.data?.data?.taskCreated
-
-
+  const taskData = getTaskDetail?.data?.data?.taskCreated;
+  const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(
+    taskData?.internal_id,
+  );
+  
+    const whiteListedParticipants = getWhiteListedParticipants?.data?.data?.participantWhitelisteds || [];
+console.log("whiteListedParticipants", whiteListedParticipants);
 
 
   const columns = useHistoryColumns();
@@ -111,23 +116,23 @@ const TaskPortalParticipant = ({ taskId }: TaskPortalParticipantProps) => {
         </CardTitle>
 
         <div className="flex items-center w-full mt-5 mb-5 gap-2 flex-wrap">
-          {taskData?.taskDetail?.allowedWallets?.map((wallet: string) => (
+          {whiteListedParticipants?.map((data: any) => (
             <div
-              key={wallet}
+              key={data.id}
               className="relative"
-              onMouseEnter={() => setHoveredWallet(wallet)}
+              onMouseEnter={() => setHoveredWallet(data.participant)}
               onMouseLeave={() => setHoveredWallet(null)}
             >
               <div className="flex items-center justify-center h-8 w-8 rounded-full bg-[#F1F5F9] cursor-pointer">
                 <User color="#64748B" size={20} />
               </div>
-              {hoveredWallet === wallet && (
+              {hoveredWallet === data.participant && (
                 <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-[#297AD6] text-[#F8FAFC] text-xs px-2 py-1 rounded-md shadow-md whitespace-nowrap">
-                  {wallet}
+                  {data.participant}
                 </div>
               )}
               <span className="text-xs text-gray-500 text-center mt-1">
-                {shortAddress(wallet)}
+                {shortAddress(data.participant)}
               </span>
             </div>
           ))}
