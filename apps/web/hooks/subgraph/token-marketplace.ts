@@ -2,11 +2,11 @@ import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   useReadRewardRedemptinFactoryGetRewardOwners,
+  useReadRewardRedemptionOwner,
   useWriteRewardRedemptinFactoryCreateRewardRedemption,
   useWriteRewardRedemptionRedeem,
   useWriteRewardRedemptionUpdateRedemptionStatus,
   useWriteRewardTokenApprove,
-  useReadRewardRedemptionOwner,
 } from "../wagmi/contracts";
 
 export const useCreateReward = () => {
@@ -109,12 +109,12 @@ export const useRedeemReward = () => {
       });
       return result;
     },
-    onSuccess: (result, variable) => {
-      setTimeout(() => {
-        queryClient.invalidateQueries({
-          queryKey: ["redeemedRewardsList"],
-        });
-      }, 3000);
+    onSuccess: async (result, variable) => {
+     await new Promise((resolve) => setTimeout(resolve, 9000));
+     await queryClient.invalidateQueries({
+       queryKey: ["redeemedRewardsList"],
+     });
+     
     },
   });
 
@@ -174,12 +174,12 @@ export const useUpdateRedemptionStatus = () => {
       });
       return result;
     },
-    onSuccess: (result, variable) => {
-      setTimeout(() => {
-        queryClient.invalidateQueries({
-          queryKey: ["redeemedRewardsList"],
-        });
-      }, 3000);
+   
+    onSuccess: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 9000));
+      await queryClient.invalidateQueries({
+        queryKey: ["redeemedRewardsList"],
+      });
     },
   });
 
@@ -222,10 +222,8 @@ export const useGetRewardOwner = (rewardId: string) => {
   };
 };
 
-
-
-export const  useGetRewardRole =(rewardId: string) =>{
-  const { data, isError, isLoading } =  useReadRewardRedemptionOwner({
+export const useGetRewardRole = (rewardId: string) => {
+  const { data, isError, isLoading } = useReadRewardRedemptionOwner({
     address: rewardId as `0x${string}`,
     args: [],
   });
