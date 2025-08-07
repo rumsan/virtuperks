@@ -2,7 +2,7 @@ import { AppRegistryABI, RewardManagementABI } from "@workspace/contracts/abis";
 import { useAccount, useReadContract } from "wagmi";
 
 interface HasRoleProps {
-  role: `0x${string}`
+  role: string;
 }
 
 export default function hasRole({ role }: HasRoleProps) {
