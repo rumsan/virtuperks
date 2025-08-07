@@ -1,6 +1,6 @@
 "use client";
 
-import { useCheckTotalUnallocatedTokens } from "@/hooks/subgraph/entity";
+import { usegetEntityOwner, useGetOwner } from "@/hooks/subgraph/entity";
 import { useTaskAdd } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,10 +12,15 @@ import { ArrowLeft } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { isAddress, keccak256 } from "viem";
-import { useWriteContract } from "wagmi";
+import { keccak256 } from "viem";
 import { TaskFormData, taskSchema } from "./schema";
 import TaskBaseForm from "./task.form";
+import hasRole from "@/utils/role";
+import { useRoleCheck } from "@/hooks/subgraph/role-check";
+
+
+
+
 
 const defaultValues = {
   name: "",
@@ -45,27 +50,64 @@ export default function TaskAdd({ router }: TaskAddProps) {
   });
   const { toast } = useToast();
   const [entityId, setEntityId] = useState("");
-  const [showTokenDialog, setShowTokenDialog] = useState(false);
-  const [isCheckingBalance, setIsCheckingBalance] = useState(false);
-
-  const { writeContractAsync, isPending, isSuccess, isError, error } =
-    useWriteContract();
 
 
 
-  const { taskAdd, taskPending, taskSuccess } = useTaskAdd();
+  const { getEntityOwnerRole, roleLoading, isError } =
+    usegetEntityOwner(entityId);
+
+  // Check if the connected wallet has the owner role
+  const {
+    roleStatus: hasOwnerRole,
+    isError: roleCheckError,
+    statusLoading: roleCheckLoading,
+  } = useRoleCheck(getEntityOwnerRole);
+
+  const { taskAdd, taskPending } = useTaskAdd();
+  const entityAddress = form.watch("entityAddress");
+  
+  useEffect(() => {
+    if (entityAddress) {
+      setEntityId(entityAddress);
+    }
+  }, [entityAddress]);
+
 
   const createTask = async (data: any) => {
     try {
-      // Create task logic without token balance check
+  
+
+      // Check if role data is still loading
+      if (roleLoading || roleCheckLoading) {
+        toast({
+          title: "Checking Ownership",
+          description: "Verifying ownership role, please wait...",
+          variant: "default",
+        });
+        return;
+      }
+
+      if (!hasOwnerRole) {
+        toast({
+          title: "Access Denied",
+          description:
+            "You don't have permission to create tasks for this entity",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Rest of your existing task creation code
       const cuid = createId();
       const taskId = keccak256(toUtf8Bytes(cuid));
 
       const { detailsUrl, rewardToken, owner, isOpen, name } = data;
       const expiryDate = BigInt(
-        Math.floor(new Date(data.expiryDate).getTime() / 1000)
+        Math.floor(new Date(data.expiryDate).getTime() / 1000),
       );
-      const whitelistedParticipants = Array.isArray(data.whitelistedParticipants)
+      const whitelistedParticipants = Array.isArray(
+        data.whitelistedParticipants,
+      )
         ? data.whitelistedParticipants
         : [data.whitelistedParticipants];
       const totalRewardAmount = BigInt(data.totalRewardAmount);
@@ -90,19 +132,18 @@ export default function TaskAdd({ router }: TaskAddProps) {
         verfiedParticipants: [], // Default to empty array
       });
 
-      // Success Toast
       toast({
         title: "Task Created Successfully!",
         variant: "success",
       });
 
-      //navigate to
       router.push(PATHS.TASKS.HOME);
     } catch (err) {
       console.error("Failed to create task:", err);
-      // Error Toast
       toast({
         title: "Task Creation Failed",
+        description:
+          err instanceof Error ? err.message : "Unknown error occurred",
         variant: "destructive",
       });
     }

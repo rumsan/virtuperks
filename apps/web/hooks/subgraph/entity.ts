@@ -9,6 +9,7 @@ import {
   useReadRewardManagementTotalAllocatedTokens,
   useWriteRewardManagementFactoryCreateRewardManagement,
   useWriteRewardTokenMint,
+  useReadRewardManagementOwner
 } from "../wagmi/contracts";
 
 export const useGetAllEntity = () => {
@@ -170,3 +171,40 @@ export const useGetEntityOwners = (entityId: string) => {
     statusLoading: isLoading,
   };
 };
+
+
+
+export const useGetOwner = (entityId:string) => {
+  
+
+const { data, isError, isLoading } =
+  useReadRewardManagementOwner({
+    address: entityId as `0x${string}`,
+    args: [],
+  });
+
+return {
+  getEntityOwnerRole: data,
+  isError,
+  statusLoading: isLoading,
+};
+
+
+
+
+}
+
+export const  usegetEntityOwner =(entityId: string) =>{
+  const { data, isError, isLoading } =  useReadRewardManagementOwner({
+    address: entityId as `0x${string}`,
+    args: [],
+  });
+
+  return {
+    getEntityOwnerRole: data,
+    isError,
+    roleLoading: isLoading,
+  };
+};
+
+
