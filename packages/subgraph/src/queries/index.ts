@@ -782,26 +782,26 @@ export const GetRewardManagement = `
 export const getParticipantTaskStatistics = `
   query GetParticipantTaskStatistics($participant: Bytes!) {
     
-    applied: participantTaskStatuses(
-      where: { participant: $participant, status: "PENDING" }
+    applied: participantApplieds(
+      where: { participant: $participant}
     ) {
       id
     }
     
-    accepted: participantTaskStatuses(
-      where: { participant: $participant, status: "ACCEPTED" }
+    accepted:taskAccepteds (
+      where: { participant: $participant }
     ) {
       id
     }
     
-    completed: participantTaskStatuses(
-      where: { participant: $participant, status: "COMPLETED" }
+    completed: taskCompleteds(
+      where: { participant: $participant}
     ) {
       id
     }
     
-    verified: participantTaskStatuses(
-      where: { participant: $participant, status: "VERIFIED" }
+    verified: taskVerifieds(
+      where: { participant: $participant }
     ) {
       id
     }
@@ -981,3 +981,15 @@ query GetRedeemedRewardsByParticipant($participant: Bytes!) {
   }
 }
 `
+export  const GetWhiteListedParticipantByTask = `
+query GetWhiteListedParticipantByTask($taskId: Bytes!) {
+  participantWhitelisteds(where: { taskId: $taskId }) {
+    id
+    taskId
+    participant
+    by
+    blockNumber
+    blockTimestamp
+  }
+}
+`;
