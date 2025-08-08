@@ -44,7 +44,7 @@ const TaskPortalParticipant = ({ taskId }: TaskPortalParticipantProps) => {
   );
   
     const whiteListedParticipants = getWhiteListedParticipants?.data?.data?.participantWhitelisteds || [];
-console.log("whiteListedParticipants", whiteListedParticipants);
+
 
 
   const columns = useHistoryColumns();

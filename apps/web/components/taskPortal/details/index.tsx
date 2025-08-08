@@ -45,6 +45,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
   const whiteListedParticipants = getWhiteListedParticipants?.data?.data?.participantWhitelisteds || [];
 
+
   const { participateTask, participatePending, participateSuccess } =
     useParticipateTaskMutation();
   const { completeTask, completePending } = useCompleteTaskMutation();
@@ -59,6 +60,26 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const handleApplyTask = async () => {
     if (!isConnected) {
       setAlertDialog(true);
+      return;
+    }
+ 
+
+    // Check if the connected address is whitelisted
+   
+    const isWhitelisted = whiteListedParticipants.some(
+      (participantList: { participant: string }, index: number) => {
+      
+        return participantList.participant === address?.toLowerCase()
+      },
+    );
+  
+
+    if (!isWhitelisted) {
+      toast({
+        title: "Not Eligible",
+        description: "Your wallet is not whitelisted for this task.",
+        variant: "destructive",
+      });
       return;
     }
 
