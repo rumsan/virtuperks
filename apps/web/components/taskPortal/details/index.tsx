@@ -22,6 +22,7 @@ import { useState } from "react";
 import { useAccount } from "wagmi";
 import TaskPortalParticipant from "./details.participant";
 import TaskPortalDetails from "./details.task";
+import { useGetWhiteListedParticipantByTask } from "@/hooks/subgraph/participant";
 
 type TaskPortalMainProps = {
   cuid: Cuid;
@@ -36,9 +37,14 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const { isConnected, address } = useAccount();
 
   const getTaskDetail = useGetTaskById(cuid.id);
+  
 
   const { toast } = useToast();
   const taskData = getTaskDetail?.data?.data?.taskCreated;
+  const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(taskData?.internal_id, false);
+
+  const whiteListedParticipants = getWhiteListedParticipants?.data?.data?.participantWhitelisteds || [];
+
 
   const { participateTask, participatePending, participateSuccess } =
     useParticipateTaskMutation();
@@ -54,6 +60,26 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const handleApplyTask = async () => {
     if (!isConnected) {
       setAlertDialog(true);
+      return;
+    }
+ 
+
+    // Check if the connected address is whitelisted
+   
+    const isWhitelisted = whiteListedParticipants.some(
+      (participantList: { participant: string }, index: number) => {
+      
+        return participantList.participant === address?.toLowerCase()
+      },
+    );
+  
+
+    if (!isWhitelisted) {
+      toast({
+        title: "Not Eligible",
+        description: "Your wallet is not whitelisted for this task.",
+        variant: "destructive",
+      });
       return;
     }
 

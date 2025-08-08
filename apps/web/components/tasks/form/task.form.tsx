@@ -87,7 +87,7 @@ export default function TaskBaseForm({
     }
   }, [entityAddress, totalRewardAmount, unallocatedTokens, setError, clearErrors]);
 
-  // Add effect to set error when entity changes
+ 
   useEffect(() => {
     if (entityAddress && unallocatedTokens !== undefined) {
       if (unallocatedTokens === BigInt(0)) {

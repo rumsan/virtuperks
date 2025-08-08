@@ -16,6 +16,7 @@ import {
   GetRewards,
   getTaskCreatedById,
   getTaskCreation,
+  GetWhiteListedParticipantByTask,
   RewardManagementQueries,
   TokenQueries
 } from '../queries';
@@ -262,6 +263,20 @@ return { data, error };
       return { data, error };
     } catch (error) {
       console.error('Error fetching redeemed rewards by participant:', error);
+      return { data: null, error };
+    }
+  }
+
+  //servie to get whitelisted participants by task Id
+  async getWhitelistedParticipantsByTaskId(taskId: string) {
+    try {
+      const { data, error } = await this.subgraphQuery.query(
+        GetWhiteListedParticipantByTask,
+        { taskId }
+      );
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching whitelisted participants by task ID:', error);
       return { data: null, error };
     }
   }

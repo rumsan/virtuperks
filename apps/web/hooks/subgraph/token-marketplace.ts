@@ -2,6 +2,7 @@ import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   useReadRewardRedemptinFactoryGetRewardOwners,
+  useReadRewardRedemptionOwner,
   useWriteRewardRedemptinFactoryCreateRewardRedemption,
   useWriteRewardRedemptionRedeem,
   useWriteRewardRedemptionUpdateRedemptionStatus,
@@ -108,12 +109,12 @@ export const useRedeemReward = () => {
       });
       return result;
     },
-    onSuccess: (result, variable) => {
-      setTimeout(() => {
-        queryClient.invalidateQueries({
-          queryKey: ["redeemedRewardsList"],
-        });
-      }, 3000);
+    onSuccess: async (result, variable) => {
+     await new Promise((resolve) => setTimeout(resolve, 9000));
+     await queryClient.invalidateQueries({
+       queryKey: ["redeemedRewardsList"],
+     });
+     
     },
   });
 
@@ -173,18 +174,18 @@ export const useUpdateRedemptionStatus = () => {
       });
       return result;
     },
-    onSuccess: (result, variable) => {
-      setTimeout(() => {
-        queryClient.invalidateQueries({
-          queryKey: ["redeemedRewardsList"],
-        });
-      }, 3000);
+   
+    onSuccess: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 9000));
+      await queryClient.invalidateQueries({
+        queryKey: ["redeemedRewardsList"],
+      });
     },
   });
 
   return {
     UpdateRedeemStatus: mutation.mutateAsync,
-    UpdateRedeemPending: mutation.isPending,
+    UpdateRedeemPending: mutation.isPending as any,
     UpdateRedeemSuccess: mutation.isSuccess,
   };
 };
@@ -218,5 +219,18 @@ export const useGetRewardOwner = (rewardId: string) => {
     getRewardOwner: data,
     isError,
     isLoading,
+  };
+};
+
+export const useGetRewardRole = (rewardId: string) => {
+  const { data, isError, isLoading } = useReadRewardRedemptionOwner({
+    address: rewardId as `0x${string}`,
+    args: [],
+  });
+
+  return {
+    rewardRole: data,
+    isError,
+    roleLoading: isLoading,
   };
 };

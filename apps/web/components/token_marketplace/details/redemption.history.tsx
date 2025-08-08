@@ -4,6 +4,8 @@ import { DataTablePagination } from "@/components/common/list/list.pagination";
 import {
   useGetRedeemedReward,
   useGetRedeemedRewardByParticiant,
+  useGetRewardOwner,
+  useGetRewardRole,
   useUpdateRedemptionStatus,
 } from "@/hooks/subgraph/token-marketplace";
 import {
@@ -33,6 +35,9 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
   const getParticipantReward = useGetRedeemedRewardByParticiant(
     address as `0x${string}`,
   );
+  const { rewardRole, roleLoading } = useGetRewardRole(rewardId);
+
+  
 
   const allRedemptions = getRedeemReward?.data?.data?.redemptionStatuses ?? [];
 
@@ -41,6 +46,7 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
 
   const { UpdateRedeemStatus: rawUpdateStatus, UpdateRedeemPending } =
     useUpdateRedemptionStatus();
+  const [ isPending, setIsPending ] = useState(false);
 
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
@@ -52,6 +58,7 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
     setUpdatingId(params.redemptionId);
     try {
       await rawUpdateStatus(params);
+  
     } finally {
       setUpdatingId(null);
     }
@@ -60,6 +67,7 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
   const columns = useColumns<(typeof allRedemptions)[0]>(
     updateStatus,
     updatingId,
+     rewardRole
   );
 
   const [paginationAll, setPaginationAll] = useState({

@@ -37,12 +37,11 @@ export const useTaskAdd = () => {
           data.whitelistedParticipants,
         ],
       });
-      return { result, entityAddress: data.entityAddress };
     },
     onSuccess: async (resultObj) => {
       await new Promise((resolve) => setTimeout(resolve, 9000));
       await queryClient.invalidateQueries({
-        queryKey: ["taskList", resultObj.entityAddress],
+        queryKey: ["taskList"],
       });
     },
   });
@@ -175,9 +174,3 @@ export const useIsTaskExpired = (taskId: string, entityId: string) => {
     statusLoading: isLoading,
   };
 };
-
-
-
-
-
-
