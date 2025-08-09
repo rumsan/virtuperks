@@ -18,6 +18,7 @@ import { Input } from "@workspace/ui/components/input";
 import { Search, User } from "lucide-react";
 import React, { useMemo } from "react";
 import { useColumns } from "./details.column";
+import { useGetWhiteListedParticipantByTask } from "@/hooks/subgraph/participant";
 
 type Cuid = {
   id: string;
@@ -34,6 +35,8 @@ const TaskParticipant = (  {taskData} : TaskParticipantProps) => {
     [],
   );
 
+    
+
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
@@ -44,6 +47,7 @@ const TaskParticipant = (  {taskData} : TaskParticipantProps) => {
   const columns = useColumns(); 
 
   const { pendingParticipants, acceptedParticipants, completedParticipants, verifiedPartcipants } = useGetCombineStausByTask(taskData?.internal_id);
+ 
   const pendingAndAcceptedParticipants = useMemo(() => {
     return [
       ...(pendingParticipants || []),
