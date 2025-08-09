@@ -25,16 +25,18 @@ import {
 } from "@workspace/ui/components/tabs";
 import { Plus } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useColumns } from "../details/details.column";
 import ListCardDetails from "./list.card";
 import { DatePickerWithRange } from "./list.date";
+
 
 interface TaskListMainProps {
   router: AppRouterInstance;
 }
 
 export default function TaskListMain({ router }: TaskListMainProps) {
+
   const [tabStatus, setTabStatus] = useState<"open" | "closed">("open");
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -47,6 +49,7 @@ export default function TaskListMain({ router }: TaskListMainProps) {
 
   const openTask = useOpenTask();
   const closeTask = useClosedTask();
+
 
   const openTaskList = openTask?.data?.data?.taskCreateds ?? [];
   const closedTaskList = closeTask?.data?.data?.taskCreateds ?? [];
@@ -84,6 +87,8 @@ export default function TaskListMain({ router }: TaskListMainProps) {
       pagination,
     },
   });
+
+
 
   if (isLoading) {
     return (
