@@ -17,7 +17,7 @@ import {
   getTaskCreatedById,
   getTaskCreation,
   GetWhiteListedParticipantByTask,
-  RewardManagementQueries,
+
   TokenQueries
 } from '../queries';
 
@@ -83,7 +83,7 @@ export class SubgraphService {
 
 
   async getTaskById(id: string) {
-    const { data, error } = await this.subgraphQuery.query(getTaskCreatedById, { id })
+    const { data, error } = await this.subgraphQuery.query(getTaskCreatedById, { internal_id: id })
     return { data, error }
   }
   
@@ -113,19 +113,7 @@ export class SubgraphService {
 
 
   }
-  
-  async getContractState() {
-    try {
-      const { data, error } = await this.subgraphQuery.query(
-        RewardManagementQueries.getContractState,
-        {}
-      );
-      return { data, error };
-    } catch (error) {
-      console.error('Error fetching contract state:', error);
-      return { error };
-    }
-  }
+
 
   // Factory Related Services
   async getDeployments() {

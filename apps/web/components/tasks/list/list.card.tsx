@@ -15,52 +15,34 @@ const ListCardDetails = ({
   router,
   tabStatus,
 }: ListCardDetailsProps) => {
-  const filteredTaskList = () => {
-    if (!taskList || !Array.isArray(taskList)) {
-      return [];
-    }
 
-    if (tabStatus === "open") {
-      return taskList.filter((task) => {
-        return (
-          task?.taskDetail?.isOpen === true &&
-          !task?.taskDetail?.isTokenDisbursed
-        );
-      });
-    } else if (tabStatus === "closed") {
-      return taskList.filter((task) => {
-        return (
-          task?.taskDetail?.isOpen === false ||
-          task?.taskDetail?.isTokenDisbursed
-        );
-      });
-    }
+  
+ 
 
-    return taskList;
-  };
 
   const handleUrlClick = (e: React.MouseEvent, url: string) => {
     e.stopPropagation();
     window.open(url, "_blank", "noopener,noreferrer");
   };
+  
 
   return (
     <div className="grid grid-cols-2 gap-4">
-      {filteredTaskList().map((task) => (
+      {taskList.map((task) => (
         <Card
           key={task?.id}
           className="cursor-pointer"
-          onClick={() => task?.id && router.push(PATHS.TASKS.DETAILS(task?.id))}
+          onClick={() => task?.id && router.push(PATHS.TASKS.DETAILS(task?.internal_id))}
         >
           <CardTitle className="flex flex-col p-4 gap-2">
             <div className="flex items-center gap-2 text-[#334155]">
               <span>{task?.taskDetail?.name}</span>
               <span
                 className={`px-2 py-0.5 rounded text-white text-xs font-semibold ${
-                  task?.taskDetail?.isOpen ? "bg-green-500" : "bg-red-500"
+                tabStatus ==="open" ? "bg-green-500" : "bg-red-500"
                 }`}
               >
-                {task?.taskDetail?.isOpen ? "Open" : "Closed"}
+                {tabStatus==="open" ? "Open" : "Closed"}
               </span>
             </div>
 

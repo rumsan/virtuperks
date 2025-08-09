@@ -27,7 +27,8 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
 
   const [isDisbursed, setIsDisbursed] = useState(false);
 
-  const taskData = getTaskDetail?.data?.data?.taskCreated;
+  const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
+
 
   const { status, statusLoading } = useCheckTaskStatus(
     taskData?.internal_id,
