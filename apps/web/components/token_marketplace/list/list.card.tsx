@@ -2,7 +2,6 @@ import { DialogButton } from "@/components/common/ui/dialog";
 import { useCheckParticipantBalance } from "@/hooks/subgraph/token";
 import {
   useCreateReward,
-  useGetRedeemedRewardByParticiant,
   useGetRewards,
 } from "@/hooks/subgraph/token-marketplace";
 import { PATHS } from "@/routes/paths";
@@ -24,7 +23,6 @@ import { useState } from "react";
 import { keccak256 } from "viem";
 import { useAccount } from "wagmi";
 import { categoryColorMap } from "../img/imgLink";
-import { add } from "date-fns";
 
 const TokenMarketListCard = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -37,8 +35,6 @@ const TokenMarketListCard = () => {
   const { toast } = useToast();
   const tokenData = useGetRewards();
   const tokenList = tokenData?.data?.data?.rewardRedemptionCreateds || [];
-  console.log("Token Data: ++", tokenList);
-  // const totalRewards = tokenList.length;
   const affordableRewards = tokenList.filter(
     (item: any) =>
       parseInt(item.tokensRequired) <= (participantTotalToken ?? 0),

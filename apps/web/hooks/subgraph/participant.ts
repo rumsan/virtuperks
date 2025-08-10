@@ -2,7 +2,6 @@ import { useGraphService } from "@/providers/subgraph-provider";
 import { useQuery } from "@tanstack/react-query";
 import { useRemoteClient } from "../utils/api.utils";
 import { useReadRewardManagementGetParticipantTaskAssignment } from "../wagmi/contracts";
-// import { useRemoteClient } from "./useRemoteClient";
 
 export const useGetTaskListByParticipant = (
   participant: string,
@@ -59,22 +58,24 @@ export const useGetParticipantStatistic = (participantAddress: string) => {
   };
 };
 
-export function useUserByWallet(wallet: string, enabled = true) {
-  const { userClient, queryClient } = useRemoteClient();
+export const useGetWhiteListedParticipants = () => {
+  const { queryService } = useGraphService();
 
   return useQuery({
-    queryKey: ["user", wallet],
-    queryFn: () => userClient.findByWallet(wallet),
-    enabled: !!wallet && enabled,
-    staleTime: 5 * 60 * 1000,
+    queryKey: ["whiteListedParticipants"],
+    queryFn: async () => {
+      const taskDetail = await queryService?.getWhitelistedParticipants();
+      return taskDetail;
+    },
   });
-}
+};
 
-export function useGetALLUserByWallet() {
-  const { userClient, queryClient } = useRemoteClient();
+export function useGetAllUsers() {
+  const { userClient } = useRemoteClient();
 
   return useQuery({
-    queryKey: ["participantList"],
+    queryKey: ["users"],
     queryFn: () => userClient.findAll(),
+    enabled: !!userClient,
   });
 }

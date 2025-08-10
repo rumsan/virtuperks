@@ -1,38 +1,44 @@
+import { ParticipantLookupData } from "@/type/participantLookup.type";
 import { ColumnDef } from "@tanstack/react-table";
 
-type Participant = {
-  account: string;
-  role: string;
-};
-
-export function useColumns(): ColumnDef<Participant>[] {
+export function useColumns({
+  lookupByWallet,
+  isLoading,
+  isError,
+}: {
+  lookupByWallet: (wallet: string) => string;
+  isLoading: boolean;
+  isError: boolean;
+}): ColumnDef<ParticipantLookupData>[] {
   return [
     {
-      accessorKey: "account",
+      accessorKey: "wallet",
       header: () => (
-        <div className="text-left text-xs font-semibold uppercase text-gray-500 tracking-wider">
+        <div className="text-left text-xs font-semibold uppercase text-gray-500">
           Wallet Address
         </div>
       ),
       cell: ({ row }) => (
-        <div className="mb-1">
-          <p className="text-sm font-mono text-gray-800 break-all">
-            {row.original.account}
-          </p>
-        </div>
+        <p className="text-sm font-mono text-gray-800 break-all">
+          {row.original.wallet}
+        </p>
       ),
     },
     {
-      accessorKey: "role",
+      accessorKey: "name",
       header: () => (
-        <div className="text-left text-xs font-semibold uppercase text-gray-500 tracking-wider">
-          Role
+        <div className="text-left text-xs font-semibold uppercase text-gray-500">
+          Name
         </div>
       ),
-      cell: () => (
-        <div className="mt-1">
-          <p className="text-sm font-mono text-gray-700">{"Participant"}</p>
-        </div>
+      cell: ({ row }) => (
+        <p className="text-sm font-mono text-gray-700">
+          {isLoading
+            ? "Loading..."
+            : isError
+              ? "Error fetching name"
+              : lookupByWallet(row.original.wallet)}
+        </p>
       ),
     },
   ];

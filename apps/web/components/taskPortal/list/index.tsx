@@ -3,7 +3,7 @@
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
-import { useGetALLUserByWallet } from "@/hooks/subgraph/participant";
+// import { useGetALLUserByWallet } from "@/hooks/subgraph/participant";
 import { useGetAllTask } from "@/hooks/subgraph/task";
 import {
   ColumnFiltersState,
@@ -29,8 +29,8 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
 
   const getAllTask = useGetAllTask();
   console.log("API:", process.env.NEXT_PUBLIC_API_URL);
-  const { data, error, isLoading, isError } = useGetALLUserByWallet();
-  console.log("Data: ", data);
+  // const { data, error, isLoading, isError } = useGetALLUserByWallet();
+  // console.log("Data: ", data);
   // console.log("Participant name:", user?.details?.name ?? "Loading...");
   const allTask = getAllTask?.data?.data?.taskCreateds || [];
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(

@@ -6,6 +6,7 @@ import {
   getOpenTasks,
   getParticipantTasks,
   getParticipantTaskStatistics,
+  getParticipantWhiteListed,
   GetRedeemedReward,
   GetRedeemedRewardsByParticipant,
   getRewardById,
@@ -262,6 +263,20 @@ return { data, error };
       return { data, error };
     } catch (error) {
       console.error('Error fetching redeemed rewards by participant:', error);
+      return { data: null, error };
+    }
+  }
+
+  //get all the whitelisted participants 
+  async getWhitelistedParticipants() {
+    try {
+      const { data, error } = await this.subgraphQuery.query(
+        getParticipantWhiteListed,
+        {}
+      );
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching whitelisted participants:', error);
       return { data: null, error };
     }
   }
