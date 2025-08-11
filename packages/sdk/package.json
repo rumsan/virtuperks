@@ -5,6 +5,10 @@
     "build": "tsc",
     "dev": "tsc --watch --preserveWatchOutput"
   },
+  "dependencies": {
+    "@rumsan/sdk": "^0.2.10",
+    "axios": "^1.7.9"
+  },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@workspace/typescript-config": "workspace:*",
@@ -30,6 +34,17 @@
       "import": "./dist/constants/events.js",
       "require": "./dist/constants/events.js",
       "types": "./dist/constants/events.d.ts"
-    }
+    },
+    "./client": {
+  "import": "./dist/client/index.js",
+  "require": "./dist/client/index.js",
+  "types": "./dist/client/index.d.ts"
+},
+"./client/*": {
+  "import": "./dist/client/*.js",
+  "require": "./dist/client/*.js",
+  "types": "./dist/client/*.d.ts"
+}
+
   }
 }
