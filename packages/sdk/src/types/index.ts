@@ -7,5 +7,6 @@ export * from './redemption.type';
 export * from './reward.type';
 export * from './task.type';
 export * from './taskDetail.type';
+export * from './userDetails.type';
 export * from './users.type';
 

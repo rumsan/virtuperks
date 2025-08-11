@@ -1,7 +1,7 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useQuery } from "@tanstack/react-query";
+import { useRemoteClient } from "../utils/api.utils";
 import { useReadRewardManagementGetParticipantTaskAssignment } from "../wagmi/contracts";
-import { acala } from "viem/chains";
 
 export const useGetTaskListByParticipant = (
   participant: string,
@@ -50,17 +50,35 @@ export const useGetParticipantStatistic = (participantAddress: string) => {
     enabled: !!participantAddress && !!queryService,
   });
 
-
   return {
-applied:response?.data?.data?.applied?.length || 0,
+    applied: response?.data?.data?.applied?.length || 0,
     completed: response?.data?.data?.completed?.length || 0,
     verified: response?.data?.data?.verified?.length || 0,
     accepted: response?.data?.data?.accepted?.length || 0,
-
-
-  }
+  };
 };
 
+export const useGetWhiteListedParticipants = () => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["whiteListedParticipants"],
+    queryFn: async () => {
+      const taskDetail = await queryService?.getWhitelistedParticipants();
+      return taskDetail;
+    },
+  });
+};
+
+export function useGetAllUsers() {
+  const { userClient } = useRemoteClient();
+
+  return useQuery({
+    queryKey: ["users"],
+    queryFn: () => userClient.findAll(),
+    enabled: !!userClient,
+  });
+}
 
 export const useGetWhiteListedParticipantByTask = (
   taskId: string,

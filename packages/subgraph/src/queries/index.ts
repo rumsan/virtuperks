@@ -725,3 +725,17 @@ query GetWhiteListedParticipantByTask($taskId: Bytes!) {
   }
 }
 `;
+
+
+export const getParticipantWhiteListed =`
+query GetParticipantWhiteListed  {
+  participantWhitelisteds(first: 100, orderBy: blockTimestamp, orderDirection: desc) {
+    id
+    taskId
+    participant
+    by
+    blockNumber
+    blockTimestamp
+  }
+}
+`;

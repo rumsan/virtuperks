@@ -8,5 +8,6 @@
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
   "editor.formatOnType": true,
-  "githubIssues.issueBranchTitle": "${user}/${issueNumber}-${sanitizedIssueTitle}"
+  "githubIssues.issueBranchTitle": "${user}/${issueNumber}-${sanitizedIssueTitle}",
+  "prettier.useEditorConfig": false
 }

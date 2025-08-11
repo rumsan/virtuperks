@@ -6,6 +6,7 @@ import {
   getOpenTasks,
   getParticipantTasks,
   getParticipantTaskStatistics,
+  getParticipantWhiteListed,
   GetRedeemedReward,
   GetRedeemedRewardsByParticipant,
   getRewardById,
@@ -67,16 +68,16 @@ export class SubgraphService {
  
   async getOpenTasks() {
     
-      const { data, error } = await this.subgraphQuery.query(getOpenTasks, {})
-      return { data, error };
+    const { data, error } = await this.subgraphQuery.query(getOpenTasks, {})
+    return { data, error };
     
   }
 
  
   async getCloseTasks() {
     
-      const { data, error } = await this.subgraphQuery.query(getCloseTasks, {})
-      return { data, error };
+    const { data, error } = await this.subgraphQuery.query(getCloseTasks, {})
+    return { data, error };
   }
 
 
@@ -208,20 +209,20 @@ export class SubgraphService {
   }
 
   // reward sevice function
-  async getRewards (){
-try {
-  const { data, error } = await this.subgraphQuery.query(GetRewards, {});
-return { data, error };
-}catch(error) {
-    console.error('Error fetching rewards:', error);
-    return { data: null, error };
-}
+  async getRewards() {
+    try {
+      const { data, error } = await this.subgraphQuery.query(GetRewards, {});
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching rewards:', error);
+      return { data: null, error };
+    }
   }
 
 
   async getRewardById(rewardRedemption: string) {
     try {
-      const { data, error } = await this.subgraphQuery.query(getRewardById, {rewardRedemption });
+      const { data, error } = await this.subgraphQuery.query(getRewardById, { rewardRedemption });
       return { data, error };
     } catch (error) {
       console.error('Error fetching reward by ID:', error);
@@ -229,17 +230,17 @@ return { data, error };
     }
   }
 
-    // service to get redeemed rewards
-  async getRedeemedReward (rewardRedemption: string) {
+  // service to get redeemed rewards
+  async getRedeemedReward(rewardRedemption: string) {
 
-try {
-  const { data, error } = await this.subgraphQuery.query(GetRedeemedReward, {rewardRedemption});
-return { data, error };
-}catch(error) {
-    console.error('Error fetching rewards:', error);
-    return { data: null, error };
-}
-  } 
+    try {
+      const { data, error } = await this.subgraphQuery.query(GetRedeemedReward, { rewardRedemption });
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching rewards:', error);
+      return { data: null, error };
+    }
+  }
 
   //service to get redeemed rewards by participant address
   async getRedeemedRewardsByParticipant(participantAddress: string) {
@@ -255,19 +256,33 @@ return { data, error };
     }
   }
 
-  //servie to get whitelisted participants by task Id
-  async getWhitelistedParticipantsByTaskId(taskId: string) {
+  //get all the whitelisted participants 
+  async getWhitelistedParticipants() {
     try {
       const { data, error } = await this.subgraphQuery.query(
-        GetWhiteListedParticipantByTask,
-        { taskId }
+        getParticipantWhiteListed,
+        {}
       );
       return { data, error };
     } catch (error) {
-      console.error('Error fetching whitelisted participants by task ID:', error);
-      return { data: null, error };
+      console.error('Error fetching whitelisted participants:', error);
     }
   }
+  //servie to get whitelisted participants by task Id
+  async getWhitelistedParticipantsByTaskId(taskId: string) {
+      try {
+        const { data, error } = await this.subgraphQuery.query(
+          GetWhiteListedParticipantByTask,
+          { taskId }
+        );
+        return { data, error };
+      } catch (error) {
+        console.error('Error fetching whitelisted participants by task ID:', error);
+        return { data: null, error };
+      }
+    }
+  
+
 }
 
 
