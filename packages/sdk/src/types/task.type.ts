@@ -48,3 +48,14 @@ export interface TaskCreateParams {
 }
 
 
+export interface Tasks {
+  id: string;
+  taskDetail: {
+    name: string;
+    isOpen: boolean;
+    detailsUrl: string;
+    maxParticipants: number;
+    expiryDate: number;
+    rewardAmount: number;
+  };
+}
