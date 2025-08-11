@@ -79,3 +79,22 @@ export function useGetAllUsers() {
     enabled: !!userClient,
   });
 }
+
+export const useGetWhiteListedParticipantByTask = (
+  taskId: string,
+  skip: boolean = false,
+) => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["whiteListedParticipantByTask", taskId],
+    queryFn: async () => {
+      const taskDetail =
+        await queryService?.getWhitelistedParticipantsByTaskId(taskId);
+      return taskDetail;
+    },
+    enabled: !!taskId && !skip,
+  });
+};
+
+

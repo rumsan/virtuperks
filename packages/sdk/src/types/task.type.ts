@@ -13,7 +13,7 @@ export interface AcceptedTaskData extends CommonFields {
 
 
 export type TaskCreated = CommonFields & {
-
+  internal_id: string;
   entityTaskManager?: EntityTaskManagerCreated;
   status: string;
   taskDetail: TaskDetail;

@@ -1,4 +1,5 @@
 import { Cuid } from "@/components/departments/details/details.main";
+import { useCheckTaskStatus, useIsTaskExpired } from "@/hooks/subgraph/task";
 import { useGetTaskDetailById } from "@/hooks/subgraph/taskDetail";
 import { formatDate } from "@/utils/formatDate";
 import { Card, CardTitle } from "@workspace/ui/components/card";
@@ -12,7 +13,12 @@ type TaskDetailsProps = {
 const TaskDetails = ({ cuid }: TaskDetailsProps) => {
   const getTaskDetail = useGetTaskDetailById(cuid.id);
 
-  const taskData = getTaskDetail?.data?.data?.taskCreated;
+
+  const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
+
+  const { taskDetail } = useCheckTaskStatus(taskData?.internal_id, taskData?.rewardManagement.rewardManagement)
+
+  
 
   const formattedDate = formatDate(taskData?.taskDetail?.expiryDate);
 
@@ -31,10 +37,10 @@ const TaskDetails = ({ cuid }: TaskDetailsProps) => {
             </span>
             <span
               className={`px-2 py-0.5 rounded text-white text-xs font-semibold ${
-                taskData?.taskDetail?.isOpen ? "bg-green-500" : "bg-red-500"
+              taskDetail?.isOpen ? "bg-green-500" : "bg-red-500"
               }`}
             >
-              {taskData?.taskDetail?.isOpen ? "Open" : "Closed"}
+              {taskDetail?.isOpen ? "Open" : "Closed"}
             </span>
           </div>
 
@@ -68,7 +74,7 @@ const TaskDetails = ({ cuid }: TaskDetailsProps) => {
           </span>
           <span className="flex items-center gap-2">
             <Users color="#64748B" size={20} strokeWidth={2.5} />
-            {taskData?.taskDetail.maxParticipants} members participating
+            {taskData?.taskDetail?.maxParticipants} members participating
           </span>
           <span className="flex items-center gap-2">
             <Timer color="#64748B" size={20} strokeWidth={2.5} /> Deadline:{" "}
@@ -82,7 +88,7 @@ const TaskDetails = ({ cuid }: TaskDetailsProps) => {
           <Trophy color="#297AD6" size={20} />
         </div>
         <span className="text-2xl text-[#297AD6] font-bold">
-          {taskData?.taskDetail?.rewardAmount} Tokens
+          {taskData?.taskDetail?.totalRewardAmount} Tokens
         </span>
       </Card>
     </>

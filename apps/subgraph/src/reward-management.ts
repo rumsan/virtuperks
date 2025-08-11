@@ -1,4 +1,4 @@
-import { log } from "@graphprotocol/graph-ts"
+import { Bytes, log } from "@graphprotocol/graph-ts"
 import {
   AdditionalDisbursementToTask as AdditionalDisbursementToTaskEvent,
   ContractPaused as ContractPausedEvent,
@@ -33,6 +33,7 @@ import {
   TaskClosed,
   TaskCompleted,
   TaskCreated,
+  TaskDetail,
   TaskDetailsUpdated,
   TaskIdMapping,
   TaskVerified,
@@ -102,6 +103,7 @@ export function handleDisbursementToTask(event: DisbursementToTaskEvent): void {
     entity.rewardManagement = rewardManagement.id;
     
   }
+ 
 
   entity.save()
 }
@@ -235,6 +237,38 @@ export function handleTaskClosed(event: TaskClosedEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+  // Create TaskDetail entity first
+  let taskDetail = fetchTaskDetails(event.params.id, event.address);
+  entity.taskDetail = taskDetail.id;
+
+  // Update TaskDetail.isOpen using TaskIdMapping
+  let mapping = TaskIdMapping.load(event.params.id);
+  if (mapping) {
+    let taskCreated = TaskCreated.load(mapping.taskCreated);
+    if (taskCreated && taskCreated.taskDetail) {
+      let taskDetail = TaskDetail.load(taskCreated.taskDetail as Bytes);
+      if (taskDetail) {
+        taskDetail.isOpen = false;
+        taskDetail.save();
+        log.info("Updated TaskDetail: taskId={0}, isOpen={1}", [
+          event.params.id.toHexString(),
+          taskDetail.isOpen.toString(),
+        ]);
+      } else {
+        log.warning("TaskDetail not found for taskId: {0}", [
+          event.params.id.toHexString(),
+        ]);
+      }
+    } else {
+      log.warning("TaskCreated not found or taskDetail is null for taskId: {0}", [
+        event.params.id.toHexString(),
+      ]);
+    }
+  } else {
+    log.warning("TaskIdMapping not found for taskId: {0}", [
+      event.params.id.toHexString(),
+    ]);
+  }
 
   entity.save()
 }

@@ -24,9 +24,11 @@ export function useColumns<
     redemptionId: string;
   }) => void,
   updatingId: string | null,
+  rewardRole?: string,
 ): ColumnDef<T>[] {
+ 
   const hasDefaultAdminRole = hasRole({
-    role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
+    role: rewardRole || "",
   });
 
   return [

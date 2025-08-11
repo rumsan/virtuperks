@@ -1,6 +1,7 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  useReadRewardManagementGetOpenTasks,
   useReadRewardManagementGetTask,
   useReadRewardManagementIsTaskExpired,
   useWriteRewardManagementCloseTask,
@@ -37,12 +38,11 @@ export const useTaskAdd = () => {
           data.whitelistedParticipants,
         ],
       });
-      return { result, entityAddress: data.entityAddress };
     },
     onSuccess: async (resultObj) => {
       await new Promise((resolve) => setTimeout(resolve, 9000));
       await queryClient.invalidateQueries({
-        queryKey: ["taskList", resultObj.entityAddress],
+        queryKey: ["taskList"],
       });
     },
   });
@@ -142,18 +142,14 @@ export const useCloseTaskMutation = () => {
 // to check wheter the task is expired or not
 
 export const useCheckTaskStatus = (taskId: string, entityId: string) => {
-  const {
-    data: taskStatus,
-    isError,
-    isLoading,
-  } = useReadRewardManagementGetTask({
+  const { data, isError, isLoading } = useReadRewardManagementGetTask({
     address: entityId as `0x${string}`,
     args: [taskId as `0x${string}`],
   });
-  console.log(taskStatus, "taskStatus from hook");
 
   return {
-    status: taskStatus?.isTokenDisbursed,
+    taskDetail: data,
+    status: data?.isTokenDisbursed,
     isError,
     statusLoading: isLoading,
   };
@@ -176,4 +172,15 @@ export const useIsTaskExpired = (taskId: string, entityId: string) => {
   };
 };
 
+export const useGetOpentask = (entityId: string) => {
+  const { data, isError, isLoading } = useReadRewardManagementGetOpenTasks({
+    address: entityId as `0x${string}`,
+    args: [],
+  });
 
+  return {
+    openTasks: data,
+    isError,
+    statusLoading: isLoading,
+  };
+};
