@@ -7,6 +7,7 @@ import {
   useGetEntityById,
   useGetEntityOwners,
 } from "@/hooks/subgraph/entity";
+import { useParticipantLookup } from "@/hooks/subgraph/participantLookup";
 import { useDirectTokenTransfer } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
@@ -34,7 +35,6 @@ export default function DepartmentDetailsCard({
 }: DepartmentDetailsCardProps) {
   const { data: entity, isLoading, isError, error } = useGetEntityById(cuid.id);
 
-
   const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
     entity?.rewardManagement,
   );
@@ -44,6 +44,7 @@ export default function DepartmentDetailsCard({
   );
 
   const { getEntityOwners } = useGetEntityOwners(entity?.entityId);
+  const { lookupByWallet } = useParticipantLookup();
 
   const {
     directTransfer,
@@ -134,7 +135,9 @@ export default function DepartmentDetailsCard({
                 setIsOpen={setIsOpen}
                 title="Are you sure you want to transfer token amount?"
                 subTitle="This action cannot be undone"
-                buttonName={directTransferPending ? "Processing..." : "Transfer Token"}
+                buttonName={
+                  directTransferPending ? "Processing..." : "Transfer Token"
+                }
                 submitType="directdisburse"
                 handleApplyTaskLogic={handleDialogAction}
               />
@@ -174,25 +177,30 @@ export default function DepartmentDetailsCard({
                         : "Department Owners"}
                     </span>
                     <div className="flex flex-col gap-1 text-sm text-[#64748B]">
-                      {getEntityOwners.map((owner: string, idx: number) => (
-                        <div key={idx} className="flex items-center gap-2">
-                          <span className="truncate max-w-[200px]">
-                            {owner}
-                          </span>
-                          <Copy
-                            size={16}
-                            strokeWidth={2}
-                            className="cursor-pointer"
-                            onClick={() => {
-                              navigator.clipboard.writeText(owner);
-                              toast({
-                                title: "Copied to clipboard!",
-                                variant: "success",
-                              });
-                            }}
-                          />
-                        </div>
-                      ))}
+                      {getEntityOwners.map((owner: string, idx: number) => {
+                        const name = lookupByWallet(owner);
+                        const displayName =
+                          name === "Unnamed Participant" ? owner : name;
+                        return (
+                          <div key={idx} className="flex items-center gap-2">
+                            <span className="truncate max-w-[200px]">
+                              {displayName}
+                            </span>
+                            <Copy
+                              size={16}
+                              strokeWidth={2}
+                              className="cursor-pointer"
+                              onClick={() => {
+                                navigator.clipboard.writeText(owner);
+                                toast({
+                                  title: "Copied to clipboard!",
+                                  variant: "success",
+                                });
+                              }}
+                            />
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
