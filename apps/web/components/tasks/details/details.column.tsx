@@ -170,7 +170,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
 
             {selectedTask &&
               isDialogOpen &&
-              selectedTask.id === row.original.internal_id && (
+              selectedTask.id === row.original.taskId && (
                 <>
                   <DialogButton
                     isOpen={isDialogOpen}

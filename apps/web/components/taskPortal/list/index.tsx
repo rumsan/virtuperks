@@ -30,6 +30,7 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
   const getAllTask = useGetAllTask();
 
   const allTask = getAllTask?.data?.data?.taskCreateds || [];
+
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );

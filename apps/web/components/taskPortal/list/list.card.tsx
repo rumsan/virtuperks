@@ -25,7 +25,7 @@ const TaskPortalCard = ({ data, router }: TaskPortalCardProps) => {
             key={task.id}
             className="w-full cursor-pointer p-4"
             onClick={() =>
-              task.id && router.push(PATHS.TASKPORTAL.DETAILS(task.id))
+              task.id && router.push(PATHS.TASKPORTAL.DETAILS(task.internal_id))
             }
           >
             <CardTitle className="flex flex-col gap-1 w-full">
