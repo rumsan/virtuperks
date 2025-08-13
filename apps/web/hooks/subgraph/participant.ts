@@ -1,8 +1,8 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useQuery } from "@tanstack/react-query";
 import { useReadRewardManagementGetParticipantTaskAssignment } from "../wagmi/contracts";
-import { acala } from "viem/chains";
 
+//praticipatig task
 export const useGetTaskListByParticipant = (
   participant: string,
   skip: boolean = false,
@@ -20,7 +20,6 @@ export const useGetTaskListByParticipant = (
 };
 
 // to get the participant task assignment
-
 export const useGetParticipantTaskAssignmet = (
   taskId: string,
   participant: string,
@@ -30,7 +29,6 @@ export const useGetParticipantTaskAssignmet = (
     address: entityId as `0x${string}`,
     args: [taskId as `0x${string}`, participant as `0x${string}`],
   });
-
   return data;
 };
 
@@ -50,17 +48,13 @@ export const useGetParticipantStatistic = (participantAddress: string) => {
     enabled: !!participantAddress && !!queryService,
   });
 
-
   return {
-applied:response?.data?.data?.applied?.length || 0,
+    applied: response?.data?.data?.applied?.length || 0,
     completed: response?.data?.data?.completed?.length || 0,
     verified: response?.data?.data?.verified?.length || 0,
     accepted: response?.data?.data?.accepted?.length || 0,
-
-
-  }
+  };
 };
-
 
 export const useGetWhiteListedParticipantByTask = (
   taskId: string,
@@ -78,5 +72,3 @@ export const useGetWhiteListedParticipantByTask = (
     enabled: !!taskId && !skip,
   });
 };
-
-

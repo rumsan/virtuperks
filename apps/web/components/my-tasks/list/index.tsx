@@ -6,6 +6,7 @@ import {
   useGetParticipantStatistic,
   useGetTaskListByParticipant,
 } from "@/hooks/subgraph/participant";
+import { useGetTasksOwnedByIndividual } from "@/hooks/subgraph/task";
 import { useWallet } from "@/providers/walletProvider";
 import {
   ColumnFiltersState,
@@ -66,8 +67,9 @@ export default function TaskListMain({ router }: TaskListMainProps) {
   );
 
   const { data: dataOwned, isLoading: isLoadingOwned } =
-    useGetTaskListByParticipant(address as `0x${string}`);
-  const ownedTaskList = dataOwned?.data?.participantTaskStatuses ?? [];
+    useGetTasksOwnedByIndividual(address as `0x${string}`);
+  const ownedTaskList = dataOwned?.data?.taskCreateds ?? [];
+  console.log("ownedTaskList", dataOwned?.data?.taskCreateds);
 
   const { data: dataParticipating } = useGetTaskListByParticipant(
     address as `0x${string}`,

@@ -16,6 +16,7 @@ import {
   GetRewards,
   getTaskCreatedById,
   getTaskCreation,
+  GetTaskOwnedByIndividual,
   GetWhiteListedParticipantByTask,
 
   TokenQueries
@@ -102,17 +103,17 @@ export class SubgraphService {
     } catch (error) {
       console.error('Error fetching task with participant status:', error);
       return { error };
-
-
     }
-  
-
-
-
-
-
-
   }
+
+
+  // async getTaskOwnedByIndividual(){
+  //   try {
+
+  //   } catch () {
+      
+  //   }
+  // }
 
 
   // Factory Related Services
@@ -136,7 +137,6 @@ export class SubgraphService {
       if (error) {
         throw error;
       }
-  
       return { data, error: null };
     } catch (error) {
       console.error('Error fetching rewardManagementCreated by address:', error);
@@ -157,6 +157,24 @@ export class SubgraphService {
       return { data: null, error };
     }
   }
+
+  async getTasksOwnedByIndividual(createdBy: string) {
+    if (!createdBy) throw new Error("Creator address is required");
+  
+    try {
+      const { data, error } = await this.subgraphQuery.query(
+        GetTaskOwnedByIndividual,
+        { createdBy: createdBy.toLowerCase() } // match GraphQL variable
+      );
+  
+      return { data, error };
+    } catch (error) {
+      console.error("Error fetching tasks owned by individual:", error);
+      return { data: null, error };
+    }
+  }
+  
+
 
   // service function to get participant task statistics
 
