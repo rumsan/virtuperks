@@ -2,7 +2,10 @@
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
-import { useGetParticipantStatistic, useGetTaskListByParticipant } from "@/hooks/subgraph/participant";
+import {
+  useGetParticipantStatistic,
+  useGetTaskListByParticipant,
+} from "@/hooks/subgraph/participant";
 import { useWallet } from "@/providers/walletProvider";
 import {
   ColumnFiltersState,
@@ -38,7 +41,8 @@ interface TaskListMainProps {
 }
 
 export default function TaskListMain({ router }: TaskListMainProps) {
-  const [tabStatus, setTabStatus] = useState("active");
+  const [tab, setTab] = useState<"owned" | "participating">("owned");
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -46,24 +50,36 @@ export default function TaskListMain({ router }: TaskListMainProps) {
     [],
   );
   const [rowSelection, setRowSelection] = React.useState({});
-  const [pagination, setPagination] = React.useState({
+
+  const [paginationOwned, setPaginationOwned] = React.useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [paginationParticipating, setPaginationParticipating] = React.useState({
     pageIndex: 0,
     pageSize: 10,
   });
 
   const { address } = useWallet();
-  const { applied, completed, verified } = useGetParticipantStatistic(address as `0x${string}`);
-
-  const { data: myTaskList, isLoading } = useGetTaskListByParticipant(
+  const { applied, completed, verified } = useGetParticipantStatistic(
     address as `0x${string}`,
   );
-  const taskList = myTaskList?.data?.participantTaskStatuses;
 
+  const { data: dataOwned, isLoading: isLoadingOwned } =
+    useGetTaskListByParticipant(address as `0x${string}`);
+  const ownedTaskList = dataOwned?.data?.participantTaskStatuses ?? [];
+
+  const { data: dataParticipating } = useGetTaskListByParticipant(
+    address as `0x${string}`,
+    !address,
+  );
+  const participatingTask =
+    dataParticipating?.data?.participantTaskStatuses ?? [];
 
   const columns = useColumns();
 
-  const table = useReactTable({
-    data: taskList || [],
+  const tableOwned = useReactTable({
+    data: ownedTaskList,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -78,22 +94,49 @@ export default function TaskListMain({ router }: TaskListMainProps) {
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination: paginationOwned,
     },
+    onPaginationChange: setPaginationOwned,
+    pageCount: Math.ceil(ownedTaskList.length / paginationOwned.pageSize),
   });
 
-  if (isLoading) {
+  const tableParticipating = useReactTable({
+    data: participatingTask,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+      pagination: paginationParticipating,
+    },
+    onPaginationChange: setPaginationParticipating,
+    pageCount: Math.ceil(
+      participatingTask.length / paginationParticipating.pageSize,
+    ),
+  });
+
+  if (isLoadingOwned) {
     return (
       <LoaderSkeleton
-        title // h1: "My List"
+        title
         titleWidth="w-56"
-        subtitle // h3: "List of all the tasks..."
+        subtitle
         subtitleWidth="w-72"
-        cardCount={3} // 3 summary cards in grid
+        cardCount={3}
         gridCols="grid-cols-3"
         cardHeight="h-24"
         showTabs
-        tabsCount={2} // Participating, Owned
-        rowCount={5} // Simulated rows for ListCardDetails
+        tabsCount={2}
+        rowCount={5}
         rowHeight="h-20"
         showPagination
       />
@@ -150,55 +193,63 @@ export default function TaskListMain({ router }: TaskListMainProps) {
           </Card>
         </div>
 
-        <Tabs defaultValue="active" className="">
+        <Tabs
+          value={tab}
+          onValueChange={(v) => {
+            setTab(v as "owned" | "participating");
+            if (v === "owned")
+              setPaginationOwned((p) => ({ ...p, pageIndex: 0 }));
+            if (v === "participating")
+              setPaginationParticipating((p) => ({ ...p, pageIndex: 0 }));
+          }}
+        >
           <div className="flex items-center mt-10 mb-10">
             <div className="w-[400px]">
               <TabsList className="flex bg-blue-50 h-10">
-                <TabsTrigger
-                  value="open"
-                  className="w-full h-8"
-                  onClick={() => setTabStatus("open")}
-                >
-                  Participating
-                </TabsTrigger>
-                <TabsTrigger
-                  value="closed"
-                  className="w-full h-8"
-                  onClick={() => setTabStatus("completed")}
-                >
+                <TabsTrigger value="owned" className="w-full h-8">
                   Owned
+                </TabsTrigger>
+                <TabsTrigger value="participating" className="w-full h-8">
+                  Participating
                 </TabsTrigger>
               </TabsList>
             </div>
-
             <div className="ml-auto">
               <DatePickerWithRange />
             </div>
           </div>
 
-          <div className="w-full mt-5 mb-5">
-            <TabsContent className="w-full" value="active">
-              <ListCardDetails
-                taskList={taskList}
-                router={router}
-                tabStatus={tabStatus}
-              />
-            </TabsContent>
-            <TabsContent className="w-full" value="completed">
-              <ListCardDetails
-                taskList={taskList}
-                router={router}
-                tabStatus={tabStatus}
-              />
-            </TabsContent>
-          </div>
-          <div className="mt-5 mb-5">
-            <DataTablePagination
-              table={table}
-              setPagination={setPagination}
-              pagination={pagination}
+          {/* Owned tab */}
+          <TabsContent className="w-full" value="owned">
+            <ListCardDetails
+              taskList={ownedTaskList}
+              router={router}
+              tabStatus="owned"
             />
-          </div>
+            <div className="mt-5 mb-5">
+              <DataTablePagination
+                table={tableOwned}
+                setPagination={setPaginationOwned}
+                pagination={paginationOwned}
+              />
+            </div>
+          </TabsContent>
+
+          {/* Participating tab */}
+          <TabsContent className="w-full" value="participating">
+            <ListCardDetails
+              taskList={participatingTask}
+              router={router}
+              tabStatus="participating"
+            />
+            <div className="mt-5 mb-5">
+              <DataTablePagination
+                table={tableParticipating}
+                setPagination={setPaginationParticipating}
+                pagination={paginationParticipating}
+              />
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
     </main>
