@@ -1,12 +1,11 @@
-import { Cuid } from "@/components/departments/details/details.main";
-// import {
-//   useApproveTaskMutation,
-//   useGetApprovedAndCompletedList,
-// } from "@/hooks/subgraph/querycall";
-
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { DialogButton } from "@/components/common/ui/dialog";
-import { useCheckTaskStatus, useGetTaskById } from "@/hooks/subgraph/task";
+import { Cuid } from "@/components/departments/details/details.main";
+import {
+  useCheckTaskStatus,
+  useCloseTaskMutation,
+  useGetTaskById,
+} from "@/hooks/subgraph/task";
 import { useDisburseTokenToTask } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
@@ -24,23 +23,41 @@ type TaskMainProps = {
 
 const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const getTaskDetail = useGetTaskById(cuid.id);
-
   const [isDisbursed, setIsDisbursed] = useState(false);
+  const { toast } = useToast();
 
   const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
-
 
   const { status, statusLoading } = useCheckTaskStatus(
     taskData?.internal_id,
     taskData?.rewardManagement?.rewardManagement,
   );
 
-  const { toast } = useToast();
+  const { disburseTokenToTask, disbursePending } = useDisburseTokenToTask();
+
+  const closeTaskMutation = useCloseTaskMutation();
+
+  const handleCloseTask = async () => {
+    try {
+      await closeTaskMutation.mutateAsync({
+        taskId: taskData.internal_id,
+        entityId: taskData.rewardManagement.rewardManagement,
+      });
+      toast({
+        title: "Task closed successfully!",
+        variant: "success",
+      });
+    } catch (error) {
+      console.error("Error closing task:", error);
+      toast({
+        title: "Failed to close task. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const [localStatus, setLocalStatus] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-
-  const { disburseTokenToTask, disbursePending } = useDisburseTokenToTask();
 
   const handleDialogAction = async (data: any) => {
     try {
@@ -52,7 +69,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
       setIsOpen(false);
       setIsDisbursed(true);
       toast({
-        title: "Disperse Token Successfully!.",
+        title: "Disperse Token Successfully!",
         variant: "success",
       });
     } catch (error) {
@@ -66,6 +83,8 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
 
   const isDisburseButtonDisabled =
     statusLoading || status || isDisbursed || disbursePending;
+  const isCloseButtonDisabled =
+    statusLoading || status || closeTaskMutation.isPending;
 
   const getDisburseButton = () => {
     if (disbursePending) {
@@ -82,9 +101,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     return (
       <Button
         variant="outline"
-        style={{
-          border: "1px solid #03AB65",
-        }}
+        style={{ border: "1px solid #03AB65" }}
         onClick={() => setIsOpen(true)}
         disabled={isDisburseButtonDisabled}
       >
@@ -110,8 +127,8 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
         subtitle
         titleWidth="w-64"
         subtitleWidth="w-72"
-        cardCount={2} // TaskDetails + Participants
-        gridCols="grid-cols-1" // stacked sections
+        cardCount={2}
+        gridCols="grid-cols-1"
         cardHeight="h-44"
         showPagination={false}
       />
@@ -137,11 +154,25 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
           </div>
           <div className="flex items-center ml-auto gap-4">
             {getDisburseButton()}
-
-            <Button variant="outline" className="border border-[#E44134]">
-              <span className="text-[#E44134]">Close</span>{" "}
-              <CircleX color="#E44134" strokeWidth={2.5} size={20} />
+            <Button
+              variant="outline"
+              className="border border-[#E44134]"
+              onClick={handleCloseTask}
+              disabled={isCloseButtonDisabled}
+            >
+              {closeTaskMutation.isPending ? (
+                <span className="text-[#E44134] flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Closing...
+                </span>
+              ) : (
+                <>
+                  <span className="text-[#E44134]">Close</span>
+                  <CircleX color="#E44134" strokeWidth={2.5} size={20} />
+                </>
+              )}
             </Button>
+
             {!disbursePending && isOpen && (
               <DialogButton
                 isOpen={isOpen}

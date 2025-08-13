@@ -131,10 +131,14 @@ export const useCloseTaskMutation = () => {
     },
 
     onSuccess: async (result, variable) => {
-      // await new Promise((resolve) => setTimeout(resolve, 9000));
-      // await queryClient.invalidateQueries({
-      //   queryKey: ["AllParticipantsStatus", variable.taskId],
-      // });
+      await new Promise((resolve) => setTimeout(resolve, 9000));
+      await queryClient.invalidateQueries({
+        queryKey: [
+          "rewardManagementIsTaskExpired",
+          variable.entityId,
+          variable.taskId,
+        ],
+      });
     },
   });
 };
