@@ -2,9 +2,9 @@ import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
 import {
-  useCheckTaskStatus,
   useCloseTaskMutation,
   useGetTaskById,
+  useIsTaskExpired,
 } from "@/hooks/subgraph/task";
 import { useDisburseTokenToTask } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
@@ -28,13 +28,12 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
 
   const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
 
-  const { status, statusLoading } = useCheckTaskStatus(
+  const { status, statusLoading } = useIsTaskExpired(
     taskData?.internal_id,
     taskData?.rewardManagement?.rewardManagement,
   );
 
   const { disburseTokenToTask, disbursePending } = useDisburseTokenToTask();
-
   const closeTaskMutation = useCloseTaskMutation();
 
   const handleCloseTask = async () => {
@@ -81,10 +80,15 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     }
   };
 
+  // ✅ Now we just use the hook's `status` to decide closed state
+  // Only compute closed state once we know the real status
+  const isTaskClosed = !status && !statusLoading;
+
   const isDisburseButtonDisabled =
-    statusLoading || status || isDisbursed || disbursePending;
+    isTaskClosed || statusLoading || isDisbursed || disbursePending;
+
   const isCloseButtonDisabled =
-    statusLoading || status || closeTaskMutation.isPending;
+    isTaskClosed || statusLoading || closeTaskMutation.isPending;
 
   const getDisburseButton = () => {
     if (disbursePending) {
@@ -198,5 +202,4 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     </main>
   );
 };
-
 export default TaskMain;
