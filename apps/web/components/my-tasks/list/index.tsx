@@ -69,7 +69,6 @@ export default function TaskListMain({ router }: TaskListMainProps) {
   const { data: dataOwned, isLoading: isLoadingOwned } =
     useGetTasksOwnedByIndividual(address as `0x${string}`);
   const ownedTaskList = dataOwned?.data?.taskCreateds ?? [];
-  console.log("ownedTaskList", dataOwned?.data?.taskCreateds);
 
   const { data: dataParticipating } = useGetTaskListByParticipant(
     address as `0x${string}`,
@@ -162,7 +161,7 @@ export default function TaskListMain({ router }: TaskListMainProps) {
             <CardHeader className="flex-grow">
               <CardTitle className="flex items-center gap-2 p-0 mb-2 text-[#0F172A]">
                 <User className="text-blue-500" size={20} />
-                Owned
+                Verified Tasks
               </CardTitle>
               <CardFooter className="text-blue-500 text-2xl font-bold">
                 {verified}
