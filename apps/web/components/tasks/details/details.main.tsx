@@ -2,9 +2,9 @@ import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
 import {
+  useCheckTaskStatus,
   useCloseTaskMutation,
   useGetTaskById,
-  useIsTaskExpired,
 } from "@/hooks/subgraph/task";
 import { useDisburseTokenToTask } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
@@ -28,10 +28,17 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
 
   const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
 
-  const { status, statusLoading } = useIsTaskExpired(
+  // const { status, statusLoading } = useIsTaskExpired(
+  //   taskData?.internal_id,
+  //   taskData?.rewardManagement?.rewardManagement,
+  // );
+
+  const { taskDetail } = useCheckTaskStatus(
     taskData?.internal_id,
-    taskData?.rewardManagement?.rewardManagement,
+    taskData?.rewardManagement.rewardManagement,
   );
+
+  console.log("Task Detail:", taskDetail?.isOpen);
 
   const { disburseTokenToTask, disbursePending } = useDisburseTokenToTask();
   const closeTaskMutation = useCloseTaskMutation();
@@ -80,15 +87,8 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     }
   };
 
-  // ✅ Now we just use the hook's `status` to decide closed state
-  // Only compute closed state once we know the real status
-  const isTaskClosed = !status && !statusLoading;
-
-  const isDisburseButtonDisabled =
-    isTaskClosed || statusLoading || isDisbursed || disbursePending;
-
-  const isCloseButtonDisabled =
-    isTaskClosed || statusLoading || closeTaskMutation.isPending;
+  // const isDisburseButtonDisabled =
+  //   isTaskClosed || statusLoading || isDisbursed || disbursePending;
 
   const getDisburseButton = () => {
     if (disbursePending) {
@@ -107,7 +107,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
         variant="outline"
         style={{ border: "1px solid #03AB65" }}
         onClick={() => setIsOpen(true)}
-        disabled={isDisburseButtonDisabled}
+        // disabled={isDisburseButtonDisabled}
       >
         <span className="text-[#03AB65]">Disperse Token</span>
         <CheckCircle
@@ -162,7 +162,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
               variant="outline"
               className="border border-[#E44134]"
               onClick={handleCloseTask}
-              disabled={isCloseButtonDisabled}
+              // disabled={isCloseButtonDisabled}
             >
               {closeTaskMutation.isPending ? (
                 <span className="text-[#E44134] flex items-center gap-2">
