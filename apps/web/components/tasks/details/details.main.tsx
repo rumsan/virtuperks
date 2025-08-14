@@ -23,25 +23,34 @@ type TaskMainProps = {
 
 const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const getTaskDetail = useGetTaskById(cuid.id);
-  const [isDisbursed, setIsDisbursed] = useState(false);
   const { toast } = useToast();
+  const [isOpen, setIsOpen] = useState(false);
+  const [isDisbursed, setIsDisbursed] = useState(false);
 
   const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
 
-  // const { status, statusLoading } = useIsTaskExpired(
-  //   taskData?.internal_id,
-  //   taskData?.rewardManagement?.rewardManagement,
-  // );
+  // const { status: isTaskExpired, statusLoading: isTaskExpiredLoading } =
+  //   useIsTaskExpired(
+  //     taskData?.internal_id,
+  //     taskData?.rewardManagement.rewardManagement,
+  //   );
 
-  const { taskDetail } = useCheckTaskStatus(
+  const {
+    taskDetail,
+    status: isTokenDisbursedFromContract,
+    statusLoading: taskDetailLoading,
+  } = useCheckTaskStatus(
     taskData?.internal_id,
     taskData?.rewardManagement.rewardManagement,
   );
 
-  console.log("Task Detail:", taskDetail?.isOpen);
-
+  const isTaskExpired = !taskDetail?.isOpen;
   const { disburseTokenToTask, disbursePending } = useDisburseTokenToTask();
   const closeTaskMutation = useCloseTaskMutation();
+
+  const taskReady = !taskDetailLoading;
+  const isDisburseButtonDisabled = !taskReady || isTokenDisbursedFromContract;
+  const isCloseButtonDisabled = !taskReady || isTaskExpired;
 
   const handleCloseTask = async () => {
     try {
@@ -49,10 +58,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
         taskId: taskData.internal_id,
         entityId: taskData.rewardManagement.rewardManagement,
       });
-      toast({
-        title: "Task closed successfully!",
-        variant: "success",
-      });
+      toast({ title: "Task closed successfully!", variant: "success" });
     } catch (error) {
       console.error("Error closing task:", error);
       toast({
@@ -61,9 +67,6 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
       });
     }
   };
-
-  const [localStatus, setLocalStatus] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
 
   const handleDialogAction = async (data: any) => {
     try {
@@ -74,10 +77,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
       });
       setIsOpen(false);
       setIsDisbursed(true);
-      toast({
-        title: "Disperse Token Successfully!",
-        variant: "success",
-      });
+      toast({ title: "Disperse Token Successfully!", variant: "success" });
     } catch (error) {
       console.error("Error approving task:", error);
       toast({
@@ -86,9 +86,6 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
       });
     }
   };
-
-  // const isDisburseButtonDisabled =
-  //   isTaskClosed || statusLoading || isDisbursed || disbursePending;
 
   const getDisburseButton = () => {
     if (disbursePending) {
@@ -107,17 +104,12 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
         variant="outline"
         style={{ border: "1px solid #03AB65" }}
         onClick={() => setIsOpen(true)}
-        // disabled={isDisburseButtonDisabled}
+        disabled={isDisburseButtonDisabled}
       >
         <span className="text-[#03AB65]">Disperse Token</span>
         <CheckCircle
           className="ml-2"
-          style={{
-            color: "#03AB65",
-            strokeWidth: 2.5,
-            width: "20px",
-            height: "20px",
-          }}
+          style={{ color: "#03AB65", strokeWidth: 2.5, width: 20, height: 20 }}
         />
       </Button>
     );
@@ -149,6 +141,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
           <ArrowLeft size={24} strokeWidth={2} />
           <span className="font-base text-gray-700">Back</span>
         </div>
+
         <div className="flex items-center">
           <div className="flex flex-col gap-1">
             <h1 className="font-bold text-4xl">Task Details</h1>
@@ -156,13 +149,15 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
               Detailed view of the selected task
             </h3>
           </div>
+
           <div className="flex items-center ml-auto gap-4">
             {getDisburseButton()}
+
             <Button
               variant="outline"
               className="border border-[#E44134]"
               onClick={handleCloseTask}
-              // disabled={isCloseButtonDisabled}
+              disabled={isCloseButtonDisabled}
             >
               {closeTaskMutation.isPending ? (
                 <span className="text-[#E44134] flex items-center gap-2">
@@ -202,4 +197,5 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     </main>
   );
 };
+
 export default TaskMain;

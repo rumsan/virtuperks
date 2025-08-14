@@ -1,5 +1,4 @@
 import { Cuid } from "@/components/departments/details/details.main";
-import { useCheckTaskStatus } from "@/hooks/subgraph/task";
 import { useGetTaskDetailById } from "@/hooks/subgraph/taskDetail";
 import { formatDate } from "@/utils/formatDate";
 import { Card, CardTitle } from "@workspace/ui/components/card";
@@ -14,10 +13,6 @@ const TaskDetails = ({ cuid }: TaskDetailsProps) => {
 
   const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
 
-  const { taskDetail } = useCheckTaskStatus(
-    taskData?.internal_id,
-    taskData?.rewardManagement.rewardManagement,
-  );
 
   const formattedDate = formatDate(taskData?.taskDetail?.expiryDate);
 
@@ -36,10 +31,10 @@ const TaskDetails = ({ cuid }: TaskDetailsProps) => {
             </span>
             <span
               className={`px-2 py-0.5 rounded text-white text-xs font-semibold ${
-                taskDetail?.isOpen ? "bg-green-500" : "bg-red-500"
+                taskData?.taskDetail?.isOpen ? "bg-green-500" : "bg-red-500"
               }`}
             >
-              {taskDetail?.isOpen ? "Open" : "Closed"}
+              {taskData?.taskDetail?.isOpen ? "Open" : "Closed"}
             </span>
           </div>
 
