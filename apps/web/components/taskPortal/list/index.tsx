@@ -14,6 +14,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
+import { Tasks } from "@workspace/sdk/type";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import React from "react";
 import { useColumns } from "../details/details.column";
@@ -29,6 +30,7 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
   const getAllTask = useGetAllTask();
 
   const allTask = getAllTask?.data?.data?.taskCreateds || [];
+
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
@@ -40,13 +42,17 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
     pageSize: 10,
   });
 
-  const columns = useColumns();
+  const columns = useColumns() as import("@tanstack/react-table").ColumnDef<
+    Tasks,
+    any
+  >[];
 
-  const table = useReactTable({
+  const table = useReactTable<Tasks>({
     data: allTask,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -58,6 +64,7 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination,
     },
   });
 
@@ -84,7 +91,12 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
           </h3>
         </div>
 
-        <TaskPortalCard data={allTask} router={router} />
+        {/* <TaskPortalCard data={allTask} router={router} /> */}
+
+        <TaskPortalCard
+          data={table.getRowModel().rows.map((row) => row.original)}
+          router={router}
+        />
 
         <div className="mt-5 mb-5">
           <DataTablePagination

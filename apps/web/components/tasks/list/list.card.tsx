@@ -35,10 +35,10 @@ const ListCardDetails = ({
               <span>{task?.taskDetail?.name}</span>
               <span
                 className={`px-2 py-0.5 rounded text-white text-xs font-semibold ${
-                  task?.taskDetail?.isOpen ? "bg-green-500" : "bg-red-500"
+                  tabStatus === "open" ? "bg-green-500" : "bg-red-500"
                 }`}
               >
-                {task?.taskDetail?.isOpen ? "Open" : "Closed"}
+                {tabStatus === "open" ? "Open" : "Closed"}
               </span>
             </div>
 

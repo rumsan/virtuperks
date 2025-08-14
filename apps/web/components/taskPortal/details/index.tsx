@@ -7,6 +7,7 @@ import { Cuid } from "@/components/departments/details/details.main";
 // } from "@/hooks/subgraph/querycall";
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { DialogButton } from "@/components/common/ui/dialog";
+import { useGetWhiteListedParticipantByTask } from "@/hooks/subgraph/participant";
 import {
   useCheckParticipantStatus,
   useCompleteTaskMutation,
@@ -22,7 +23,6 @@ import { useState } from "react";
 import { useAccount } from "wagmi";
 import TaskPortalParticipant from "./details.participant";
 import TaskPortalDetails from "./details.task";
-import { useGetWhiteListedParticipantByTask } from "@/hooks/subgraph/participant";
 
 type TaskPortalMainProps = {
   cuid: Cuid;
@@ -30,6 +30,7 @@ type TaskPortalMainProps = {
 };
 
 const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
+  console.log("Cuid:", cuid);
   const [isOpen, setIsOpen] = useState(false);
   const [alertDialog, setAlertDialog] = useState(false);
   const [localButtonState, setLocalButtonState] = useState<string | null>(null);
@@ -37,14 +38,21 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const { isConnected, address } = useAccount();
 
   const getTaskDetail = useGetTaskById(cuid.id);
-  
+
+  console.log("Loading:", getTaskDetail.isLoading);
+  console.log("Error:", getTaskDetail.isError);
+  console.log("Data:", getTaskDetail.data);
 
   const { toast } = useToast();
-  const taskData = getTaskDetail?.data?.data?.taskCreated;
-  const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(taskData?.internal_id, false);
+  const taskData = getTaskDetail?.data?.data?.taskCreateds?.[0];
+  console.log("Task Data:", taskData);
+  const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(
+    taskData?.internal_id,
+    false,
+  );
 
-  const whiteListedParticipants = getWhiteListedParticipants?.data?.data?.participantWhitelisteds || [];
-
+  const whiteListedParticipants =
+    getWhiteListedParticipants?.data?.data?.participantWhitelisteds || [];
 
   const { participateTask, participatePending, participateSuccess } =
     useParticipateTaskMutation();
@@ -56,23 +64,19 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
       taskData?.rewardManagement?.rewardManagement,
     );
 
-
   const handleApplyTask = async () => {
     if (!isConnected) {
       setAlertDialog(true);
       return;
     }
- 
 
     // Check if the connected address is whitelisted
-   
+
     const isWhitelisted = whiteListedParticipants.some(
       (participantList: { participant: string }, index: number) => {
-      
-        return participantList.participant === address?.toLowerCase()
+        return participantList.participant === address?.toLowerCase();
       },
     );
-  
 
     if (!isWhitelisted) {
       toast({
