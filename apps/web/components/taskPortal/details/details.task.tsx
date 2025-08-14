@@ -8,6 +8,7 @@ type TaskPortalDetailsProps = {
 };
 
 const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
+  console.log("Task Data:", taskData);
   const handleUrlClick = (e: React.MouseEvent, url: string) => {
     e.stopPropagation();
     window.open(url, "_blank", "noopener,noreferrer");
@@ -18,8 +19,12 @@ const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
         <CardTitle className="flex flex-col gap-1 w-full">
           <div className="flex items-center gap-2">
             <span>{taskData?.taskDetail?.name}</span>
-            <span className="w-20 h-6 flex items-center justify-center bg-blue-50 rounded-full text-green-700 p-1 text-sm font-normal">
-              {taskData?.taskDetail?.isOpen === true ? `open` : `closed`}
+            <span
+              className={`px-2 py-0.5 rounded text-white text-xs font-semibold ${
+                taskData?.taskDetail.isOpen ? "bg-green-500" : "bg-red-500"
+              }`}
+            >
+              {taskData?.taskDetail.isOpen ? "Open" : "Closed"}
             </span>
           </div>
 
