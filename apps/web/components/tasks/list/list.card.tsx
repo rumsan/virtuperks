@@ -15,16 +15,10 @@ const ListCardDetails = ({
   router,
   tabStatus,
 }: ListCardDetailsProps) => {
-
-  
- 
-
-
   const handleUrlClick = (e: React.MouseEvent, url: string) => {
     e.stopPropagation();
     window.open(url, "_blank", "noopener,noreferrer");
   };
-  
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -32,17 +26,19 @@ const ListCardDetails = ({
         <Card
           key={task?.id}
           className="cursor-pointer"
-          onClick={() => task?.id && router.push(PATHS.TASKS.DETAILS(task?.internal_id))}
+          onClick={() =>
+            task?.id && router.push(PATHS.TASKS.DETAILS(task?.internal_id))
+          }
         >
           <CardTitle className="flex flex-col p-4 gap-2">
             <div className="flex items-center gap-2 text-[#334155]">
               <span>{task?.taskDetail?.name}</span>
               <span
                 className={`px-2 py-0.5 rounded text-white text-xs font-semibold ${
-                tabStatus ==="open" ? "bg-green-500" : "bg-red-500"
+                  tabStatus === "open" ? "bg-green-500" : "bg-red-500"
                 }`}
               >
-                {tabStatus==="open" ? "Open" : "Closed"}
+                {tabStatus === "open" ? "Open" : "Closed"}
               </span>
             </div>
 
