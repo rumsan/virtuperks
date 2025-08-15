@@ -34,7 +34,6 @@ export default function DepartmentDetailsCard({
 }: DepartmentDetailsCardProps) {
   const { data: entity, isLoading, isError, error } = useGetEntityById(cuid.id);
 
-
   const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
     entity?.rewardManagement,
   );
@@ -134,7 +133,9 @@ export default function DepartmentDetailsCard({
                 setIsOpen={setIsOpen}
                 title="Are you sure you want to transfer token amount?"
                 subTitle="This action cannot be undone"
-                buttonName={directTransferPending ? "Processing..." : "Transfer Token"}
+                buttonName={
+                  directTransferPending ? "Processing..." : "Transfer Token"
+                }
                 submitType="directdisburse"
                 handleApplyTaskLogic={handleDialogAction}
               />
@@ -145,7 +146,7 @@ export default function DepartmentDetailsCard({
               variant="default"
               type="button"
               onClick={() =>
-                router.push(PATHS.TREASURER.CREATE(entity.rewardManagement))
+                router.push(PATHS.TREASURER.CREATE(entity.entityId))
               }
             >
               <Plus size={22} strokeWidth={2.75} />

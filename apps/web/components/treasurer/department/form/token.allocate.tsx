@@ -13,7 +13,6 @@ import {
   FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Token, tokenSchema } from "./schema";
@@ -21,13 +20,12 @@ import { Token, tokenSchema } from "./schema";
 const defaultValues: Token = {
   amount: 0,
 };
-
-interface TokenAllocateMainProps {
-  router: AppRouterInstance;
-  id: { id: string };
-}
-
-const TokenAllocateForm = ({ router, id }: TokenAllocateMainProps) => {
+// interface TokenAllocateMainProps {
+//   id: string;
+//   availableTokens: bigint;
+// }
+const TokenAllocateForm = (id: any) => {
+  console.log("TokenAllocateForm Params:", id.id);
   const form = useForm({
     resolver: zodResolver(tokenSchema()),
     defaultValues,
