@@ -56,6 +56,13 @@ export default function DepartmentDetailsCard({
   } = useDirectTokenTransfer();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [transferAmount, setTransferAmount] = useState<number>(0);
+  const [isAmountValid, setIsAmountValid] = useState(true);
+
+  const handleAmountChange = (value: number) => {
+    setTransferAmount(value);
+    setIsAmountValid(value <= (unallocatedTokens ?? 0));
+  };
 
   if (isLoading) {
     return <p className="text-gray-600">Loading department info...</p>;
@@ -76,6 +83,23 @@ export default function DepartmentDetailsCard({
   }
 
   const handleDialogAction = async (data: any) => {
+    if (!unallocatedTokens) {
+      toast({
+        title: "Unable to fetch available tokens.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (data.amount > unallocatedTokens) {
+      toast({
+        title: `Transfer amount exceeds available tokens!`,
+        description: `Available: ${unallocatedTokens}, Requested: ${data.amount}`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       await directTransfer({
         to: data.to,
@@ -85,13 +109,13 @@ export default function DepartmentDetailsCard({
       });
       setIsOpen(false);
       toast({
-        title: "Token transfered Successfully!.",
+        title: "Token transferred successfully!",
         variant: "success",
       });
     } catch (error) {
-      console.error("Error approving transfering token:", error);
+      console.error("Error transferring token:", error);
       toast({
-        title: "Failed To transfer token. Please Try Again.",
+        title: "Failed to transfer token. Please try again.",
         variant: "destructive",
       });
     }
@@ -142,6 +166,9 @@ export default function DepartmentDetailsCard({
                 }
                 submitType="directdisburse"
                 handleApplyTaskLogic={handleDialogAction}
+                availableTokens={
+                  unallocatedTokens ? Number(unallocatedTokens) : 0
+                }
               />
             )}
 
