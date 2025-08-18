@@ -9,6 +9,7 @@ import {
 } from "@/hooks/subgraph/entity";
 import { useDirectTokenTransfer } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
+import hasRole from "@/utils/role";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -43,6 +44,9 @@ export default function DepartmentDetailsCard({
   );
 
   const { getEntityOwners } = useGetEntityOwners(entity?.entityId);
+
+  const roleData = hasRole({ role: process.env.NEXT_PUBLIC_MINTER_ROLE! });
+  const canAllocateToken = Boolean(roleData);
 
   const {
     directTransfer,
@@ -141,14 +145,19 @@ export default function DepartmentDetailsCard({
               />
             )}
 
-            <Button
-              className="h-12 w-48 fw-[600] flex items-center justify-center"
-              variant="default"
-              type="button"
-              onClick={() => router.push(PATHS.TREASURER.CREATE(cuid.id))}
-            >
-              Allocate Token
-            </Button>
+            {canAllocateToken && (
+              <Button
+                className="h-12 w-48 fw-[600] flex items-center justify-center"
+                variant="default"
+                type="button"
+                onClick={() =>
+                  router.push(PATHS.TREASURER.CREATE(entity.rewardManagement))
+                }
+              >
+                <Plus size={22} strokeWidth={2.75} />
+                <span className="ml-2">Allocate Token</span>
+              </Button>
+            )}
           </div>
         </div>
       </div>
