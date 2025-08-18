@@ -145,12 +145,9 @@ export default function DepartmentDetailsCard({
               className="h-12 w-48 fw-[600] flex items-center justify-center"
               variant="default"
               type="button"
-              onClick={() =>
-                router.push(PATHS.TREASURER.CREATE(entity.entityId))
-              }
+              onClick={() => router.push(PATHS.TREASURER.CREATE(cuid.id))}
             >
-              <Plus size={22} strokeWidth={2.75} />
-              <span className="ml-2">Allocate Token</span>
+              Allocate Token
             </Button>
           </div>
         </div>
