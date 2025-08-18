@@ -21,11 +21,9 @@ interface TokenCreateMainProps {
 
 const TokenCreateMain = ({ id }: TokenCreateMainProps) => {
   const { data: entity, isLoading, isError, error } = useGetEntityById(id.id);
-
   const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
     entity?.rewardManagement,
   );
- 
 
   const { totalAllocatedTokens } = useCheckTotalAllocatedTokens(
     entity?.rewardManagement,
@@ -143,8 +141,9 @@ const TokenCreateMain = ({ id }: TokenCreateMainProps) => {
       </div>
 
       <TokenAllocateForm
-        id={entity?.rewardManagement}
+        id={entity?.entityId}
         availableTokens={unallocatedTokens}
+        entityData={entity}
       />
     </main>
   );
