@@ -30,7 +30,6 @@ type TaskPortalMainProps = {
 };
 
 const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
-  console.log("Cuid:", cuid);
   const [isOpen, setIsOpen] = useState(false);
   const [alertDialog, setAlertDialog] = useState(false);
   const [localButtonState, setLocalButtonState] = useState<string | null>(null);
@@ -39,13 +38,13 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
   const getTaskDetail = useGetTaskById(cuid.id);
 
-  console.log("Loading:", getTaskDetail.isLoading);
-  console.log("Error:", getTaskDetail.isError);
-  console.log("Data:", getTaskDetail.data);
-
   const { toast } = useToast();
   const taskData = getTaskDetail?.data?.data?.taskCreateds?.[0];
-  console.log("Task Data:", taskData);
+
+  const isTaskOpen = taskData?.taskDetail?.isOpen;
+
+  // const isTaskClosed = taskDetail ? !taskDetail.isOpen : false;
+
   const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(
     taskData?.internal_id,
     false,
@@ -158,9 +157,16 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
       );
     }
 
-    // Convert localButtonState to number if it's a string
+    // if task is closed
+    if (!isTaskOpen) {
+      return (
+        <Button className="bg-gray-400 cursor-not-allowed" disabled>
+          <span className="text-white">Task Closed</span>
+        </Button>
+      );
+    }
+
     const effectiveStatus = localButtonState ?? participantStatus;
-    console.log(effectiveStatus, "effectiveStatus");
 
     switch (effectiveStatus) {
       case 0: // NONE
@@ -221,7 +227,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             )}
           </>
         );
-
       case "COMPLETED":
       case 3:
         return (
@@ -239,7 +244,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             <span className="text-[#F8FAFC]">Verified</span>
           </Button>
         );
-
       default:
         return null;
     }
