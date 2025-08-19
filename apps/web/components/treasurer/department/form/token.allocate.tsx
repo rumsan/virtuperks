@@ -14,7 +14,7 @@ import {
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
 import { useEffect } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Token, tokenSchema } from "./schema";
 
 const defaultValues: Token = {
@@ -24,11 +24,10 @@ const defaultValues: Token = {
 interface TokenAllocateFormProps {
   id: string;
   availableTokens?: bigint;
+  entityData?: any;
 }
 
-const TokenAllocateForm = ({ id, availableTokens }: TokenAllocateFormProps) => {
-  console.log("Unallocated Tokens:", Number(availableTokens ?? 0));
-
+const TokenAllocateForm = ({ id, entityData }: TokenAllocateFormProps) => {
   const form = useForm({
     resolver: zodResolver(tokenSchema()),
     defaultValues,
@@ -47,26 +46,14 @@ const TokenAllocateForm = ({ id, availableTokens }: TokenAllocateFormProps) => {
 
   const handleSubmit = async (data: Token) => {
     try {
-      const amount = data.amount;
-
       await tokenMint({
-        address: id,
-        amount: amount,
+        address: entityData.rewardManagement,
+        amount: data.amount,
       });
     } catch (err) {
       console.error("Minting failed:", err);
     }
   };
-
- 
-  const noTokensAvailable = !availableTokens || availableTokens === BigInt(0);
-
-
-  const enteredAmount = useWatch({ control: form.control, name: "amount" });
-
-  const exceedsAvailable = Boolean(
-    availableTokens && enteredAmount && enteredAmount > Number(availableTokens),
-  );
 
   return (
     <div className="my-6">
@@ -90,21 +77,8 @@ const TokenAllocateForm = ({ id, availableTokens }: TokenAllocateFormProps) => {
                             onChange={(e) =>
                               field.onChange(e.target.valueAsNumber)
                             }
-                            disabled={noTokensAvailable} // disable input if no tokens
                           />
                         </FormControl>
-                        {/* Message below input */}
-                        {noTokensAvailable && (
-                          <p className="text-sm text-red-500 mt-1">
-                            ⚠️ No tokens to allocate
-                          </p>
-                        )}
-                        {exceedsAvailable && (
-                          <p className="text-sm text-red-500 mt-1">
-                            ⚠️ You have only {availableTokens?.toString()}{" "}
-                            tokens available
-                          </p>
-                        )}
                         <FormMessage />
                       </FormItem>
                     )}
@@ -127,9 +101,7 @@ const TokenAllocateForm = ({ id, availableTokens }: TokenAllocateFormProps) => {
                     type="submit"
                     variant="default"
                     className="w-[170px] flex justify-center items-center gap-2"
-                    disabled={
-                      mintPending || noTokensAvailable || exceedsAvailable
-                    } 
+                    disabled={mintPending}
                   >
                     {mintPending ? "Minting..." : "Create"}
                   </Button>
