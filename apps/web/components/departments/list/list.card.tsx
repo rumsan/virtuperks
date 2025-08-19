@@ -1,6 +1,5 @@
-import { useGetAllEntity, useGetOwner } from "@/hooks/subgraph/entity";
+import { useGetAllEntity } from "@/hooks/subgraph/entity";
 import { PATHS } from "@/routes/paths";
-import hasRole from "@/utils/role";
 import { DepartmentDetails } from "@workspace/sdk/type";
 import {
   Card,
@@ -19,8 +18,6 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
   const getAllEntity = useGetAllEntity();
 
   const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
- // const {}= useGetOwner
-
 
   return (
     <div className="grid grid-cols-4 gap-4 w-full p-4">

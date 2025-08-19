@@ -24,10 +24,15 @@ const defaultValues: Token = {
 interface TokenAllocateFormProps {
   id: string;
   availableTokens?: bigint;
+  entityData?: any; 
 }
 
-const TokenAllocateForm = ({ id, availableTokens }: TokenAllocateFormProps) => {
-  console.log("Unallocated Tokens:", Number(availableTokens ?? 0));
+const TokenAllocateForm = ({
+  id,
+  availableTokens,
+  entityData,
+}: TokenAllocateFormProps) => {
+  
 
   const form = useForm({
     resolver: zodResolver(tokenSchema()),
@@ -50,7 +55,7 @@ const TokenAllocateForm = ({ id, availableTokens }: TokenAllocateFormProps) => {
       const amount = data.amount;
 
       await tokenMint({
-        address: id,
+        address: entityData.rewardManagement,
         amount: amount,
       });
     } catch (err) {
@@ -58,9 +63,7 @@ const TokenAllocateForm = ({ id, availableTokens }: TokenAllocateFormProps) => {
     }
   };
 
- 
   const noTokensAvailable = !availableTokens || availableTokens === BigInt(0);
-
 
   const enteredAmount = useWatch({ control: form.control, name: "amount" });
 
@@ -129,7 +132,7 @@ const TokenAllocateForm = ({ id, availableTokens }: TokenAllocateFormProps) => {
                     className="w-[170px] flex justify-center items-center gap-2"
                     disabled={
                       mintPending || noTokensAvailable || exceedsAvailable
-                    } 
+                    }
                   >
                     {mintPending ? "Minting..." : "Create"}
                   </Button>
