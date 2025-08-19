@@ -31,8 +31,6 @@ const TokenMarketListCard = () => {
     role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
   });
 
-  console.log("Role Data: ", isDefaultAdmin);
-
   const { address } = useAccount();
   const { participantTotalToken } = useCheckParticipantBalance(
     address as `0x${string}`,
