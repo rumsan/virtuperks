@@ -34,6 +34,7 @@ export default function DepartmentDetailsCard({
   router,
 }: DepartmentDetailsCardProps) {
   const { data: entity, isLoading, isError, error } = useGetEntityById(cuid.id);
+  console.log("Entity Data AA:", entity.rewardManagement);
 
   const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
     entity?.rewardManagement,
@@ -178,7 +179,7 @@ export default function DepartmentDetailsCard({
                 variant="default"
                 type="button"
                 onClick={() =>
-                  router.push(PATHS.TREASURER.CREATE(entity.rewardManagement))
+                  router.push(PATHS.TREASURER.CREATE(entity.entityId))
                 }
               >
                 <Plus size={22} strokeWidth={2.75} />

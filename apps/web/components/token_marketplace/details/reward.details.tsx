@@ -22,6 +22,7 @@ export interface RewardDetailsProps {
 }
 
 const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
+  console.log("Reward ID: ", rewardId);
   const { data: rewardDetail, isLoading, error } = useGetRewardById(rewardId);
   const { address, isConnected } = useAccount();
   //hook to check participant balance
@@ -59,6 +60,13 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   }
 
   const rewardRaw = rewardDetail?.data?.rewardRedemptionCreateds[0];
+  console.log("Reward Raw Data: ", rewardRaw);
+
+  // const {
+  //   getRewardOwner: rewardOwner,
+  //   isError: ownerError,
+  //   isLoading: ownerLoading,
+  // } = useGetRewardOwner(rewardRaw?.rewardId);
 
   const handleApprove = async () => {
     try {
@@ -97,45 +105,61 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
 
       <div className="flex flex-col md:flex-row gap-6 items-start">
         {/* Left Section */}
-        <div className="flex-[2] border border-gray-200 rounded-lg p-5 bg-white">
-          <div className="bg-gray-100 rounded-lg h-48 flex items-center justify-center mb-5">
-            {/* <img
-              src={getImageForTitle(rewardRaw.name)}
-              alt={rewardRaw.name}
-              className="object-cover h-full w-full rounded-lg"
-            /> */}
-
+        <div className="flex-[2] border border-gray-200 rounded-2xl p-6 bg-white shadow-sm hover:shadow-md transition-shadow">
+          {/* Image Section */}
+          <div className="relative rounded-xl overflow-hidden h-52 mb-6">
             <Image
               src={
                 categoryColorMap[rewardRaw.category]?.image ??
                 "https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg"
               }
               alt={rewardRaw.name}
-              width={400}
-              height={300}
-              className="w-full h-full object-cover rounded-lg"
+              width={500}
+              height={350}
+              className="w-full h-full object-cover"
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+            <div className="absolute bottom-3 left-3 bg-white/80 text-gray-800 text-xs px-3 py-1 rounded-full shadow">
+              {rewardRaw.category}
+            </div>
           </div>
-          <h2 className="text-xl font-semibold mb-2">
-            Title: {rewardRaw.name}
+
+          {/* Title & Description */}
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            {rewardRaw.name}
           </h2>
-          <p className="text-gray-600 mb-4">Description: Token reward</p>
-          <div className="text-gray-600 mb-4 flex items-center gap-2">
-            <span>Token:</span>
-            <span className="text-blue-600 flex items-center gap-1">
+          <p className="text-gray-600 mb-5 leading-relaxed">
+            Token reward for active members and participants.
+          </p>
+
+          {/* Token Info */}
+          <div className="flex items-center gap-2 text-gray-700 mb-4">
+            <span className="font-medium">Required Tokens:</span>
+            <span className="text-blue-600 flex items-center gap-1 font-semibold text-lg">
               {rewardRaw.tokensRequired}
-              <Coins size={18} strokeWidth={2.65} />
+              <Coins size={20} strokeWidth={2.4} />
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 text-sm text-gray-700 mb-2">
-            <div>
-              <p className="font-medium">Validity</p>
-              <p>6 months from redemption</p>
+          {/* Owner Address */}
+          <div className="bg-gray-50 border rounded-lg p-3 mb-6">
+            <p className="text-sm font-semibold text-gray-800 mb-1">
+              Owner Address
+            </p>
+            <p className="text-xs text-gray-600 break-all font-mono">
+              {/* {rewardOwner} */}
+            </p>
+          </div>
+
+          {/* Details Grid */}
+          <div className="grid grid-cols-2 gap-6 text-sm text-gray-700">
+            <div className="space-y-1">
+              <p className="font-semibold text-gray-900">Validity</p>
+              <p className="text-gray-600">6 months from redemption</p>
             </div>
-            <div>
-              <p className="font-medium">Rules & Regulations</p>
-              <ul className="list-disc list-inside">
+            <div className="space-y-2">
+              <p className="font-semibold text-gray-900">Rules & Regulations</p>
+              <ul className="list-disc list-inside space-y-1 text-gray-600">
                 <li>Non-transferable and cannot be exchanged for cash.</li>
                 <li>Valid only within the redemption period.</li>
                 <li>Subject to availability and venue policies.</li>
