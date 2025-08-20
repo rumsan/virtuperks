@@ -1,5 +1,6 @@
 import { useGetAllEntity } from "@/hooks/subgraph/entity";
 import { PATHS } from "@/routes/paths";
+import hasRole from "@/utils/role";
 import { DepartmentDetails } from "@workspace/sdk/type";
 import {
   Card,
@@ -16,18 +17,24 @@ interface DepartmentListCardProps {
 
 const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
   const getAllEntity = useGetAllEntity();
-
   const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
+  const hasEntityOwnerRole = hasRole({
+    role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
+  });
+
+  const canAddDepartment = Boolean(hasEntityOwnerRole);
 
   return (
     <div className="grid grid-cols-4 gap-4 w-full p-4">
-      <Card
-        className="w-full flex items-center justify-center text-blue-500 bg-blue-50 border-sm border-primary border-dashed cursor-pointer hover:shadow-lg hover:text-blue-400"
-        onClick={() => router.push(PATHS.DEPARTMENT.ADD)}
-      >
-        <span className="text-center text-base">Add Department</span>
-        <Plus size={24} />
-      </Card>
+      {canAddDepartment && (
+        <Card
+          className="w-full flex items-center justify-center text-blue-500 bg-blue-50 border-sm border-primary border-dashed cursor-pointer hover:shadow-lg hover:text-blue-400"
+          onClick={() => router.push(PATHS.DEPARTMENT.ADD)}
+        >
+          <span className="text-center text-base">Add Department</span>
+          <Plus size={24} />
+        </Card>
+      )}
 
       {entityList &&
         entityList.map((department: DepartmentDetails) => {
