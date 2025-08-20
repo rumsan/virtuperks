@@ -2,12 +2,8 @@ import { useGetAllEntity } from "@/hooks/subgraph/entity";
 import { PATHS } from "@/routes/paths";
 import hasRole from "@/utils/role";
 import { DepartmentDetails } from "@workspace/sdk/type";
-import {
-  Card,
-  CardDescription,
-  CardTitle,
-} from "@workspace/ui/components/card";
-import { ArrowRight, Coins, Plus, User } from "lucide-react";
+import { Card, CardTitle } from "@workspace/ui/components/card";
+import { ArrowRight, Building, Plus } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 interface DepartmentListCardProps {
@@ -41,38 +37,29 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
           return (
             <Card
               key={department.id}
-              className="cursor-pointer hover:shadow-lg p-4"
+              className="cursor-pointer hover:shadow-lg p-6 rounded-2xl border border-slate-200 transition-all duration-200 group"
               onClick={() =>
                 router.push(PATHS.DEPARTMENT.DETAILS(department.entityId))
               }
             >
-              <CardTitle className="flex text-base">
-                <span className="text-[#334155]">{department.name}</span>
-
-                <span className="ml-auto w-[90px] flex items-center justify-center bg-[#F1F5F9] rounded-xl font-normal text-[#334155] text-sm">
+              {/* Department Header */}
+              <CardTitle className="flex items-center gap-4 text-lg font-semibold text-[#0F172A]">
+                <div className="p-3 bg-blue-50 rounded-xl flex items-center justify-center">
+                  <Building
+                    size={36}
+                    strokeWidth={2}
+                    className="text-[#297AD6]"
+                  />
+                </div>
+                <span className="truncate text-xl font-bold text-slate-800">
                   {department.name}
                 </span>
               </CardTitle>
-              <CardDescription className="flex gap-2 text-sm">
-                <User size={20} strokeWidth={2.75} />
-                <span>{department.name}</span>
-              </CardDescription>
-              <div className="flex flex-col mr-auto gap-2 p-0 font-normal">
-                {/* <span className="flex text-[#64748B] mt-5">
-                  Available Tokens:
-                </span> */}
-                <div className="flex items-center justify-start">
-                  <div className="flex items-center text-[#297AD6] gap-2">
-                    <Coins size={20} strokeWidth={2.5} color="#297AD6" />
-                    <span className="text-2xl font-bold">
-                      {department.totalAvailableTokens}
-                    </span>
-                  </div>
-                  <div className="flex items-center ml-auto gap-2">
-                    <span className="text-[#297AD6]">View details</span>
-                    <ArrowRight size={24} strokeWidth={2} color="#297AD6" />
-                  </div>
-                </div>
+
+              {/* Footer */}
+              <div className="flex items-center justify-end mt-6 text-[#297AD6] font-medium group-hover:translate-x-1 transition-transform">
+                <span>View details</span>
+                <ArrowRight size={20} strokeWidth={2.25} />
               </div>
             </Card>
           );
