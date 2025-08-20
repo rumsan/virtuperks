@@ -27,8 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select";
-
-import { format, isAfter, startOfDay } from "date-fns";
+import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -79,8 +78,6 @@ export default function TaskBaseForm({
   const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
     entityAddress ?? "",
   );
-  const isAfterToday = (d: Date) =>
-    isAfter(startOfDay(d), startOfDay(new Date()));
 
   useEffect(() => {
     if (entityAddress && totalRewardAmount && unallocatedTokens !== undefined) {
@@ -118,11 +115,12 @@ export default function TaskBaseForm({
 
   const handleAddWallet = () => {
     if (currentWallet && isAddress(currentWallet)) {
-      const updatedWallets = [...walletAddresses, currentWallet];
-      setWalletAddresses(updatedWallets);
-      form.setValue("whitelistedParticipants", updatedWallets);
+      setWalletAddresses((prev) => [...prev, currentWallet]);
+      form.setValue("whitelistedParticipants", [
+        ...walletAddresses,
+        currentWallet,
+      ]);
       setCurrentWallet("");
-      clearErrors("whitelistedParticipants");
     }
   };
 
@@ -130,38 +128,13 @@ export default function TaskBaseForm({
     const filtered = walletAddresses.filter((addr) => addr !== addressToRemove);
     setWalletAddresses(filtered);
     form.setValue("whitelistedParticipants", filtered);
-    if (filtered.length === 0) {
-      setError("whitelistedParticipants", {
-        type: "manual",
-        message: "At least one participant address is required.",
-      });
-    }
   };
 
-  const handleSubmitForm = form.handleSubmit((data) => {
-    const exp = form.getValues("expiryDate");
-    if (!exp || !isAfterToday(exp)) {
-      setError("expiryDate", {
-        type: "manual",
-        message: "Expiry date must be after today.",
-      });
-      return;
-    }
-
-    if (walletAddresses.length === 0) {
-      setError("whitelistedParticipants", {
-        type: "manual",
-        message: "At least one participant address is required.",
-      });
-      return;
-    }
-
-    saveForm(data);
-  });
+  const handleSubmitForm = form.handleSubmit(saveForm);
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmitForm}>
+      <form onSubmit={form.handleSubmit(handleSubmitForm)}>
         <div className="p-6">
           <div className="flex flex-col w-full gap-4 mb-5">
             <FormField
@@ -255,6 +228,7 @@ export default function TaskBaseForm({
                     }
                     onChange={(e) => {
                       const value = e.target.value;
+
                       field.onChange(
                         value === "" ? undefined : parseInt(value, 10),
                       );
@@ -285,6 +259,7 @@ export default function TaskBaseForm({
                       }
                       onChange={(e) => {
                         const value = e.target.value;
+
                         field.onChange(
                           value === "" ? undefined : parseInt(value, 10),
                         );
@@ -306,7 +281,7 @@ export default function TaskBaseForm({
                     <Select
                       onValueChange={(value) => field.onChange(value)}
                       value={process.env.NEXT_PUBLIC_RAHAT_TOKEN || ""}
-                      disabled
+                      disabled // Make it read-only
                     >
                       <SelectTrigger>
                         <SelectValue>Rahat Token</SelectValue>
@@ -396,18 +371,14 @@ export default function TaskBaseForm({
                           mode="single"
                           selected={field.value}
                           onSelect={(date) => {
-                            if (!date || !isAfterToday(date)) {
-                              setError("expiryDate", {
-                                type: "manual",
-                                message: "Expiry date must be after today.",
-                              });
-                              return;
-                            }
                             field.onChange(date);
-                            clearErrors("expiryDate");
                             setIsPopoverOpen(false);
                           }}
-                          disabled={(date) => !isAfterToday(date)}
+                          disabled={(date) => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            return date < today;
+                          }}
                           initialFocus
                         />
                       </PopoverContent>
@@ -440,7 +411,7 @@ export default function TaskBaseForm({
           <FormField
             control={form.control}
             name="whitelistedParticipants"
-            render={() => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel>Add Participant Addresses</FormLabel>
                 <div className="space-y-4">

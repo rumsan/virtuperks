@@ -53,8 +53,7 @@ export default function DepartmentDetailsCard({
   const { entityRole, roleLoading } = useGetEntityRole(
     entity?.rewardManagement || "",
   );
-  // console.log("Entity Role: --", entityRole);
-
+ 
   const hasEntityOwnerRole = hasRole({
     role: entityRole || "",
   });
