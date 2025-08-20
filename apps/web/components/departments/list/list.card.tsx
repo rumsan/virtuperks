@@ -27,7 +27,10 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
           className="w-full flex items-center justify-center text-blue-500 bg-blue-50 border-sm border-primary border-dashed cursor-pointer hover:shadow-lg hover:text-blue-400"
           onClick={() => router.push(PATHS.DEPARTMENT.ADD)}
         >
-          <span className="text-center text-base">Add Department</span>
+          <span className="text-xl font-bold text-blue-500">
+            Add Department
+          </span>
+
           <Plus size={24} />
         </Card>
       )}

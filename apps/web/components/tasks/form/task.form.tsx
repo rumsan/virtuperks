@@ -1,6 +1,9 @@
 "use client";
 
-import { useCheckTotalUnallocatedTokens, useGetAllEntity } from "@/hooks/subgraph/entity";
+import {
+  useCheckTotalUnallocatedTokens,
+  useGetAllEntity,
+} from "@/hooks/subgraph/entity";
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
 import {
@@ -24,7 +27,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select";
-import { format } from "date-fns";
+
+import { format, isAfter, startOfDay } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -62,38 +66,49 @@ export default function TaskBaseForm({
   const getAllEntity = useGetAllEntity();
   const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
 
-  const {  watch, formState: { errors }, setError, clearErrors } = form;
-  
+  const {
+    watch,
+    formState: { errors },
+    setError,
+    clearErrors,
+  } = form;
 
   const entityAddress = watch("entityAddress");
   const totalRewardAmount = watch("totalRewardAmount");
 
+  const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
+    entityAddress ?? "",
+  );
+  const isAfterToday = (d: Date) =>
+    isAfter(startOfDay(d), startOfDay(new Date()));
 
-
-  const { unallocatedTokens } = useCheckTotalUnallocatedTokens(entityAddress ?? "");
-
-  
   useEffect(() => {
     if (entityAddress && totalRewardAmount && unallocatedTokens !== undefined) {
       const amount = BigInt(totalRewardAmount || 0);
       if (amount > unallocatedTokens) {
         setError("totalRewardAmount", {
           type: "manual",
-          message: `Insufficient tokens. Available: ${unallocatedTokens.toString()}`
+          message: `Insufficient tokens. Available: ${unallocatedTokens.toString()}`,
         });
       } else {
         clearErrors("totalRewardAmount");
       }
     }
-  }, [entityAddress, totalRewardAmount, unallocatedTokens, setError, clearErrors]);
+  }, [
+    entityAddress,
+    totalRewardAmount,
+    unallocatedTokens,
+    setError,
+    clearErrors,
+  ]);
 
- 
   useEffect(() => {
     if (entityAddress && unallocatedTokens !== undefined) {
       if (unallocatedTokens === BigInt(0)) {
         setError("entityAddress", {
           type: "manual",
-          message: "Selected entity has no tokens available. Please mint tokens first."
+          message:
+            "Selected entity has no tokens available. Please mint tokens first.",
         });
       } else {
         clearErrors("entityAddress");
@@ -103,27 +118,50 @@ export default function TaskBaseForm({
 
   const handleAddWallet = () => {
     if (currentWallet && isAddress(currentWallet)) {
-      setWalletAddresses((prev) => [...prev, currentWallet]);
-      form.setValue("whitelistedParticipants", [
-        ...walletAddresses,
-        currentWallet,
-      ]);
+      const updatedWallets = [...walletAddresses, currentWallet];
+      setWalletAddresses(updatedWallets);
+      form.setValue("whitelistedParticipants", updatedWallets);
       setCurrentWallet("");
+      clearErrors("whitelistedParticipants");
     }
   };
-
 
   const removeWallet = (addressToRemove: string) => {
     const filtered = walletAddresses.filter((addr) => addr !== addressToRemove);
     setWalletAddresses(filtered);
     form.setValue("whitelistedParticipants", filtered);
+    if (filtered.length === 0) {
+      setError("whitelistedParticipants", {
+        type: "manual",
+        message: "At least one participant address is required.",
+      });
+    }
   };
 
-  const handleSubmitForm = form.handleSubmit(saveForm);
+  const handleSubmitForm = form.handleSubmit((data) => {
+    const exp = form.getValues("expiryDate");
+    if (!exp || !isAfterToday(exp)) {
+      setError("expiryDate", {
+        type: "manual",
+        message: "Expiry date must be after today.",
+      });
+      return;
+    }
+
+    if (walletAddresses.length === 0) {
+      setError("whitelistedParticipants", {
+        type: "manual",
+        message: "At least one participant address is required.",
+      });
+      return;
+    }
+
+    saveForm(data);
+  });
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmitForm)}>
+      <form onSubmit={handleSubmitForm}>
         <div className="p-6">
           <div className="flex flex-col w-full gap-4 mb-5">
             <FormField
@@ -186,10 +224,10 @@ export default function TaskBaseForm({
                             key={entity.id}
                             value={entity.rewardManagement}
                           >
-                            {entity.name} 
-                            {unallocatedTokens !== undefined && entity.rewardManagement === entityAddress && 
-                              ` (Available: ${unallocatedTokens.toString()} tokens)`
-                            }
+                            {entity.name}
+                            {unallocatedTokens !== undefined &&
+                              entity.rewardManagement === entityAddress &&
+                              ` (Available: ${unallocatedTokens.toString()} tokens)`}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -217,7 +255,6 @@ export default function TaskBaseForm({
                     }
                     onChange={(e) => {
                       const value = e.target.value;
-
                       field.onChange(
                         value === "" ? undefined : parseInt(value, 10),
                       );
@@ -248,7 +285,6 @@ export default function TaskBaseForm({
                       }
                       onChange={(e) => {
                         const value = e.target.value;
-
                         field.onChange(
                           value === "" ? undefined : parseInt(value, 10),
                         );
@@ -270,7 +306,7 @@ export default function TaskBaseForm({
                     <Select
                       onValueChange={(value) => field.onChange(value)}
                       value={process.env.NEXT_PUBLIC_RAHAT_TOKEN || ""}
-                      disabled // Make it read-only
+                      disabled
                     >
                       <SelectTrigger>
                         <SelectValue>Rahat Token</SelectValue>
@@ -360,14 +396,18 @@ export default function TaskBaseForm({
                           mode="single"
                           selected={field.value}
                           onSelect={(date) => {
+                            if (!date || !isAfterToday(date)) {
+                              setError("expiryDate", {
+                                type: "manual",
+                                message: "Expiry date must be after today.",
+                              });
+                              return;
+                            }
                             field.onChange(date);
+                            clearErrors("expiryDate");
                             setIsPopoverOpen(false);
                           }}
-                          disabled={(date) => {
-                            const today = new Date();
-                            today.setHours(0, 0, 0, 0);
-                            return date < today;
-                          }}
+                          disabled={(date) => !isAfterToday(date)}
                           initialFocus
                         />
                       </PopoverContent>
@@ -400,7 +440,7 @@ export default function TaskBaseForm({
           <FormField
             control={form.control}
             name="whitelistedParticipants"
-            render={({ field }) => (
+            render={() => (
               <FormItem>
                 <FormLabel>Add Participant Addresses</FormLabel>
                 <div className="space-y-4">
