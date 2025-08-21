@@ -6,7 +6,7 @@ import {
   AvatarImage,
 } from "@workspace/ui/components/avatar";
 import { ConnectKitButton } from "connectkit";
-import { LayoutList, ShoppingBag, Wallet } from "lucide-react";
+import { Layers, LayoutList, ShoppingBag, Wallet } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -41,7 +41,7 @@ export default function TaskPortalNav({ children }: PropsWithChildren) {
     <header className="border-b bg-white">
       <div className="flex h-14 items-center pl-6 pr-4 justify-between border-b-2 border-[#E2E8F0]">
         {/* Left section: Logo + Token Marketplace */}
-        <div className="flex items-center gap-20 h-full">
+        <div className="flex items-center gap-10 h-full">
           <Link href="/" className="flex items-center">
             <Image
               src="/bg/rumsan-logo.png"
@@ -49,6 +49,13 @@ export default function TaskPortalNav({ children }: PropsWithChildren) {
               height={40}
               alt="Logo"
             />
+          </Link>
+          <Link
+            href="/departments"
+            className={`flex items-center ml-10 gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.DEPARTMENTS)}`}
+          >
+            <Layers size={18} strokeWidth={2.65} />
+            Department
           </Link>
           <Link
             href="/token_marketplace"

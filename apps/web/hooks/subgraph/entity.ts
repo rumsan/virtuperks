@@ -6,10 +6,10 @@ import { keccak256 } from "viem";
 import {
   useReadRewardManagementFactoryGetEntityOwners,
   useReadRewardManagementGetTotalUnallocatedTokens,
+  useReadRewardManagementOwner,
   useReadRewardManagementTotalAllocatedTokens,
   useWriteRewardManagementFactoryCreateRewardManagement,
   useWriteRewardTokenMint,
-  useReadRewardManagementOwner
 } from "../wagmi/contracts";
 
 export const useGetAllEntity = () => {
@@ -172,31 +172,21 @@ export const useGetEntityOwners = (entityId: string) => {
   };
 };
 
-
-
-
-export const useGetOwner = (entityId:string) => {
-  
-
-const { data, isError, isLoading } =
-  useReadRewardManagementOwner({
+export const useGetOwner = (entityId: string) => {
+  const { data, isError, isLoading } = useReadRewardManagementOwner({
     address: entityId as `0x${string}`,
     args: [],
   });
 
-return {
-  getEntityOwnerRole: data,
-  isError,
-  statusLoading: isLoading,
+  return {
+    getEntityOwnerRole: data,
+    isError,
+    statusLoading: isLoading,
+  };
 };
 
-
-
-
-}
-
-export const  usegetEntityOwner =(entityId: string) =>{
-  const { data, isError, isLoading } =  useReadRewardManagementOwner({
+export const usegetEntityOwner = (entityId: string) => {
+  const { data, isError, isLoading } = useReadRewardManagementOwner({
     address: entityId as `0x${string}`,
     args: [],
   });
@@ -208,4 +198,15 @@ export const  usegetEntityOwner =(entityId: string) =>{
   };
 };
 
+export const useGetEntityRole = (entityId: string) => {
+  const { data, isError, isLoading } = useReadRewardManagementOwner({
+    address: entityId as `0x${string}`,
+    args: [],
+  });
 
+  return {
+    entityRole: data,
+    isError,
+    roleLoading: isLoading,
+  };
+};

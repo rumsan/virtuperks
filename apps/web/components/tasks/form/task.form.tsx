@@ -1,6 +1,9 @@
 "use client";
 
-import { useCheckTotalUnallocatedTokens, useGetAllEntity } from "@/hooks/subgraph/entity";
+import {
+  useCheckTotalUnallocatedTokens,
+  useGetAllEntity,
+} from "@/hooks/subgraph/entity";
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
 import {
@@ -62,38 +65,47 @@ export default function TaskBaseForm({
   const getAllEntity = useGetAllEntity();
   const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
 
-  const {  watch, formState: { errors }, setError, clearErrors } = form;
-  
+  const {
+    watch,
+    formState: { errors },
+    setError,
+    clearErrors,
+  } = form;
 
   const entityAddress = watch("entityAddress");
   const totalRewardAmount = watch("totalRewardAmount");
 
+  const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
+    entityAddress ?? "",
+  );
 
-
-  const { unallocatedTokens } = useCheckTotalUnallocatedTokens(entityAddress ?? "");
-
-  
   useEffect(() => {
     if (entityAddress && totalRewardAmount && unallocatedTokens !== undefined) {
       const amount = BigInt(totalRewardAmount || 0);
       if (amount > unallocatedTokens) {
         setError("totalRewardAmount", {
           type: "manual",
-          message: `Insufficient tokens. Available: ${unallocatedTokens.toString()}`
+          message: `Insufficient tokens. Available: ${unallocatedTokens.toString()}`,
         });
       } else {
         clearErrors("totalRewardAmount");
       }
     }
-  }, [entityAddress, totalRewardAmount, unallocatedTokens, setError, clearErrors]);
+  }, [
+    entityAddress,
+    totalRewardAmount,
+    unallocatedTokens,
+    setError,
+    clearErrors,
+  ]);
 
- 
   useEffect(() => {
     if (entityAddress && unallocatedTokens !== undefined) {
       if (unallocatedTokens === BigInt(0)) {
         setError("entityAddress", {
           type: "manual",
-          message: "Selected entity has no tokens available. Please mint tokens first."
+          message:
+            "Selected entity has no tokens available. Please mint tokens first.",
         });
       } else {
         clearErrors("entityAddress");
@@ -111,7 +123,6 @@ export default function TaskBaseForm({
       setCurrentWallet("");
     }
   };
-
 
   const removeWallet = (addressToRemove: string) => {
     const filtered = walletAddresses.filter((addr) => addr !== addressToRemove);
@@ -186,10 +197,10 @@ export default function TaskBaseForm({
                             key={entity.id}
                             value={entity.rewardManagement}
                           >
-                            {entity.name} 
-                            {unallocatedTokens !== undefined && entity.rewardManagement === entityAddress && 
-                              ` (Available: ${unallocatedTokens.toString()} tokens)`
-                            }
+                            {entity.name}
+                            {unallocatedTokens !== undefined &&
+                              entity.rewardManagement === entityAddress &&
+                              ` (Available: ${unallocatedTokens.toString()} tokens)`}
                           </SelectItem>
                         ))}
                       </SelectContent>

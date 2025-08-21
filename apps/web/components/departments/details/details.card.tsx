@@ -6,6 +6,7 @@ import {
   useCheckTotalUnallocatedTokens,
   useGetEntityById,
   useGetEntityOwners,
+  useGetEntityRole,
 } from "@/hooks/subgraph/entity";
 import { useDirectTokenTransfer } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
@@ -22,6 +23,7 @@ import { toast } from "@workspace/ui/hooks/use-toast";
 import { Copy, Loader2, Plus, User } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
+import { useAccount } from "wagmi";
 import { Cuid } from "./details.main";
 
 type DepartmentDetailsCardProps = {
@@ -34,8 +36,7 @@ export default function DepartmentDetailsCard({
   router,
 }: DepartmentDetailsCardProps) {
   const { data: entity, isLoading, isError, error } = useGetEntityById(cuid.id);
-  console.log("Entity Data AA:", entity.rewardManagement);
-
+  const { address } = useAccount();
   const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
     entity?.rewardManagement,
   );
@@ -49,6 +50,18 @@ export default function DepartmentDetailsCard({
   const roleData = hasRole({ role: process.env.NEXT_PUBLIC_MINTER_ROLE! });
   const canAllocateToken = Boolean(roleData);
 
+  const { entityRole, roleLoading } = useGetEntityRole(
+    entity?.rewardManagement || "",
+  );
+ 
+  const hasEntityOwnerRole = hasRole({
+    role: entityRole || "",
+  });
+
+  const canTransferToken = Boolean(hasEntityOwnerRole);
+
+  console.log("Transfer Token: ", canTransferToken);
+  console.log("Hellow from DepartmentDetailsCard");
   const {
     directTransfer,
     directTransferPending,
@@ -154,9 +167,9 @@ export default function DepartmentDetailsCard({
             </h3>
           </div>
           <div className="flex gap-10">
-            {getTransferButton()}
+            {canTransferToken && getTransferButton()}
 
-            {!directTransferPending && (
+            {!directTransferPending && canTransferToken && (
               <DialogButton
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
