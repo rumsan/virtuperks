@@ -29,7 +29,6 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import { useState } from "react";
 import { useColumns } from "../details/details.column";
 import ListCardDetails from "./list.card";
-import { DatePickerWithRange } from "./list.date";
 
 interface TaskListMainProps {
   router: AppRouterInstance;
@@ -182,10 +181,6 @@ export default function TaskListMain({ router }: TaskListMainProps) {
                   Closed
                 </TabsTrigger>
               </TabsList>
-            </div>
-
-            <div className="ml-auto">
-              <DatePickerWithRange />
             </div>
           </div>
 

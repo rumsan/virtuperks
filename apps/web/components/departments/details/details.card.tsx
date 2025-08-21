@@ -53,15 +53,15 @@ export default function DepartmentDetailsCard({
   const { entityRole, roleLoading } = useGetEntityRole(
     entity?.rewardManagement || "",
   );
- 
+
   const hasEntityOwnerRole = hasRole({
     role: entityRole || "",
   });
 
+ 
   const canTransferToken = Boolean(hasEntityOwnerRole);
 
-  console.log("Transfer Token: ", canTransferToken);
-  console.log("Hellow from DepartmentDetailsCard");
+  
   const {
     directTransfer,
     directTransferPending,
@@ -168,7 +168,6 @@ export default function DepartmentDetailsCard({
           </div>
           <div className="flex gap-10">
             {canTransferToken && getTransferButton()}
-
             {!directTransferPending && canTransferToken && (
               <DialogButton
                 isOpen={isOpen}
