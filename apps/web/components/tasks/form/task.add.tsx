@@ -1,6 +1,7 @@
 "use client";
 
-import { usegetEntityOwner, useGetOwner } from "@/hooks/subgraph/entity";
+import { usegetEntityOwner } from "@/hooks/subgraph/entity";
+import { useRoleCheck } from "@/hooks/subgraph/role-check";
 import { useTaskAdd } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,12 +16,6 @@ import { useForm } from "react-hook-form";
 import { keccak256 } from "viem";
 import { TaskFormData, taskSchema } from "./schema";
 import TaskBaseForm from "./task.form";
-import hasRole from "@/utils/role";
-import { useRoleCheck } from "@/hooks/subgraph/role-check";
-
-
-
-
 
 const defaultValues = {
   name: "",
@@ -29,7 +24,7 @@ const defaultValues = {
   entityAddress: "",
   expiryDate: new Date(),
   rewardToken: process.env.NEXT_PUBLIC_RAHAT_TOKEN || "",
-  totalRewardAmount: "",
+  totalRewardAmount: 0,
   isOpen: true,
   isTokenDisbursed: false,
   requireApproval: true,
@@ -51,8 +46,6 @@ export default function TaskAdd({ router }: TaskAddProps) {
   const { toast } = useToast();
   const [entityId, setEntityId] = useState("");
 
-
-
   const { getEntityOwnerRole, roleLoading, isError } =
     usegetEntityOwner(entityId);
 
@@ -65,18 +58,15 @@ export default function TaskAdd({ router }: TaskAddProps) {
 
   const { taskAdd, taskPending } = useTaskAdd();
   const entityAddress = form.watch("entityAddress");
-  
+
   useEffect(() => {
     if (entityAddress) {
       setEntityId(entityAddress);
     }
   }, [entityAddress]);
 
-
   const createTask = async (data: any) => {
     try {
-  
-
       // Check if role data is still loading
       if (roleLoading || roleCheckLoading) {
         toast({
@@ -90,8 +80,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
       if (!hasOwnerRole) {
         toast({
           title: "Access Denied",
-          description:
-            "Access Denied. Only the owner can create tasks.",
+          description: "Access Denied. Only the owner can create tasks.",
           variant: "destructive",
         });
         return;
