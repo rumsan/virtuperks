@@ -107,7 +107,7 @@ export default function SuperAdminNav({ children }: PropsWithChildren) {
         </div>
       </div>
 
-      <div className="h-[calc(100dvh-60px)] overflow-auto">{children}</div>
+      <div>{children}</div>
     </header>
   );
 }
