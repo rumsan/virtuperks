@@ -13,7 +13,6 @@ const TaskDetails = ({ cuid }: TaskDetailsProps) => {
 
   const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
 
-
   const formattedDate = formatDate(taskData?.taskDetail?.expiryDate);
 
   const handleUrlClick = (e: React.MouseEvent, url: string) => {
@@ -23,14 +22,15 @@ const TaskDetails = ({ cuid }: TaskDetailsProps) => {
 
   return (
     <>
-      <Card className="w-[80%] h-full p-4">
-        <CardTitle className="flex flex-col gap-3 w-full">
-          <div className="flex items-center gap-2">
-            <span className="text-lg font-semibold text-[#334155]">
+      <Card className="w-[80%] h-full p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
+        <CardTitle className="flex flex-col gap-4 w-full">
+          {/* Title and Status */}
+          <div className="flex items-center gap-3">
+            <span className="text-2xl font-bold text-[#1E293B]">
               {taskData?.taskDetail?.name}
             </span>
             <span
-              className={`px-2 py-0.5 rounded text-white text-xs font-semibold ${
+              className={`px-3 py-1 rounded text-white text-sm font-semibold ${
                 taskData?.taskDetail?.isOpen ? "bg-green-500" : "bg-red-500"
               }`}
             >
@@ -38,41 +38,50 @@ const TaskDetails = ({ cuid }: TaskDetailsProps) => {
             </span>
           </div>
 
-          <div className="flex items-center gap-1 max-w-[220px] truncate text-sm">
+          {/* Details URL */}
+          <div
+            className="flex items-center gap-2 max-w-[300px] truncate text-base group cursor-pointer"
+            onClick={() =>
+              taskData?.taskDetail?.detailsUrl &&
+              window.open(taskData.taskDetail.detailsUrl, "_blank")
+            }
+          >
             <span
-              className="text-[#297AD6] truncate"
+              className="text-[#297AD6] truncate group-hover:text-blue-800 hover:underline transition-colors"
               title={taskData?.taskDetail?.detailsUrl}
             >
               {taskData?.taskDetail?.detailsUrl
-                ? taskData.taskDetail.detailsUrl.length > 40
-                  ? `${taskData.taskDetail.detailsUrl.slice(0, 40)}...`
+                ? taskData.taskDetail.detailsUrl.length > 50
+                  ? `${taskData.taskDetail.detailsUrl.slice(0, 50)}...`
                   : taskData.taskDetail.detailsUrl
                 : ""}
             </span>
             <ExternalLink
-              size={16}
+              size={20}
               color="#297AD6"
-              strokeWidth={1.75}
-              className="flex-shrink-0 cursor-pointer"
-              onClick={(e) =>
-                handleUrlClick(e, taskData?.taskDetail?.detailsUrl ?? "")
-              }
+              strokeWidth={2}
+              className="flex-shrink-0 text-[#297AD6] group-hover:text-blue-800 transition-colors"
             />
           </div>
         </CardTitle>
 
-        <div className="flex flex-col text-gray-500 font-normal gap-1 text-sm">
-          <span className="flex items-center gap-2">
-            <UserRoundCog color="#64748B" size={20} strokeWidth={2.5} />
-            Task Owner: {taskData?.taskDetail?.owner}
+        {/* Task Info */}
+        <div className="flex flex-col text-gray-600 font-medium gap-2 mt-4 text-base">
+          <span className="flex items-center gap-3">
+            <UserRoundCog color="#64748B" size={22} strokeWidth={2.5} />
+            Task Owner:{" "}
+            <span className="font-semibold">{taskData?.taskDetail?.owner}</span>
           </span>
-          <span className="flex items-center gap-2">
-            <Users color="#64748B" size={20} strokeWidth={2.5} />
-            {taskData?.taskDetail?.maxParticipants} members participating
+          <span className="flex items-center gap-3">
+            <Users color="#64748B" size={22} strokeWidth={2.5} />
+            <span className="font-semibold">
+              {taskData?.taskDetail?.maxParticipants}
+            </span>{" "}
+            members participating
           </span>
-          <span className="flex items-center gap-2">
-            <Timer color="#64748B" size={20} strokeWidth={2.5} /> Deadline:{" "}
-            {formattedDate}
+          <span className="flex items-center gap-3">
+            <Timer color="#64748B" size={22} strokeWidth={2.5} /> Deadline:{" "}
+            <span className="font-semibold">{formattedDate}</span>
           </span>
         </div>
       </Card>
