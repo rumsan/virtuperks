@@ -3,7 +3,6 @@
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { useGetEntityById } from "@/hooks/subgraph/entity";
 import { PATHS } from "@/routes/paths";
-import { ArrowLeft } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import React, { useState } from "react";
 import DepartmentDetailsCard from "./details.card";
@@ -56,13 +55,13 @@ export default function DepartmentDetails({
 
   return (
     <main className="gap-2 p-4 sm:px-8 md:gap-8">
-      <div
+      <button
         onClick={() => router.push(PATHS.DEPARTMENT.HOME)}
-        className="flex items-center gap-2 cursor-pointer hover:text-gray-400"
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-blue-600 font-semibold hover:bg-blue-50 hover:text-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-300"
       >
-        <ArrowLeft size={24} strokeWidth={2} />
-        <span className="font-base text-gray-700">Back</span>
-      </div>
+        <span className="text-lg">&larr;</span>
+        <span>Back to Departments</span>
+      </button>
       {isLoading && <p className="text-gray-600">Loading entity details...</p>}
       {isError && (
         <p className="text-red-600">Error loading entity: {error.message}</p>

@@ -10,7 +10,7 @@ import { useDisburseTokenToTask } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { useToast } from "@workspace/ui/hooks/use-toast";
-import { ArrowLeft, CheckCircle, CircleX, Loader2 } from "lucide-react";
+import { CheckCircle, CircleX, Loader2 } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 import TaskParticipant from "./details.participant";
@@ -133,14 +133,14 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
 
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
-      <div className="space-y-4">
-        <div
+      <div className="space-y-4 mt-5">
+        <button
           onClick={() => router.push(PATHS.TASKS.HOME)}
-          className="flex items-center gap-2 cursor-pointer hover:text-gray-400 my-3"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-blue-600 font-bold hover:bg-blue-50 hover:text-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-300"
         >
-          <ArrowLeft size={24} strokeWidth={2} />
-          <span className="font-base text-gray-700">Back</span>
-        </div>
+          <span className="text-lg">&larr;</span>
+          <span>Back to Task List</span>
+        </button>
 
         <div className="flex items-center">
           <div className="flex flex-col gap-1">

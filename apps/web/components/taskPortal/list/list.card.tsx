@@ -2,7 +2,7 @@ import { PATHS } from "@/routes/paths";
 import { formatDate } from "@/utils/formatDate";
 import { Tasks } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
-import { Coins, Dot, ExternalLink, Timer, Users } from "lucide-react";
+import { Coins, Dot, Timer, Users } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import NoTask from "./no.task";
 
@@ -44,14 +44,6 @@ const TaskPortalCard = ({ data, router }: TaskPortalCardProps) => {
                 <span className="text-[#297AD6] text-sm font-normal">
                   {task?.taskDetail.detailsUrl}
                 </span>
-                <ExternalLink
-                  size={16}
-                  color="#297AD6"
-                  strokeWidth={2.75}
-                  onClick={(e) =>
-                    handleUrlClick(e, task?.taskDetail.detailsUrl)
-                  }
-                />
               </div>
               <div className="flex items-center gap-1 text-sm">
                 <div className="flex items-center font-normal text-[#64748B] gap-1">
