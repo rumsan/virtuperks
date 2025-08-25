@@ -80,26 +80,6 @@ export default function TaskBaseForm({
   );
 
   useEffect(() => {
-    if (entityAddress && totalRewardAmount && unallocatedTokens !== undefined) {
-      const amount = BigInt(totalRewardAmount || 0);
-      if (amount > unallocatedTokens) {
-        setError("totalRewardAmount", {
-          type: "manual",
-          message: `Insufficient tokens. Available: ${unallocatedTokens.toString()}`,
-        });
-      } else {
-        clearErrors("totalRewardAmount");
-      }
-    }
-  }, [
-    entityAddress,
-    totalRewardAmount,
-    unallocatedTokens,
-    setError,
-    clearErrors,
-  ]);
-
-  useEffect(() => {
     if (entityAddress && unallocatedTokens !== undefined) {
       if (unallocatedTokens === BigInt(0)) {
         setError("entityAddress", {
@@ -129,6 +109,33 @@ export default function TaskBaseForm({
     setWalletAddresses(filtered);
     form.setValue("whitelistedParticipants", filtered);
   };
+
+  useEffect(() => {
+    if (!entityAddress || unallocatedTokens === undefined) return;
+    if (!totalRewardAmount) return;
+
+    try {
+      const totalAmount = BigInt(totalRewardAmount.toString());
+      const availableAmount = BigInt(unallocatedTokens);
+
+      if (totalAmount > availableAmount) {
+        setError("totalRewardAmount", {
+          type: "manual",
+          message: `Insufficient tokens. Available: ${availableAmount.toString()}`,
+        });
+      } else {
+        clearErrors("totalRewardAmount");
+      }
+    } catch (err) {
+      console.error("Error parsing totalRewardAmount:", err);
+    }
+  }, [
+    entityAddress,
+    totalRewardAmount,
+    unallocatedTokens,
+    setError,
+    clearErrors,
+  ]);
 
   const handleSubmitForm = form.handleSubmit(saveForm);
 
@@ -177,42 +184,6 @@ export default function TaskBaseForm({
             />
             <FormField
               control={form.control}
-              name="entityAddress"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Select Entity</FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                      }}
-                      value={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select Entity" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {entityList?.map((entity: EntityType) => (
-                          <SelectItem
-                            key={entity.id}
-                            value={entity.rewardManagement}
-                          >
-                            {entity.name}
-                            {unallocatedTokens !== undefined &&
-                              entity.rewardManagement === entityAddress &&
-                              ` (Available: ${unallocatedTokens.toString()} tokens)`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage className="text-red-500" />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="maxParticipants"
               render={({ field }) => (
                 <FormItem>
@@ -252,17 +223,11 @@ export default function TaskBaseForm({
                       type="number"
                       placeholder="0"
                       {...field}
-                      value={
-                        field.value !== undefined && field.value !== null
-                          ? field.value.toString()
-                          : ""
-                      }
+                      value={field.value ?? ""}
                       onChange={(e) => {
-                        const value = e.target.value;
-
-                        field.onChange(
-                          value === "" ? undefined : parseInt(value, 10),
-                        );
+                        const raw = e.target.value;
+                        field.onChange(raw === "" ? "" : raw);
+                        form.trigger("totalRewardAmount");
                       }}
                     />
                   </FormControl>
@@ -296,6 +261,42 @@ export default function TaskBaseForm({
                     </Select>
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="entityAddress"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Select Entity</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                      }}
+                      value={field.value}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Entity" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {entityList?.map((entity: EntityType) => (
+                          <SelectItem
+                            key={entity.id}
+                            value={entity.rewardManagement}
+                          >
+                            {entity.name}
+                            {unallocatedTokens !== undefined &&
+                              entity.rewardManagement === entityAddress &&
+                              ` (Available: ${unallocatedTokens.toString()} tokens)`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />

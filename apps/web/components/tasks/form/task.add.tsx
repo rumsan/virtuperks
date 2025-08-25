@@ -40,8 +40,8 @@ type TaskAddProps = {
 export default function TaskAdd({ router }: TaskAddProps) {
   const form = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema()),
+    mode: "onChange",
     defaultValues: defaultValues,
-    mode: "onChange", // Enable validation on change
   });
   const { toast } = useToast();
   const [entityId, setEntityId] = useState("");

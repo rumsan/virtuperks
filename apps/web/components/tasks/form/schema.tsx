@@ -34,10 +34,10 @@ export const taskSchema = () => {
     totalRewardAmount: z.coerce
       .number({
         required_error: "Reward amount is required",
-        invalid_type_error: "Reward amount must be a number",
+        invalid_type_error: "Reward amount must be greater than 0 number",
       })
       .refine((val) => val > 0, {
-        message: "Reward amount must be a positive number",
+        message: "Reward amount must be greater than 0",
       }),
 
     isOpen: z.boolean().default(true),
