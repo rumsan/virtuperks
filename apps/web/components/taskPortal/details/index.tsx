@@ -49,7 +49,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
     taskData?.internal_id,
     false,
   );
-
   const whiteListedParticipants =
     getWhiteListedParticipants?.data?.data?.participantWhitelisteds || [];
 

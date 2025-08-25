@@ -20,9 +20,9 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { toast } from "@workspace/ui/hooks/use-toast";
-import { Copy, Loader2, Plus, User } from "lucide-react";
+import { Building, Copy, Loader2, Plus } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useAccount } from "wagmi";
 import { Cuid } from "./details.main";
 
@@ -58,10 +58,8 @@ export default function DepartmentDetailsCard({
     role: entityRole || "",
   });
 
- 
   const canTransferToken = Boolean(hasEntityOwnerRole);
 
-  
   const {
     directTransfer,
     directTransferPending,
@@ -72,6 +70,7 @@ export default function DepartmentDetailsCard({
   const [isOpen, setIsOpen] = useState(false);
   const [transferAmount, setTransferAmount] = useState<number>(0);
   const [isAmountValid, setIsAmountValid] = useState(true);
+  const [copiedOwner, setCopiedOwner] = React.useState<string | null>(null);
 
   const handleAmountChange = (value: number) => {
     setTransferAmount(value);
@@ -206,13 +205,14 @@ export default function DepartmentDetailsCard({
         <Card className="font-normal text-base h-50 flex flex-col p-4">
           <CardTitle className="flex items-center gap-3">
             <div className="rounded-full flex p-3 bg-[#475263] mb-auto">
-              <User color="#fff" />
+              <Building color="#fff" size={20} />
             </div>
             <CardDescription className="flex flex-col gap-2">
               <div className="flex flex-col items-start gap-2">
                 <div className="flex flex-start text-[#334155] text-xl justify-start">
                   {entity.name}
                 </div>
+
                 {getEntityOwners && getEntityOwners.length > 0 && (
                   <div className="flex flex-col gap-2">
                     <span className="text-[#475569] font-medium text-sm">
@@ -220,24 +220,39 @@ export default function DepartmentDetailsCard({
                         ? "Department Owner"
                         : "Department Owners"}
                     </span>
-                    <div className="flex flex-col gap-1 text-sm text-[#64748B]">
-                      {getEntityOwners.map((owner: string, idx: number) => (
-                        <div key={idx} className="flex items-center gap-2">
-                          <span className="truncate max-w-[200px]">
+                    <div className="flex flex-col gap-1 text-sm">
+                      {getEntityOwners.map((owner: string, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center gap-2 cursor-pointer group"
+                          onClick={() => {
+                            navigator.clipboard.writeText(owner);
+                            setCopiedOwner(owner);
+                            setTimeout(() => setCopiedOwner(null), 2000); // reset after 2s
+                          }}
+                        >
+                          <span
+                            className={`truncate max-w-[200px] transition-colors ${
+                              copiedOwner === owner
+                                ? "text-blue-800"
+                                : "group-hover:text-blue-800"
+                            }`}
+                          >
                             {owner}
                           </span>
-                          <Copy
-                            size={16}
-                            strokeWidth={2}
-                            className="cursor-pointer"
-                            onClick={() => {
-                              navigator.clipboard.writeText(owner);
-                              toast({
-                                title: "Copied to clipboard!",
-                                variant: "success",
-                              });
-                            }}
-                          />
+                          <div className="flex items-center transition-colors">
+                            {copiedOwner === owner ? (
+                              <span className="text-blue-800 font-bold">
+                                ✔
+                              </span>
+                            ) : (
+                              <Copy
+                                className="group-hover:text-blue-800"
+                                size={16}
+                                strokeWidth={2}
+                              />
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -248,6 +263,7 @@ export default function DepartmentDetailsCard({
           </CardTitle>
         </Card>
 
+        {/* Token Cards */}
         <Card className="font-normal text-base h-50 flex flex-col">
           <CardHeader className="flex-grow">
             <CardTitle className="flex p-0 mb-4 text-[#0F172A]">
@@ -258,6 +274,7 @@ export default function DepartmentDetailsCard({
             {totalAllocatedTokens ?? "-"}
           </CardFooter>
         </Card>
+
         <Card className="font-normal text-base h-50 flex flex-col">
           <CardHeader className="flex-grow">
             <CardTitle className="flex p-0 mb-4 text-[#0F172A]">
@@ -268,6 +285,7 @@ export default function DepartmentDetailsCard({
             {unallocatedTokens ?? "-"}
           </CardFooter>
         </Card>
+
         <Card className="font-normal text-base h-50 flex flex-col">
           <CardHeader className="flex-grow">
             <CardTitle className="flex p-0 mb-4 text-[#0F172A]">

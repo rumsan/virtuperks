@@ -1,8 +1,7 @@
-import { PATHS } from "@/routes/paths";
 import { formatDate } from "@/utils/formatDate";
 import { TaskCreated } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
-import { Coins, Dot, ExternalLink } from "lucide-react";
+import { Coins, Dot } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 type ListCardDetailsProps = {
   taskList: TaskCreated[];
@@ -50,7 +49,7 @@ const ListCardDetails = ({
         <Card
           key={task?.id}
           className="cursor-pointer"
-        //  onClick={() => task?.id && router.push(PATHS.TASKS.DETAILS(task?.id))}
+          //  onClick={() => task?.id && router.push(PATHS.TASKS.DETAILS(task?.id))}
         >
           <CardTitle className="flex flex-col p-4 gap-2">
             <div className="flex items-center gap-2 text-[#334155]">
@@ -63,6 +62,9 @@ const ListCardDetails = ({
                 <span
                   className="text-[#297AD6] truncate max-w-[200px]"
                   title={task?.taskDetail?.detailsUrl}
+                  onClick={(e) =>
+                    handleUrlClick(e, task?.taskDetail?.detailsUrl ?? "")
+                  }
                 >
                   {task?.taskDetail?.detailsUrl
                     ? task.taskDetail.detailsUrl.length > 40
@@ -70,14 +72,6 @@ const ListCardDetails = ({
                       : task.taskDetail.detailsUrl
                     : ""}
                 </span>
-                <ExternalLink
-                  size={16}
-                  color="#297AD6"
-                  strokeWidth={1.75}
-                  onClick={(e) =>
-                    handleUrlClick(e, task?.taskDetail?.detailsUrl ?? "")
-                  }
-                />
               </div>
 
               <div className="flex items-center font-normal text-[#64748B]">
