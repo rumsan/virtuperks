@@ -223,11 +223,11 @@ export default function TaskBaseForm({
                       type="number"
                       placeholder="0"
                       {...field}
-                      value={field.value ?? ""}
+                      value={field.value === 0 ? "" : (field.value ?? "")}
                       onChange={(e) => {
-                        const raw = e.target.value;
-                        field.onChange(raw === "" ? "" : raw);
-                        form.trigger("totalRewardAmount");
+                        const val = e.target.value;
+
+                        field.onChange(val === "" ? undefined : Number(val));
                       }}
                     />
                   </FormControl>

@@ -7,14 +7,14 @@ import { getDialogContent } from "@/utils/dialog";
 import { ColumnDef } from "@tanstack/react-table";
 import { TaskCreated } from "@workspace/sdk/types/task.type";
 import { useToast } from "@workspace/ui/hooks/use-toast";
-import { CircleCheck, CircleX, Copy, ExternalLink } from "lucide-react";
+import { CircleCheck, Copy, ExternalLink } from "lucide-react";
 import { useState } from "react";
 
 interface SelectedTask {
   id: string;
   participant: string;
   completionUrl?: string;
-  status: "PENDING" | "COMPLETED" | "vERIFIED";
+  status: "PENDING" | "COMPLETED" | "VERIFIED";
   entityId?: string;
 }
 
@@ -23,6 +23,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
   const [selectedTask, setSelectedTask] = useState<SelectedTask | null>(null);
   const acceptParticipantMutation = useAcceptParticipantMutation();
   const verifyParticipantMutation = useVerifyParticipantMutation();
+  const [openTaskId, setOpenTaskId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const isPending =
@@ -30,6 +31,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
 
   const handleMutation = async (task: SelectedTask) => {
     try {
+      setOpenTaskId(null);
       if (task.status === "PENDING") {
         await acceptParticipantMutation.mutateAsync({
           taskId: task.id,
@@ -76,7 +78,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
         completionUrl: row.getValue("completionUrl") as string | undefined,
       };
       setSelectedTask(task);
-      setIsDialogOpen(true);
+      setOpenTaskId(task.id);
     }
   };
 
@@ -157,34 +159,27 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
 
         return (
           <>
-            <span className="flex items-center gap-1">
-              <CircleCheck
-                color="#03AB65"
-                strokeWidth={1.5}
-                size={28}
-                onClick={() => handleAction(row)}
-                className="cursor-pointer"
-              />
-              <CircleX color="#E44134" strokeWidth={1.5} size={28} />
-            </span>
+            <button
+              onClick={() => handleAction(row)}
+              disabled={isPending}
+              className={`disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              <CircleCheck color="#03AB65" strokeWidth={1.5} size={28} />
+            </button>
 
-            {selectedTask &&
-              isDialogOpen &&
-              selectedTask.id === row.original.taskId && (
-                <>
-                  <DialogButton
-                    isOpen={isDialogOpen}
-                    setIsOpen={setIsDialogOpen}
-                    title={dialogContent.title}
-                    subTitle={dialogContent.subTitle}
-                    buttonName={
-                      isPending ? "Processing..." : dialogContent.buttonName
-                    }
-                    handleApplyTaskLogic={() => handleMutation(selectedTask)}
-                    isDisabled={isPending}
-                  />
-                </>
-              )}
+            {selectedTask && openTaskId === row.original.taskId && (
+              <DialogButton
+                isOpen={!!openTaskId}
+                setIsOpen={() => setOpenTaskId(null)}
+                title={dialogContent.title}
+                subTitle={dialogContent.subTitle}
+                buttonName={
+                  isPending ? "Processing..." : dialogContent.buttonName
+                }
+                handleApplyTaskLogic={() => handleMutation(selectedTask)}
+                isDisabled={isPending}
+              />
+            )}
 
             <LoadingBar />
           </>
