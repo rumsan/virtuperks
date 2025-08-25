@@ -1,4 +1,5 @@
 import { ListTable } from "@/components/common/list/list.table";
+import { useGetWhiteListedParticipantByTask } from "@/hooks/subgraph/participant";
 import { useGetTaskDetailById } from "@/hooks/subgraph/taskDetail";
 import { TaskHistory } from "@/sampleData";
 import { shortAddress } from "@/utils/shortAddress";
@@ -22,11 +23,9 @@ import {
 import { User } from "lucide-react";
 import { useState } from "react";
 import { useHistoryColumns } from "./history.column";
-import { useGetWhiteListedParticipantByTask } from "@/hooks/subgraph/participant";
 type TaskPortalParticipantProps = { taskId: any };
 
 const TaskPortalParticipant = ({ taskId }: TaskPortalParticipantProps) => {
-
   const [hoveredWallet, setHoveredWallet] = useState<string | null>(null);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -37,15 +36,13 @@ const TaskPortalParticipant = ({ taskId }: TaskPortalParticipantProps) => {
     pageSize: 10,
   });
   const getTaskDetail = useGetTaskDetailById(taskId.id);
-     
-  const taskData = getTaskDetail?.data?.data?.taskCreated;
+
+  const taskData = getTaskDetail?.data?.data?.taskCreateds[0] || [];
   const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(
     taskData?.internal_id,
   );
-  
-    const whiteListedParticipants = getWhiteListedParticipants?.data?.data?.participantWhitelisteds || [];
-
-
+  const whiteListedParticipants =
+    getWhiteListedParticipants?.data?.data?.participantWhitelisteds || [];
 
   const columns = useHistoryColumns();
   const table = useReactTable({
