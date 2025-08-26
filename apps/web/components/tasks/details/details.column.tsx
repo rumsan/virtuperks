@@ -111,16 +111,25 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
         const completionUrl = row.getValue("completionUrl") as
           | string
           | undefined;
+
         if (!completionUrl) return null;
+
+        // Ensure the URL is absolute by adding a protocol if it's missing.
+        const absoluteUrl =
+          completionUrl.startsWith("http://") ||
+          completionUrl.startsWith("https://")
+            ? completionUrl
+            : `https://${completionUrl}`;
 
         return (
           <a
-            href={completionUrl}
+            href={absoluteUrl} // Use the corrected, absolute URL here
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline"
           >
-            <span className="text-sm">View Submission</span>
+            {/* Display the original URL as the link's text */}
+            <span className="text-sm">{completionUrl}</span>
             <ExternalLink size={16} />
           </a>
         );
@@ -180,7 +189,6 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
                 isDisabled={isPending}
               />
             )}
-
             <LoadingBar />
           </>
         );
