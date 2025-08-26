@@ -49,6 +49,7 @@ const TaskPortalCard = ({ data, router }: TaskPortalCardProps) => {
                 <div className="flex items-center font-normal text-[#64748B] gap-1">
                   <Users size={18} strokeWidth={2.5} color="#64748B" />
                   <span>
+                    {task?.taskDetail.acceptedParticipantCount} /{" "}
                     {task?.taskDetail.maxParticipants} members participating
                   </span>
                   <Dot color="#94A3B8" />

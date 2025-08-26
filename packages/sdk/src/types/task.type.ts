@@ -59,5 +59,6 @@ export interface Tasks {
     maxParticipants: number;
     expiryDate: number;
     totalRewardAmount: number;
+    acceptedParticipantCount: number;
   };
 }
