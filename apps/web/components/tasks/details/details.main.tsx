@@ -1,6 +1,7 @@
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
+import { useGetCombineStausByTask } from "@/hooks/subgraph/querycall";
 import {
   useCheckTaskStatus,
   useCloseTaskMutation,
@@ -40,10 +41,10 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     status: isTokenDisbursedFromContract,
     statusLoading: taskDetailLoading,
   } = useCheckTaskStatus(
-    taskData?.internal_id,
-    taskData?.rewardManagement.rewardManagement,
+    taskData?.internal_id ?? "",
+    taskData?.rewardManagement.rewardManagement ?? "",
   );
-
+  const participantDataLoading = !taskData;
   const isTaskExpired = !taskDetail?.isOpen;
   const { disburseTokenToTask, disbursePending } = useDisburseTokenToTask();
   const closeTaskMutation = useCloseTaskMutation();
@@ -51,6 +52,15 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const taskReady = !taskDetailLoading;
   const isDisburseButtonDisabled = !taskReady || isTokenDisbursedFromContract;
   const isCloseButtonDisabled = !taskReady || isTaskExpired;
+  const taskLoading = getTaskDetail.isLoading;
+
+  const {
+    pendingParticipants,
+    acceptedParticipants,
+    completedParticipants,
+    verifiedPartcipants,
+    combineParticipantsLoading: participantsLoading,
+  } = useGetCombineStausByTask(taskData?.internal_id);
 
   const handleCloseTask = async () => {
     try {
@@ -115,7 +125,13 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     );
   };
 
-  if (getTaskDetail.isLoading) {
+  const isLoading =
+    getTaskDetail.isLoading ||
+    taskDetailLoading ||
+    disbursePending ||
+    participantsLoading;
+
+  if (isLoading) {
     return (
       <LoaderSkeleton
         backButton
@@ -187,11 +203,17 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
         </div>
 
         <div className="flex w-full gap-4">
-          <TaskDetails cuid={cuid} />
+          <TaskDetails taskData={taskData} />
         </div>
 
         <div className="flex w-full gap-4">
-          <TaskParticipant taskData={taskData} />
+          <TaskParticipant
+            taskData={taskData}
+            pendingParticipants={pendingParticipants}
+            acceptedParticipants={acceptedParticipants}
+            completedParticipants={completedParticipants}
+            verifiedPartcipants={verifiedPartcipants}
+          />
         </div>
       </div>
     </main>

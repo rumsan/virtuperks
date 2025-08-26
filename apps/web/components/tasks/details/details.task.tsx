@@ -1,18 +1,12 @@
-import { Cuid } from "@/components/departments/details/details.main";
-import { useGetTaskDetailById } from "@/hooks/subgraph/taskDetail";
 import { formatDate } from "@/utils/formatDate";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { ExternalLink, Timer, Trophy, UserRoundCog, Users } from "lucide-react";
 
 type TaskDetailsProps = {
-  cuid: Cuid;
+  taskData: any;
 };
 
-const TaskDetails = ({ cuid }: TaskDetailsProps) => {
-  const getTaskDetail = useGetTaskDetailById(cuid.id);
-
-  const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
-
+const TaskDetails = ({ taskData}: TaskDetailsProps) => {
   const formattedDate = formatDate(taskData?.taskDetail?.expiryDate);
 
   const handleUrlClick = (e: React.MouseEvent, url: string) => {
