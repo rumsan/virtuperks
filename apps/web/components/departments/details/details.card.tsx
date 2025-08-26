@@ -1,13 +1,7 @@
 "use client";
 
 import { DialogButton } from "@/components/common/ui/dialog";
-import {
-  useCheckTotalAllocatedTokens,
-  useCheckTotalUnallocatedTokens,
-  useGetEntityById,
-  useGetEntityOwners,
-  useGetEntityRole,
-} from "@/hooks/subgraph/entity";
+import { useGetEntityRole } from "@/hooks/subgraph/entity";
 import { useDirectTokenTransfer } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
 import hasRole from "@/utils/role";
@@ -24,29 +18,23 @@ import { Building, Copy, Loader2, Plus } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import React, { useState } from "react";
 import { useAccount } from "wagmi";
-import { Cuid } from "./details.main";
 
 type DepartmentDetailsCardProps = {
-  cuid: Cuid;
+  entity: any;
+  totalAllocatedTokens?: bigint;
+  unallocatedTokens?: bigint;
+  getEntityOwners?: readonly `0x${string}`[];
   router: AppRouterInstance;
 };
 
 export default function DepartmentDetailsCard({
-  cuid,
+  entity,
+  totalAllocatedTokens,
+  unallocatedTokens,
+  getEntityOwners,
   router,
 }: DepartmentDetailsCardProps) {
-  const { data: entity, isLoading, isError, error } = useGetEntityById(cuid.id);
   const { address } = useAccount();
-  const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
-    entity?.rewardManagement,
-  );
-
-  const { totalAllocatedTokens } = useCheckTotalAllocatedTokens(
-    entity?.rewardManagement,
-  );
-
-  const { getEntityOwners } = useGetEntityOwners(entity?.entityId);
-
   const roleData = hasRole({ role: process.env.NEXT_PUBLIC_MINTER_ROLE! });
   const canAllocateToken = Boolean(roleData);
 
@@ -76,16 +64,6 @@ export default function DepartmentDetailsCard({
     setTransferAmount(value);
     setIsAmountValid(value <= (unallocatedTokens ?? 0));
   };
-
-  if (isLoading) {
-    return <p className="text-gray-600">Loading department info...</p>;
-  }
-
-  if (isError) {
-    return (
-      <p className="text-red-600">Failed to load department: {error.message}</p>
-    );
-  }
 
   if (!entity) {
     return (
@@ -234,8 +212,8 @@ export default function DepartmentDetailsCard({
                           <span
                             className={`truncate max-w-[200px] transition-colors ${
                               copiedOwner === owner
-                                ? "text-blue-800"
-                                : "group-hover:text-blue-800"
+                                ? "text-blue-800 underline"
+                                : "group-hover:text-blue-800 group-hover:underline"
                             }`}
                           >
                             {owner}
