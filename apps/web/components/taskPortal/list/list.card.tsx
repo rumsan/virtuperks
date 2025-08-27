@@ -49,6 +49,7 @@ const TaskPortalCard = ({ data, router }: TaskPortalCardProps) => {
                 <div className="flex items-center font-normal text-[#64748B] gap-1">
                   <Users size={18} strokeWidth={2.5} color="#64748B" />
                   <span>
+                    {task?.taskDetail.acceptedParticipantCount} /{" "}
                     {task?.taskDetail.maxParticipants} members participating
                   </span>
                   <Dot color="#94A3B8" />
@@ -60,7 +61,7 @@ const TaskPortalCard = ({ data, router }: TaskPortalCardProps) => {
                 <div className="flex justify-end ml-auto items-center gap-2">
                   <Coins color="#297AD6" />
                   <span className="text-xl text-[#297AD6] font-bold">
-                    {task?.taskDetail.rewardAmount} tokens
+                    {task?.taskDetail.totalRewardAmount} tokens
                   </span>
                 </div>
               </div>

@@ -17,7 +17,7 @@ import { useGetTaskById } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { useToast } from "@workspace/ui/hooks/use-toast";
-import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 import { useAccount } from "wagmi";
@@ -267,13 +267,13 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
       <div className="space-y-4">
-        <div
+        <button
           onClick={() => router.push(PATHS.TASKPORTAL.HOME)}
-          className="flex items-center gap-2 cursor-pointer hover:text-gray-400 my-3"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-blue-600 font-semibold hover:bg-blue-50 hover:text-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-300 mt-5"
         >
-          <ArrowLeft size={24} strokeWidth={2} />
-          <span className="font-base text-gray-700">Back</span>
-        </div>
+          <span className="text-lg">&larr;</span>
+          <span>Back to TaskPortal</span>
+        </button>
         <div className="flex items-center">
           <div className="flex flex-col gap-1">
             <h1 className="font-bold text-4xl">Task Details</h1>

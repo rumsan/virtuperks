@@ -1,7 +1,14 @@
 import { formatDate } from "@/utils/formatDate";
 import { TaskCreated } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
-import { ExternalLink, Timer, Trophy, UserRoundCog, Users } from "lucide-react";
+import {
+  Coins,
+  ExternalLink,
+  Timer,
+  Trophy,
+  UserRoundCog,
+  Users,
+} from "lucide-react";
 
 type TaskPortalDetailsProps = {
   taskData: TaskCreated;
@@ -87,9 +94,12 @@ const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
         <div className="flex items-center justify-center rounded-full h-10 w-10 bg-blue-50">
           <Trophy color="#297AD6" size={20} />
         </div>
-        <span className="text-2xl text-[#297AD6] font-bold">
-          {taskData?.taskDetail?.totalRewardAmount} tokens
-        </span>
+        <div className="flex items-center">
+          <Coins color="#297AD6" />
+          <span className="text-2xl text-[#297AD6] font-bold ml-2">
+            {taskData?.taskDetail?.totalRewardAmount} tokens
+          </span>
+        </div>
       </Card>
     </>
   );
