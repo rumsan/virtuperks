@@ -152,7 +152,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
       <div className="space-y-4 mt-5">
         <button
           onClick={() => router.push(PATHS.TASKS.HOME)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-blue-600 font-bold hover:bg-blue-50 hover:text-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-300"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-blue-600 font-semibold hover:bg-blue-50 hover:text-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-300"
         >
           <span className="text-lg">&larr;</span>
           <span>Back to Task List</span>

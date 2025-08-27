@@ -215,7 +215,7 @@ export const DialogButton = ({
           </Label>
           <Input
             id="amount"
-            type="text"
+            type="number"
             value={formData.amount}
             onChange={handleInputChange("amount")}
             placeholder="Enter amount to disperse"
