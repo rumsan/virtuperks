@@ -62,12 +62,6 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   const rewardRaw = rewardDetail?.data?.rewardRedemptionCreateds[0];
   console.log("Reward Raw Data: ", rewardRaw);
 
-  // const {
-  //   getRewardOwner: rewardOwner,
-  //   isError: ownerError,
-  //   isLoading: ownerLoading,
-  // } = useGetRewardOwner(rewardRaw?.rewardId);
-
   const handleApprove = async () => {
     try {
       const txHash = await ApproveReward({
@@ -92,6 +86,15 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
       // console.error("Redeem failed:", err);
     }
   };
+
+  // Determine if the participant has enough tokens
+  const hasSufficientBalance =
+    participantTotalToken !== undefined &&
+    // Corrected line: convert bigint to string with .toString()
+    BigInt(participantTotalToken.toString()) >=
+      BigInt(rewardRaw.tokensRequired);
+
+  const isButtonDisabled = !hasSufficientBalance;
 
   return (
     <main className="w-full gap-4 p-4 sm:px-8 sm:py-4 md:gap-8 lg:px-16 bg-gray-50">
@@ -180,7 +183,8 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
                   Available Tokens
                 </p>
                 <div className="flex justify-center items-center text-blue-700 text-2xl font-bold gap-2">
-                  {participantTotalToken ?? 0} <Coins size={24} />
+                  {/* Correctly display bigint as string */}
+                  {participantTotalToken?.toString() ?? 0} <Coins size={24} />
                 </div>
               </div>
 
@@ -197,6 +201,13 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
 
               {/* Redemption Steps */}
               <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded text-xs text-green-700 text-center flex flex-col justify-between min-h-[150px] transition-all">
+                {/* Insufficient balance message */}
+                {isButtonDisabled && (
+                  <div className="text-red-500 font-bold mb-2 text-base">
+                    Insufficient balance to redeem this reward.
+                  </div>
+                )}
+
                 {step === "approve" && (
                   <div className="flex flex-col gap-3 justify-center">
                     <p className="font-semibold">
@@ -204,9 +215,9 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
                     </p>
                     <button
                       onClick={handleApprove}
-                      disabled={ApprovePending}
+                      disabled={ApprovePending || isButtonDisabled}
                       className={`py-2 px-4 rounded-lg text-sm font-medium transition text-white ${
-                        ApprovePending
+                        ApprovePending || isButtonDisabled
                           ? "bg-gray-400 cursor-not-allowed"
                           : "bg-blue-600 hover:bg-blue-700"
                       }`}
@@ -226,9 +237,9 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
                     </div>
                     <button
                       onClick={handleRedeem}
-                      disabled={RedeemPending}
+                      disabled={RedeemPending || isButtonDisabled}
                       className={`py-2 px-4 rounded-lg text-sm font-medium transition text-white ${
-                        RedeemPending
+                        RedeemPending || isButtonDisabled
                           ? "bg-gray-400 cursor-not-allowed"
                           : "bg-green-600 hover:bg-green-700"
                       }`}
@@ -255,7 +266,12 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
                         setApprovalHash(null);
                         setRedeemTxHash(null);
                       }}
-                      className="py-2 px-4 rounded-lg text-sm font-medium transition text-white bg-gray-700 hover:bg-gray-800"
+                      disabled={isButtonDisabled}
+                      className={`py-2 px-4 rounded-lg text-sm font-medium transition text-white ${
+                        isButtonDisabled
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-gray-700 hover:bg-gray-800"
+                      }`}
                     >
                       Redeem Another Reward
                     </button>
