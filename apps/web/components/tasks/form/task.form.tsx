@@ -151,18 +151,23 @@ export default function TaskBaseForm({
                 <FormItem>
                   <FormLabel>Task Title</FormLabel>
                   <FormControl>
-                    <div className="relative flex items-center bg-white rounded-md">
-                      <Input
-                        placeholder="Write name for the task"
-                        {...field}
-                        value={field.value ?? ""}
-                      />
-                    </div>
+                    <Input
+                      placeholder="Write name for the task"
+                      {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // Prevent space as the first character
+                        if (value.length === 1 && value[0] === " ") return;
+                        field.onChange(value);
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="detailsUrl"
@@ -175,6 +180,11 @@ export default function TaskBaseForm({
                         placeholder="Write title Url"
                         {...field}
                         value={field.value ?? ""}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value.length === 1 && value[0] === " ") return;
+                          field.onChange(value);
+                        }}
                       />
                     </div>
                   </FormControl>
@@ -401,8 +411,12 @@ export default function TaskBaseForm({
                     placeholder="Add owner Address"
                     {...field}
                     value={field.value ?? ""}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value.length === 1 && value[0] === " ") return;
+                      field.onChange(value);
+                    }}
                   />
-
                   <FormMessage />
                 </FormItem>
               )}
@@ -421,7 +435,11 @@ export default function TaskBaseForm({
                       type="text"
                       placeholder="Paste wallet address"
                       value={currentWallet}
-                      onChange={(e) => setCurrentWallet(e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value.length === 1 && value[0] === " ") return;
+                        setCurrentWallet(value);
+                      }}
                     />
                     <Button
                       type="button"
