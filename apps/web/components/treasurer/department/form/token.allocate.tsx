@@ -30,7 +30,6 @@ interface TokenAllocateFormProps {
 const TokenAllocateForm = ({ id, entityData }: TokenAllocateFormProps) => {
   const form = useForm({
     resolver: zodResolver(tokenSchema()),
-    defaultValues,
   });
 
   const { tokenMint, mintPending, mintSuccess, mintError } =
@@ -48,7 +47,7 @@ const TokenAllocateForm = ({ id, entityData }: TokenAllocateFormProps) => {
     try {
       await tokenMint({
         address: entityData.rewardManagement,
-        amount: data.amount,
+        amount: data.amount!,
       });
     } catch (err) {
       console.error("Minting failed:", err);
@@ -73,9 +72,13 @@ const TokenAllocateForm = ({ id, entityData }: TokenAllocateFormProps) => {
                           <Input
                             type="number"
                             placeholder="Enter token amount"
-                            {...field}
+                            value={field.value ?? ""} // show empty string if undefined
                             onChange={(e) =>
-                              field.onChange(e.target.valueAsNumber)
+                              field.onChange(
+                                e.target.value === ""
+                                  ? undefined
+                                  : e.target.valueAsNumber,
+                              )
                             }
                           />
                         </FormControl>

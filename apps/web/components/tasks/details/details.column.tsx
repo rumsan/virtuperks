@@ -7,8 +7,9 @@ import { getDialogContent } from "@/utils/dialog";
 import { ColumnDef } from "@tanstack/react-table";
 import { TaskCreated } from "@workspace/sdk/types/task.type";
 import { useToast } from "@workspace/ui/hooks/use-toast";
-import { CircleCheck, Copy, ExternalLink } from "lucide-react";
+import { Check, CircleCheck, Copy, ExternalLink } from "lucide-react";
 import { useState } from "react";
+import { useAccount } from "wagmi";
 
 interface SelectedTask {
   id: string;
@@ -25,6 +26,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
   const verifyParticipantMutation = useVerifyParticipantMutation();
   const [openTaskId, setOpenTaskId] = useState<string | null>(null);
   const { toast } = useToast();
+  const { address: userAddress } = useAccount();
 
   const isPending =
     acceptParticipantMutation.isPending || verifyParticipantMutation.isPending;
@@ -93,14 +95,37 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
       header: () => (
         <div className="text-left text-gray-600 font-bold">Wallet Address</div>
       ),
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-700">
-            {row.getValue("participant")}
-          </span>
-          <Copy color="#94A3B8" size={16} strokeWidth={2.75} />
-        </div>
-      ),
+      cell: ({ row }) => {
+        const [copied, setCopied] = useState(false);
+        const walletAddress = row.getValue("participant") as string;
+
+        const handleCopy = async () => {
+          try {
+            await navigator.clipboard.writeText(walletAddress);
+            setCopied(true);
+
+            setTimeout(() => setCopied(false), 2000);
+          } catch (err) {
+            console.error("Failed to copy wallet address:", err);
+          }
+        };
+
+        return (
+          <div
+            className="flex items-center gap-2 cursor-pointer group"
+            onClick={handleCopy}
+          >
+            <span className="text-sm text-gray-700 group-hover:underline decoration-blue-500 decoration-2">
+              {walletAddress}
+            </span>
+            {copied ? (
+              <Check color="#03AB65" size={16} strokeWidth={2.75} />
+            ) : (
+              <Copy color="#94A3B8" size={16} strokeWidth={2.75} />
+            )}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "completionUrl",
@@ -111,16 +136,25 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
         const completionUrl = row.getValue("completionUrl") as
           | string
           | undefined;
+
         if (!completionUrl) return null;
+
+        // Ensure the URL is absolute by adding a protocol if it's missing.
+        const absoluteUrl =
+          completionUrl.startsWith("http://") ||
+          completionUrl.startsWith("https://")
+            ? completionUrl
+            : `https://${completionUrl}`;
 
         return (
           <a
-            href={completionUrl}
+            href={absoluteUrl} // Use the corrected, absolute URL here
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline"
+            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 hover:underline decoration-2"
           >
-            <span className="text-sm">View Submission</span>
+            {/* Display the original URL as the link's text */}
+            <span className="text-sm">{completionUrl}</span>
             <ExternalLink size={16} />
           </a>
         );
@@ -149,8 +183,22 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
       ),
       enableHiding: false,
       cell: ({ row }) => {
+        // ... (existing logic)
         const status = row.getValue("status") as string;
         const dialogContent = getDialogContent(status);
+        const taskOwnerAddress = row.original.taskDetail.owner;
+
+        const isOwner =
+          userAddress?.toLowerCase() === taskOwnerAddress?.toLowerCase();
+        const isDisabled = isPending || !isOwner;
+
+        // Determine the tooltip message based on the disabled state
+        const tooltipMessage = !isOwner
+          ? "Only the task owner of task can perform this action"
+          : isPending
+            ? "Processing, please wait..."
+            : `Click to ${status === "PENDING" ? "accept" : "verify"} participant`;
+
         if (status !== "PENDING" && status !== "COMPLETED") {
           return (
             <span className="text-sm text-gray-500">No action available</span>
@@ -161,12 +209,12 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
           <>
             <button
               onClick={() => handleAction(row)}
-              disabled={isPending}
+              disabled={isDisabled}
+              title={tooltipMessage}
               className={`disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               <CircleCheck color="#03AB65" strokeWidth={1.5} size={28} />
             </button>
-
             {selectedTask && openTaskId === row.original.taskId && (
               <DialogButton
                 isOpen={!!openTaskId}
@@ -180,7 +228,6 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
                 isDisabled={isPending}
               />
             )}
-
             <LoadingBar />
           </>
         );

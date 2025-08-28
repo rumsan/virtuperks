@@ -256,8 +256,8 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
         subtitle
         titleWidth="w-64"
         subtitleWidth="w-72"
-        cardCount={2} // TaskDetails + Participants
-        gridCols="grid-cols-1" // stacked sections
+        cardCount={2}
+        gridCols="grid-cols-1"
         cardHeight="h-60"
         showPagination={false}
       />
