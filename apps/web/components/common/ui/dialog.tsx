@@ -77,6 +77,8 @@ export const DialogButton = ({
   const handleInputChange =
     (field: keyof typeof formData) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      if (value.length === 1 && value[0] === " ") return;
       setFormData((prev) => ({ ...prev, [field]: e.target.value }));
       setError(null);
     };

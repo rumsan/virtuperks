@@ -37,7 +37,7 @@ export default function DepartmentAdd({ router }: DepartmentAddProps) {
     useDepartmentAdd();
   const { toast } = useToast();
 
-  console.log("Sucess Status: ", isSuccess);
+  
   // Handle success and redirect
   useEffect(() => {
     if (departmentSuccess) {

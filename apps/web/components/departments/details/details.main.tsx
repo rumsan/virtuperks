@@ -52,10 +52,7 @@ export default function DepartmentDetails({
   );
 
   const transferList = tokenTransferData?.rewardManagementCreateds?.[0];
-
   const disbursementList = disbursementData?.rewardManagementCreateds?.[0];
-  console.log("Transfer: ", transferList);
-  console.log("Disburse: ", disbursementList);
 
   const Loading =
     entityLoading || allocatedLoading || unallocatedLoading || ownersLoading;
