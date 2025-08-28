@@ -9,7 +9,6 @@ import { createId } from "@paralleldrive/cuid2";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { useToast } from "@workspace/ui/hooks/use-toast";
 import { toUtf8Bytes } from "ethers";
-import { ArrowLeft } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -141,13 +140,13 @@ export default function TaskAdd({ router }: TaskAddProps) {
   return (
     <div className="w-full items-center">
       <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
-        <div
+        <button
           onClick={() => router.push(PATHS.TASKS.HOME)}
-          className="flex items-center gap-2 cursor-pointer hover:text-gray-400 my-3"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-blue-600 font-semibold hover:bg-blue-50 hover:text-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-300 mt-5"
         >
-          <ArrowLeft size={24} strokeWidth={2} />
-          <span className="font-base text-gray-700">Back</span>
-        </div>
+          <span className="text-lg">&larr;</span>
+          <span>Back to Task List</span>
+        </button>
 
         <div className="flex flex-col gap-1 my-2">
           <h1 className="font-bold text-4xl">Create Task</h1>

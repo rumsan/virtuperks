@@ -6,9 +6,8 @@ type TaskDetailsProps = {
   taskData: any;
 };
 
-const TaskDetails = ({ taskData}: TaskDetailsProps) => {
+const TaskDetails = ({ taskData }: TaskDetailsProps) => {
   const formattedDate = formatDate(taskData?.taskDetail?.expiryDate);
-
   const handleUrlClick = (e: React.MouseEvent, url: string) => {
     e.stopPropagation();
     window.open(url, "_blank", "noopener,noreferrer");

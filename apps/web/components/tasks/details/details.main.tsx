@@ -1,7 +1,10 @@
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
-import { useGetCombineStausByTask } from "@/hooks/subgraph/querycall";
+import {
+  useCheckParticipantStatus,
+  useGetCombineStausByTask,
+} from "@/hooks/subgraph/querycall";
 import {
   useCheckTaskStatus,
   useCloseTaskMutation,
@@ -35,6 +38,13 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   //     taskData?.internal_id,
   //     taskData?.rewardManagement.rewardManagement,
   //   );
+  const { status: participantStatus, isLoading: statusLoading } =
+    useCheckParticipantStatus(
+      taskData?.internal_id,
+      taskData?.rewardManagement?.rewardManagement,
+    );
+
+  console.log("Participant Status: ", participantStatus);
 
   const {
     taskDetail,
@@ -50,7 +60,8 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const closeTaskMutation = useCloseTaskMutation();
 
   const taskReady = !taskDetailLoading;
-  const isDisburseButtonDisabled = !taskReady || isTokenDisbursedFromContract;
+  const isDisburseButtonDisabled =
+    !taskReady || isTokenDisbursedFromContract || participantStatus !== 4;
   const isCloseButtonDisabled = !taskReady || isTaskExpired;
   const taskLoading = getTaskDetail.isLoading;
 
@@ -110,18 +121,32 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     }
 
     return (
-      <Button
-        variant="outline"
-        style={{ border: "1px solid #03AB65" }}
-        onClick={() => setIsOpen(true)}
-        disabled={isDisburseButtonDisabled}
-      >
-        <span className="text-[#03AB65]">Disperse Token</span>
-        <CheckCircle
-          className="ml-2"
-          style={{ color: "#03AB65", strokeWidth: 2.5, width: 20, height: 20 }}
-        />
-      </Button>
+      <div className="relative group flex items-center">
+        <Button
+          variant="outline"
+          disabled={isDisburseButtonDisabled}
+          className="border border-[#03AB65] disabled:cursor-not-allowed disabled:hover:bg-transparent"
+          onClick={() => setIsOpen(true)}
+        >
+          <span className="text-[#03AB65]">Disperse Token</span>
+          <CheckCircle
+            className="ml-2"
+            style={{
+              color: "#03AB65",
+              strokeWidth: 2.5,
+              width: 20,
+              height: 20,
+            }}
+          />
+        </Button>
+
+        {/* Show warning only on hover */}
+        {isDisburseButtonDisabled && (
+          <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 hidden group-hover:flex items-center gap-2 bg-yellow-100 border border-yellow-300 text-yellow-700 text-sm rounded-md px-3 py-1 whitespace-nowrap shadow">
+            ⚠️ Task not verified
+          </div>
+        )}
+      </div>
     );
   };
 
@@ -152,7 +177,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
       <div className="space-y-4 mt-5">
         <button
           onClick={() => router.push(PATHS.TASKS.HOME)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-blue-600 font-bold hover:bg-blue-50 hover:text-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-300"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-blue-600 font-semibold hover:bg-blue-50 hover:text-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-300"
         >
           <span className="text-lg">&larr;</span>
           <span>Back to Task List</span>
@@ -166,7 +191,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
             </h3>
           </div>
 
-          <div className="flex items-center ml-auto gap-4">
+          <div className="flex items-center ml-auto gap-4 mb-5">
             {getDisburseButton()}
 
             <Button
@@ -202,7 +227,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
           </div>
         </div>
 
-        <div className="flex w-full gap-4">
+        <div className="flex w-full gap-4 mt-5">
           <TaskDetails taskData={taskData} />
         </div>
 
