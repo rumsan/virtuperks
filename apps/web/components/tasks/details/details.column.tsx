@@ -103,7 +103,6 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
           try {
             await navigator.clipboard.writeText(walletAddress);
             setCopied(true);
-
             setTimeout(() => setCopied(false), 2000);
           } catch (err) {
             console.error("Failed to copy wallet address:", err);
@@ -112,12 +111,10 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
 
         return (
           <div
-            className="flex items-center gap-2 cursor-pointer group"
+            className="flex items-center gap-2 cursor-pointer"
             onClick={handleCopy}
           >
-            <span className="text-sm text-gray-700 group-hover:underline decoration-blue-500 decoration-2">
-              {walletAddress}
-            </span>
+            <span className="text-sm text-gray-700">{walletAddress}</span>
             {copied ? (
               <Check color="#03AB65" size={16} strokeWidth={2.75} />
             ) : (
@@ -139,27 +136,34 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
 
         if (!completionUrl) return null;
 
-        // Ensure the URL is absolute by adding a protocol if it's missing.
         const absoluteUrl =
           completionUrl.startsWith("http://") ||
           completionUrl.startsWith("https://")
             ? completionUrl
             : `https://${completionUrl}`;
 
+        let displayUrl: string;
+        try {
+          const urlObj = new URL(absoluteUrl);
+          displayUrl = urlObj.hostname;
+        } catch {
+          displayUrl = completionUrl;
+        }
+
         return (
           <a
-            href={absoluteUrl} // Use the corrected, absolute URL here
+            href={absoluteUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-blue-600 hover:text-blue-700 hover:underline decoration-2"
           >
-            {/* Display the original URL as the link's text */}
-            <span className="text-sm">{completionUrl}</span>
+            <span className="text-sm truncate max-w-[200px]">{displayUrl}</span>
             <ExternalLink size={16} />
           </a>
         );
       },
     },
+
     {
       accessorKey: "status",
       header: () => (

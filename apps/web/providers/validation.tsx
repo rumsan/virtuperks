@@ -6,22 +6,22 @@ import TreasurerNav from "@/components/layout/nav/treasurer.nav";
 import UnifiedNav from "@/components/layout/nav/unified.nav";
 import { AppRegistryABI } from "@workspace/contracts/abis";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAccount, useReadContract } from "wagmi";
 
 type Role = "ADMIN" | "TREASURER" | "PARTICIPANT" | "NONE" | "BOTH";
 
 interface ValidationProps {
   children: React.ReactNode;
+  restricted?: boolean; 
 }
 
-const Validation = ({ children }: ValidationProps) => {
-  const [currentRole, setCurrentRole] = useState<Role>("NONE");
+const Validation = ({ children, restricted = true }: ValidationProps) => {
   const { address, isConnected } = useAccount();
   const router = useRouter();
   const pathname = usePathname();
 
-  const { data: hasDefaultAdminRole } = useReadContract({
+  const { data: hasAdminRole, isLoading: loadingAdmin } = useReadContract({
     address: process.env.NEXT_PUBLIC_APPREGISTRY as `0x${string}`,
     abi: AppRegistryABI,
     functionName: "hasRole",
@@ -30,77 +30,84 @@ const Validation = ({ children }: ValidationProps) => {
       process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE,
       address,
     ],
+    query: {
+      enabled: isConnected,
+    },
   });
 
-  const { data: hasTreasurerRole } = useReadContract({
-    address: process.env.NEXT_PUBLIC_APPREGISTRY as `0x${string}`,
-    abi: AppRegistryABI,
-    functionName: "hasRole",
-    args: [
-      process.env.NEXT_PUBLIC_APP_ID,
-      process.env.NEXT_PUBLIC_MINTER_ROLE,
-      address,
-    ],
-  });
+  const { data: hasTreasurerRole, isLoading: loadingTreasurer } =
+    useReadContract({
+      address: process.env.NEXT_PUBLIC_APPREGISTRY as `0x${string}`,
+      abi: AppRegistryABI,
+      functionName: "hasRole",
+      args: [
+        process.env.NEXT_PUBLIC_APP_ID,
+        process.env.NEXT_PUBLIC_MINTER_ROLE,
+        address,
+      ],
+      query: {
+        enabled: isConnected,
+      },
+    });
+
+  const loading = loadingAdmin || loadingTreasurer || !isConnected;
+
+  const isAuthorized = hasAdminRole || hasTreasurerRole;
+  const isRestrictedPage =
+    restricted &&
+    (pathname.startsWith("/tasks") || pathname.startsWith("/participants"));
 
   useEffect(() => {
-    if (!isConnected) {
-      setCurrentRole("NONE");
-      return;
-    }
-
-    if (hasDefaultAdminRole && hasTreasurerRole) {
-      setCurrentRole("BOTH");
-    } else if (hasDefaultAdminRole) {
-      setCurrentRole("ADMIN");
-    } else if (hasTreasurerRole) {
-      setCurrentRole("TREASURER");
-    } else {
-      setCurrentRole("PARTICIPANT");
-    }
-  }, [isConnected, hasDefaultAdminRole, hasTreasurerRole]);
-
-  // 🚫 If participant tries to access /tasks, show message then redirect
-  useEffect(() => {
-    if (
-      currentRole === "PARTICIPANT" &&
-      (pathname === "/tasks" || pathname === "/participants")
-    ) {
+    if (!loading && isRestrictedPage && !isAuthorized) {
       const timer = setTimeout(() => {
-        router.replace("/task_portal"); // 👈 navigate after 3s
-      }, 3000);
-
-      return () => clearTimeout(timer); // cleanup
+        router.replace("/task_portal");
+      }, 1000);
+      return () => clearTimeout(timer);
     }
-  }, [currentRole, pathname, router]);
+  }, [loading, isRestrictedPage, isAuthorized, router]);
 
-  if (
-    currentRole === "PARTICIPANT" &&
-    (pathname === "/tasks" || pathname === "/participants")
-  ) {
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center text-lg text-gray-500">
+        Checking permissions... {" "}
+      </div>
+    );
+  } 
+
+  if (isRestrictedPage && !isAuthorized) {
     return (
       <div className="flex h-screen items-center justify-center text-xl font-semibold text-red-600">
-        🚫 You are not allowed to access this page. Redirecting you...
+        🚫 You are not allowed to access this page. Redirecting you... 
+        {" "}
       </div>
     );
   }
 
-  const renderNav = () => {
-    switch (currentRole) {
-      case "BOTH":
-        return <UnifiedNav>{children}</UnifiedNav>;
-      case "ADMIN":
-        return <EntityOwnerNav>{children}</EntityOwnerNav>;
-      case "TREASURER":
-        return <TreasurerNav>{children}</TreasurerNav>;
-      case "PARTICIPANT":
-      case "NONE":
-      default:
-        return <TaskPortalNav>{children}</TaskPortalNav>;
-    }
-  };
+  let currentRole: Role;
+  if (!isConnected) {
+    currentRole = "NONE";
+  } else if (hasAdminRole && hasTreasurerRole) {
+    currentRole = "BOTH";
+  } else if (hasAdminRole) {
+    currentRole = "ADMIN";
+  } else if (hasTreasurerRole) {
+    currentRole = "TREASURER";
+  } else {
+    currentRole = "PARTICIPANT";
+  }
 
-  return renderNav();
+  switch (currentRole) {
+    case "BOTH":
+      return <UnifiedNav>{children}</UnifiedNav>;
+    case "ADMIN":
+      return <EntityOwnerNav>{children}</EntityOwnerNav>;
+    case "TREASURER":
+      return <TreasurerNav>{children}</TreasurerNav>;
+    case "PARTICIPANT":
+    case "NONE":
+    default:
+      return <TaskPortalNav>{children}</TaskPortalNav>;
+  }
 };
 
 export default Validation;
