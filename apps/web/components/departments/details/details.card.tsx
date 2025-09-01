@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { toast } from "@workspace/ui/hooks/use-toast";
-import { Building, Copy, Loader2, Plus } from "lucide-react";
+import { Building, Clock, Copy, Loader2, Plus } from "lucide-react"; // ✅ added Clock
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import React, { useState } from "react";
 import { useAccount } from "wagmi";
@@ -25,6 +25,8 @@ type DepartmentDetailsCardProps = {
   unallocatedTokens?: bigint;
   getEntityOwners?: readonly `0x${string}`[];
   router: AppRouterInstance;
+  closePending?: boolean;
+  handleCloseExpiredTasks?: () => Promise<void>;
 };
 
 export default function DepartmentDetailsCard({
@@ -33,7 +35,10 @@ export default function DepartmentDetailsCard({
   unallocatedTokens,
   getEntityOwners,
   router,
+  closePending,
+  handleCloseExpiredTasks,
 }: DepartmentDetailsCardProps) {
+  console.log("Entity: ", entity);
   const { address } = useAccount();
   const roleData = hasRole({ role: process.env.NEXT_PUBLIC_MINTER_ROLE! });
   const canAllocateToken = Boolean(roleData);
@@ -112,26 +117,77 @@ export default function DepartmentDetailsCard({
     }
   };
 
-  const getTransferButton = () => (
-    <Button
-      variant="outline"
-      className="h-12 w-48 flex items-center justify-center"
-      style={{
-        border: "1px solid #03AB65",
-      }}
-      disabled={directTransferPending}
-      onClick={() => !directTransferPending && setIsOpen(true)}
-    >
-      <span className="text-[#03AB65] flex items-center gap-2">
-        {directTransferPending ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Plus size={16} strokeWidth={2.75} />
-        )}
-        {directTransferPending ? "Processing..." : "Transfer Token"}
-      </span>
-    </Button>
-  );
+  const getTransferButton = () => {
+    if (roleLoading) {
+      return (
+        <Button
+          variant="outline"
+          disabled
+          className="h-12 w-48 flex items-center justify-center border border-[#03AB65] opacity-70 cursor-not-allowed"
+        >
+          <Loader2 className="h-4 w-4 animate-spin text-[#03AB65]" />
+          <span className="ml-2 text-[#03AB65]">Loading...</span>
+        </Button>
+      );
+    }
+
+    return (
+      <Button
+        variant="outline"
+        className="h-12 w-48 flex items-center justify-center border border-[#03AB65]"
+        disabled={directTransferPending}
+        onClick={() => !directTransferPending && setIsOpen(true)}
+      >
+        <span className="text-[#03AB65] flex items-center gap-2">
+          {directTransferPending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Plus size={16} strokeWidth={2.75} />
+          )}
+          {directTransferPending ? "Processing..." : "Transfer Token"}
+        </span>
+      </Button>
+    );
+  };
+
+  const getCloseExpiredButton = () => {
+    if (roleLoading) {
+      return (
+        <button
+          type="button"
+          disabled
+          className="h-12 w-56 flex items-center justify-center rounded-md border border-[#FF5733] opacity-70 cursor-not-allowed"
+        >
+          <Loader2 className="h-4 w-4 animate-spin text-[#FF5733]" />
+          <span className="ml-2 text-[#FF5733]">Loading...</span>
+        </button>
+      );
+    }
+
+    return (
+      <button
+        type="button"
+        disabled={closePending}
+        onClick={handleCloseExpiredTasks}
+        className={`h-12 w-56 flex items-center justify-center rounded-md border border-[#FF5733] 
+          transition-colors font-medium
+          ${closePending ? "opacity-70 cursor-not-allowed" : "hover:bg-[#FF5733]/10 cursor-pointer"}`}
+      >
+        <span
+          className={`flex items-center gap-2 ${
+            closePending ? "text-red-600" : "text-[#FF5733]"
+          }`}
+        >
+          {closePending ? (
+            <Loader2 className="h-4 w-4 animate-spin text-red-600" />
+          ) : (
+            <Clock size={16} strokeWidth={2.75} />
+          )}
+          {closePending ? "Closing..." : "Close Expired Tasks"}
+        </span>
+      </button>
+    );
+  };
 
   return (
     <>
@@ -144,7 +200,10 @@ export default function DepartmentDetailsCard({
             </h3>
           </div>
           <div className="flex gap-10">
-            {canTransferToken && getTransferButton()}
+            {/* Transfer Button */}
+            {getTransferButton()}
+
+            {/* Dialog stays conditional because it only makes sense when user can transfer */}
             {!directTransferPending && canTransferToken && (
               <DialogButton
                 isOpen={isOpen}
@@ -162,6 +221,7 @@ export default function DepartmentDetailsCard({
               />
             )}
 
+            {/* Allocate Button */}
             {canAllocateToken && (
               <Button
                 className="h-12 w-48 fw-[600] flex items-center justify-center"
@@ -175,6 +235,9 @@ export default function DepartmentDetailsCard({
                 <span className="ml-2">Allocate Token</span>
               </Button>
             )}
+
+            {/* Close Expired Tasks Button */}
+            {getCloseExpiredButton()}
           </div>
         </div>
       </div>
@@ -206,7 +269,7 @@ export default function DepartmentDetailsCard({
                           onClick={() => {
                             navigator.clipboard.writeText(owner);
                             setCopiedOwner(owner);
-                            setTimeout(() => setCopiedOwner(null), 2000); // reset after 2s
+                            setTimeout(() => setCopiedOwner(null), 2000);
                           }}
                         >
                           <span
@@ -220,7 +283,7 @@ export default function DepartmentDetailsCard({
                           </span>
                           <div className="flex items-center transition-colors">
                             {copiedOwner === owner ? (
-                              <span className="text-blue-800 font-bold">
+                              <span className="text-green-800 font-bold">
                                 ✔
                               </span>
                             ) : (

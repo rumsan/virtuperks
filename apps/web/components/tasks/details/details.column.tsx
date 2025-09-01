@@ -1,9 +1,11 @@
 import { DialogButton } from "@/components/common/ui/dialog";
+import { useGetEntityRole } from "@/hooks/subgraph/entity";
 import {
   useAcceptParticipantMutation,
   useVerifyParticipantMutation,
 } from "@/hooks/subgraph/querycall";
 import { getDialogContent } from "@/utils/dialog";
+import hasRole from "@/utils/role";
 import { ColumnDef } from "@tanstack/react-table";
 import { TaskCreated } from "@workspace/sdk/types/task.type";
 import { useToast } from "@workspace/ui/hooks/use-toast";
@@ -20,11 +22,10 @@ interface SelectedTask {
 }
 
 export function useColumns(): ColumnDef<TaskCreated>[] {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<SelectedTask | null>(null);
+  const [openTaskId, setOpenTaskId] = useState<string | null>(null);
   const acceptParticipantMutation = useAcceptParticipantMutation();
   const verifyParticipantMutation = useVerifyParticipantMutation();
-  const [openTaskId, setOpenTaskId] = useState<string | null>(null);
   const { toast } = useToast();
   const { address: userAddress } = useAccount();
 
@@ -34,6 +35,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
   const handleMutation = async (task: SelectedTask) => {
     try {
       setOpenTaskId(null);
+
       if (task.status === "PENDING") {
         await acceptParticipantMutation.mutateAsync({
           taskId: task.id,
@@ -53,9 +55,10 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
         toast({
           title: "Participant verified successfully!",
           variant: "success",
+          duration: 2000,
         });
       }
-      setIsDialogOpen(false);
+
       setSelectedTask(null);
     } catch (error) {
       console.error(
@@ -65,6 +68,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
       toast({
         title: `Failed to ${task.status === "PENDING" ? "accept" : "verify"} participant.`,
         variant: "destructive",
+        duration: 2000,
       });
     }
   };
@@ -84,12 +88,8 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
     }
   };
 
-  const LoadingBar = () =>
-    isPending ? (
-      <div className="fixed top-0 left-0 w-full h-1 bg-blue-500 animate-pulse" />
-    ) : null;
-
   return [
+    // Participant Column
     {
       accessorKey: "participant",
       header: () => (
@@ -124,6 +124,8 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
         );
       },
     },
+
+    // Completion URL Column
     {
       accessorKey: "completionUrl",
       header: () => (
@@ -133,7 +135,6 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
         const completionUrl = row.getValue("completionUrl") as
           | string
           | undefined;
-
         if (!completionUrl) return null;
 
         const absoluteUrl =
@@ -142,13 +143,10 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
             ? completionUrl
             : `https://${completionUrl}`;
 
-        let displayUrl: string;
+        let displayUrl = completionUrl;
         try {
-          const urlObj = new URL(absoluteUrl);
-          displayUrl = urlObj.hostname;
-        } catch {
-          displayUrl = completionUrl;
-        }
+          displayUrl = new URL(absoluteUrl).hostname;
+        } catch {}
 
         return (
           <a
@@ -164,6 +162,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
       },
     },
 
+    // Status Column
     {
       accessorKey: "status",
       header: () => (
@@ -180,6 +179,8 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
         return <span className={`text-sm ${statusColor}`}>{status}</span>;
       },
     },
+
+    // Actions Column
     {
       id: "actions",
       header: () => (
@@ -187,38 +188,70 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
       ),
       enableHiding: false,
       cell: ({ row }) => {
-        // ... (existing logic)
         const status = row.getValue("status") as string;
         const dialogContent = getDialogContent(status);
+
         const taskOwnerAddress = row.original.taskDetail.owner;
+        const entityContractAddress =
+          row.original.rewardManagement?.rewardManagement ?? "";
 
-        const isOwner =
+        // Use role hook
+        const { entityRole } = useGetEntityRole(entityContractAddress);
+        const hasEntityOwnerRole = hasRole({ role: entityRole ?? "" });
+
+        const isTaskOwner =
           userAddress?.toLowerCase() === taskOwnerAddress?.toLowerCase();
-        const isDisabled = isPending || !isOwner;
+        const isAcceptAction = status === "PENDING";
+        const isVerifyAction = status === "COMPLETED";
 
-        // Determine the tooltip message based on the disabled state
-        const tooltipMessage = !isOwner
-          ? "Only the task owner of task can perform this action"
-          : isPending
-            ? "Processing, please wait..."
-            : `Click to ${status === "PENDING" ? "accept" : "verify"} participant`;
+        const isDisabled =
+          isPending ||
+          (isAcceptAction && !hasEntityOwnerRole) ||
+          (isVerifyAction && !isTaskOwner) ||
+          !(status === "PENDING" || status === "COMPLETED");
 
-        if (status !== "PENDING" && status !== "COMPLETED") {
+        const tooltipMessage = isPending
+          ? "Processing, please wait..."
+          : isAcceptAction && !hasEntityOwnerRole
+            ? "Only entity owners can accept participants"
+            : isVerifyAction && !isTaskOwner
+              ? "Only the task owner can verify participants"
+              : `Click to ${isAcceptAction ? "accept" : "verify"} participant`;
+
+        if (!(status === "PENDING" || status === "COMPLETED")) {
           return (
             <span className="text-sm text-gray-500">No action available</span>
           );
         }
 
         return (
-          <>
-            <button
-              onClick={() => handleAction(row)}
-              disabled={isDisabled}
-              title={tooltipMessage}
-              className={`disabled:opacity-50 disabled:cursor-not-allowed`}
-            >
-              <CircleCheck color="#03AB65" strokeWidth={1.5} size={28} />
-            </button>
+          <div className="flex items-center gap-2 relative">
+            {/* Show loader + message instead of CircleCheck when pending */}
+            {isPending && selectedTask?.id === row.original.taskId ? (
+              <div className="flex items-center gap-2 ml-1 text-sm text-gray-700">
+                <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                <span>
+                  {selectedTask.status === "PENDING"
+                    ? "Accepting participant..."
+                    : "Verifying participant..."}
+                </span>
+              </div>
+            ) : (
+              <button
+                onClick={() => handleAction(row)}
+                disabled={isDisabled}
+                title={tooltipMessage}
+                className="disabled:opacity-50 disabled:cursor-not-allowed relative"
+              >
+                <CircleCheck
+                  color={isDisabled ? "#A1A1AA" : "#03AB65"}
+                  strokeWidth={1.5}
+                  size={28}
+                />
+              </button>
+            )}
+
+            {/* Dialog for action */}
             {selectedTask && openTaskId === row.original.taskId && (
               <DialogButton
                 isOpen={!!openTaskId}
@@ -232,8 +265,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
                 isDisabled={isPending}
               />
             )}
-            <LoadingBar />
-          </>
+          </div>
         );
       },
     },

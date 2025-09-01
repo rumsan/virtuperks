@@ -3,7 +3,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   useReadRewardManagementGetOpenTasks,
   useReadRewardManagementGetTask,
+  useReadRewardManagementGetTaskVerifiedParticipants,
   useReadRewardManagementIsTaskExpired,
+  useWriteRewardManagementCloseExpiredTasks,
   useWriteRewardManagementCloseTask,
   useWriteRewardManagementCreateTask,
 } from "../wagmi/contracts";
@@ -92,6 +94,35 @@ export const useClosedTask = () => {
   });
 };
 
+export const useCloseExpiredTask = () => {
+  const queryClient = useQueryClient();
+  const { writeContractAsync } = useWriteRewardManagementCloseExpiredTasks();
+
+  const mutation = useMutation({
+    mutationFn: async (data: { entityAddress: `0x${string}` }) => {
+      return await writeContractAsync({
+        address: data.entityAddress,
+        args: [],
+      });
+    },
+    onSuccess: async () => {
+      // wait a bit to ensure tx is mined & indexers (like TheGraph) update
+      await new Promise((resolve) => setTimeout(resolve, 9000));
+
+      // refresh task list queries after closing
+      await queryClient.invalidateQueries({
+        queryKey: ["taskList"],
+      });
+    },
+  });
+
+  return {
+    taskCloseExpired: mutation.mutateAsync,
+    taskPending: mutation.isPending,
+    taskSuccess: mutation.isSuccess,
+  };
+};
+
 export const useGetTaskById = (id: string) => {
   const { queryService } = useGraphService();
 
@@ -132,6 +163,22 @@ export const useCloseTaskMutation = () => {
 };
 
 // to check wheter the task is expired or not
+
+export const useCheckTaskVerifiedParticipant = (
+  taskId: string,
+  entityId: string,
+) => {
+  const { data, isError, isLoading } =
+    useReadRewardManagementGetTaskVerifiedParticipants({
+      address: entityId as `0x${string}`,
+      args: [taskId as `0x${string}`],
+    });
+  return {
+    verifiedTaskParticipant: data,
+    isError,
+    statusLoading: isLoading,
+  };
+};
 
 export const useCheckTaskStatus = (taskId: string, entityId: string) => {
   const { data, isError, isLoading } = useReadRewardManagementGetTask({
