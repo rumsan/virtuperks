@@ -201,7 +201,7 @@ export default function DepartmentDetailsCard({
           </div>
           <div className="flex gap-10">
             {/* Transfer Button */}
-            {getTransferButton()}
+            {canTransferToken && getTransferButton()}
 
             {/* Dialog stays conditional because it only makes sense when user can transfer */}
             {!directTransferPending && canTransferToken && (
