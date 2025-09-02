@@ -51,6 +51,13 @@ export default function TaskPortalNav({ children }: PropsWithChildren) {
             />
           </Link>
           <Link
+            href="/participants"
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.PARTICIPANTS)}`}
+          >
+            <LayoutList size={18} strokeWidth={2.65} />
+            Participant
+          </Link>
+          <Link
             href="/departments"
             className={`flex items-center ml-10 gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.DEPARTMENTS)}`}
           >
@@ -61,6 +68,13 @@ export default function TaskPortalNav({ children }: PropsWithChildren) {
             href="/token_marketplace"
             className={`flex items-center gap-2 text-sm font-medium h-full px-2 ${getNavItemClasses(NavItem.TOKEN_MARKETPLACE)}`}
           >
+            <Link
+              href="/tasks"
+              className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASKS)}`}
+            >
+              <Layers size={18} strokeWidth={2.65} />
+              Task Management
+            </Link>
             <ShoppingBag size={18} strokeWidth={2.65} />
             Token Marketplace
           </Link>
