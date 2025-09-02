@@ -6,14 +6,7 @@ import {
   AvatarImage,
 } from "@workspace/ui/components/avatar";
 import { ConnectKitButton } from "connectkit";
-import {
-  Coins,
-  Layers,
-  LayoutDashboard,
-  LayoutList,
-  ShoppingBag,
-  Wallet,
-} from "lucide-react";
+import { Layers, LayoutList, ShoppingBag, Wallet } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -49,36 +42,33 @@ export default function TreasurerNav({ children }: PropsWithChildren) {
       {/* Fixed Header */}
       <header className="fixed top-0 left-0 right-0 z-50 border-b bg-white">
         <div className="flex h-14 items-center px-4 gap-8 border-b-2 border-[#E2E8F0]">
-          {/* Logo */}
-          <nav className="flex items-center justify-center w-[50px] h-full">
-            <Link href="/" className="flex items-center gap-2">
+          <div className="flex items-center h-full gap-6">
+            {" "}
+            {/* reduced for general nav item spacing */}
+            {/* Logo with extra gap to nav items */}
+            <Link href="/" className="flex items-center mr-8">
               <Image
                 src="/bg/rumsan-logo.png"
-                width={50}
-                height={50}
+                width={40}
+                height={40}
                 alt="Logo"
               />
             </Link>
-          </nav>
-
-          {/* Navigation */}
-          <nav className="flex items-center gap-6 h-full">
+            {/* Nav items with equal spacing */}
             <Link
               href="/participants"
               className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.PARTICIPANTS)}`}
             >
-              <LayoutDashboard size={18} strokeWidth={2.65} />
-              Participants
+              <LayoutList size={18} strokeWidth={2.65} />
+              Participant
             </Link>
-
             <Link
               href="/departments"
               className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.DEPARTMENTS)}`}
             >
-              <Coins size={18} strokeWidth={2.65} />
+              <Layers size={18} strokeWidth={2.65} />
               Department
             </Link>
-
             <Link
               href="/tasks"
               className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASKS)}`}
@@ -86,15 +76,14 @@ export default function TreasurerNav({ children }: PropsWithChildren) {
               <Layers size={18} strokeWidth={2.65} />
               Task Management
             </Link>
-
             <Link
               href="/token_marketplace"
-              className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TOKEN_MARKETPLACE)}`}
+              className={`flex items-center gap-2 text-sm font-medium h-full p-2 ${getNavItemClasses(NavItem.TOKEN_MARKETPLACE)}`}
             >
               <ShoppingBag size={18} strokeWidth={2.65} />
               Token Marketplace
             </Link>
-          </nav>
+          </div>
 
           {/* Right Side */}
           <div className="ml-auto flex items-center gap-4 h-full">
