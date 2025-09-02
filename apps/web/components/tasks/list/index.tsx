@@ -4,6 +4,7 @@ import { DataTablePagination } from "@/components/common/list/list.pagination";
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { useClosedTask, useOpenTask } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
+import hasRole from "@/utils/role";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -55,6 +56,10 @@ export default function TaskListMain({ router }: TaskListMainProps) {
 
   const openTask = useOpenTask();
   const closeTask = useClosedTask();
+
+  const hasAdminOwnerRole = hasRole({
+    role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
+  });
 
   const openTaskList: TaskCreated[] = openTask?.data?.data?.taskCreateds ?? [];
   const closedTaskList: TaskCreated[] =
@@ -148,9 +153,31 @@ export default function TaskListMain({ router }: TaskListMainProps) {
             </h3>
           </div>
 
-          <div className="flex flex-col ml-auto justify-end h-full ">
+          <div className="flex flex-col ml-auto justify-end h-full space-y-2">
+            {/* Warning message always visible */}
+            <div className="flex items-center gap-2 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-3 rounded-md shadow-sm max-w-xs">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span className="text-sm font-medium">
+                Only entity owners can create tasks.
+              </span>
+            </div>
+
+            {/* Create Task Button */}
             <Button
-              className="min-w-[10rem] fw-[600] h-10"
+              className="min-w-[10rem] font-semibold h-10"
               variant="default"
               onClick={() => router.push(PATHS.TASKS.ADD)}
             >
