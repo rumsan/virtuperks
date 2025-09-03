@@ -237,7 +237,7 @@ export default function DepartmentDetailsCard({
             )}
 
             {/* Close Expired Tasks Button */}
-            {getCloseExpiredButton()}
+            {canTransferToken && getCloseExpiredButton()}
           </div>
         </div>
       </div>
