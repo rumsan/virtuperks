@@ -15,7 +15,7 @@ type TaskPortalDetailsProps = {
 };
 
 const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
-  console.log("Task Data:", taskData);
+  
   const handleUrlClick = (e: React.MouseEvent, url: string) => {
     e.stopPropagation();
     window.open(url, "_blank", "noopener,noreferrer");

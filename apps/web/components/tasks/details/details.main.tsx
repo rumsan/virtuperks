@@ -35,7 +35,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const [isDisbursed, setIsDisbursed] = useState(false);
 
   const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
-  console.log("Task: ", taskData);
+
   const { entityRole, roleLoading } = useGetEntityRole(
     taskData?.rewardManagement?.rewardManagement || "",
   );

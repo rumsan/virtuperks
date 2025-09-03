@@ -22,7 +22,6 @@ export interface RewardDetailsProps {
 }
 
 const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
-  console.log("Reward ID: ", rewardId);
   const { data: rewardDetail, isLoading, error } = useGetRewardById(rewardId);
   const { address, isConnected } = useAccount();
   //hook to check participant balance
@@ -60,7 +59,6 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   }
 
   const rewardRaw = rewardDetail?.data?.rewardRedemptionCreateds[0];
-  console.log("Reward Raw Data: ", rewardRaw);
 
   const handleApprove = async () => {
     try {

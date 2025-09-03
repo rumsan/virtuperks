@@ -76,7 +76,6 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
   });
 
   // const getRewardOwnerAddress = useGetRewardOwner(rewardId);
-  // console.log("Reward Owner Address: ", getRewardOwnerAddress);
 
   const [tab, setTab] = useState<"all" | "mine">("all");
 

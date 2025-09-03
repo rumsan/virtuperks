@@ -39,7 +39,7 @@ const TokenMarketListCard = () => {
   const { toast } = useToast();
   const tokenData = useGetRewards();
   const tokenList = tokenData?.data?.data?.rewardRedemptionCreateds || [];
-  console.log("Token Data: ++", tokenList);
+
   // const totalRewards = tokenList.length;
   const affordableRewards = tokenList.filter(
     (item: any) =>

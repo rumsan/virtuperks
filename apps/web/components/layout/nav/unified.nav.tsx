@@ -16,7 +16,6 @@ import { navItemPaths } from "./navItemPaths";
 
 export default function UnifiedNav({ children }: PropsWithChildren) {
   const pathname = usePathname();
-  console.log("Active Page: ", pathname);
 
   const getNavItemClasses = (navItem: NavItem) => {
     // const paths = navItemPaths[navItem];
@@ -37,7 +36,6 @@ export default function UnifiedNav({ children }: PropsWithChildren) {
     })
       ? "text-[#297AD6] border-b-2 border-[#297AD6]"
       : "text-[#1E293B] hover:text-[#1e293b]";
-    console.log(`Checking ${navItem}:`, paths, "Against pathname:", pathname);
   };
 
   return (

@@ -76,7 +76,7 @@ export default function DepartmentDetails({
         variant: "success",
       });
     } catch (err) {
-      console.error("Error closing expired tasks:", err);
+      
       toast({
         title: "Failed to close expired tasks.",
         variant: "destructive",
