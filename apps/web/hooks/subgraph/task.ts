@@ -176,3 +176,21 @@ export const useGetOpentask = (entityId: string) => {
     statusLoading: isLoading,
   };
 };
+
+export const useGetTasksOwnedByIndividual = (
+  createdBy: string,
+  skip: boolean = false,
+) => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["tasksOwned", createdBy],
+    queryFn: async () => {
+      if (!queryService) {
+        throw new Error("Query service is not initialized");
+      }
+      return await queryService.getTasksOwnedByIndividual(createdBy);
+    },
+    enabled: !!createdBy && !skip,
+  });
+};
