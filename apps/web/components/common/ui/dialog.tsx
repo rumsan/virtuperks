@@ -27,6 +27,7 @@ type DialogButtonProps = {
     | "CreateReward";
   inputLabel?: string;
   inputPlaceholder?: string;
+  availableTokens?: number;
   handleApplyTaskLogic?: (data?: {
     completionUrl?: string;
     amount?: string;
@@ -51,6 +52,7 @@ export const DialogButton = ({
   inputPlaceholder = "https://example.com/completion",
   handleApplyTaskLogic,
   isDisabled,
+  availableTokens,
 }: DialogButtonProps) => {
   const [formData, setFormData] = useState<{
     completionUrl: string;
@@ -75,6 +77,8 @@ export const DialogButton = ({
   const handleInputChange =
     (field: keyof typeof formData) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      if (value.length === 1 && value[0] === " ") return;
       setFormData((prev) => ({ ...prev, [field]: e.target.value }));
       setError(null);
     };
@@ -89,8 +93,14 @@ export const DialogButton = ({
     ) {
       return "Amount is required";
     }
-    if (submitType === "directdisburse" && !formData.to.trim()) {
-      return "Recipient address is required";
+    if (submitType === "directdisburse") {
+      if (!formData.amount.trim()) return "Amount is required";
+      const amountNum = Number(formData.amount);
+      if (isNaN(amountNum) || amountNum <= 0)
+        return "Amount must be greater than 0";
+      if (availableTokens !== undefined && amountNum > availableTokens)
+        return `Amount exceeds available tokens (${availableTokens})`;
+      if (!formData.to.trim()) return "Recipient address is required";
     }
     if (
       submitType === "CreateReward" &&
@@ -207,7 +217,7 @@ export const DialogButton = ({
           </Label>
           <Input
             id="amount"
-            type="text"
+            type="number"
             value={formData.amount}
             onChange={handleInputChange("amount")}
             placeholder="Enter amount to disperse"
@@ -219,6 +229,8 @@ export const DialogButton = ({
       );
     }
     if (submitType === "directdisburse") {
+      const amountNum = Number(formData.amount);
+
       return (
         <div className="py-4 space-y-4">
           <div>
@@ -230,7 +242,7 @@ export const DialogButton = ({
             </Label>
             <Input
               id="amount"
-              type="text"
+              type="number"
               value={formData.amount}
               onChange={handleInputChange("amount")}
               placeholder="Enter amount"
@@ -238,7 +250,22 @@ export const DialogButton = ({
                 error ? "border-red-600" : ""
               }`}
             />
+            {/* Warning if availableTokens is 0 */}
+            {availableTokens === 0 && (
+              <p className="text-red-500 text-sm mt-1">
+                No tokens available for disbursement
+              </p>
+            )}
+            {/* Live warning for exceeding tokens */}
+            {availableTokens !== undefined &&
+              formData.amount &&
+              amountNum > availableTokens && (
+                <p className="text-red-500 text-sm mt-1">
+                  Amount exceeds available tokens ({availableTokens})
+                </p>
+              )}
           </div>
+
           <div>
             <Label
               htmlFor="to"
@@ -257,6 +284,7 @@ export const DialogButton = ({
               }`}
             />
           </div>
+
           <div>
             <Label
               htmlFor="remarks"
@@ -276,6 +304,7 @@ export const DialogButton = ({
         </div>
       );
     }
+
     if (submitType === "CreateReward") {
       return (
         <div className="py-4 space-y-4">

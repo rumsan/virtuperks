@@ -7,6 +7,7 @@ import { Cuid } from "@/components/departments/details/details.main";
 // } from "@/hooks/subgraph/querycall";
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { DialogButton } from "@/components/common/ui/dialog";
+import { useGetWhiteListedParticipantByTask } from "@/hooks/subgraph/participant";
 import {
   useCheckParticipantStatus,
   useCompleteTaskMutation,
@@ -16,13 +17,12 @@ import { useGetTaskById } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
 import { Button } from "@workspace/ui/components/button";
 import { useToast } from "@workspace/ui/hooks/use-toast";
-import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import TaskPortalParticipant from "./details.participant";
 import TaskPortalDetails from "./details.task";
-import { useGetWhiteListedParticipantByTask } from "@/hooks/subgraph/participant";
 
 type TaskPortalMainProps = {
   cuid: Cuid;
@@ -37,14 +37,20 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const { isConnected, address } = useAccount();
 
   const getTaskDetail = useGetTaskById(cuid.id);
-  
 
   const { toast } = useToast();
-  const taskData = getTaskDetail?.data?.data?.taskCreated;
-  const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(taskData?.internal_id, false);
+  const taskData = getTaskDetail?.data?.data?.taskCreateds?.[0];
 
-  const whiteListedParticipants = getWhiteListedParticipants?.data?.data?.participantWhitelisteds || [];
+  const isTaskOpen = taskData?.taskDetail?.isOpen;
 
+  // const isTaskClosed = taskDetail ? !taskDetail.isOpen : false;
+
+  const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(
+    taskData?.internal_id,
+    false,
+  );
+  const whiteListedParticipants =
+    getWhiteListedParticipants?.data?.data?.participantWhitelisteds || [];
 
   const { participateTask, participatePending, participateSuccess } =
     useParticipateTaskMutation();
@@ -56,23 +62,19 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
       taskData?.rewardManagement?.rewardManagement,
     );
 
-
   const handleApplyTask = async () => {
     if (!isConnected) {
       setAlertDialog(true);
       return;
     }
- 
 
     // Check if the connected address is whitelisted
-   
+
     const isWhitelisted = whiteListedParticipants.some(
       (participantList: { participant: string }, index: number) => {
-      
-        return participantList.participant === address?.toLowerCase()
+        return participantList.participant === address?.toLowerCase();
       },
     );
-  
 
     if (!isWhitelisted) {
       toast({
@@ -154,9 +156,16 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
       );
     }
 
-    // Convert localButtonState to number if it's a string
+    // if task is closed
+    if (!isTaskOpen) {
+      return (
+        <Button className="bg-gray-400 cursor-not-allowed" disabled>
+          <span className="text-white">Task Closed</span>
+        </Button>
+      );
+    }
+
     const effectiveStatus = localButtonState ?? participantStatus;
-    console.log(effectiveStatus, "effectiveStatus");
 
     switch (effectiveStatus) {
       case 0: // NONE
@@ -217,7 +226,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             )}
           </>
         );
-
       case "COMPLETED":
       case 3:
         return (
@@ -235,7 +243,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             <span className="text-[#F8FAFC]">Verified</span>
           </Button>
         );
-
       default:
         return null;
     }
@@ -249,8 +256,8 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
         subtitle
         titleWidth="w-64"
         subtitleWidth="w-72"
-        cardCount={2} // TaskDetails + Participants
-        gridCols="grid-cols-1" // stacked sections
+        cardCount={2}
+        gridCols="grid-cols-1"
         cardHeight="h-60"
         showPagination={false}
       />
@@ -260,13 +267,13 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
       <div className="space-y-4">
-        <div
+        <button
           onClick={() => router.push(PATHS.TASKPORTAL.HOME)}
-          className="flex items-center gap-2 cursor-pointer hover:text-gray-400 my-3"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-blue-600 font-semibold hover:bg-blue-50 hover:text-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-300 mt-5"
         >
-          <ArrowLeft size={24} strokeWidth={2} />
-          <span className="font-base text-gray-700">Back</span>
-        </div>
+          <span className="text-lg">&larr;</span>
+          <span>Back to TaskPortal</span>
+        </button>
         <div className="flex items-center">
           <div className="flex flex-col gap-1">
             <h1 className="font-bold text-4xl">Task Details</h1>

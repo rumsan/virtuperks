@@ -126,15 +126,7 @@ export const useCloseTaskMutation = () => {
         address: (entityId as `0x${string}`) || "0x",
         args: [taskId as `0x${string}`],
       });
-
       return result;
-    },
-
-    onSuccess: async (result, variable) => {
-      // await new Promise((resolve) => setTimeout(resolve, 9000));
-      // await queryClient.invalidateQueries({
-      //   queryKey: ["AllParticipantsStatus", variable.taskId],
-      // });
     },
   });
 };

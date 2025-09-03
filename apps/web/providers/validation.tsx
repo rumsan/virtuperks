@@ -5,6 +5,7 @@ import TaskPortalNav from "@/components/layout/nav/task_portal.nav";
 import TreasurerNav from "@/components/layout/nav/treasurer.nav";
 import UnifiedNav from "@/components/layout/nav/unified.nav";
 import { AppRegistryABI } from "@workspace/contracts/abis";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAccount, useReadContract } from "wagmi";
 
@@ -17,6 +18,8 @@ interface ValidationProps {
 const Validation = ({ children }: ValidationProps) => {
   const [currentRole, setCurrentRole] = useState<Role>("NONE");
   const { address, isConnected } = useAccount();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const { data: hasDefaultAdminRole } = useReadContract({
     address: process.env.NEXT_PUBLIC_APPREGISTRY as `0x${string}`,
@@ -28,8 +31,6 @@ const Validation = ({ children }: ValidationProps) => {
       address,
     ],
   });
-
-
 
   const { data: hasTreasurerRole } = useReadContract({
     address: process.env.NEXT_PUBLIC_APPREGISTRY as `0x${string}`,
@@ -50,7 +51,6 @@ const Validation = ({ children }: ValidationProps) => {
 
     if (hasDefaultAdminRole && hasTreasurerRole) {
       setCurrentRole("BOTH");
-      console.log("Role: ", currentRole);
     } else if (hasDefaultAdminRole) {
       setCurrentRole("ADMIN");
     } else if (hasTreasurerRole) {
@@ -60,8 +60,32 @@ const Validation = ({ children }: ValidationProps) => {
     }
   }, [isConnected, hasDefaultAdminRole, hasTreasurerRole]);
 
+  // 🚫 If participant tries to access /tasks, show message then redirect
+  useEffect(() => {
+    if (
+      currentRole === "PARTICIPANT" &&
+      (pathname === "/tasks" || pathname === "/participants")
+    ) {
+      const timer = setTimeout(() => {
+        router.replace("/task_portal"); // 👈 navigate after 3s
+      }, 3000);
+
+      return () => clearTimeout(timer); // cleanup
+    }
+  }, [currentRole, pathname, router]);
+
+  if (
+    currentRole === "PARTICIPANT" &&
+    (pathname === "/tasks" || pathname === "/participants")
+  ) {
+    return (
+      <div className="flex h-screen items-center justify-center text-xl font-semibold text-red-600">
+        🚫 You are not allowed to access this page. Redirecting you...
+      </div>
+    );
+  }
+
   const renderNav = () => {
-    console.log("Current Role: ", currentRole);
     switch (currentRole) {
       case "BOTH":
         return <UnifiedNav>{children}</UnifiedNav>;

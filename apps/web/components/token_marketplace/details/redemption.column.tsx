@@ -26,7 +26,6 @@ export function useColumns<
   updatingId: string | null,
   rewardRole?: string,
 ): ColumnDef<T>[] {
- 
   const hasDefaultAdminRole = hasRole({
     role: rewardRole || "",
   });
@@ -92,6 +91,7 @@ export function useColumns<
           <div className="flex justify-center items-center w-full">
             <button
               onClick={() => {
+                if (isButtonLoading || isCompleted) return; // prevent accidental triggers
                 updateStatus({
                   userAddress: row.original.from,
                   rewardAddress: row.original.rewardRedemption.rewardRedemption,
@@ -99,23 +99,38 @@ export function useColumns<
                 });
               }}
               disabled={isButtonLoading || isCompleted}
-              className={`p-1.5 rounded-full transition ${
+              className={`p-2 rounded-full transition ${
                 isButtonLoading || isCompleted
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-green-100"
+                  ? "opacity-60 cursor-not-allowed"
+                  : "hover:bg-green-300"
               }`}
-              title={isCompleted ? "Already Completed" : "Mark as Completed"}
+              title={
+                isCompleted
+                  ? "Already marked as completed"
+                  : isButtonLoading
+                    ? "Updating..."
+                    : "Mark as Completed"
+              }
             >
               {isButtonLoading ? (
-                <Loader className="w-4 h-4 text-green-800 animate-spin" />
+                <Loader className="w-6 h-6 text-green-800 animate-spin" />
+              ) : isCompleted ? (
+                // Different icon when disabled (completed state)
+                <CircleCheck className="w-6 h-6 text-gray-400" />
               ) : (
-                <CircleCheck className="text-green-800" />
+                // Default active icon
+                <CircleCheck className="w-6 h-6 text-green-800" />
               )}
             </button>
           </div>
         ) : (
           <div className="flex justify-center items-center w-full">
-            <CircleCheck className="text-green-800 opacity-20" />
+            <span
+              className="relative group cursor-not-allowed"
+              title="You don’t have permission to update"
+            >
+              <CircleCheck className="w-6 h-6 text-green-800 opacity-50 " />
+            </span>
           </div>
         );
       },

@@ -1,6 +1,9 @@
 "use client";
 
-import { useCheckTotalUnallocatedTokens, useGetAllEntity } from "@/hooks/subgraph/entity";
+import {
+  useCheckTotalUnallocatedTokens,
+  useGetAllEntity,
+} from "@/hooks/subgraph/entity";
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
 import {
@@ -62,38 +65,27 @@ export default function TaskBaseForm({
   const getAllEntity = useGetAllEntity();
   const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
 
-  const {  watch, formState: { errors }, setError, clearErrors } = form;
-  
+  const {
+    watch,
+    formState: { errors },
+    setError,
+    clearErrors,
+  } = form;
 
   const entityAddress = watch("entityAddress");
   const totalRewardAmount = watch("totalRewardAmount");
 
+  const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
+    entityAddress ?? "",
+  );
 
-
-  const { unallocatedTokens } = useCheckTotalUnallocatedTokens(entityAddress ?? "");
-
-  
-  useEffect(() => {
-    if (entityAddress && totalRewardAmount && unallocatedTokens !== undefined) {
-      const amount = BigInt(totalRewardAmount || 0);
-      if (amount > unallocatedTokens) {
-        setError("totalRewardAmount", {
-          type: "manual",
-          message: `Insufficient tokens. Available: ${unallocatedTokens.toString()}`
-        });
-      } else {
-        clearErrors("totalRewardAmount");
-      }
-    }
-  }, [entityAddress, totalRewardAmount, unallocatedTokens, setError, clearErrors]);
-
- 
   useEffect(() => {
     if (entityAddress && unallocatedTokens !== undefined) {
       if (unallocatedTokens === BigInt(0)) {
         setError("entityAddress", {
           type: "manual",
-          message: "Selected entity has no tokens available. Please mint tokens first."
+          message:
+            "Selected entity has no tokens available. Please mint tokens first.",
         });
       } else {
         clearErrors("entityAddress");
@@ -112,12 +104,38 @@ export default function TaskBaseForm({
     }
   };
 
-
   const removeWallet = (addressToRemove: string) => {
     const filtered = walletAddresses.filter((addr) => addr !== addressToRemove);
     setWalletAddresses(filtered);
     form.setValue("whitelistedParticipants", filtered);
   };
+
+  useEffect(() => {
+    if (!entityAddress || unallocatedTokens === undefined) return;
+    if (!totalRewardAmount) return;
+
+    try {
+      const totalAmount = BigInt(totalRewardAmount.toString());
+      const availableAmount = BigInt(unallocatedTokens);
+
+      if (totalAmount > availableAmount) {
+        setError("totalRewardAmount", {
+          type: "manual",
+          message: `Insufficient tokens. Available: ${availableAmount.toString()}`,
+        });
+      } else {
+        clearErrors("totalRewardAmount");
+      }
+    } catch (err) {
+      console.error("Error parsing totalRewardAmount:", err);
+    }
+  }, [
+    entityAddress,
+    totalRewardAmount,
+    unallocatedTokens,
+    setError,
+    clearErrors,
+  ]);
 
   const handleSubmitForm = form.handleSubmit(saveForm);
 
@@ -133,18 +151,23 @@ export default function TaskBaseForm({
                 <FormItem>
                   <FormLabel>Task Title</FormLabel>
                   <FormControl>
-                    <div className="relative flex items-center bg-white rounded-md">
-                      <Input
-                        placeholder="Write name for the task"
-                        {...field}
-                        value={field.value ?? ""}
-                      />
-                    </div>
+                    <Input
+                      placeholder="Write name for the task"
+                      {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // Prevent space as the first character
+                        if (value.length === 1 && value[0] === " ") return;
+                        field.onChange(value);
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="detailsUrl"
@@ -157,6 +180,11 @@ export default function TaskBaseForm({
                         placeholder="Write title Url"
                         {...field}
                         value={field.value ?? ""}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value.length === 1 && value[0] === " ") return;
+                          field.onChange(value);
+                        }}
                       />
                     </div>
                   </FormControl>
@@ -164,42 +192,6 @@ export default function TaskBaseForm({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="entityAddress"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Select Entity</FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                      }}
-                      value={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select Entity" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {entityList?.map((entity: EntityType) => (
-                          <SelectItem
-                            key={entity.id}
-                            value={entity.rewardManagement}
-                          >
-                            {entity.name} 
-                            {unallocatedTokens !== undefined && entity.rewardManagement === entityAddress && 
-                              ` (Available: ${unallocatedTokens.toString()} tokens)`
-                            }
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage className="text-red-500" />
-                </FormItem>
-              )}
-            />
-
             <FormField
               control={form.control}
               name="maxParticipants"
@@ -241,17 +233,11 @@ export default function TaskBaseForm({
                       type="number"
                       placeholder="0"
                       {...field}
-                      value={
-                        field.value !== undefined && field.value !== null
-                          ? field.value.toString()
-                          : ""
-                      }
+                      value={field.value === 0 ? "" : (field.value ?? "")}
                       onChange={(e) => {
-                        const value = e.target.value;
+                        const val = e.target.value;
 
-                        field.onChange(
-                          value === "" ? undefined : parseInt(value, 10),
-                        );
+                        field.onChange(val === "" ? undefined : Number(val));
                       }}
                     />
                   </FormControl>
@@ -285,6 +271,42 @@ export default function TaskBaseForm({
                     </Select>
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="entityAddress"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Select Entity</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                      }}
+                      value={field.value}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Entity" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {entityList?.map((entity: EntityType) => (
+                          <SelectItem
+                            key={entity.id}
+                            value={entity.rewardManagement}
+                          >
+                            {entity.name}
+                            {unallocatedTokens !== undefined &&
+                              entity.rewardManagement === entityAddress &&
+                              ` (Available: ${unallocatedTokens.toString()} tokens)`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />
@@ -389,8 +411,12 @@ export default function TaskBaseForm({
                     placeholder="Add owner Address"
                     {...field}
                     value={field.value ?? ""}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value.length === 1 && value[0] === " ") return;
+                      field.onChange(value);
+                    }}
                   />
-
                   <FormMessage />
                 </FormItem>
               )}
@@ -409,7 +435,11 @@ export default function TaskBaseForm({
                       type="text"
                       placeholder="Paste wallet address"
                       value={currentWallet}
-                      onChange={(e) => setCurrentWallet(e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value.length === 1 && value[0] === " ") return;
+                        setCurrentWallet(value);
+                      }}
                     />
                     <Button
                       type="button"

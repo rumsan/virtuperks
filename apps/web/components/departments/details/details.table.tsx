@@ -1,10 +1,6 @@
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import { ListTable } from "@/components/common/list/list.table";
 import {
-  useGetDisbursements,
-  useGetTokenTransfers,
-} from "@/hooks/subgraph/token";
-import {
   getCoreRowModel,
   getPaginationRowModel,
   useReactTable,
@@ -31,24 +27,18 @@ interface ListTableProps<T> {
   setPagination: Dispatch<SetStateAction<Pagination>>;
   filterTab: "direct" | "task";
   setFilterTab: (tab: "direct" | "task") => void;
+  transferList: T[]; // added
+  disbursementList: T[]; // added
 }
 
 const DepartmentDetailsTable = <T extends { type?: string }>({
   pagination,
   setPagination,
-  cuid,
   filterTab,
   setFilterTab,
+  transferList,
+  disbursementList,
 }: ListTableProps<T>) => {
-  const { data: disbursementData } = useGetDisbursements(cuid);
-  const { data: tokenTransferData } = useGetTokenTransfers(cuid);
-
-  const transferList =
-    tokenTransferData?.rewardManagementCreateds?.[0]?.tokenTransfers ?? [];
-
-  const disbursementList =
-    disbursementData?.rewardManagementCreateds?.[0]?.disbursements ?? [];
-
   const transferColumns = useColumns("transfer");
   const disbursementColumns = useColumns("disbursement");
 

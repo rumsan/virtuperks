@@ -1,14 +1,10 @@
 "use client";
 
 import { DialogButton } from "@/components/common/ui/dialog";
-import {
-  useCheckTotalAllocatedTokens,
-  useCheckTotalUnallocatedTokens,
-  useGetEntityById,
-  useGetEntityOwners,
-} from "@/hooks/subgraph/entity";
+import { useGetEntityRole } from "@/hooks/subgraph/entity";
 import { useDirectTokenTransfer } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
+import hasRole from "@/utils/role";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -18,32 +14,39 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { toast } from "@workspace/ui/hooks/use-toast";
-import { Copy, Loader2, Plus, User } from "lucide-react";
+import { Building, Copy, Loader2, Plus } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { useState } from "react";
-import { Cuid } from "./details.main";
+import React, { useState } from "react";
+import { useAccount } from "wagmi";
 
 type DepartmentDetailsCardProps = {
-  cuid: Cuid;
+  entity: any;
+  totalAllocatedTokens?: bigint;
+  unallocatedTokens?: bigint;
+  getEntityOwners?: readonly `0x${string}`[];
   router: AppRouterInstance;
 };
 
 export default function DepartmentDetailsCard({
-  cuid,
+  entity,
+  totalAllocatedTokens,
+  unallocatedTokens,
+  getEntityOwners,
   router,
 }: DepartmentDetailsCardProps) {
-  const { data: entity, isLoading, isError, error } = useGetEntityById(cuid.id);
+  const { address } = useAccount();
+  const roleData = hasRole({ role: process.env.NEXT_PUBLIC_MINTER_ROLE! });
+  const canAllocateToken = Boolean(roleData);
 
-
-  const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
-    entity?.rewardManagement,
+  const { entityRole, roleLoading } = useGetEntityRole(
+    entity?.rewardManagement || "",
   );
 
-  const { totalAllocatedTokens } = useCheckTotalAllocatedTokens(
-    entity?.rewardManagement,
-  );
+  const hasEntityOwnerRole = hasRole({
+    role: entityRole || "",
+  });
 
-  const { getEntityOwners } = useGetEntityOwners(entity?.entityId);
+  const canTransferToken = Boolean(hasEntityOwnerRole);
 
   const {
     directTransfer,
@@ -53,16 +56,14 @@ export default function DepartmentDetailsCard({
   } = useDirectTokenTransfer();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [transferAmount, setTransferAmount] = useState<number>(0);
+  const [isAmountValid, setIsAmountValid] = useState(true);
+  const [copiedOwner, setCopiedOwner] = React.useState<string | null>(null);
 
-  if (isLoading) {
-    return <p className="text-gray-600">Loading department info...</p>;
-  }
-
-  if (isError) {
-    return (
-      <p className="text-red-600">Failed to load department: {error.message}</p>
-    );
-  }
+  const handleAmountChange = (value: number) => {
+    setTransferAmount(value);
+    setIsAmountValid(value <= (unallocatedTokens ?? 0));
+  };
 
   if (!entity) {
     return (
@@ -73,6 +74,23 @@ export default function DepartmentDetailsCard({
   }
 
   const handleDialogAction = async (data: any) => {
+    if (!unallocatedTokens) {
+      toast({
+        title: "Unable to fetch available tokens.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (data.amount > unallocatedTokens) {
+      toast({
+        title: `Transfer amount exceeds available tokens!`,
+        description: `Available: ${unallocatedTokens}, Requested: ${data.amount}`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       await directTransfer({
         to: data.to,
@@ -82,13 +100,13 @@ export default function DepartmentDetailsCard({
       });
       setIsOpen(false);
       toast({
-        title: "Token transfered Successfully!.",
+        title: "Token transferred successfully!",
         variant: "success",
       });
     } catch (error) {
-      console.error("Error approving transfering token:", error);
+      console.error("Error transferring token:", error);
       toast({
-        title: "Failed To transfer token. Please Try Again.",
+        title: "Failed to transfer token. Please try again.",
         variant: "destructive",
       });
     }
@@ -126,31 +144,37 @@ export default function DepartmentDetailsCard({
             </h3>
           </div>
           <div className="flex gap-10">
-            {getTransferButton()}
-
-            {!directTransferPending && (
+            {canTransferToken && getTransferButton()}
+            {!directTransferPending && canTransferToken && (
               <DialogButton
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
                 title="Are you sure you want to transfer token amount?"
                 subTitle="This action cannot be undone"
-                buttonName={directTransferPending ? "Processing..." : "Transfer Token"}
+                buttonName={
+                  directTransferPending ? "Processing..." : "Transfer Token"
+                }
                 submitType="directdisburse"
                 handleApplyTaskLogic={handleDialogAction}
+                availableTokens={
+                  unallocatedTokens ? Number(unallocatedTokens) : 0
+                }
               />
             )}
 
-            <Button
-              className="h-12 w-48 fw-[600] flex items-center justify-center"
-              variant="default"
-              type="button"
-              onClick={() =>
-                router.push(PATHS.TREASURER.CREATE(entity.rewardManagement))
-              }
-            >
-              <Plus size={22} strokeWidth={2.75} />
-              <span className="ml-2">Allocate Token</span>
-            </Button>
+            {canAllocateToken && (
+              <Button
+                className="h-12 w-48 fw-[600] flex items-center justify-center"
+                variant="default"
+                type="button"
+                onClick={() =>
+                  router.push(PATHS.TREASURER.CREATE(entity.entityId))
+                }
+              >
+                <Plus size={22} strokeWidth={2.75} />
+                <span className="ml-2">Allocate Token</span>
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -159,13 +183,14 @@ export default function DepartmentDetailsCard({
         <Card className="font-normal text-base h-50 flex flex-col p-4">
           <CardTitle className="flex items-center gap-3">
             <div className="rounded-full flex p-3 bg-[#475263] mb-auto">
-              <User color="#fff" />
+              <Building color="#fff" size={20} />
             </div>
             <CardDescription className="flex flex-col gap-2">
               <div className="flex flex-col items-start gap-2">
                 <div className="flex flex-start text-[#334155] text-xl justify-start">
                   {entity.name}
                 </div>
+
                 {getEntityOwners && getEntityOwners.length > 0 && (
                   <div className="flex flex-col gap-2">
                     <span className="text-[#475569] font-medium text-sm">
@@ -173,24 +198,39 @@ export default function DepartmentDetailsCard({
                         ? "Department Owner"
                         : "Department Owners"}
                     </span>
-                    <div className="flex flex-col gap-1 text-sm text-[#64748B]">
-                      {getEntityOwners.map((owner: string, idx: number) => (
-                        <div key={idx} className="flex items-center gap-2">
-                          <span className="truncate max-w-[200px]">
+                    <div className="flex flex-col gap-1 text-sm">
+                      {getEntityOwners.map((owner: string, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center gap-2 cursor-pointer group"
+                          onClick={() => {
+                            navigator.clipboard.writeText(owner);
+                            setCopiedOwner(owner);
+                            setTimeout(() => setCopiedOwner(null), 2000); // reset after 2s
+                          }}
+                        >
+                          <span
+                            className={`truncate max-w-[200px] transition-colors ${
+                              copiedOwner === owner
+                                ? "text-blue-800 underline"
+                                : "group-hover:text-blue-800 group-hover:underline"
+                            }`}
+                          >
                             {owner}
                           </span>
-                          <Copy
-                            size={16}
-                            strokeWidth={2}
-                            className="cursor-pointer"
-                            onClick={() => {
-                              navigator.clipboard.writeText(owner);
-                              toast({
-                                title: "Copied to clipboard!",
-                                variant: "success",
-                              });
-                            }}
-                          />
+                          <div className="flex items-center transition-colors">
+                            {copiedOwner === owner ? (
+                              <span className="text-blue-800 font-bold">
+                                ✔
+                              </span>
+                            ) : (
+                              <Copy
+                                className="group-hover:text-blue-800"
+                                size={16}
+                                strokeWidth={2}
+                              />
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -201,6 +241,7 @@ export default function DepartmentDetailsCard({
           </CardTitle>
         </Card>
 
+        {/* Token Cards */}
         <Card className="font-normal text-base h-50 flex flex-col">
           <CardHeader className="flex-grow">
             <CardTitle className="flex p-0 mb-4 text-[#0F172A]">
@@ -211,6 +252,7 @@ export default function DepartmentDetailsCard({
             {totalAllocatedTokens ?? "-"}
           </CardFooter>
         </Card>
+
         <Card className="font-normal text-base h-50 flex flex-col">
           <CardHeader className="flex-grow">
             <CardTitle className="flex p-0 mb-4 text-[#0F172A]">
@@ -221,6 +263,7 @@ export default function DepartmentDetailsCard({
             {unallocatedTokens ?? "-"}
           </CardFooter>
         </Card>
+
         <Card className="font-normal text-base h-50 flex flex-col">
           <CardHeader className="flex-grow">
             <CardTitle className="flex p-0 mb-4 text-[#0F172A]">

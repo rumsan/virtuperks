@@ -13,7 +13,6 @@ import {
   FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Token, tokenSchema } from "./schema";
@@ -22,15 +21,15 @@ const defaultValues: Token = {
   amount: 0,
 };
 
-interface TokenAllocateMainProps {
-  router: AppRouterInstance;
-  id: { id: string };
+interface TokenAllocateFormProps {
+  id: string;
+  availableTokens?: bigint;
+  entityData?: any;
 }
 
-const TokenAllocateForm = ({ router, id }: TokenAllocateMainProps) => {
+const TokenAllocateForm = ({ id, entityData }: TokenAllocateFormProps) => {
   const form = useForm({
     resolver: zodResolver(tokenSchema()),
-    defaultValues,
   });
 
   const { tokenMint, mintPending, mintSuccess, mintError } =
@@ -46,11 +45,9 @@ const TokenAllocateForm = ({ router, id }: TokenAllocateMainProps) => {
 
   const handleSubmit = async (data: Token) => {
     try {
-      const amount = data.amount;
-
       await tokenMint({
-        address: id.id,
-        amount: amount,
+        address: entityData.rewardManagement,
+        amount: data.amount!,
       });
     } catch (err) {
       console.error("Minting failed:", err);
@@ -75,9 +72,13 @@ const TokenAllocateForm = ({ router, id }: TokenAllocateMainProps) => {
                           <Input
                             type="number"
                             placeholder="Enter token amount"
-                            {...field}
+                            value={field.value ?? ""} // show empty string if undefined
                             onChange={(e) =>
-                              field.onChange(e.target.valueAsNumber)
+                              field.onChange(
+                                e.target.value === ""
+                                  ? undefined
+                                  : e.target.valueAsNumber,
+                              )
                             }
                           />
                         </FormControl>

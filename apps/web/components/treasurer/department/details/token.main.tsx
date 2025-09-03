@@ -1,5 +1,9 @@
-import { useCheckTotalUnallocatedTokens,useCheckTotalAllocatedTokens, useGetAllEntity, useGetEntityById } from "@/hooks/subgraph/entity";
-import { DepartmentDetails } from "@workspace/sdk/type";
+import {
+  useCheckTotalAllocatedTokens,
+  useCheckTotalUnallocatedTokens,
+  useGetEntityById,
+  useGetEntityOwners,
+} from "@/hooks/subgraph/entity";
 import {
   Card,
   CardDescription,
@@ -7,27 +11,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import { ArrowLeft, Coins, Folders, User } from "lucide-react";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { toast } from "@workspace/ui/hooks/use-toast";
+import { ArrowLeft, Coins, Copy, User } from "lucide-react";
 import TokenAllocateForm from "../form/token.allocate";
 
 interface TokenCreateMainProps {
-  router: AppRouterInstance;
   id: { id: string };
 }
 
-const TokenCreateMain = ({ router, id }: TokenCreateMainProps) => {
- 
-
+const TokenCreateMain = ({ id }: TokenCreateMainProps) => {
   const { data: entity, isLoading, isError, error } = useGetEntityById(id.id);
- 
-  
+  const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
+    entity?.rewardManagement,
+  );
 
-   const { unallocatedTokens } = useCheckTotalUnallocatedTokens(entity?.rewardManagement)
-  
-  const { totalAllocatedTokens  }   = useCheckTotalAllocatedTokens(entity?.rewardManagement)
-  
-
+  const { totalAllocatedTokens } = useCheckTotalAllocatedTokens(
+    entity?.rewardManagement,
+  );
+  const { getEntityOwners } = useGetEntityOwners(entity?.entityId);
 
   return (
     <main className="gap-2 p-4 sm:px-8 md:gap-8 w-full">
@@ -57,23 +58,49 @@ const TokenCreateMain = ({ router, id }: TokenCreateMainProps) => {
       </div>
 
       <div className="grid grid-cols-4 mt-4 gap-4 w-full">
-        <Card className="font-normal text-base h-40 flex flex-col w-full h-full">
-          <CardHeader className="flex-grow">
-            <CardTitle className="flex items-center p-0 mb-4">
-              <span className="text-[#0F172A] tracking-wide">
-                Department Owner
-              </span>
-              <User className="ml-auto" />
-            </CardTitle>
-            <CardDescription className="flex items-center text-sm">
-              <div className="h-4"></div>
+        <Card className="font-normal text-base h-50 flex flex-col p-4">
+          <CardTitle className="flex items-center gap-3">
+            <div className="rounded-full flex p-3 bg-[#475263] mb-auto">
+              <User color="#fff" />
+            </div>
+            <CardDescription className="flex flex-col gap-2">
+              <div className="flex flex-col items-start gap-2">
+                <div className="flex flex-start text-[#334155] text-xl justify-start">
+                  {entity?.name}
+                </div>
+                {getEntityOwners && getEntityOwners.length > 0 && (
+                  <div className="flex flex-col gap-2">
+                    <span className="text-[#475569] font-medium text-sm">
+                      {getEntityOwners.length === 1
+                        ? "Department Owner"
+                        : "Department Owners"}
+                    </span>
+                    <div className="flex flex-col gap-1 text-sm text-[#64748B]">
+                      {getEntityOwners.map((owner: string, idx: number) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <span className="truncate max-w-[200px]">
+                            {owner}
+                          </span>
+                          <Copy
+                            size={16}
+                            strokeWidth={2}
+                            className="cursor-pointer"
+                            onClick={() => {
+                              navigator.clipboard.writeText(owner);
+                              toast({
+                                title: "Copied to clipboard!",
+                                variant: "success",
+                              });
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </CardDescription>
-          </CardHeader>
-          {/* <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {department?.entityTaskManager?.entityTaskManager
-              ? `${department.entityTaskManager.entityTaskManager.slice(0, 10)} . . . ${department.entityTaskManager.entityTaskManager.slice(-6)}`
-              : ""}
-          </CardFooter> */}
+          </CardTitle>
         </Card>
 
         <Card className="font-normal text-base h-40 flex flex-col w-full h-full">
@@ -111,25 +138,13 @@ const TokenCreateMain = ({ router, id }: TokenCreateMainProps) => {
             {unallocatedTokens ?? "0"}
           </CardFooter>
         </Card>
-
-        <Card className="font-normal text-base h-40 flex flex-col w-full h-full">
-          <CardHeader className="flex-grow">
-            <CardTitle className="flex items-center justify-between p-0 mb-4">
-              <span className="text-[#0F172A] tracking-wide">Group</span>
-              <Folders />
-            </CardTitle>
-            <CardDescription className="flex items-center text-sm">
-              <div className="h-4"></div>
-            </CardDescription>
-          </CardHeader>
-
-          <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {entity?.name}
-          </CardFooter>
-        </Card>
       </div>
 
-      <TokenAllocateForm router={router} id={id} />
+      <TokenAllocateForm
+        id={entity?.entityId}
+        availableTokens={unallocatedTokens}
+        entityData={entity}
+      />
     </main>
   );
 };

@@ -1,51 +1,91 @@
 import { formatDate } from "@/utils/formatDate";
 import { TaskCreated } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
-import { ExternalLink, Timer, Trophy, UserRoundCog, Users } from "lucide-react";
+import {
+  Coins,
+  ExternalLink,
+  Timer,
+  Trophy,
+  UserRoundCog,
+  Users,
+} from "lucide-react";
 
 type TaskPortalDetailsProps = {
   taskData: TaskCreated;
 };
 
 const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
+  console.log("Task Data:", taskData);
   const handleUrlClick = (e: React.MouseEvent, url: string) => {
     e.stopPropagation();
     window.open(url, "_blank", "noopener,noreferrer");
   };
   return (
     <>
-      <Card className="w-[80%] h-full p-4">
-        <CardTitle className="flex flex-col gap-1 w-full">
-          <div className="flex items-center gap-2">
-            <span>{taskData?.taskDetail?.name}</span>
-            <span className="w-20 h-6 flex items-center justify-center bg-blue-50 rounded-full text-green-700 p-1 text-sm font-normal">
-              {taskData?.taskDetail?.isOpen === true ? `open` : `closed`}
+      <Card className="w-[80%] h-full p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
+        <CardTitle className="flex flex-col gap-3 w-full">
+          {/* Task Name and Status */}
+          <div className="flex items-center gap-3">
+            <span className="text-xl font-semibold text-gray-900">
+              {taskData?.taskDetail?.name}
+            </span>
+            <span
+              className={`px-3 py-1 rounded-full text-white text-sm font-semibold ${
+                taskData?.taskDetail.isOpen ? "bg-green-500" : "bg-red-500"
+              }`}
+            >
+              {taskData?.taskDetail.isOpen ? "Open" : "Closed"}
             </span>
           </div>
 
+          {/* Details URL */}
           <div
-            className="flex items-center gap-2 cursor-pointer hover:text-blue-400"
+            className="flex items-center gap-1 cursor-pointer max-w-[280px] group"
+            title={taskData?.taskDetail?.detailsUrl}
             onClick={(e) => handleUrlClick(e, taskData?.taskDetail?.detailsUrl)}
           >
-            <span className="line-clamp-1 font-normal text-[#297AD6] text-sm">
-              {taskData?.taskDetail?.detailsUrl}
+            <span className="flex items-center gap-1 border-b-2 border-transparent group-hover:border-blue-800 transition-all">
+              <span className="font-normal text-[#297AD6] text-lg truncate">
+                {taskData?.taskDetail?.detailsUrl || "-"}
+              </span>
+              <ExternalLink
+                size={18}
+                color="#297AD6"
+                strokeWidth={2.5}
+                className="group-hover:text-blue-800 transition-colors"
+              />
             </span>
-            <ExternalLink size={16} color="#297AD6" strokeWidth={2.75} />
           </div>
         </CardTitle>
 
-        <div className="flex flex-col text-gray-500 font-normal gap-1 text-sm mt-4">
-          <span className="flex items-center gap-2">
-            <UserRoundCog color="#64748B" size={20} strokeWidth={2.5} />
-            Task Owner: {taskData?.taskDetail?.owner}
+        {/* Task Info */}
+        <div className="flex flex-col text-gray-600 font-medium gap-2 mt-5 text-base">
+          <span className="flex items-center gap-3">
+            <UserRoundCog color="#64748B" size={22} strokeWidth={2.5} />
+            <span>
+              Task Owner:{" "}
+              <span className="font-semibold">
+                {taskData?.taskDetail?.owner}
+              </span>
+            </span>
           </span>
-          <span className="flex items-center gap-2">
-            <Users color="#64748B" size={20} strokeWidth={2.5} />
-            {taskData?.taskDetail?.maxParticipants} members participating
+          <span className="flex items-center gap-3">
+            <Users color="#64748B" size={22} strokeWidth={2.5} />
+            <span>
+              <span className="font-semibold">
+                {taskData?.taskDetail?.maxParticipants}
+              </span>{" "}
+              members participating
+            </span>
           </span>
-          <span className="flex items-center gap-2">
-            <Timer color="#64748B" size={20} strokeWidth={2.5} /> Deadline:{" "}
-            {formatDate(taskData?.taskDetail?.expiryDate)}
+          <span className="flex items-center gap-3">
+            <Timer color="#64748B" size={22} strokeWidth={2.5} />
+            <span>
+              Deadline:{" "}
+              <span className="font-semibold">
+                {formatDate(taskData?.taskDetail?.expiryDate)}
+              </span>
+            </span>
           </span>
         </div>
       </Card>
@@ -54,9 +94,12 @@ const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
         <div className="flex items-center justify-center rounded-full h-10 w-10 bg-blue-50">
           <Trophy color="#297AD6" size={20} />
         </div>
-        <span className="text-2xl text-[#297AD6] font-bold">
-          {taskData?.taskDetail?.totalRewardAmount} tokens
-        </span>
+        <div className="flex items-center">
+          <Coins color="#297AD6" />
+          <span className="text-2xl text-[#297AD6] font-bold ml-2">
+            {taskData?.taskDetail?.totalRewardAmount} tokens
+          </span>
+        </div>
       </Card>
     </>
   );

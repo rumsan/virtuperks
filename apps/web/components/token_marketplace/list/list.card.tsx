@@ -2,11 +2,11 @@ import { DialogButton } from "@/components/common/ui/dialog";
 import { useCheckParticipantBalance } from "@/hooks/subgraph/token";
 import {
   useCreateReward,
-  useGetRedeemedRewardByParticiant,
   useGetRewards,
 } from "@/hooks/subgraph/token-marketplace";
 import { PATHS } from "@/routes/paths";
 import { getCategoryIcon } from "@/utils/rewardIcon";
+import hasRole from "@/utils/role";
 import { createId } from "@paralleldrive/cuid2";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -24,10 +24,12 @@ import { useState } from "react";
 import { keccak256 } from "viem";
 import { useAccount } from "wagmi";
 import { categoryColorMap } from "../img/imgLink";
-import { add } from "date-fns";
 
 const TokenMarketListCard = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const isDefaultAdmin = hasRole({
+    role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
+  });
 
   const { address } = useAccount();
   const { participantTotalToken } = useCheckParticipantBalance(
@@ -108,13 +110,16 @@ const TokenMarketListCard = () => {
       {/* Grid of Rewards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
         {/* Add Token Card */}
-        <Card
-          className="w-full flex flex-col items-center justify-center text-green-500 bg-green-50 border border-dashed border-green-300 cursor-pointer hover:shadow-lg hover:text-green-600 transition"
-          onClick={() => setIsDialogOpen(true)}
-        >
-          <Plus size={36} />
-          <span className="text-center text-base mt-2">Add Token</span>
-        </Card>
+        {/* Add Token Card - Only for Default Admin */}
+        {isDefaultAdmin && (
+          <Card
+            className="w-full flex flex-col items-center justify-center text-green-500 bg-green-50 border border-dashed border-green-300 cursor-pointer hover:shadow-lg hover:text-green-600 transition"
+            onClick={() => setIsDialogOpen(true)}
+          >
+            <Plus size={36} />
+            <span className="text-center text-base mt-2">Add Reward</span>
+          </Card>
+        )}
 
         {/* Rewards List */}
         {tokenList.map((item: any) => (

@@ -1,7 +1,6 @@
 // import { useGetTaskParticipantsWithStatus } from "@/hooks/subgraph/querycall";
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import { ListTable } from "@/components/common/list/list.table";
-import { useGetCombineStausByTask } from "@/hooks/subgraph/querycall";
 import { shortAddress } from "@/utils/shortAddress";
 import {
   ColumnFiltersState,
@@ -14,11 +13,9 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { Card, CardTitle } from "@workspace/ui/components/card";
-import { Input } from "@workspace/ui/components/input";
-import { Search, User } from "lucide-react";
+import { User } from "lucide-react";
 import React, { useMemo } from "react";
 import { useColumns } from "./details.column";
-import { useGetWhiteListedParticipantByTask } from "@/hooks/subgraph/participant";
 
 type Cuid = {
   id: string;
@@ -26,16 +23,23 @@ type Cuid = {
 
 type TaskParticipantProps = {
   taskData: any;
+  pendingParticipants: any[];
+  acceptedParticipants: any[];
+  completedParticipants: any[];
+  verifiedPartcipants: any[];
 };
 
-const TaskParticipant = (  {taskData} : TaskParticipantProps) => {
-
+const TaskParticipant = ({
+  taskData,
+  pendingParticipants,
+  acceptedParticipants,
+  completedParticipants,
+  verifiedPartcipants,
+}: TaskParticipantProps) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
-
-    
 
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -44,20 +48,16 @@ const TaskParticipant = (  {taskData} : TaskParticipantProps) => {
     pageIndex: 0,
     pageSize: 10,
   });
-  const columns = useColumns(); 
 
-  const { pendingParticipants, acceptedParticipants, completedParticipants, verifiedPartcipants } = useGetCombineStausByTask(taskData?.internal_id);
- 
+  const columns = useColumns();
+
   const pendingAndAcceptedParticipants = useMemo(() => {
     return [
       ...(pendingParticipants || []),
       ...(completedParticipants || []),
-       ...(verifiedPartcipants || []),
+      ...(verifiedPartcipants || []),
     ];
-  }
-  , [pendingParticipants, acceptedParticipants]);
-  
-
+  }, [pendingParticipants, completedParticipants, verifiedPartcipants]);
 
   const table = useReactTable({
     data: pendingAndAcceptedParticipants,
@@ -87,17 +87,6 @@ const TaskParticipant = (  {taskData} : TaskParticipantProps) => {
             List of all the requests in this stack
           </span>
         </CardTitle>
-
-        <div className="w-full h-10 flex rounded-md border border-gray-200 rounded-md items-center mt-3 mb-3 p-3">
-          <p className="text-gray-500">
-            <Search size={20} strokeWidth={2.75} />
-          </p>
-          <Input
-            type="text"
-            placeholder="Search"
-            className="border-none focus:outline-none"
-          />
-        </div>
 
         <div className="">
           <ListTable table={table} columns={columns} />

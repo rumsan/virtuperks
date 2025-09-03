@@ -17,6 +17,7 @@ export type TaskCreated = CommonFields & {
   entityTaskManager?: EntityTaskManagerCreated;
   status: string;
   taskDetail: TaskDetail;
+  taskId: string;
 };
 
 export interface TaskCreateParams {
@@ -48,3 +49,16 @@ export interface TaskCreateParams {
 }
 
 
+export interface Tasks {
+  id: string;
+  internal_id: string;
+  taskDetail: {
+    name: string;
+    isOpen: boolean;
+    detailsUrl: string;
+    maxParticipants: number;
+    expiryDate: number;
+    totalRewardAmount: number;
+    acceptedParticipantCount: number;
+  };
+}
