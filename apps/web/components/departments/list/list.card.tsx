@@ -14,11 +14,11 @@ interface DepartmentListCardProps {
 const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
   const getAllEntity = useGetAllEntity();
   const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
-  const hasEntityOwnerRole = hasRole({
+  const hasAdminOwnerRole = hasRole({
     role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
   });
 
-  const canAddDepartment = Boolean(hasEntityOwnerRole);
+  const canAddDepartment = Boolean(hasAdminOwnerRole);
 
   return (
     <div className="grid grid-cols-4 gap-4 w-full p-4">
