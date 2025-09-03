@@ -31,7 +31,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
-import { CheckCircle, User, Users } from "lucide-react";
+import { AlertCircle, CheckCircle, User, Users } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import React, { useState } from "react";
 import { useColumns } from "../details/details.column";
@@ -43,7 +43,9 @@ interface TaskListMainProps {
 
 export default function TaskListMain({ router }: TaskListMainProps) {
   const [tab, setTab] = useState<"owned" | "participating">("owned");
-
+  const ROW_HEIGHT = 50;
+  const MIN_ROWS = 10;
+  const TABLE_MIN_HEIGHT = ROW_HEIGHT * MIN_ROWS;
   // shared states
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] =
@@ -226,36 +228,74 @@ export default function TaskListMain({ router }: TaskListMainProps) {
 
           {/* Owned Tab */}
           <TabsContent className="w-full" value="owned">
-            <ListCardDetails
-              taskList={tableOwned.getRowModel().rows.map((r) => r.original)}
-              router={router}
-              tabStatus="owned"
-            />
-            <div className="mt-5 mb-5">
-              <DataTablePagination
-                table={tableOwned}
-                pagination={paginationOwned}
-                setPagination={setPaginationOwned}
-              />
-            </div>
+            {tableOwned.getRowModel().rows.length === 0 ? (
+              <div className="text-gray-500 text-center py-6 flex flex-col items-center gap-2">
+                <AlertCircle className="text-gray-400" size={32} />
+                <p>No owned tasks found.</p>
+                <p className="text-sm text-gray-400 max-w-md">
+                  You currently don’t have any tasks that you own. Tasks appear
+                  here once they are assigned or created by you.
+                </p>
+              </div>
+            ) : (
+              <>
+                <div
+                  className="overflow-y-auto"
+                  style={{ minHeight: TABLE_MIN_HEIGHT }}
+                >
+                  <ListCardDetails
+                    taskList={tableOwned
+                      .getRowModel()
+                      .rows.map((r) => r.original)}
+                    router={router}
+                    tabStatus="owned"
+                  />
+                </div>
+                <div className="mt-5 mb-5">
+                  <DataTablePagination
+                    table={tableOwned}
+                    pagination={paginationOwned}
+                    setPagination={setPaginationOwned}
+                  />
+                </div>
+              </>
+            )}
           </TabsContent>
 
           {/* Participating Tab */}
           <TabsContent className="w-full" value="participating">
-            <ListCardDetails
-              taskList={tableParticipating
-                .getRowModel()
-                .rows.map((r) => r.original)}
-              router={router}
-              tabStatus="participating"
-            />
-            <div className="mt-5 mb-5">
-              <DataTablePagination
-                table={tableParticipating}
-                pagination={paginationParticipating}
-                setPagination={setPaginationParticipating}
-              />
-            </div>
+            {tableParticipating.getRowModel().rows.length === 0 ? (
+              <div className="text-gray-500 text-center py-6 flex flex-col items-center gap-2">
+                <AlertCircle className="text-gray-400" size={32} />
+                <p>No participating tasks found.</p>
+                <p className="text-sm text-gray-400 max-w-md">
+                  You are not currently participating in any tasks. Once you
+                  join or are assigned to a task, it will appear here.
+                </p>
+              </div>
+            ) : (
+              <>
+                <div
+                  className="overflow-y-auto"
+                  style={{ minHeight: TABLE_MIN_HEIGHT }}
+                >
+                  <ListCardDetails
+                    taskList={tableParticipating
+                      .getRowModel()
+                      .rows.map((r) => r.original)}
+                    router={router}
+                    tabStatus="participating"
+                  />
+                </div>
+                <div className="mt-5 mb-5">
+                  <DataTablePagination
+                    table={tableParticipating}
+                    pagination={paginationParticipating}
+                    setPagination={setPaginationParticipating}
+                  />
+                </div>
+              </>
+            )}
           </TabsContent>
         </Tabs>
       </div>
