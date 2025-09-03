@@ -163,7 +163,7 @@ export const DialogButton = ({
       });
       setIsOpen(false);
     } catch (error) {
-      console.error("Error:", error);
+      
       let errorMessage = "Failed to apply for task";
       if (submitType === "Complete")
         errorMessage = "Failed to submit completion URL";

@@ -32,7 +32,7 @@ export default function TokenBaseForm({
       saveForm(data);
     },
     (errors) => {
-      console.log("Validation errors:", errors);
+      console.error("Validation errors:", errors);
     },
   );
 

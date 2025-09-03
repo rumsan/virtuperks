@@ -12,7 +12,7 @@ interface TaskPortalCardProps {
 }
 
 const TaskPortalCard = ({ data, router }: TaskPortalCardProps) => {
-  console.log("TaskPortalCard Data:", data);
+
   const handleUrlClick = (e: React.MouseEvent, url: string) => {
     e.stopPropagation();
     window.open(url, "_blank", "noopener,noreferrer");
