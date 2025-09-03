@@ -18,6 +18,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
+import { TaskCreated } from "@workspace/sdk/type";
 import {
   Card,
   CardFooter,
@@ -43,6 +44,7 @@ interface TaskListMainProps {
 export default function TaskListMain({ router }: TaskListMainProps) {
   const [tab, setTab] = useState<"owned" | "participating">("owned");
 
+  // shared states
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -51,6 +53,7 @@ export default function TaskListMain({ router }: TaskListMainProps) {
   );
   const [rowSelection, setRowSelection] = React.useState({});
 
+  // separate pagination states
   const [paginationOwned, setPaginationOwned] = React.useState({
     pageIndex: 0,
     pageSize: 10,
@@ -78,15 +81,12 @@ export default function TaskListMain({ router }: TaskListMainProps) {
 
   const columns = useColumns();
 
-  const tableOwned = useReactTable({
+  // table for owned tasks
+  const tableOwned = useReactTable<TaskCreated>({
     data: ownedTaskList,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
@@ -97,18 +97,19 @@ export default function TaskListMain({ router }: TaskListMainProps) {
       pagination: paginationOwned,
     },
     onPaginationChange: setPaginationOwned,
-    pageCount: Math.ceil(ownedTaskList.length / paginationOwned.pageSize),
-  });
-
-  const tableParticipating = useReactTable({
-    data: participatingTask,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    pageCount: Math.ceil(ownedTaskList.length / paginationOwned.pageSize),
+  });
+
+  // table for participating tasks
+  const tableParticipating = useReactTable<TaskCreated>({
+    data: participatingTask,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
@@ -119,6 +120,10 @@ export default function TaskListMain({ router }: TaskListMainProps) {
       pagination: paginationParticipating,
     },
     onPaginationChange: setPaginationParticipating,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     pageCount: Math.ceil(
       participatingTask.length / paginationParticipating.pageSize,
     ),
@@ -146,6 +151,7 @@ export default function TaskListMain({ router }: TaskListMainProps) {
   return (
     <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full overflow-x-hidden">
       <div className="space-y-4">
+        {/* Header */}
         <div className="flex items-center mt-5">
           <div className="flex flex-col w-[80%] gap-1">
             <h1 className="font-bold text-3xl">My List</h1>
@@ -155,6 +161,7 @@ export default function TaskListMain({ router }: TaskListMainProps) {
           </div>
         </div>
 
+        {/* Stats */}
         <div className="grid grid-cols-4 mt-1 gap-4 w-full">
           <Card className="font-normal text-base h-25 flex flex-col">
             <CardHeader className="flex-grow">
@@ -193,6 +200,7 @@ export default function TaskListMain({ router }: TaskListMainProps) {
           </Card>
         </div>
 
+        {/* Tabs */}
         <Tabs
           value={tab}
           onValueChange={(v) => {
@@ -214,39 +222,38 @@ export default function TaskListMain({ router }: TaskListMainProps) {
                 </TabsTrigger>
               </TabsList>
             </div>
-            {/* <div className="ml-auto">
-              <DatePickerWithRange />
-            </div>  */}
           </div>
 
-          {/* Owned tab */}
+          {/* Owned Tab */}
           <TabsContent className="w-full" value="owned">
             <ListCardDetails
-              taskList={ownedTaskList}
+              taskList={tableOwned.getRowModel().rows.map((r) => r.original)}
               router={router}
               tabStatus="owned"
             />
             <div className="mt-5 mb-5">
               <DataTablePagination
                 table={tableOwned}
-                setPagination={setPaginationOwned}
                 pagination={paginationOwned}
+                setPagination={setPaginationOwned}
               />
             </div>
           </TabsContent>
 
-          {/* Participating tab */}
+          {/* Participating Tab */}
           <TabsContent className="w-full" value="participating">
             <ListCardDetails
-              taskList={participatingTask}
+              taskList={tableParticipating
+                .getRowModel()
+                .rows.map((r) => r.original)}
               router={router}
               tabStatus="participating"
             />
             <div className="mt-5 mb-5">
               <DataTablePagination
                 table={tableParticipating}
-                setPagination={setPaginationParticipating}
                 pagination={paginationParticipating}
+                setPagination={setPaginationParticipating}
               />
             </div>
           </TabsContent>
