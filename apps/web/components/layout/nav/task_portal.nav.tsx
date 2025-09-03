@@ -41,8 +41,11 @@ export default function TaskPortalNav({ children }: PropsWithChildren) {
     <header className="border-b bg-white">
       <div className="flex h-14 items-center pl-6 pr-4 justify-between border-b-2 border-[#E2E8F0]">
         {/* Left section: Logo + Token Marketplace */}
-        <div className="flex items-center gap-10 h-full">
-          <Link href="/" className="flex items-center">
+        <div className="flex items-center h-full gap-6">
+          {" "}
+          {/* reduced for general nav item spacing */}
+          {/* Logo with extra gap to nav items */}
+          <Link href="/" className="flex items-center mr-8">
             <Image
               src="/bg/rumsan-logo.png"
               width={40}
@@ -50,16 +53,31 @@ export default function TaskPortalNav({ children }: PropsWithChildren) {
               alt="Logo"
             />
           </Link>
+          {/* Nav items with equal spacing */}
+          <Link
+            href="/participants"
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.PARTICIPANTS)}`}
+          >
+            <LayoutList size={18} strokeWidth={2.65} />
+            Participant
+          </Link>
           <Link
             href="/departments"
-            className={`flex items-center ml-10 gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.DEPARTMENTS)}`}
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.DEPARTMENTS)}`}
           >
             <Layers size={18} strokeWidth={2.65} />
             Department
           </Link>
           <Link
+            href="/tasks"
+            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASKS)}`}
+          >
+            <Layers size={18} strokeWidth={2.65} />
+            Task Management
+          </Link>
+          <Link
             href="/token_marketplace"
-            className={`flex items-center gap-2 text-sm font-medium h-full px-2 ${getNavItemClasses(NavItem.TOKEN_MARKETPLACE)}`}
+            className={`flex items-center gap-2 text-sm font-medium h-full p-2 ${getNavItemClasses(NavItem.TOKEN_MARKETPLACE)}`}
           >
             <ShoppingBag size={18} strokeWidth={2.65} />
             Token Marketplace

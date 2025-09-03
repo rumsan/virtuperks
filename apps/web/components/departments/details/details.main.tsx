@@ -7,11 +7,13 @@ import {
   useGetEntityById,
   useGetEntityOwners,
 } from "@/hooks/subgraph/entity";
+import { useCloseExpiredTask } from "@/hooks/subgraph/task";
 import {
   useGetDisbursements,
   useGetTokenTransfers,
 } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
+import { toast } from "@workspace/ui/hooks/use-toast";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import React, { useState } from "react";
 import DepartmentDetailsCard from "./details.card";
@@ -30,7 +32,6 @@ export default function DepartmentDetails({
   cuid,
   router,
 }: DepartmentDetailsProps) {
-  console.log("CUID main: ", cuid);
   const {
     data: entity,
     isLoading: entityLoading,
@@ -51,6 +52,8 @@ export default function DepartmentDetails({
     entity?.rewardManagement,
   );
 
+  const { taskCloseExpired, taskPending: closePending } = useCloseExpiredTask();
+
   const transferList = tokenTransferData?.rewardManagementCreateds?.[0];
   const disbursementList = disbursementData?.rewardManagementCreateds?.[0];
 
@@ -62,6 +65,24 @@ export default function DepartmentDetails({
   });
 
   const [activeTab, setActiveTab] = useState<"direct" | "task">("direct");
+
+  const handleCloseExpiredTasks = async () => {
+    try {
+      await taskCloseExpired({
+        entityAddress: entity.rewardManagement as `0x${string}`,
+      });
+      toast({
+        title: "Expired tasks closed successfully!",
+        variant: "success",
+      });
+    } catch (err) {
+      console.error("Error closing expired tasks:", err);
+      toast({
+        title: "Failed to close expired tasks.",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (Loading) {
     return (
@@ -105,6 +126,8 @@ export default function DepartmentDetails({
         unallocatedTokens={unallocatedTokens}
         getEntityOwners={getEntityOwners}
         router={router}
+        handleCloseExpiredTasks={handleCloseExpiredTasks}
+        closePending={closePending}
       />
       ;
       <DepartmentDetailsTable

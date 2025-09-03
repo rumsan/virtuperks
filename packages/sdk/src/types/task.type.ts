@@ -12,13 +12,22 @@ export interface AcceptedTaskData extends CommonFields {
 }
 
 
+export type RewardManagement = {
+  appId: string;
+  id: string;
+  name: string;
+  rewardManagement: string; 
+};
+
 export type TaskCreated = CommonFields & {
   internal_id: string;
   entityTaskManager?: EntityTaskManagerCreated;
+  rewardManagement?: RewardManagement; 
   status: string;
   taskDetail: TaskDetail;
   taskId: string;
 };
+
 
 export interface TaskCreateParams {
   

@@ -1,17 +1,20 @@
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { DialogButton } from "@/components/common/ui/dialog";
 import { Cuid } from "@/components/departments/details/details.main";
+import { useGetEntityRole } from "@/hooks/subgraph/entity";
 import {
   useCheckParticipantStatus,
   useGetCombineStausByTask,
 } from "@/hooks/subgraph/querycall";
 import {
   useCheckTaskStatus,
+  useCheckTaskVerifiedParticipant,
   useCloseTaskMutation,
   useGetTaskById,
 } from "@/hooks/subgraph/task";
 import { useDisburseTokenToTask } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
+import hasRole from "@/utils/role";
 import { Button } from "@workspace/ui/components/button";
 import { useToast } from "@workspace/ui/hooks/use-toast";
 import { CheckCircle, CircleX, Loader2 } from "lucide-react";
@@ -32,20 +35,26 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const [isDisbursed, setIsDisbursed] = useState(false);
 
   const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
+  console.log("Task: ", taskData);
+  const { entityRole, roleLoading } = useGetEntityRole(
+    taskData?.rewardManagement?.rewardManagement || "",
+  );
+  const hasEntityOwnerRole = hasRole({
+    role: entityRole || "",
+  });
 
-  // const { status: isTaskExpired, statusLoading: isTaskExpiredLoading } =
-  //   useIsTaskExpired(
-  //     taskData?.internal_id,
-  //     taskData?.rewardManagement.rewardManagement,
-  //   );
   const { status: participantStatus, isLoading: statusLoading } =
     useCheckParticipantStatus(
       taskData?.internal_id,
       taskData?.rewardManagement?.rewardManagement,
     );
 
-  console.log("Participant Status: ", participantStatus);
-
+  const { verifiedTaskParticipant: verifiedParticipants } =
+    useCheckTaskVerifiedParticipant(
+      taskData?.internal_id,
+      taskData?.rewardManagement?.rewardManagement,
+    );
+  const hasVerifiedParticipants = (verifiedParticipants?.length ?? 0) > 0;
   const {
     taskDetail,
     status: isTokenDisbursedFromContract,
@@ -54,16 +63,17 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     taskData?.internal_id ?? "",
     taskData?.rewardManagement.rewardManagement ?? "",
   );
-  const participantDataLoading = !taskData;
+
   const isTaskExpired = !taskDetail?.isOpen;
   const { disburseTokenToTask, disbursePending } = useDisburseTokenToTask();
   const closeTaskMutation = useCloseTaskMutation();
 
   const taskReady = !taskDetailLoading;
   const isDisburseButtonDisabled =
-    !taskReady || isTokenDisbursedFromContract || participantStatus !== 4;
+    !taskReady ||
+    isTokenDisbursedFromContract ||
+    hasVerifiedParticipants == false;
   const isCloseButtonDisabled = !taskReady || isTaskExpired;
-  const taskLoading = getTaskDetail.isLoading;
 
   const {
     pendingParticipants,
@@ -85,6 +95,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
       toast({
         title: "Failed to close task. Please try again.",
         variant: "destructive",
+        duration: 2000,
       });
     }
   };
@@ -98,33 +109,34 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
       });
       setIsOpen(false);
       setIsDisbursed(true);
-      toast({ title: "Disperse Token Successfully!", variant: "success" });
+      toast({
+        title: "Disperse Token Successfully!",
+        variant: "success",
+        duration: 2000,
+      });
     } catch (error) {
       console.error("Error approving task:", error);
       toast({
         title: "Failed To Approve Task. Please Try Again.",
         variant: "destructive",
+        duration: 2000,
       });
     }
   };
 
   const getDisburseButton = () => {
-    if (disbursePending) {
-      return (
-        <Button variant="outline" className="border border-[#03AB65]" disabled>
-          <span className="text-[#03AB65] flex items-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Processing...
-          </span>
-        </Button>
-      );
-    }
+    const showTooltip = !hasVerifiedParticipants || !hasEntityOwnerRole;
+    const isButtonDisabled =
+      !taskReady ||
+      isTokenDisbursedFromContract ||
+      !hasVerifiedParticipants ||
+      !hasEntityOwnerRole;
 
     return (
       <div className="relative group flex items-center">
         <Button
           variant="outline"
-          disabled={isDisburseButtonDisabled}
+          disabled={isButtonDisabled}
           className="border border-[#03AB65] disabled:cursor-not-allowed disabled:hover:bg-transparent"
           onClick={() => setIsOpen(true)}
         >
@@ -140,10 +152,18 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
           />
         </Button>
 
-        {/* Show warning only on hover */}
-        {isDisburseButtonDisabled && (
-          <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 hidden group-hover:flex items-center gap-2 bg-yellow-100 border border-yellow-300 text-yellow-700 text-sm rounded-md px-3 py-1 whitespace-nowrap shadow">
-            ⚠️ Task not verified
+        {/* Tooltip */}
+        {showTooltip && (
+          <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 hidden group-hover:flex flex-col items-start gap-1 bg-yellow-100 border border-yellow-300 text-yellow-700 text-sm rounded-md px-3 py-2 shadow w-max max-w-xs">
+            <div className="flex items-start gap-2">
+              <span className="text-lg">⚠️</span>
+              <div className="flex flex-col gap-1">
+                {!hasEntityOwnerRole && (
+                  <span>Only entity owners can disperse tokens</span>
+                )}
+                {!hasVerifiedParticipants && <span>Task not verified</span>}
+              </div>
+            </div>
           </div>
         )}
       </div>
