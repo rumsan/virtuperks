@@ -5,6 +5,8 @@ import TaskPortalNav from "@/components/layout/nav/task_portal.nav";
 import TreasurerNav from "@/components/layout/nav/treasurer.nav";
 import UnifiedNav from "@/components/layout/nav/unified.nav";
 import { AppRegistryABI } from "@workspace/contracts/abis";
+import { ConnectKitButton } from "connectkit";
+import { AlertTriangle, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAccount, useReadContract } from "wagmi";
 
@@ -48,7 +50,6 @@ const Validation = ({ children }: ValidationProps) => {
 
     if (hasDefaultAdminRole && hasTreasurerRole) {
       setCurrentRole("BOTH");
-      console.log("Role: ", currentRole);
     } else if (hasDefaultAdminRole) {
       setCurrentRole("ADMIN");
     } else if (hasTreasurerRole) {
@@ -58,8 +59,37 @@ const Validation = ({ children }: ValidationProps) => {
     }
   }, [isConnected, hasDefaultAdminRole, hasTreasurerRole]);
 
+  // Full-screen overlay if wallet not connected
+  const renderOverlay = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50 pointer-events-auto">
+      <div className="bg-white/95 shadow-xl rounded-2xl p-6 text-center max-w-sm w-200 border border-red-300">
+        {/* Warning Icon */}
+        <div className="flex flex-col items-center justify-center mb-4">
+          <AlertTriangle size={48} className="text-red-500 mb-2" />
+          <h2 className="text-2xl font-bold text-red-600">
+            Wallet Not Connected
+          </h2>
+        </div>
+
+        {/* Description */}
+        <p className="text-red-700 text-sm mb-4">
+          You must connect your wallet to access the app.
+        </p>
+
+        {/* Wallet Connect Button */}
+        <div className="flex flex-col items-center justify-center border border-red-300 rounded-xl p-4 cursor-pointer bg-white/80 hover:bg-white/90 transition-all duration-200 max-w-[200px] mx-auto">
+          <Wallet size={40} strokeWidth={2.5} className="mb-2 text-gray-700" />
+          <ConnectKitButton
+            label="Connect Wallet"
+            showAvatar={false}
+            theme="auto"
+          />
+        </div>
+      </div>
+    </div>
+  );
+
   const renderNav = () => {
-    console.log("Current Role: ", currentRole);
     switch (currentRole) {
       case "BOTH":
         return <UnifiedNav>{children}</UnifiedNav>;
@@ -74,7 +104,12 @@ const Validation = ({ children }: ValidationProps) => {
     }
   };
 
-  return renderNav();
+  return (
+    <>
+      {renderNav()}
+      {!isConnected && renderOverlay()}
+    </>
+  );
 };
 
 export default Validation;
