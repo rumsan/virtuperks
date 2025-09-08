@@ -233,17 +233,18 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
               )}
             </Button>
 
-            {!disbursePending && isOpen && (
-              <DialogButton
-                isOpen={isOpen}
-                setIsOpen={setIsOpen}
-                title="Are you sure you want to disperse the amount?"
-                subTitle="This action cannot be undone"
-                buttonName="Disperse"
-                submitType="Disperse"
-                handleApplyTaskLogic={handleDialogAction}
-              />
-            )}
+            <DialogButton
+              isOpen={isOpen}
+              setIsOpen={setIsOpen}
+              title="Are you sure you want to disperse the amount?"
+              subTitle="This action cannot be undone"
+              buttonName="Disperse"
+              submitType="Disperse"
+              handleApplyTaskLogic={handleDialogAction}
+              availableTokens={Number(
+                taskData?.taskDetail?.totalRewardAmount ?? 0,
+              )} 
+            />
           </div>
         </div>
 

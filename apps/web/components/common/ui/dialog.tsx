@@ -64,7 +64,7 @@ export const DialogButton = ({
     category: string;
   }>({
     completionUrl: "",
-    amount: "",
+    amount: availableTokens ? String(availableTokens) : "",
     to: "",
     remarks: "",
     name: "",
@@ -163,7 +163,6 @@ export const DialogButton = ({
       });
       setIsOpen(false);
     } catch (error) {
-      
       let errorMessage = "Failed to apply for task";
       if (submitType === "Complete")
         errorMessage = "Failed to submit completion URL";
@@ -207,6 +206,7 @@ export const DialogButton = ({
       );
     }
     if (submitType === "Disperse") {
+      const amountNum = Number(formData.amount);
       return (
         <div className="py-4">
           <Label
@@ -225,6 +225,13 @@ export const DialogButton = ({
               error ? "border-red-600" : ""
             }`}
           />
+
+          {/* Show warning if amount exceeds availableTokens */}
+          {availableTokens !== undefined && amountNum > availableTokens && (
+            <p className="text-red-500 text-sm mt-1">
+              Amount exceeds the task reward {availableTokens}
+            </p>
+          )}
         </div>
       );
     }
@@ -367,7 +374,12 @@ export const DialogButton = ({
       open={isOpen}
       onOpenChange={(open) => {
         setIsOpen(open);
-        if (!open) {
+        if (open) {
+          setFormData((prev) => ({
+            ...prev,
+            amount: availableTokens ? String(availableTokens) : "",
+          }));
+        } else {
           setFormData({
             completionUrl: "",
             amount: "",
