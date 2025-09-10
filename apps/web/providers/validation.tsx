@@ -75,7 +75,10 @@ const Validation = ({ children }: ValidationProps) => {
         <p className="text-red-700 text-l mb-4">
           You must connect your wallet to access the app.
         </p>
-        <div className="flex items-center justify-center gap-1.5 border border-red-300 rounded-xl p-4 cursor-pointer bg-white/80 hover:bg-white/90 transition-all duration-200 max-w-[200px] mx-auto">
+        <div
+          className="flex items-center justify-center gap-1.5 border border-gray-300 rounded-xl p-4 cursor-pointer hover:bg-gray-100 transition-all duration-200 max-w-[200px] mx-auto"
+          style={{ backgroundColor: "rgb(246,247,249)" }}
+        >
           <Wallet size={40} strokeWidth={2.5} className="text-gray-700" />
           <ConnectKitButton
             label="Connect Wallet"
