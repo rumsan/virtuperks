@@ -17,8 +17,8 @@ interface ValidationProps {
 }
 
 const Validation = ({ children }: ValidationProps) => {
-  const [currentRole, setCurrentRole] = useState<Role>("NONE");
-  const { address, isConnected } = useAccount();
+  const [currentRole, setCurrentRole] = useState<Role | null>(null);
+  const { address, isConnected, isConnecting } = useAccount();
 
   const { data: hasDefaultAdminRole } = useReadContract({
     address: process.env.NEXT_PUBLIC_APPREGISTRY as `0x${string}`,
@@ -43,6 +43,8 @@ const Validation = ({ children }: ValidationProps) => {
   });
 
   useEffect(() => {
+    if (isConnecting) return;
+
     if (!isConnected) {
       setCurrentRole("NONE");
       return;
@@ -57,28 +59,27 @@ const Validation = ({ children }: ValidationProps) => {
     } else {
       setCurrentRole("PARTICIPANT");
     }
-  }, [isConnected, hasDefaultAdminRole, hasTreasurerRole]);
+  }, [isConnected, isConnecting, hasDefaultAdminRole, hasTreasurerRole]);
 
-  // Full-screen overlay if wallet not connected
   const renderOverlay = () => (
     <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50 pointer-events-auto">
-      <div className="bg-white/95 shadow-xl rounded-2xl p-6 text-center max-w-sm w-200 border border-red-300">
-        {/* Warning Icon */}
+      <div className="bg-white/95 shadow-xl rounded-2xl p-6 text-center max-w-sm w-100 border border-red-300">
         <div className="flex flex-col items-center justify-center mb-4">
-          <AlertTriangle size={48} className="text-red-500 mb-2" />
-          <h2 className="text-2xl font-bold text-red-600">
+          <div className="w-12 h-12 rounded-full bg-gray-400 flex items-center justify-center">
+            <AlertTriangle size={28} stroke="white" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">
             Wallet Not Connected
           </h2>
         </div>
-
-        {/* Description */}
-        <p className="text-red-700 text-sm mb-4">
+        <p className="text-red-700 text-l mb-4">
           You must connect your wallet to access the app.
         </p>
-
-        {/* Wallet Connect Button */}
-        <div className="flex flex-col items-center justify-center border border-red-300 rounded-xl p-4 cursor-pointer bg-white/80 hover:bg-white/90 transition-all duration-200 max-w-[200px] mx-auto">
-          <Wallet size={40} strokeWidth={2.5} className="mb-2 text-gray-700" />
+        <div
+          className="flex items-center justify-center gap-1.5 border border-gray-300 rounded-xl p-4 cursor-pointer hover:bg-gray-100 transition-all duration-200 max-w-[200px] mx-auto"
+          style={{ backgroundColor: "rgb(246,247,249)" }}
+        >
+          <Wallet size={40} strokeWidth={2.5} className="text-gray-700" />
           <ConnectKitButton
             label="Connect Wallet"
             showAvatar={false}
@@ -99,15 +100,18 @@ const Validation = ({ children }: ValidationProps) => {
         return <TreasurerNav>{children}</TreasurerNav>;
       case "PARTICIPANT":
       case "NONE":
-      default:
         return <TaskPortalNav>{children}</TaskPortalNav>;
+      default:
+        return null;
     }
   };
+
+  const showOverlay = currentRole === "NONE" && !isConnected && !isConnecting;
 
   return (
     <>
       {renderNav()}
-      {!isConnected && renderOverlay()}
+      {showOverlay && renderOverlay()}
     </>
   );
 };

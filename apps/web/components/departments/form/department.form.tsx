@@ -48,9 +48,7 @@ export default function DepartmentBaseForm({
     (data) => {
       saveForm(data);
     },
-    (errors) => {
-      console.log("Validation errors:", errors);
-    },
+    (errors) => {},
   );
   return (
     <>

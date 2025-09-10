@@ -12,7 +12,6 @@ interface TaskPortalCardProps {
 }
 
 const TaskPortalCard = ({ data, router }: TaskPortalCardProps) => {
-  console.log("TaskPortalCard Data:", data);
   const handleUrlClick = (e: React.MouseEvent, url: string) => {
     e.stopPropagation();
     window.open(url, "_blank", "noopener,noreferrer");
@@ -40,11 +39,12 @@ const TaskPortalCard = ({ data, router }: TaskPortalCardProps) => {
                   {task?.taskDetail.isOpen ? "Open" : "Closed"}
                 </span>
               </div>
-              <div className="flex items-center gap-2 cursor-pointer hover:text-blue-400">
-                <span className="text-[#297AD6] text-sm font-normal">
-                  {task?.taskDetail.detailsUrl}
+              <div className="flex items-center gap-2 cursor-pointer group">
+                <span className="text-[#297AD6] text-sm font-normal border-b-2 border-transparent group-hover:border-blue-400 transition-all">
+                  {task?.taskDetail.detailsUrl || "-"}
                 </span>
               </div>
+
               <div className="flex items-center gap-1 text-sm">
                 <div className="flex items-center font-normal text-[#64748B] gap-1">
                   <Users size={18} strokeWidth={2.5} color="#64748B" />

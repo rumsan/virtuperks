@@ -43,9 +43,9 @@ const ListCardDetails = ({
             </div>
 
             <div className="flex flex-col gap-1 text-sm">
-              <div className="flex items-center font-normal gap-2 cursor-pointer hover:text-blue-400">
+              <div className="flex items-center font-normal gap-2 cursor-pointer group">
                 <span
-                  className="text-[#297AD6] truncate max-w-[200px]"
+                  className="text-[#297AD6] truncate max-w-[200px] border-b-2 border-transparent group-hover:border-[#297AD6] transition-all"
                   title={task?.taskDetail?.detailsUrl}
                   onClick={(e) =>
                     handleUrlClick(e, task?.taskDetail?.detailsUrl ?? "")

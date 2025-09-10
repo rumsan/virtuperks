@@ -15,7 +15,6 @@ type TaskPortalDetailsProps = {
 };
 
 const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
-  console.log("Task Data:", taskData);
   const handleUrlClick = (e: React.MouseEvent, url: string) => {
     e.stopPropagation();
     window.open(url, "_blank", "noopener,noreferrer");
@@ -44,15 +43,15 @@ const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
             title={taskData?.taskDetail?.detailsUrl}
             onClick={(e) => handleUrlClick(e, taskData?.taskDetail?.detailsUrl)}
           >
-            <span className="flex items-center gap-1 border-b-2 border-transparent group-hover:border-blue-800 transition-all">
-              <span className="font-normal text-[#297AD6] text-lg truncate">
+            <span className="flex items-center gap-1 border-b-2 border-transparent text-[#297AD6] group-hover:border-[#297AD6] transition-all">
+              <span className="font-normal text-lg truncate">
                 {taskData?.taskDetail?.detailsUrl || "-"}
               </span>
               <ExternalLink
                 size={18}
                 color="#297AD6"
                 strokeWidth={2.5}
-                className="group-hover:text-blue-800 transition-colors"
+                className="transition-colors"
               />
             </span>
           </div>

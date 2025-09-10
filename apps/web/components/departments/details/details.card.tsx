@@ -38,7 +38,6 @@ export default function DepartmentDetailsCard({
   closePending,
   handleCloseExpiredTasks,
 }: DepartmentDetailsCardProps) {
-  console.log("Entity: ", entity);
   const { address } = useAccount();
   const roleData = hasRole({ role: process.env.NEXT_PUBLIC_MINTER_ROLE! });
   const canAllocateToken = Boolean(roleData);
@@ -109,7 +108,6 @@ export default function DepartmentDetailsCard({
         variant: "success",
       });
     } catch (error) {
-      console.error("Error transferring token:", error);
       toast({
         title: "Failed to transfer token. Please try again.",
         variant: "destructive",
@@ -237,7 +235,7 @@ export default function DepartmentDetailsCard({
             )}
 
             {/* Close Expired Tasks Button */}
-            {getCloseExpiredButton()}
+            {canTransferToken && getCloseExpiredButton()}
           </div>
         </div>
       </div>
@@ -272,18 +270,12 @@ export default function DepartmentDetailsCard({
                             setTimeout(() => setCopiedOwner(null), 2000);
                           }}
                         >
-                          <span
-                            className={`truncate max-w-[200px] transition-colors ${
-                              copiedOwner === owner
-                                ? "text-blue-800 underline"
-                                : "group-hover:text-blue-800 group-hover:underline"
-                            }`}
-                          >
+                          <span className="truncate max-w-[200px] transition-colors text-[#475569]">
                             {owner}
                           </span>
                           <div className="flex items-center transition-colors">
                             {copiedOwner === owner ? (
-                              <span className="text-green-800 font-bold">
+                              <span className="text-green-600 font-bold">
                                 ✔
                               </span>
                             ) : (

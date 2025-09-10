@@ -35,7 +35,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const [isDisbursed, setIsDisbursed] = useState(false);
 
   const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
-  console.log("Task: ", taskData);
+
   const { entityRole, roleLoading } = useGetEntityRole(
     taskData?.rewardManagement?.rewardManagement || "",
   );
@@ -233,17 +233,18 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
               )}
             </Button>
 
-            {!disbursePending && isOpen && (
-              <DialogButton
-                isOpen={isOpen}
-                setIsOpen={setIsOpen}
-                title="Are you sure you want to disperse the amount?"
-                subTitle="This action cannot be undone"
-                buttonName="Disperse"
-                submitType="Disperse"
-                handleApplyTaskLogic={handleDialogAction}
-              />
-            )}
+            <DialogButton
+              isOpen={isOpen}
+              setIsOpen={setIsOpen}
+              title="Are you sure you want to disperse the amount?"
+              subTitle="This action cannot be undone"
+              buttonName="Disperse"
+              submitType="Disperse"
+              handleApplyTaskLogic={handleDialogAction}
+              availableTokens={Number(
+                taskData?.taskDetail?.totalRewardAmount ?? 0,
+              )} 
+            />
           </div>
         </div>
 
