@@ -5,7 +5,8 @@ import TaskPortalNav from "@/components/layout/nav/task_portal.nav";
 import TreasurerNav from "@/components/layout/nav/treasurer.nav";
 import UnifiedNav from "@/components/layout/nav/unified.nav";
 import { AppRegistryABI } from "@workspace/contracts/abis";
-import { AlertTriangle, Wallet } from "lucide-react";
+import { ConnectKitButton } from "connectkit";
+import { AlertTriangle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAccount, useReadContract } from "wagmi";
 
@@ -69,7 +70,7 @@ const Validation = ({ children }: ValidationProps) => {
         {/* Centered Circle with Icon */}
         <div className="flex justify-center mb-4">
           <div className="w-12 h-12 rounded-full bg-gray-400 flex items-center justify-center">
-            <AlertTriangle size={28} stroke="white" />
+            <AlertTriangle size={35} stroke="white" />
           </div>
         </div>
 
@@ -84,10 +85,16 @@ const Validation = ({ children }: ValidationProps) => {
         </p>
 
         {/* Connect Wallet Button */}
-        <button className="w-full flex items-center justify-center gap-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 transition-colors">
-          <Wallet size={20} className="text-white" />
-          Connect Wallet
-        </button>
+        <div className="flex flex-col items-center gap-4">
+          {/* Visible custom button */}
+          <button className="w-full flex items-center justify-center gap-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 transition-colors">
+            <ConnectKitButton
+              label="Connect Wallet"
+              showAvatar={false}
+              theme="auto"
+            />
+          </button>
+        </div>
       </div>
     </div>
   );
