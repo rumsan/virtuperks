@@ -6,7 +6,7 @@ import TreasurerNav from "@/components/layout/nav/treasurer.nav";
 import UnifiedNav from "@/components/layout/nav/unified.nav";
 import { AppRegistryABI } from "@workspace/contracts/abis";
 import { ConnectKitButton } from "connectkit";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAccount, useReadContract } from "wagmi";
 
@@ -61,39 +61,27 @@ const Validation = ({ children }: ValidationProps) => {
     }
   }, [isConnected, isConnecting, hasDefaultAdminRole, hasTreasurerRole]);
 
-  // Overlay shown when wallet is NOT connected
-  const showOverlay = !isConnected;
-
   const renderOverlay = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="border border-blue-300 rounded-md p-6 max-w-md w-full mx-4 text-center bg-white shadow-lg">
-        {/* Centered Circle with Icon */}
-        <div className="flex justify-center mb-4">
+    <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50 pointer-events-auto">
+      <div className="bg-white/95 shadow-xl rounded-2xl p-6 text-center max-w-sm w-100 border border-red-300">
+        <div className="flex flex-col items-center justify-center mb-4">
           <div className="w-12 h-12 rounded-full bg-gray-400 flex items-center justify-center">
-            <AlertTriangle size={35} stroke="white" />
+            <AlertTriangle size={28} stroke="white" />
           </div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">
+            Wallet Not Connected
+          </h2>
         </div>
-
-        {/* Title */}
-        <h2 className="text-xl font-semibold text-gray-800 mb-2">
-          Wallet Not Connected
-        </h2>
-
-        {/* Description */}
-        <p className="text-gray-600 mb-6">
-          You must connect your wallet to access this app
+        <p className="text-red-700 text-l mb-4">
+          You must connect your wallet to access the app.
         </p>
-
-        {/* Connect Wallet Button */}
-        <div className="flex flex-col items-center gap-4">
-          {/* Visible custom button */}
-          <button className="w-full flex items-center justify-center gap-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 transition-colors">
-            <ConnectKitButton
-              label="Connect Wallet"
-              showAvatar={false}
-              theme="auto"
-            />
-          </button>
+        <div className="flex items-center justify-center gap-1.5 border border-red-300 rounded-xl p-4 cursor-pointer bg-white/80 hover:bg-white/90 transition-all duration-200 max-w-[200px] mx-auto">
+          <Wallet size={40} strokeWidth={2.5} className="text-gray-700" />
+          <ConnectKitButton
+            label="Connect Wallet"
+            showAvatar={false}
+            theme="auto"
+          />
         </div>
       </div>
     </div>
@@ -114,6 +102,8 @@ const Validation = ({ children }: ValidationProps) => {
         return null;
     }
   };
+
+  const showOverlay = currentRole === "NONE" && !isConnected && !isConnecting;
 
   return (
     <>
