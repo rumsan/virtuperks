@@ -40,7 +40,7 @@ const TaskDetails = ({ taskData }: TaskDetailsProps) => {
             }
           >
             <span
-              className="text-[#297AD6] truncate group-hover:text-blue-800 hover:underline transition-colors"
+              className="text-[#297AD6] truncate border-b-2 border-transparent group-hover:border-[#297AD6] transition-all"
               title={taskData?.taskDetail?.detailsUrl}
             >
               {taskData?.taskDetail?.detailsUrl
@@ -53,7 +53,7 @@ const TaskDetails = ({ taskData }: TaskDetailsProps) => {
               size={20}
               color="#297AD6"
               strokeWidth={2}
-              className="flex-shrink-0 text-[#297AD6] group-hover:text-blue-800 transition-colors"
+              className="flex-shrink-0 text-[#297AD6] group-hover:text-[#297AD6] transition-colors"
             />
           </div>
         </CardTitle>

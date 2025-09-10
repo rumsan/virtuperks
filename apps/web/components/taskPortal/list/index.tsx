@@ -31,6 +31,21 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
 
   const allTask = getAllTask?.data?.data?.taskCreateds || [];
 
+  const tasksSortedByStatusAndDate = allTask.sort((taskA: any, taskB: any) => {
+    // Prioritize open tasks first
+    const isTaskAOpen = taskA.taskDetail.isOpen;
+    const isTaskBOpen = taskB.taskDetail.isOpen;
+
+    if (isTaskAOpen && !isTaskBOpen) return -1;
+    if (!isTaskAOpen && isTaskBOpen) return 1;
+
+    // If both tasks have the same status, sort by expiry date (newest first)
+    const taskAExpiry = new Date(taskA.taskDetail.expiryDate).getTime();
+    const taskBExpiry = new Date(taskB.taskDetail.expiryDate).getTime();
+
+    return taskBExpiry - taskAExpiry; // Newest to oldest
+  });
+
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
@@ -48,7 +63,7 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
   >[];
 
   const table = useReactTable<Tasks>({
-    data: allTask,
+    data: tasksSortedByStatusAndDate,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
