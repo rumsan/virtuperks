@@ -231,6 +231,28 @@ contract RewardManagement is IRewardManagement, Multicall, ReentrancyGuard {
         }
     }
 
+    /// @notice This function allows the task owner to reject a participant with a reason
+/// @param taskId The unique identifier of the task
+/// @param participant The address of the participant to reject
+/// @param reason The reason for rejecting the participant
+function rejectParticipant(bytes32 taskId, address participant, string memory reason) public onlyTaskOwner(taskId) {
+    _isTaskOpen(taskId);
+    TaskAssignment storage taskAssignment = taskAssignments[taskId][participant];
+
+    // Ensure the participant is in a valid state to be rejected
+    require(
+         taskAssignment.status == AssignmentStatus.COMPLETED,
+        "Participant cannot be rejected in the current state"
+    );
+
+    // Update the participant's status to REJECTED
+    taskAssignment.status = AssignmentStatus.REJECTED;
+    tasks[taskId].rejectedParticipants.push(participant);
+
+    // Emit the TaskRejected event with the reason
+    emit TaskRejected(taskId, participant, msg.sender, reason);
+}
+
     /// @notice Retrieves all details of a specific task
     /// @param taskId The unique identifier of the task
     /// @return task The task details including its status and participants
@@ -502,6 +524,14 @@ contract RewardManagement is IRewardManagement, Multicall, ReentrancyGuard {
     /// @return participants Array of verified participant addresses
     function getTaskVerifiedParticipants(bytes32 taskId) public view returns (address[] memory) {
         return tasks[taskId].verifiedParticipants;
+    }
+
+
+      /// @notice Get all rejected  participants for a task
+    /// @param taskId The unique identifier of the task
+    /// @return participants Array of rejected participant addresses
+    function getTaskRejectedParticipants(bytes32 taskId) public view returns (address[] memory) {
+        return tasks[taskId].rejectedParticipants;
     }
 
     /// @notice Check if a task has reached its maximum participant limit

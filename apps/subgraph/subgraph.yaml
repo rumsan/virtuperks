@@ -91,7 +91,7 @@ dataSources:
     source:
       address: "0xC56f9e53570a3aa10bdB59D62997d898A9c58f53"
       abi: RewardRedemptionFactory
-      startBlock: 29092766
+      startBlock: 29092766P
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
