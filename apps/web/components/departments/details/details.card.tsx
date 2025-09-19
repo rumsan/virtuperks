@@ -14,8 +14,9 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { toast } from "@workspace/ui/hooks/use-toast";
-import { Building, Clock, Copy, Loader2, Plus } from "lucide-react"; // ✅ added Clock
+import { Building, Clock, Copy, Loader2, Plus } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { useParams } from "next/navigation";
 import React, { useState } from "react";
 import { useAccount } from "wagmi";
 
@@ -68,6 +69,9 @@ export default function DepartmentDetailsCard({
     setTransferAmount(value);
     setIsAmountValid(value <= (unallocatedTokens ?? 0));
   };
+
+  const params = useParams();
+  const cuid = params?.id as string;
 
   if (!entity) {
     return (
@@ -200,6 +204,17 @@ export default function DepartmentDetailsCard({
           <div className="flex gap-10">
             {/* Transfer Button */}
             {canTransferToken && getTransferButton()}
+
+            {canTransferToken && (
+              <Button
+                className="h-12 w-48 fw-[600] flex items-center justify-center"
+                variant="default"
+                onClick={() => router.push(PATHS.DEPARTMENT.TASK_ADD(cuid))}
+              >
+                <Plus size={22} strokeWidth={2.75} />
+                <span>Create Task</span>
+              </Button>
+            )}
 
             {/* Dialog stays conditional because it only makes sense when user can transfer */}
             {!directTransferPending && canTransferToken && (

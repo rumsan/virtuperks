@@ -14,9 +14,10 @@ export const PATHS = {
 
   DEPARTMENT: {
     HOME: `${ROOTS.DEPARTMENT}`,
-    ADD: `${ROOTS.DEPARTMENT}/add`,
-    EDIT: (cuid: string) => `${ROOTS.DEPARTMENT}/${cuid}`,
-    DETAILS: (cuid: string) => `${ROOTS.DEPARTMENT}/${cuid}`,
+    ADD: `${ROOTS.DEPARTMENT}/dep_add`, // ✅ matches folder
+    TASK_ADD: (cuid: string) => `${ROOTS.DEPARTMENT}/${cuid}/task_add`, // ✅ new task_add route
+    EDIT: (cuid: string) => `${ROOTS.DEPARTMENT}/${cuid}/edit`, // ✅ edit path inside [id]/edit
+    DETAILS: (cuid: string) => `${ROOTS.DEPARTMENT}/${cuid}`, // ✅ details at [id]
   },
 
   TREASURY: {

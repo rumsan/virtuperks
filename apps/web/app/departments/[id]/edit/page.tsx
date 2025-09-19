@@ -1,6 +1,6 @@
 "use client";
 
-import DepartmentEdit from "@/components/departments/form/department.edit";
+import DepartmentEdit from "@/components/departments/department_form/department.edit";
 import dynamic from "next/dynamic";
 
 function Page() {
