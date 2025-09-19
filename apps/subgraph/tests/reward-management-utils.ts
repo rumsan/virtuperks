@@ -15,6 +15,7 @@ import {
   TaskCompleted,
   TaskCreated,
   TaskDetailsUpdated,
+  TaskRejected,
   TaskVerified,
   TokenTransferred
 } from "../generated/RewardManagement/RewardManagement"
@@ -305,6 +306,38 @@ export function createTaskDetailsUpdatedEvent(
   )
 
   return taskDetailsUpdatedEvent
+}
+
+export function createTaskRejectedEvent(
+  id: Bytes,
+  participant: Address,
+  rejectedBy: Address,
+  reason: string
+): TaskRejected {
+  let taskRejectedEvent = changetype<TaskRejected>(newMockEvent())
+
+  taskRejectedEvent.parameters = new Array()
+
+  taskRejectedEvent.parameters.push(
+    new ethereum.EventParam("id", ethereum.Value.fromFixedBytes(id))
+  )
+  taskRejectedEvent.parameters.push(
+    new ethereum.EventParam(
+      "participant",
+      ethereum.Value.fromAddress(participant)
+    )
+  )
+  taskRejectedEvent.parameters.push(
+    new ethereum.EventParam(
+      "rejectedBy",
+      ethereum.Value.fromAddress(rejectedBy)
+    )
+  )
+  taskRejectedEvent.parameters.push(
+    new ethereum.EventParam("reason", ethereum.Value.fromString(reason))
+  )
+
+  return taskRejectedEvent
 }
 
 export function createTaskVerifiedEvent(
