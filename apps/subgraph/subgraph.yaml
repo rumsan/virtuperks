@@ -1,4 +1,4 @@
-specVersion: 1.3.0
+specVersion: 1.2.0
 indexerHints:
   prune: auto
 schema:
@@ -42,3 +42,113 @@ dataSources:
         - event: RoleRevoked(indexed bytes32,indexed bytes32,indexed address,address)
           handler: handleRoleRevoked
       file: ./src/app-registry.ts
+  - kind: ethereum
+    name: RewardToken
+    network: base-sepolia
+    source:
+      address: "0xD6BA3357fdb5423030Ba81E7268Ea786aF70b39B"
+      abi: RewardToken
+      startBlock: 31240749
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - Transfer
+      abis:
+        - name: RewardToken
+          file: ./abis/RewardToken.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/reward-token.ts
+  - kind: ethereum
+    name: RewardManagementFactory
+    network: base-sepolia
+    source:
+      address: "0x6baE87178836d3eE036751a2d3B6693eAd0188a8"
+      abi: RewardManagementFactory
+      startBlock: 31240756
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - RewardManagementCreated
+      abis:
+        - name: RewardManagementFactory
+          file: ./abis/RewardManagementFactory.json
+      eventHandlers:
+        - event: RewardManagementCreated(address,address,bytes32,string,bytes32)
+          handler: handleRewardManagementCreated
+      file: ./src/reward-management-factory.ts
+templates:
+  - kind: ethereum
+    name: RewardManagement
+    network: base-sepolia
+    source:
+      abi: RewardManagement
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - AdditionalDisbursementToTask
+        - ContractPaused
+        - ContractUnpaused
+        - DisbursementToTask
+        - EtherWithdrawn
+        - ParticipantApplied
+        - ParticipantRemovedFromWhitelist
+        - ParticipantWhitelisted
+        - TaskAccepted
+        - TaskApproved
+        - TaskClosed
+        - TaskCompleted
+        - TaskCreated
+        - TaskDetailsUpdated
+        - TaskRejected
+        - TaskVerified
+        - TokenTransferred
+      abis:
+        - name: RewardManagement
+          file: ./abis/RewardManagement.json
+      eventHandlers:
+        - event: AdditionalDisbursementToTask(indexed bytes32,uint256,string,indexed address)
+          handler: handleAdditionalDisbursementToTask
+        - event: ContractPaused(indexed address)
+          handler: handleContractPaused
+        - event: ContractUnpaused(indexed address)
+          handler: handleContractUnpaused
+        - event: DisbursementToTask(indexed bytes32,uint256,indexed address)
+          handler: handleDisbursementToTask
+        - event: EtherWithdrawn(indexed address,uint256,indexed address)
+          handler: handleEtherWithdrawn
+        - event: ParticipantApplied(indexed bytes32,indexed address)
+          handler: handleParticipantApplied
+        - event: ParticipantRemovedFromWhitelist(indexed bytes32,indexed address,indexed address)
+          handler: handleParticipantRemovedFromWhitelist
+        - event: ParticipantWhitelisted(indexed bytes32,indexed address,indexed address)
+          handler: handleParticipantWhitelisted
+        - event: TaskAccepted(indexed bytes32,indexed address)
+          handler: handleTaskAccepted
+        - event: TaskApproved(indexed bytes32,indexed address)
+          handler: handleTaskApproved
+        - event: TaskClosed(indexed bytes32,indexed address)
+          handler: handleTaskClosed
+        - event: TaskCompleted(indexed bytes32,indexed address)
+          handler: handleTaskCompleted
+        - event: TaskCreated(indexed bytes32,indexed address)
+          handler: handleTaskCreated
+        - event: TaskDetailsUpdated(indexed bytes32,indexed address)
+          handler: handleTaskDetailsUpdated
+        - event: TaskRejected(indexed bytes32,indexed address,indexed address,string)
+          handler: handleTaskRejected
+        - event: TaskVerified(indexed bytes32,indexed address,indexed address)
+          handler: handleTaskVerified
+        - event: TokenTransferred(indexed address,indexed address,uint256,string,indexed address)
+          handler: handleTokenTransferred
+      file: ./src/reward-management.ts

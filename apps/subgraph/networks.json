@@ -3,6 +3,15 @@
     "AppRegistry": {
       "address": "0xd258EE403eEa5b9d90631CfBCE81b6c7B729e6C5",
       "startBlock": 31240728
+    },
+    "RewardToken": {
+      "address": "0xD6BA3357fdb5423030Ba81E7268Ea786aF70b39B"
+    },
+    "RewardManagementFactory": {
+      "address": "0x6baE87178836d3eE036751a2d3B6693eAd0188a8"
+    },
+    "RewardManagement": {
+      "address": "0xE7A3fc226Fd8f624982047289B62Cd674ec8AE5d"
     }
   }
 }
