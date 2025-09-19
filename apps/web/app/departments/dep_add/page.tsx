@@ -1,6 +1,6 @@
 "use client";
 
-import DepartmentAdd from "@/components/departments/form/department.add";
+import DepartmentAdd from "@/components/departments/department_form/department.add";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 

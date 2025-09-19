@@ -478,11 +478,20 @@ export default function TaskBaseForm({
             <Button
               variant="outline"
               type="button"
-              className="w-[170px] flex justify-center items-center gap-2"
+              className={`w-[170px] flex justify-center items-center gap-2 ${
+                isPending
+                  ? "cursor-not-allowed opacity-70"
+                  : "hover:bg-gray-100"
+              }`}
               onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                 e.preventDefault();
-                history.back();
+                if (!isPending) history.back();
               }}
+              title={
+                isPending
+                  ? "Cannot cancel while task is being created"
+                  : "Cancel"
+              }
             >
               Cancel
             </Button>
@@ -490,11 +499,12 @@ export default function TaskBaseForm({
             <Button
               type="submit"
               variant="default"
-              className="w-[170px]"
+              className="w-[170px] flex justify-center items-center gap-2"
               disabled={isPending}
             >
               {isPending ? (
                 <>
+                  {/* Spinner */}
                   <svg
                     className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                     xmlns="http://www.w3.org/2000/svg"
@@ -515,6 +525,8 @@ export default function TaskBaseForm({
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
+                  {/* Optional disabled icon */}
+                  <span className="mr-1">🚫</span>
                   Processing...
                 </>
               ) : (

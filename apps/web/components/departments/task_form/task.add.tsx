@@ -10,6 +10,7 @@ import { Card, CardContent } from "@workspace/ui/components/card";
 import { useToast } from "@workspace/ui/hooks/use-toast";
 import { toUtf8Bytes } from "ethers";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { keccak256 } from "viem";
@@ -47,6 +48,9 @@ export default function TaskAdd({ router }: TaskAddProps) {
 
   const { getEntityOwnerRole, roleLoading, isError } =
     usegetEntityOwner(entityId);
+
+  const params = useParams();
+  const cuid = params?.id as string;
 
   // Check if the connected wallet has the owner role
   const {
@@ -141,7 +145,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
     <div className="w-full items-center">
       <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
         <button
-          onClick={() => router.push(PATHS.TASKS.HOME)}
+          onClick={() => router.push(PATHS.DEPARTMENT.DETAILS(cuid))}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-blue-600 font-semibold hover:bg-blue-50 hover:text-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-300 mt-5"
         >
           <span className="text-lg">&larr;</span>
