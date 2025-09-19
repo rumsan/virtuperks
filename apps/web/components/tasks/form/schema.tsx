@@ -53,6 +53,15 @@ export const taskSchema = () => {
       .optional()
       .default([]),
 
+    rejectedParticipants: z
+      .array(
+        z
+          .string()
+          .regex(/^0x[a-fA-F0-9]{40}$/, "Must be a valid Ethereum address"),
+      )
+      .optional()
+      .default([]),
+
     requireApproval: z.boolean().default(true),
     isWhitelisted: z.boolean().default(true),
 
