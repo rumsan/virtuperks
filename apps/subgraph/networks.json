@@ -1,17 +1,8 @@
 {
   "base-sepolia": {
     "AppRegistry": {
-      "address": "0x222e7FEA396B3A75d0A8544484B2eE06505d8Db7",
-      "startBlock": 31202904
-    },
-    "RewardToken": {
-      "address": "0x78a33a9a6e72894682DEE0a8d1a0b2d3BDea425D"
-    },
-    "RewardManagementFactory": {
-      "address": "0x6c3855dC65b2F0d23B75BA9cA326FC9Ff95B9b4e"
-    },
-    "RewardManagement": {
-      "address": "0x586442393A2361a17e5679300F55285D27BeB68d"
+      "address": "0xd258EE403eEa5b9d90631CfBCE81b6c7B729e6C5",
+      "startBlock": 31240728
     }
   }
 }

@@ -31,8 +31,9 @@ export class commonLib {
   public async getContractArtifacts(
     contractName: string,
   ): Promise<ContractArtifacts> {
-    console.log(contractName, 'contractName');
+    
     const contract = require(`../artifacts/${contractName}.json`);
+   
     return contract;
   }
 
@@ -43,16 +44,19 @@ export class commonLib {
     const factory = new ethers.ContractFactory(abi, bytecode, signer);
     const contract = await factory.deploy(...args);
 
-    const address = await contract.getAddress();
+  
     await contract.waitForDeployment();
 
-    const txBlock = await contract.deploymentTransaction()?.getBlock();
-    await this.sleep(2000);
+    const tx = contract.deploymentTransaction()
+    const receipt = await this.provider.waitForTransaction(tx!.hash)
+    const address = await contract.getAddress();
+    const blockNumber = receipt?.blockNumber || 1;
+    
 
-    console.log(txBlock);
+    console.log(blockNumber);
 
     return {
-      blockNumber: txBlock?.number || 1,
+      blockNumber,
       contract: new ethers.Contract(address, abi, this.provider),
     };
   }
