@@ -1,5 +1,5 @@
 import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
-import { ParticipantTaskStatus, TaskCreated, TaskDetail, TaskIdMapping } from "../generated/schema";
+import { ParticipantTaskStatus, ParticipantWhitelisted, TaskCreated, TaskDetail, TaskIdMapping } from "../generated/schema";
 import { RewardManagement } from "../generated/templates/RewardManagement/RewardManagement";
 
 
@@ -97,7 +97,56 @@ export function updateParticipantTaskStatus(
   ]);
 }
 
+// New helper function to add a participant to the whitelisted array
+export function addParticipantToWhitelist(
+  taskId: Bytes, 
+  participant: Bytes, 
+  blockNumber: BigInt, 
+  blockTimestamp: BigInt,
+  by: Bytes
+): void {
+  let whitelistId = taskId.concat(participant);
+  
+  let whitelistEntity = new ParticipantWhitelisted(whitelistId);
+  whitelistEntity.taskId = taskId;
+  whitelistEntity.participant = participant;
+  whitelistEntity.by = by;
+  whitelistEntity.blockNumber = blockNumber;
+  whitelistEntity.blockTimestamp = blockTimestamp;
+  whitelistEntity.save();
+  
+  let taskDetail = TaskDetail.load(taskId);
+  if (taskDetail) {
+    let whitelistedParticipants: Bytes[] = [];
+    
 
+    
+    // Check if participant is already in the array using a traditional loop
+    let isAlreadyWhitelisted = false;
+    for (let i = 0; i < whitelistedParticipants.length; i++) {
+      if (whitelistedParticipants[i].equals(participant)) {
+        isAlreadyWhitelisted = true;
+        break;
+      }
+    }
+    
+    // Add participant if not already in the array
+    if (!isAlreadyWhitelisted) {
+      whitelistedParticipants.push(participant);
+      taskDetail.whitelistedParticipants = whitelistedParticipants;
+      taskDetail.save();
+      
+      log.info("Added participant {} to whitelist for task {}", [
+        participant.toHexString(),
+        taskId.toHexString()
+      ]);
+    }
+  } else {
+    log.warning("Could not find TaskDetail for taskId {} when trying to add to whitelist", [
+      taskId.toHexString()
+    ]);
+  }
+}
 
 
 
