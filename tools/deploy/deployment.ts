@@ -53,7 +53,7 @@ class SeedProject extends commonLib {
       appId,
       name,
       '0x0EDE41a921F2Db76dfa94B4b032E550746143f24',
-      true,
+      false,
     );
 
     // Assign MINTER roles
