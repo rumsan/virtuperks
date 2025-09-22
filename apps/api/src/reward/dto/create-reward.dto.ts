@@ -1,28 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateReward } from '@workspace/sdk/type';
+
 import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateRewardDto implements CreateReward {
-  name: string;
-  tokensRequired: number;
-  appId?: string | undefined;
-  image?: string | undefined;
+
   @ApiProperty()
   @IsString()
   title: string;
 
   @ApiProperty()
   @IsString()
-  description: string;
+  @IsOptional()
+  description?: string;
 
   @ApiProperty()
   @IsNumber()
   tokens: number; 
 
-  @ApiProperty({ required: false })
-  @IsOptional()
+  @ApiProperty()
   @IsString()
-  category?: string;
+  wallet: string;
 
   @ApiProperty()
   @IsBoolean()
@@ -33,8 +31,4 @@ export class CreateRewardDto implements CreateReward {
   @IsString()
   imageUrl?: string;
 
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsNumber()
-  stock?: number;
 }

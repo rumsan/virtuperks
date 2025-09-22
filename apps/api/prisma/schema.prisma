@@ -14,37 +14,39 @@ datasource db {
 }
 
 
-
-
 model Reward {
   cuid        String       @id @unique @default(cuid())
   title       String       @db.VarChar(255)
-  description String
+  description String?
   tokens      Int
-  category    String?      @db.VarChar(100)
+  wallet      String
   isActive    Boolean      @default(true)
   imageUrl    String?      @db.VarChar(255)
-  stock       Int?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  redemptions Redemption[]
+  redemptions  Redemption[]
 }
 
+
 model Redemption {
-  cuid              Int              @id @default(autoincrement())
+  cuid            String       @id @unique @default(cuid())
   userAddress     String           @db.VarChar(42)
   rewardId        String
+  userPhoneNumber String           @db.VarChar(20)
   reward          Reward           @relation(fields: [rewardId], references: [cuid])
-  tokens          Int
   transactionHash String?          @db.VarChar(66)
   status          RedemptionStatus @default(PENDING)
-  taskId          String?          @db.VarChar(66)
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }
 
 enum RedemptionStatus {
   PENDING
-  COMPLETED
+  PROCESSING
+  FAILED
+  CANCELLED
+  REJECTED
+  SUCCESS 
+
 }
 

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateRedemption, RedemptionStatus } from '@workspace/sdk/type';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateRedemptionDto implements CreateRedemption {
   @ApiProperty()
@@ -10,10 +10,6 @@ export class CreateRedemptionDto implements CreateRedemption {
   @ApiProperty()
   @IsString()
   rewardId: string;
-  
-  @ApiProperty()
-  @IsNumber()
-  tokens: number; 
 
   @ApiProperty()
   @IsString()
@@ -25,10 +21,11 @@ export class CreateRedemptionDto implements CreateRedemption {
   @IsString()
   status: RedemptionStatus;
 
-  @ApiProperty()
-  @IsOptional()
+
+  @ApiProperty({ required: false })
+@IsNotEmpty()
   @IsString()
-  taskId?: string;
+  userPhoneNumber: string;
 
   
 }

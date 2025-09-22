@@ -1,37 +1,17 @@
  import { CommonFields } from "./common.type";
 import { RedemptionStatus } from "./enums";
 
-export type RewardBase = {
-  rewardRedemption: string;   
-  appId?: string;
-  name: string;
-  tokensRequired: bigint;
-  image?: string;
-};
-
-export type RewardRedemptionBase = {
-  name: string;
-  rewardId: string;
-
-  appId: string;
-  tokensRequired: number;
-};
-
-
-export type CreateRedemption = {
+export type RedemptionBase = {
   userAddress: string;
   rewardId: string;
-  tokens: number;
+  userPhoneNumber?: string;
   transactionHash?: string;
   status: RedemptionStatus;
-  taskId?: string;
-};
-
-
-export type RewardRedemption = RewardRedemptionBase & CommonFields & {
-  status: number;   
-  from: string;
   
 };
+export type Redemption = RedemptionBase & CommonFields  & {cuid: string};
+export type  CreateRedemption = RedemptionBase
+export type EditRedemption = Partial<CreateRedemption> & { cuid: string };
+
 
 
