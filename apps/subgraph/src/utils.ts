@@ -107,13 +107,15 @@ export function addParticipantToWhitelist(
 ): void {
   let whitelistId = taskId.concat(participant);
   
-  let whitelistEntity = new ParticipantWhitelisted(whitelistId);
-  whitelistEntity.taskId = taskId;
-  whitelistEntity.participant = participant;
-  whitelistEntity.by = by;
-  whitelistEntity.blockNumber = blockNumber;
-  whitelistEntity.blockTimestamp = blockTimestamp;
-  whitelistEntity.save();
+
+  // let whitelistEntity = new ParticipantWhitelisted(whitelistId);
+  // whitelistEntity.taskId = taskId;
+  // whitelistEntity.participant = participant;
+  // whitelistEntity.by = by;
+  // whitelistEntity.blockNumber = blockNumber;
+  // whitelistEntity.blockTimestamp = blockTimestamp;
+  // whitelistEntity.save();
+
   
   let taskDetail = TaskDetail.load(taskId);
   if (taskDetail) {

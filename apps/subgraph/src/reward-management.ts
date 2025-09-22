@@ -190,16 +190,18 @@ export function handleParticipantWhitelisted(
   entity.transactionHash = event.transaction.hash
 
   entity.save()
-  addParticipantToWhitelist(
-    event.params.taskId,
-    event.params.participant,
-    event.block.number,
-    event.block.timestamp,
-    event.params.by
+
+  // addParticipantToWhitelist(
+  //   event.params.taskId,
+  //   event.params.participant,
+  //   event.block.number,
+  //   event.block.timestamp,
+  //   event.params.by
 
 
 
-  )
+  // )
+
 }
 
 export function handleTaskAccepted(event: TaskAcceptedEvent): void {
