@@ -43,7 +43,7 @@ import {
 } from "../generated/schema"
 
 
-import { fetchTaskDetails, updateParticipantTaskStatus } from "./utils"
+import { addParticipantToWhitelist, fetchTaskDetails, updateParticipantTaskStatus } from "./utils"
 
 
 export function handleAdditionalDisbursementToTask(
@@ -190,6 +190,7 @@ export function handleParticipantWhitelisted(
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
   // addParticipantToWhitelist(
   //   event.params.taskId,
   //   event.params.participant,
@@ -200,6 +201,7 @@ export function handleParticipantWhitelisted(
 
 
   // )
+
 }
 
 export function handleTaskAccepted(event: TaskAcceptedEvent): void {
