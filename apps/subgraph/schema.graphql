@@ -180,7 +180,7 @@ type ParticipantWhitelisted @entity(immutable: true) {
   by: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
-  transactionHash: Bytes!
+  transactionHash: Bytes 
 }
 
 type TaskAccepted @entity(immutable: true) {
@@ -240,6 +240,9 @@ type TaskDetail @entity (immutable: false) {
   maxParticipants: BigInt!
   acceptedParticipantCount: BigInt!
   verifiedParticipants: [Bytes!]!
+  whitelistedParticipants: [Bytes!]
+
+  
   createdAt: BigInt
   task: TaskCreated
 }

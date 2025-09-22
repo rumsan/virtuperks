@@ -216,7 +216,7 @@ export const getTaskCreation = `
 
   export const getOpenTasks = `
     query GetOpenTasks {
-      taskCreateds(first: 100, orderBy: blockTimestamp, orderDirection: desc, where: { taskDetail_: { isOpen: true } }
+      taskCreateds(first: 10, orderBy: blockTimestamp, orderDirection: desc, where: { taskDetail_: { isOpen: true } }
       ) {
         id
         internal_id
