@@ -36,16 +36,18 @@ const TaskPortalParticipant = ({ taskId }: TaskPortalParticipantProps) => {
   });
   const getTaskDetail = useGetTaskDetailById(taskId.id);
 
-  const taskData = getTaskDetail?.data?.data?.taskCreateds[0] || [];
+  const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
+
   const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(
     taskData?.internal_id,
   );
+
   const whiteListedParticipants =
     getWhiteListedParticipants?.data?.data?.participantWhitelisteds || [];
 
   const columns = useHistoryColumns();
   const table = useReactTable({
-    data: [],
+    data: whiteListedParticipants ?? [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
