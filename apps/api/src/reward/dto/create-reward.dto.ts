@@ -19,12 +19,12 @@ export class CreateRewardDto implements CreateReward {
   tokens: number; 
 
   @ApiProperty()
-  @IsString()
-  wallet: string;
-
-  @ApiProperty()
   @IsBoolean()
   isActive: boolean;
+
+  @ApiProperty()
+  @IsString()
+  wallet: string;
 
   @ApiProperty({ required: false })
   @IsOptional()

@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@rumsan/prisma';
-import { CreateRewardDto } from './dto/create-reward.dto';
 import { UpdateRewardDto } from './dto/update-reward.dto';
 
 @Injectable()
@@ -14,13 +13,14 @@ export class RewardService {
 
   async findOne(cuid: string) {
     const reward = await this.prisma.reward.findUnique({ where: { cuid } });
+ 
     return reward;
   }
 
-  async create(dto: CreateRewardDto) {
-    const reward = await this.prisma.reward.create({ data: dto });
-    return reward;
-  }
+  // async create(dto: CreateRewardDto) {
+  //   const reward = await this.prisma.reward.create({ data: dto });
+  //   return reward;
+  // }
 
   async update(cuid: string, dto: UpdateRewardDto) {
     const reward = await this.prisma.reward.update({

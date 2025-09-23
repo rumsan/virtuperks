@@ -1,27 +1,7 @@
 "use client";
 
-import { DataTablePagination } from "@/components/common/list/list.pagination";
-import {
-  useGetRedeemedReward,
-  useGetRedeemedRewardByParticiant,
-  useGetRewardRole,
-  useUpdateRedemptionStatus,
-} from "@/hooks/subgraph/token-marketplace";
-import {
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@workspace/ui/components/tabs";
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { useColumns } from "./redemption.column";
 
 interface RedemptionHistoryProps {
   rewardId: string;
@@ -30,20 +10,20 @@ interface RedemptionHistoryProps {
 const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
   const { address, isConnected } = useAccount();
 
-  const getRedeemReward = useGetRedeemedReward(rewardId);
-  const getParticipantReward = useGetRedeemedRewardByParticiant(
-    address as `0x${string}`,
-  );
-  const { rewardRole, roleLoading } = useGetRewardRole(rewardId);
+  // const getRedeemReward = useGetRedeemedReward(rewardId);
+  // const getParticipantReward = useGetRedeemedRewardByParticiant(
+  //   address as `0x${string}`,
+  // );
+  // const { rewardRole, roleLoading } = useGetRewardRole(rewardId);
 
-  const allRedemptions = getRedeemReward?.data?.data?.redemptionStatuses ?? [];
+  //const allRedemptions = getRedeemReward?.data?.data?.redemptionStatuses ?? [];
 
-  const redeemedRewardsByParticipant =
-    getParticipantReward?.data?.data?.redemptionStatuses ?? [];
+  // const redeemedRewardsByParticipant =
+  //   getParticipantReward?.data?.data?.redemptionStatuses ?? [];
 
-  const { UpdateRedeemStatus: rawUpdateStatus, UpdateRedeemPending } =
-    useUpdateRedemptionStatus();
-  const [isPending, setIsPending] = useState(false);
+  // const { UpdateRedeemStatus: rawUpdateStatus, UpdateRedeemPending } =
+  //   useUpdateRedemptionStatus();
+  // const [isPending, setIsPending] = useState(false);
 
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
@@ -54,17 +34,17 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
   }) => {
     setUpdatingId(params.redemptionId);
     try {
-      await rawUpdateStatus(params);
+      // await rawUpdateStatus(params);
     } finally {
       setUpdatingId(null);
     }
   };
 
-  const columns = useColumns<(typeof allRedemptions)[0]>(
-    updateStatus,
-    updatingId,
-    rewardRole,
-  );
+  // const columns = useColumns<(typeof allRedemptions)[0]>(
+  //   updateStatus,
+  //   updatingId,
+  //   rewardRole,
+  // );
 
   const [paginationAll, setPaginationAll] = useState({
     pageIndex: 0,
@@ -79,207 +59,207 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
 
   const [tab, setTab] = useState<"all" | "mine">("all");
 
-  const tableAll = useReactTable({
-    data: allRedemptions,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    state: { pagination: paginationAll },
-    onPaginationChange: setPaginationAll,
-    pageCount: Math.ceil(allRedemptions.length / paginationAll.pageSize),
-  });
+  // const tableAll = useReactTable({
+  //   data: [],
+  //   columns,
+  //   getCoreRowModel: getCoreRowModel(),
+  //   getPaginationRowModel: getPaginationRowModel(),
+  //   state: { pagination: paginationAll },
+  //   onPaginationChange: setPaginationAll,
+  //   pageCount: Math.ceil(allRedemptions.length / paginationAll.pageSize),
+  // });
 
-  const tableMine = useReactTable({
-    data: redeemedRewardsByParticipant,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    state: { pagination: paginationMine },
-    onPaginationChange: setPaginationMine,
-    pageCount: Math.ceil(
-      redeemedRewardsByParticipant.length / paginationMine.pageSize,
-    ),
-  });
+  // const tableMine = useReactTable({
+  //   data: redeemedRewardsByParticipant,
+  //   columns,
+  //   getCoreRowModel: getCoreRowModel(),
+  //   getPaginationRowModel: getPaginationRowModel(),
+  //   state: { pagination: paginationMine },
+  //   onPaginationChange: setPaginationMine,
+  //   pageCount: Math.ceil(
+  //     redeemedRewardsByParticipant.length / paginationMine.pageSize,
+  //   ),
+  // });
 
-  if (getRedeemReward.isLoading || getParticipantReward.isLoading) {
-    return (
-      <p className="text-gray-500 text-sm p-6">Loading redemption history...</p>
-    );
-  }
+  // if (getRedeemReward.isLoading || getParticipantReward.isLoading) {
+  //   return (
+  //     <p className="text-gray-500 text-sm p-6">Loading redemption history...</p>
+  //   );
+  // }
 
-  if (getRedeemReward.error || getParticipantReward.error) {
-    return (
-      <p className="text-red-600 text-sm p-6">
-        Failed to load redemption history.
-      </p>
-    );
-  }
+  // if (getRedeemReward.error || getParticipantReward.error) {
+  //   return (
+  //     <p className="text-red-600 text-sm p-6">
+  //       Failed to load redemption history.
+  //     </p>
+  //   );
+  // }
 
-  return (
-    <main className="flex flex-col gap-4 p-6 bg-white rounded-xl">
-      {/* Header Section */}
-      <div className="flex flex-col gap-1">
-        <h3 className="text-xl font-bold">Redemption History</h3>
-        <p className="text-sm text-gray-500">
-          Recent redemptions for this token
-        </p>
-      </div>
+  // return (
+  //   <main className="flex flex-col gap-4 p-6 bg-white rounded-xl">
+  //     {/* Header Section */}
+  //     <div className="flex flex-col gap-1">
+  //       <h3 className="text-xl font-bold">Redemption History</h3>
+  //       <p className="text-sm text-gray-500">
+  //         Recent redemptions for this token
+  //       </p>
+  //     </div>
 
-      {/* Tabs */}
-      <Tabs
-        value={tab}
-        onValueChange={(v) => {
-          setTab(v as "all" | "mine");
-          // Reset pagination for the newly selected tab
-          if (v === "all") setPaginationAll((p) => ({ ...p, pageIndex: 0 }));
-          if (v === "mine") setPaginationMine((p) => ({ ...p, pageIndex: 0 }));
-        }}
-      >
-        <TabsList className="mb-2">
-          <TabsTrigger value="all">All History</TabsTrigger>
-          <TabsTrigger value="mine">My History</TabsTrigger>
-        </TabsList>
+  //     {/* Tabs */}
+  //     <Tabs
+  //       value={tab}
+  //       onValueChange={(v) => {
+  //         setTab(v as "all" | "mine");
+  //         // Reset pagination for the newly selected tab
+  //         if (v === "all") setPaginationAll((p) => ({ ...p, pageIndex: 0 }));
+  //         if (v === "mine") setPaginationMine((p) => ({ ...p, pageIndex: 0 }));
+  //       }}
+  //     >
+  //       <TabsList className="mb-2">
+  //         <TabsTrigger value="all">All History</TabsTrigger>
+  //         <TabsTrigger value="mine">My History</TabsTrigger>
+  //       </TabsList>
 
-        {/* All History Tab */}
-        <TabsContent value="all">
-          <div
-            className="border rounded-lg"
-            style={{ minHeight: `${paginationAll.pageSize * 48 + 56}px` }}
-          >
-            <table className="min-w-full table-fixed divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                {tableAll.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <th
-                        key={header.id}
-                        className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider h-[48px]"
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-100">
-                {tableAll.getRowModel().rows.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={columns.length}
-                      className="text-center py-12 text-gray-500 text-sm"
-                    >
-                      No redemption history found.
-                    </td>
-                  </tr>
-                ) : (
-                  tableAll.getRowModel().rows.map((row) => (
-                    <tr
-                      key={row.id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <td
-                          key={cell.id}
-                          className="px-4 py-3 text-sm text-gray-700 truncate min-h-[48px] h-[48px] align-middle"
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </td>
-                      ))}
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+  //       {/* All History Tab */}
+  //       <TabsContent value="all">
+  //         <div
+  //           className="border rounded-lg"
+  //           style={{ minHeight: `${paginationAll.pageSize * 48 + 56}px` }}
+  //         >
+  //           <table className="min-w-full table-fixed divide-y divide-gray-200">
+  //             <thead className="bg-gray-50">
+  //               {tableAll.getHeaderGroups().map((headerGroup) => (
+  //                 <tr key={headerGroup.id}>
+  //                   {headerGroup.headers.map((header) => (
+  //                     <th
+  //                       key={header.id}
+  //                       className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider h-[48px]"
+  //                     >
+  //                       {header.isPlaceholder
+  //                         ? null
+  //                         : flexRender(
+  //                             header.column.columnDef.header,
+  //                             header.getContext(),
+  //                           )}
+  //                     </th>
+  //                   ))}
+  //                 </tr>
+  //               ))}
+  //             </thead>
+  //             <tbody className="bg-white divide-y divide-gray-100">
+  //               {tableAll.getRowModel().rows.length === 0 ? (
+  //                 <tr>
+  //                   <td
+  //                     colSpan={columns.length}
+  //                     className="text-center py-12 text-gray-500 text-sm"
+  //                   >
+  //                     No redemption history found.
+  //                   </td>
+  //                 </tr>
+  //               ) : (
+  //                 tableAll.getRowModel().rows.map((row) => (
+  //                   <tr
+  //                     key={row.id}
+  //                     className="hover:bg-gray-50 transition-colors"
+  //                   >
+  //                     {row.getVisibleCells().map((cell) => (
+  //                       <td
+  //                         key={cell.id}
+  //                         className="px-4 py-3 text-sm text-gray-700 truncate min-h-[48px] h-[48px] align-middle"
+  //                       >
+  //                         {flexRender(
+  //                           cell.column.columnDef.cell,
+  //                           cell.getContext(),
+  //                         )}
+  //                       </td>
+  //                     ))}
+  //                   </tr>
+  //                 ))
+  //               )}
+  //             </tbody>
+  //           </table>
+  //         </div>
 
-          <div className="mt-4">
-            <DataTablePagination
-              table={tableAll}
-              pagination={paginationAll}
-              setPagination={setPaginationAll}
-            />
-          </div>
-        </TabsContent>
+  //         <div className="mt-4">
+  //           <DataTablePagination
+  //             table={tableAll}
+  //             pagination={paginationAll}
+  //             setPagination={setPaginationAll}
+  //           />
+  //         </div>
+  //       </TabsContent>
 
-        {/* My History Tab */}
-        <TabsContent value="mine">
-          <div
-            className="border rounded-lg"
-            style={{ minHeight: `${paginationMine.pageSize * 48 + 56}px` }}
-          >
-            <table className="min-w-full table-fixed divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                {tableMine.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <th
-                        key={header.id}
-                        className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider h-[48px]"
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-100">
-                {tableMine.getRowModel().rows.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={columns.length}
-                      className="text-center py-12 text-gray-500 text-sm"
-                    >
-                      No redemption history found.
-                    </td>
-                  </tr>
-                ) : (
-                  tableMine.getRowModel().rows.map((row) => (
-                    <tr
-                      key={row.id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <td
-                          key={cell.id}
-                          className="px-4 py-3 text-sm text-gray-700 truncate min-h-[48px] h-[48px] align-middle"
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </td>
-                      ))}
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+  //       {/* My History Tab */}
+  //       <TabsContent value="mine">
+  //         <div
+  //           className="border rounded-lg"
+  //           style={{ minHeight: `${paginationMine.pageSize * 48 + 56}px` }}
+  //         >
+  //           <table className="min-w-full table-fixed divide-y divide-gray-200">
+  //             <thead className="bg-gray-50">
+  //               {tableMine.getHeaderGroups().map((headerGroup) => (
+  //                 <tr key={headerGroup.id}>
+  //                   {headerGroup.headers.map((header) => (
+  //                     <th
+  //                       key={header.id}
+  //                       className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider h-[48px]"
+  //                     >
+  //                       {header.isPlaceholder
+  //                         ? null
+  //                         : flexRender(
+  //                             header.column.columnDef.header,
+  //                             header.getContext(),
+  //                           )}
+  //                     </th>
+  //                   ))}
+  //                 </tr>
+  //               ))}
+  //             </thead>
+  //             <tbody className="bg-white divide-y divide-gray-100">
+  //               {tableMine.getRowModel().rows.length === 0 ? (
+  //                 <tr>
+  //                   <td
+  //                     colSpan={columns.length}
+  //                     className="text-center py-12 text-gray-500 text-sm"
+  //                   >
+  //                     No redemption history found.
+  //                   </td>
+  //                 </tr>
+  //               ) : (
+  //                 tableMine.getRowModel().rows.map((row) => (
+  //                   <tr
+  //                     key={row.id}
+  //                     className="hover:bg-gray-50 transition-colors"
+  //                   >
+  //                     {row.getVisibleCells().map((cell) => (
+  //                       <td
+  //                         key={cell.id}
+  //                         className="px-4 py-3 text-sm text-gray-700 truncate min-h-[48px] h-[48px] align-middle"
+  //                       >
+  //                         {flexRender(
+  //                           cell.column.columnDef.cell,
+  //                           cell.getContext(),
+  //                         )}
+  //                       </td>
+  //                     ))}
+  //                   </tr>
+  //                 ))
+  //               )}
+  //             </tbody>
+  //           </table>
+  //         </div>
 
-          <div className="mt-4">
-            <DataTablePagination
-              table={tableMine}
-              pagination={paginationMine}
-              setPagination={setPaginationMine}
-            />
-          </div>
-        </TabsContent>
-      </Tabs>
-    </main>
-  );
+  //         <div className="mt-4">
+  //           <DataTablePagination
+  //             table={tableMine}
+  //             pagination={paginationMine}
+  //             setPagination={setPaginationMine}
+  //           />
+  //         </div>
+  //       </TabsContent>
+  //     </Tabs>
+  //   </main>
+  // );
 };
 
 export default RedemptionHistory;

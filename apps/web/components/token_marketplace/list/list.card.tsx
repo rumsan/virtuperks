@@ -1,14 +1,7 @@
-import { DialogButton } from "@/components/common/ui/dialog";
 import { useCheckParticipantBalance } from "@/hooks/subgraph/token";
-import {
-  useCreateReward,
-  useGetRewards,
-} from "@/hooks/subgraph/token-marketplace";
+import { useRewardList } from "@/hooks/subgraph/token-marketplace";
 import { PATHS } from "@/routes/paths";
 import { getCategoryIcon } from "@/utils/rewardIcon";
-import hasRole from "@/utils/role";
-import { createId } from "@paralleldrive/cuid2";
-import { Button } from "@workspace/ui/components/button";
 import {
   Card,
   CardContent,
@@ -16,57 +9,27 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import { useToast } from "@workspace/ui/hooks/use-toast";
-import { toUtf8Bytes } from "ethers";
-import { Coins, Plus } from "lucide-react";
+import { Coins } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { keccak256 } from "viem";
 import { useAccount } from "wagmi";
 import { categoryColorMap } from "../img/imgLink";
 
 const TokenMarketListCard = () => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const isDefaultAdmin = hasRole({
-    role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
-  });
-
   const { address } = useAccount();
   const { participantTotalToken } = useCheckParticipantBalance(
     address as `0x${string}`,
   );
 
-  const { toast } = useToast();
-  const tokenData = useGetRewards();
-  const tokenList = tokenData?.data?.data?.rewardRedemptionCreateds || [];
+  const getAllReward = useRewardList();
 
-  // const totalRewards = tokenList.length;
-  const affordableRewards = tokenList.filter(
+  const rewardList = getAllReward?.data || [];
+
+  const totalRewards = rewardList.length;
+  const affordableRewards = rewardList.filter(
     (item: any) =>
       parseInt(item.tokensRequired) <= (participantTotalToken ?? 0),
   ).length;
   const router = useRouter();
-  const { AddReward, rewardPending } = useCreateReward();
-
-  const handleRewardAdd = async (data: any) => {
-    try {
-      const cuid = createId();
-      const rewardId = keccak256(toUtf8Bytes(cuid));
-
-      await AddReward({
-        rewardId: rewardId,
-        name: data.name,
-        amount: data.amount,
-        category: data.category,
-        ownerAddress: data.ownerAddress,
-      });
-      setIsDialogOpen(false);
-      toast({
-        title: "Token transferred successfully!",
-        variant: "success",
-      });
-    } catch (error: any) {}
-  };
 
   const handleCardClick = (rewardId: string) => {
     router.push(PATHS.TOKENMARKETPLACE.DETAILS(rewardId));
@@ -86,9 +49,7 @@ const TokenMarketListCard = () => {
       <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
           <p className="text-sm text-gray-500">Total Rewards</p>
-          <p className="text-xl font-semibold text-[#0F172A]">
-            {tokenList.length}
-          </p>
+          <p className="text-xl font-semibold text-[#0F172A]">{totalRewards}</p>
         </div>
         <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
           <p className="text-sm text-gray-500">Affordable Rewards</p>
@@ -111,31 +72,22 @@ const TokenMarketListCard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
         {/* Add Token Card */}
         {/* Add Token Card - Only for Default Admin */}
-        {isDefaultAdmin && (
-          <Card
-            className="w-full flex flex-col items-center justify-center text-green-500 bg-green-50 border border-dashed border-green-300 cursor-pointer hover:shadow-lg hover:text-green-600 transition"
-            onClick={() => setIsDialogOpen(true)}
-          >
-            <Plus size={36} />
-            <span className="text-center text-base mt-2">Add Reward</span>
-          </Card>
-        )}
 
         {/* Rewards List */}
-        {tokenList.map((item: any) => (
+        {rewardList.map((item: any) => (
           <Card
-            key={item.id}
+            key={item.cuid}
             className="hover:shadow-md transition cursor-pointer flex flex-col justify-between"
-            onClick={() => handleCardClick(item.rewardRedemption)}
+            onClick={() => handleCardClick(item.cuid)}
           >
             <CardHeader className="p-0">
               <div className="relative w-full h-36 overflow-hidden rounded-t-lg">
                 <img
                   src={
-                    categoryColorMap[item.category]?.image ||
+                    categoryColorMap["Mobile-TopUp"]?.image ||
                     "https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg"
                   }
-                  alt={item.name}
+                  alt={item.title}
                   loading="lazy"
                   className="w-full h-full object-cover"
                 />
@@ -160,10 +112,10 @@ const TokenMarketListCard = () => {
 
               <div className="px-4 pt-3 pb-2">
                 <CardTitle className="text-lg text-[#0F172A]">
-                  {item.name}
+                  {item.title}
                 </CardTitle>
                 <CardDescription className="text-sm text-[#64748B]">
-                  {"Reward Description"}
+                  {item.description}
                 </CardDescription>
               </div>
             </CardHeader>
@@ -176,34 +128,21 @@ const TokenMarketListCard = () => {
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-2 text-[#297AD6] text-xl font-bold">
                   <Coins size={18} strokeWidth={2.65} />
-                  {parseInt(item.tokensRequired)}
+                  {parseInt(item.tokens)}
                 </div>
 
                 {/* Button also navigates */}
-                <Button
+                {/* <Button
                   className="bg-[#297AD6] hover:bg-[#1E61B4] text-white"
                   onClick={() => handleCardClick(item.id.toString())}
                 >
                   Approve and Redeem
-                </Button>
+                </Button> */}
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
-
-      {/* Dialog for Adding Token */}
-      <DialogButton
-        isOpen={isDialogOpen}
-        setIsOpen={setIsDialogOpen}
-        title="Add New Token"
-        subTitle="Fill in the details to create a new token"
-        buttonName={rewardPending ? "Processing..." : "Create Token"}
-        submitType="CreateReward"
-        inputLabel="Reward Name"
-        inputPlaceholder="Enter reward name"
-        handleApplyTaskLogic={handleRewardAdd}
-      />
     </div>
   );
 };

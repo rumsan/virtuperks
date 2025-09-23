@@ -1,0 +1,40 @@
+-- CreateEnum
+CREATE TYPE "public"."RedemptionStatus" AS ENUM ('PENDING', 'PROCESSING', 'FAILED', 'CANCELLED', 'REJECTED', 'SUCCESS');
+
+-- CreateTable
+CREATE TABLE "public"."Reward" (
+    "cuid" TEXT NOT NULL,
+    "title" VARCHAR(255) NOT NULL,
+    "description" TEXT,
+    "tokens" INTEGER NOT NULL,
+    "wallet" TEXT NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "imageUrl" VARCHAR(255),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Reward_pkey" PRIMARY KEY ("cuid")
+);
+
+-- CreateTable
+CREATE TABLE "public"."Redemption" (
+    "cuid" TEXT NOT NULL,
+    "userAddress" VARCHAR(42) NOT NULL,
+    "rewardId" TEXT NOT NULL,
+    "userPhoneNumber" VARCHAR(20) NOT NULL,
+    "transactionHash" VARCHAR(66),
+    "status" "public"."RedemptionStatus" NOT NULL DEFAULT 'PENDING',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Redemption_pkey" PRIMARY KEY ("cuid")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Reward_cuid_key" ON "public"."Reward"("cuid");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Redemption_cuid_key" ON "public"."Redemption"("cuid");
+
+-- AddForeignKey
+ALTER TABLE "public"."Redemption" ADD CONSTRAINT "Redemption_rewardId_fkey" FOREIGN KEY ("rewardId") REFERENCES "public"."Reward"("cuid") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -7,7 +7,7 @@ export class RedemptionService {
   constructor(private prisma: PrismaService) {}
 
   findAll() {
-    return this.prisma.redemption.findMany();
+    return  this.prisma.redemption.findMany();
   }
 
   async create(dto: CreateRedemptionDto) {

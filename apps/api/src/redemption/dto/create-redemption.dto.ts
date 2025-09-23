@@ -5,10 +5,12 @@ import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 export class CreateRedemptionDto implements CreateRedemption {
   @ApiProperty()
   @IsString()
+  @IsNotEmpty()
   userAddress: string;
 
   @ApiProperty()
   @IsString()
+  @IsNotEmpty()
   rewardId: string;
 
   @ApiProperty()
@@ -17,9 +19,8 @@ export class CreateRedemptionDto implements CreateRedemption {
   transactionHash?: string;
 
   @ApiProperty({ required: false })
-  @IsNotEmpty()
   @IsString()
-  status: RedemptionStatus;
+   status: RedemptionStatus;
 
 
   @ApiProperty({ required: false })

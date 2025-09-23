@@ -14,12 +14,13 @@ export class RewardController {
 
   @Get(':cuid')
   findOne(@Param('cuid') cuid: string) {
+   
     return this.rewardService.findOne(cuid);
   }
 
   @Post()
   create(@Body() payload: CreateRewardDto) {
-    return this.rewardService.create(payload);
+    //return this.rewardService.create(payload);
   }
 
   @Put(':cuid')

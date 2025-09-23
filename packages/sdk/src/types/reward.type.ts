@@ -6,7 +6,7 @@ interface RewardBase {
   description?: string;
   tokens: number;
   isActive: boolean;
-  wallet: string;
+  wallet?: string;
   imageUrl?: string;
 }
 

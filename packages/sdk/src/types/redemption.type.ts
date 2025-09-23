@@ -4,7 +4,7 @@ import { RedemptionStatus } from "./enums";
 export type RedemptionBase = {
   userAddress: string;
   rewardId: string;
-  userPhoneNumber?: string;
+  userPhoneNumber : string;
   transactionHash?: string;
   status: RedemptionStatus;
   

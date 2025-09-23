@@ -1,5 +1,6 @@
 "use client";
 
+import { RumsanProvider } from "@rumsan/ui/providers/rumsan.provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ConnectKitProvider } from "connectkit";
 import * as React from "react";
@@ -13,9 +14,8 @@ export function Providers({ children }: QueryProviderProps) {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        refetchOnWindowFocus:false,
+        refetchOnWindowFocus: false,
         retry: false,
-      
       },
       mutations: {
         retry: false,
@@ -24,10 +24,11 @@ export function Providers({ children }: QueryProviderProps) {
   });
   return (
     <QueryClientProvider client={queryClient}>
-      <WalletProvider>
-      <ConnectKitProvider >{children}</ConnectKitProvider>
-     
+      <RumsanProvider queryClient={queryClient}>
+        <WalletProvider>
+          <ConnectKitProvider>{children}</ConnectKitProvider>
         </WalletProvider>
+      </RumsanProvider>
     </QueryClientProvider>
   );
 }
