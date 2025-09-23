@@ -1,12 +1,7 @@
-import { CustomAlertDialog } from "@/components/common/ui/alert.dialog";
-import { Cuid } from "@/components/departments/details/details.main";
-// import {
-//   useCompleteTaskMutation,
-//   useGetParticipantTaskStatus,
-//   useParticipateTaskMutation,
-// } from "@/hooks/subgraph/querycall";
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
+import { CustomAlertDialog } from "@/components/common/ui/alert.dialog";
 import { DialogButton } from "@/components/common/ui/dialog";
+import { Cuid } from "@/components/departments/details/details.main";
 import { useGetWhiteListedParticipantByTask } from "@/hooks/subgraph/participant";
 import {
   useCheckParticipantStatus,
@@ -19,7 +14,7 @@ import { Button } from "@workspace/ui/components/button";
 import { useToast } from "@workspace/ui/hooks/use-toast";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 import TaskPortalParticipant from "./details.participant";
 import TaskPortalDetails from "./details.task";
@@ -32,35 +27,36 @@ type TaskPortalMainProps = {
 const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [alertDialog, setAlertDialog] = useState(false);
-  const [localButtonState, setLocalButtonState] = useState<string | null>(null);
+  const [localStatus, setLocalStatus] = useState<string | null>(null);
 
   const { isConnected, address } = useAccount();
+  const { toast } = useToast();
 
   const getTaskDetail = useGetTaskById(cuid.id);
-
-  const { toast } = useToast();
-  const taskData = getTaskDetail?.data?.data?.taskCreateds?.[0];
-
+  const taskData = useMemo(
+    () => getTaskDetail?.data?.data?.taskCreateds?.[0],
+    [getTaskDetail],
+  );
   const isTaskOpen = taskData?.taskDetail?.isOpen;
-
-  // const isTaskClosed = taskDetail ? !taskDetail.isOpen : false;
 
   const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(
     taskData?.internal_id,
-    false,
   );
-  const whiteListedParticipants =
-    getWhiteListedParticipants?.data?.data?.participantWhitelisteds || [];
+  const whiteListedParticipants = useMemo(
+    () => getWhiteListedParticipants?.data?.data?.participantWhitelisteds || [],
+    [getWhiteListedParticipants],
+  );
 
-  const { participateTask, participatePending, participateSuccess } =
-    useParticipateTaskMutation();
+  const { participateTask, participatePending } = useParticipateTaskMutation();
   const { completeTask, completePending } = useCompleteTaskMutation();
-
   const { status: participantStatus, isLoading: statusLoading } =
     useCheckParticipantStatus(
       taskData?.internal_id,
       taskData?.rewardManagement?.rewardManagement,
     );
+
+  const effectiveStatus =
+    localStatus !== null ? localStatus : participantStatus;
 
   const handleApplyTask = async () => {
     if (!isConnected) {
@@ -68,12 +64,9 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
       return;
     }
 
-    // Check if the connected address is whitelisted
-
     const isWhitelisted = whiteListedParticipants.some(
-      (participantList: { participant: string }, index: number) => {
-        return participantList.participant === address?.toLowerCase();
-      },
+      (participantList: { participant: string }) =>
+        participantList.participant === address?.toLowerCase(),
     );
 
     if (!isWhitelisted) {
@@ -93,9 +86,8 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
         },
         {
           onSuccess: () => {
-            // Update local state to PENDING (1) instead of "WAITING"
-            // setLocalButtonState("1");
-            setLocalButtonState("WAITING");
+            setLocalStatus("WAITING");
+
             toast({
               title: "Task Application Submitted Successfully!",
               variant: "success",
@@ -126,7 +118,8 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
         {
           onSuccess: () => {
             setIsOpen(false);
-            setLocalButtonState("COMPLETED");
+            setLocalStatus("COMPLETED");
+
             toast({
               title: "Task Completed Successfully!",
               variant: "success",
@@ -146,6 +139,18 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
     }
   };
 
+  useEffect(() => {
+    if (localStatus && participantStatus) {
+      if (
+        (localStatus === "WAITING" && participantStatus === 1) ||
+        (localStatus === "COMPLETED" && participantStatus === 3) ||
+        (localStatus === "ACCEPTED" && participantStatus === 2)
+      ) {
+        setLocalStatus(null);
+      }
+    }
+  }, [participantStatus, localStatus]);
+
   const getButtonContent = () => {
     if (statusLoading) {
       return (
@@ -156,7 +161,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
       );
     }
 
-    // if task is closed
     if (!isTaskOpen) {
       return (
         <Button className="bg-gray-400 cursor-not-allowed" disabled>
@@ -165,10 +169,8 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
       );
     }
 
-    const effectiveStatus = localButtonState ?? participantStatus;
-
     switch (effectiveStatus) {
-      case 0: // NONE
+      case 0:
         return (
           <Button
             className="bg-[#297AD6]"
@@ -189,14 +191,14 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
           </Button>
         );
       case "WAITING":
-      case 1: // PENDING
+      case 1:
         return (
           <Button className="bg-[#F59E0B]" disabled>
             <span className="text-[#F8FAFC]">Waiting for Approval</span>
           </Button>
         );
       case "ACCEPTED":
-      case 2: // ACCEPTED
+      case 2:
         return (
           <>
             <Button
@@ -213,6 +215,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
                 <span className="text-[#F8FAFC]">Mark as complete</span>
               )}
             </Button>
+
             {!completePending && isOpen && (
               <DialogButton
                 isOpen={isOpen}
@@ -229,15 +232,12 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
       case "COMPLETED":
       case 3:
         return (
-          <Button
-            className="bg-green-500 disabled:bg-green-500"
-            disabled={true}
-          >
-            <span className="text-[#F8FAFC]">{"Completed"}</span>
+          <Button className="bg-green-500 disabled:bg-green-500" disabled>
+            <span className="text-[#F8FAFC]">Completed</span>
           </Button>
         );
       case "VERIFIED":
-      case 4: // verified
+      case 4:
         return (
           <Button className="bg-[#22C55E]" disabled>
             <span className="text-[#F8FAFC]">Verified</span>
@@ -265,7 +265,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   }
 
   return (
-    <main className="gap-2 p-2 sm:px-6 sm:py-1 md:gap-8 w-full">
+    <main className="flex flex-col gap-2 p-2 sm:px-6 sm:py-1 w-full overflow-x-auto scroll-smooth whitespace-nowrap">
       <div className="space-y-4">
         <button
           onClick={() => router.push(PATHS.TASKPORTAL.HOME)}
@@ -274,14 +274,14 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
           <span className="text-lg">&larr;</span>
           <span>Back to TaskPortal</span>
         </button>
-        <div className="flex items-center">
+        <div className="flex items-center flex-col sm:flex-row">
           <div className="flex flex-col gap-1">
             <h1 className="font-bold text-4xl">Task Details</h1>
             <h3 className="text-gray-500 font-normal text-sm">
               Detailed view of the selected task
             </h3>
           </div>
-          <div className="flex items-center ml-auto gap-4">
+          <div className="flex items-center ml-auto gap-4 mt-4 sm:mt-0 button-container">
             {getButtonContent()}
           </div>
         </div>
@@ -294,11 +294,10 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
           />
         )}
 
-        <div className="flex w-full gap-4">
+        <div className="flex w-full gap-4 flex-nowrap">
           <TaskPortalDetails taskData={taskData} />
         </div>
-
-        <div className="flex w-full gap-4">
+        <div className="flex w-full gap-4 flex-nowrap">
           <TaskPortalParticipant taskId={cuid} />
         </div>
       </div>
