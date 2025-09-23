@@ -18,6 +18,7 @@
     "@types/recharts": "^1.8.29",
     "@urql/core": "^5.1.0",
     "@rumsan/ui": "^0.2.103",
+    "@rumsan/sdk": "^0.2.10",
     "@wagmi/cli": "^2.2.0",
     "@workspace/contracts": "workspace:*",
     "@workspace/sdk": "workspace:*",

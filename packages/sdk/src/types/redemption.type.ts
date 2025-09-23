@@ -2,11 +2,11 @@
 import { RedemptionStatus } from "./enums";
 
 export type RedemptionBase = {
-  userAddress: string;
   rewardId: string;
-  userPhoneNumber : string;
-  transactionHash?: string;
-  status: RedemptionStatus;
+  phoneId?: string;
+  phoneNumber?: string;
+  transactionHash : string;
+  status?: RedemptionStatus;
   
 };
 export type Redemption = RedemptionBase & CommonFields  & {cuid: string};

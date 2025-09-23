@@ -136,27 +136,32 @@ export const useGetDisbursements = (
   });
 };
 
-export const useRedeemToken = () => {
+export const useTokenTranfer = () => {
   const { writeContractAsync } = useWriteRewardTokenTransfer();
 
   const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN;
-  const adminAddress = process.env.NEXT_PUBLIC_ADMIN_ADDRESS;
 
   const mutation = useMutation({
-    mutationFn: async ({ amount }: { amount: number }) => {
+    mutationFn: async ({
+      amount,
+      address,
+    }: {
+      amount: number;
+      address: string;
+    }) => {
       const result = await writeContractAsync({
         address: tokenAddress as `0x${string}`,
-        args: [adminAddress as `0x${string}`, BigInt(amount)],
+        args: [address as `0x${string}`, BigInt(amount)],
       });
       return result;
     },
   });
 
   return {
-    tokenRedeem: mutation.mutateAsync,
-    redeemPending: mutation.isPending,
-    redeemSuccess: mutation.isSuccess,
-    redeemError: mutation.isError,
+    tokenTransfer: mutation.mutateAsync,
+    transferPending: mutation.isPending,
+    transferSuccess: mutation.isSuccess,
+    transferError: mutation.isError,
   };
 };
 

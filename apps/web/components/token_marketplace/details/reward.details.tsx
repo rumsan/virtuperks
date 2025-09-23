@@ -1,15 +1,26 @@
 "use client";
 
-import { useCheckParticipantBalance } from "@/hooks/subgraph/token";
-import { useGetRewardById } from "@/hooks/subgraph/token-marketplace";
+import {
+  useCheckParticipantBalance,
+  useTokenTranfer,
+} from "@/hooks/subgraph/token";
+import {
+  useAddUserPhone,
+  useCreateRedemption,
+  useGetRewardById,
+} from "@/hooks/subgraph/token-marketplace";
+import { Button } from "@workspace/ui/components/button";
+import { Input } from "@workspace/ui/components/input";
+import { useToast } from "@workspace/ui/hooks/use-toast";
 import { Coins } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import Image from "next/image";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { categoryColorMap } from "../img/imgLink";
+import RedemptionHistory from "./redemption.history";
 
-type Step = "approve" | "redeem" | "completed";
+type Step = "phone-input" | "transfer" | "completed";
 
 export interface RewardDetailsProps {
   rewardId: string;
@@ -18,62 +29,173 @@ export interface RewardDetailsProps {
 
 const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   const { data: rewardDetail, isLoading, error } = useGetRewardById(rewardId);
+  const { toast } = useToast();
+  console.log(rewardDetail, "rewardDetail");
 
   const { address, isConnected } = useAccount();
   //hook to check participant balance
-  const { participantTotalToken, isError } = useCheckParticipantBalance(
+  const { participantTotalToken } = useCheckParticipantBalance(
     address as `0x${string}`,
   );
 
-  const [step, setStep] = useState<Step>("approve");
+  const [step, setStep] = useState<Step>("phone-input");
   const [loading, setLoading] = useState(false);
-  const [approvalHash, setApprovalHash] = useState<string | null>(null);
+  const [phoneLoading, setPhoneLoading] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [phoneSuccess, setPhoneSuccess] = useState("");
+  const [transactionHash, setTransactionHash] = useState<string | null>(null);
+  const { mutateAsync: addUserPhone } = useAddUserPhone();
 
-  // hook to fetch redeemed rewards with status
+  // Phone number validation
+  const validatePhoneNumber = (phone: string): boolean => {
+    const phoneRegex = /^\+?[\d\s\-()]{10,15}$/;
+    return phoneRegex.test(phone.trim());
+  };
 
-  const [redeemTxHash, setRedeemTxHash] = useState<string | null>(null);
-  // const { ApproveReward, ApprovePending } = useApproveReward();
-  // const { RewardRedeem, RedeemPending } = useRedeemReward();
+  const { tokenTransfer, transferPending, transferSuccess, transferError } =
+    useTokenTranfer();
 
-  // if (isLoading)
-  //   return <p className="p-6 text-gray-500">Loading reward details...</p>;
+  const { mutateAsync: createRedemption } = useCreateRedemption();
 
-  // if (error || !rewardDetail?.data) {
-  //   return (
-  //     <div className="p-6">
-  //       <p className="text-red-600 font-semibold">
-  //         Failed to load reward details.
-  //       </p>
-  //       <button
-  //         onClick={() => router.push("/token_marketplace")}
-  //         className="text-blue-600 text-sm mt-2"
-  //       >
-  //         &larr; Back to Marketplace
-  //       </button>
-  //     </div>
-  //   );
-  // }
+  // Handle phone number submission
+  const handlePhoneSubmit = async () => {
+    const trimmedPhone = phoneNumber.trim();
 
-  // const handleRedeem = async () => {
-  //   try {
-  //     const txHash = await RewardRedeem({
-  //       rewardAddress: rewardRaw.rewardRedemption,
-  //     });
-  //     setRedeemTxHash(txHash);
-  //     setStep("completed");
-  //   } catch (err) {
-  //     // console.error("Redeem failed:", err);
-  //   }
-  // };
+    if (!trimmedPhone) {
+      setPhoneError("Phone number is required");
+      return;
+    }
 
-  // Determine if the participant has enough tokens
-  // const hasSufficientBalance =
-  //   participantTotalToken !== undefined &&
-  //   // Corrected line: convert bigint to string with .toString()
-  //   BigInt(participantTotalToken.toString()) >=
-  //     BigInt(rewardRaw.tokensRequired);
+    if (!validatePhoneNumber(trimmedPhone)) {
+      setPhoneError("Please enter a valid phone number");
+      return;
+    }
 
-  //const isButtonDisabled = !hasSufficientBalance;
+    setPhoneLoading(true);
+    setPhoneError("");
+    setPhoneSuccess("");
+
+    try {
+      const response = await addUserPhone({
+        phoneNumber: trimmedPhone,
+        userWalletAddress: address as `0x${string}`,
+      });
+
+      if (response.status === "already_exists") {
+        setPhoneSuccess(
+          `Phone number ${trimmedPhone} is already registered. Proceeding to transfer.`,
+        );
+        toast({
+          title: "Phone Number Found",
+          description: `The phone number ${trimmedPhone} is already registered`,
+          variant: "default",
+        });
+        // Move to next step after a short delay
+        setTimeout(() => {
+          setStep("transfer");
+        }, 1500);
+      } else if (response.status === "created") {
+        setPhoneSuccess(
+          `Phone number ${trimmedPhone} registered successfully!`,
+        );
+        toast({
+          title: "Success!",
+          description: "Phone number registered successfully",
+          variant: "default",
+        });
+        // Move to next step after a short delay
+        setTimeout(() => {
+          setStep("transfer");
+        }, 1500);
+      }
+    } catch (error) {
+      console.error("Phone submission failed:", error);
+      setPhoneError("Failed to process phone number. Please try again.");
+      toast({
+        title: "Error",
+        description: "Failed to process phone number",
+        variant: "destructive",
+      });
+    } finally {
+      setPhoneLoading(false);
+    }
+  };
+
+  // Handle token transfer and redemption
+  const handleTransfer = async () => {
+    if (!rewardDetail || !address) {
+      toast({
+        title: "Error",
+        description: "Missing reward details or wallet address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Call API to create redemption record
+      const txHash = await tokenTransfer({
+        amount: rewardDetail.tokens,
+        address: rewardDetail.wallet as `0x${string}`,
+      });
+      if (!txHash) {
+        throw new Error("Token transfer failed, no transaction hash returned");
+      }
+
+      await createRedemption({
+        rewardId: rewardDetail?.cuid,
+        phoneNumber: phoneNumber.trim(),
+
+        transactionHash: txHash,
+      });
+
+      setStep("completed");
+      toast({
+        title: "Success!",
+        description: "Redemption initiated successfully",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("Transfer failed:", error);
+      toast({
+        title: "Transfer Failed",
+        description: "Failed to transfer tokens. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Check if user has sufficient balance
+  const hasSufficientBalance =
+    participantTotalToken !== undefined &&
+    rewardDetail?.tokens &&
+    BigInt(participantTotalToken.toString()) >= BigInt(rewardDetail.tokens);
+
+  // Loading and error states
+  if (isLoading) {
+    return <div className="p-6 text-gray-500">Loading reward details...</div>;
+  }
+
+  if (error || !rewardDetail) {
+    return (
+      <div className="p-6">
+        <p className="text-red-600 font-semibold">
+          Failed to load reward details.
+        </p>
+        <button
+          onClick={() => router.push("/token_marketplace")}
+          className="text-blue-600 text-sm mt-2"
+        >
+          &larr; Back to Marketplace
+        </button>
+      </div>
+    );
+  }
 
   return (
     <main className="w-full gap-4 p-4 sm:px-8 sm:py-4 md:gap-8 lg:px-16 bg-gray-50">
@@ -93,11 +215,11 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
             {/* Image Section */}
             <div className="relative rounded-xl overflow-hidden h-72 mb-6">
               <Image
+                alt={rewardDetail?.title}
                 src={
                   categoryColorMap["Mobile-TopUp"]?.image ??
                   "https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg"
                 }
-                alt={rewardDetail?.title}
                 width={800}
                 height={500}
                 className="w-full h-full object-cover"
@@ -156,88 +278,131 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
               {/* Redemption Steps */}
               <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded text-xs text-green-700 text-center flex flex-col justify-between min-h-[150px] transition-all">
                 {/* Insufficient balance message */}
-                {/* {isButtonDisabled && (
+                {!hasSufficientBalance && (
                   <div className="text-red-500 font-bold mb-2 text-base">
                     Insufficient balance to redeem this reward.
                   </div>
-                )} */}
+                )}
 
-                {step === "approve" && (
+                {step === "phone-input" && (
                   <div className="flex flex-col gap-3 justify-center">
-                    <p className="font-semibold">
-                      Please approve token spending to continue.
+                    <p className="font-semibold text-gray-700">
+                      Enter your phone number to proceed with redemption
                     </p>
-                    {/* <button
-                      onClick={handleApprove}
-                      disabled={ApprovePending || isButtonDisabled}
+                    <div className="space-y-2">
+                      <Input
+                        type="tel"
+                        placeholder="Enter your phone number"
+                        value={phoneNumber}
+                        onChange={(e) => {
+                          setPhoneNumber(e.target.value);
+                          setPhoneError("");
+                          setPhoneSuccess("");
+                        }}
+                        className="text-center"
+                        disabled={phoneLoading}
+                      />
+                      {phoneError && (
+                        <p className="text-red-500 text-xs">{phoneError}</p>
+                      )}
+                      {phoneSuccess && (
+                        <p className="text-green-600 text-xs">{phoneSuccess}</p>
+                      )}
+                    </div>
+                    <Button
+                      onClick={handlePhoneSubmit}
+                      disabled={!phoneNumber.trim() || phoneLoading}
                       className={`py-2 px-4 rounded-lg text-sm font-medium transition text-white ${
-                        ApprovePending || isButtonDisabled
+                        !phoneNumber.trim() || phoneLoading
                           ? "bg-gray-400 cursor-not-allowed"
                           : "bg-blue-600 hover:bg-blue-700"
                       }`}
                     >
-                      {ApprovePending
-                        ? "Approving..."
-                        : "Step 1: Approve Token Spending"}
-                    </button> */}
+                      {phoneLoading ? "Processing..." : "Continue to Transfer"}
+                    </Button>
                   </div>
                 )}
 
-                {/* {step === "redeem" && approvalHash && (
+                {step === "transfer" && (
                   <div className="flex flex-col gap-3 justify-center">
-                    <p>Approval successful! You can now redeem the reward.</p>
-                    <div className="text-gray-500 text-[10px] break-all">
-                      {approvalHash}
-                    </div>
-                    <button
-                      onClick={handleRedeem}
-                      disabled={RedeemPending || isButtonDisabled}
+                    <p className="font-semibold text-gray-700">
+                      Phone: {phoneNumber}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Transfer {rewardDetail.tokens} tokens to complete
+                      redemption
+                    </p>
+                    {!hasSufficientBalance && (
+                      <div className="text-red-500 font-bold mb-2 text-sm">
+                        Insufficient balance to complete this redemption.
+                      </div>
+                    )}
+                    <Button
+                      onClick={handleTransfer}
+                      disabled={loading || !hasSufficientBalance}
                       className={`py-2 px-4 rounded-lg text-sm font-medium transition text-white ${
-                        RedeemPending || isButtonDisabled
+                        loading || !hasSufficientBalance
                           ? "bg-gray-400 cursor-not-allowed"
                           : "bg-green-600 hover:bg-green-700"
                       }`}
                     >
-                      {RedeemPending ? "Redeeming..." : "Step 2: Redeem Reward"}
-                    </button>
+                      {loading ? "Processing..." : "Transfer Tokens & Redeem"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setStep("phone-input");
+                        setPhoneSuccess("");
+                        setPhoneError("");
+                      }}
+                      disabled={loading}
+                      className="py-2 px-4 text-xs"
+                    >
+                      Change Phone Number
+                    </Button>
                   </div>
-                )} */}
+                )}
 
-                {/* {step === "completed" && (
+                {step === "completed" && (
                   <div className="flex flex-col gap-3 items-center justify-center">
-                    <p>
+                    <p className="font-semibold text-green-700">
                       Redemption successful! Your reward will be processed
                       shortly.
                     </p>
-                    {redeemTxHash && (
+                    <p className="text-sm text-gray-600">
+                      Phone: {phoneNumber}
+                    </p>
+                    {transactionHash && (
                       <p className="text-green-700 text-xs break-all">
-                        {redeemTxHash}
+                        Transaction: {transactionHash}
                       </p>
                     )}
-                    <button
+                    <Button
                       onClick={() => {
-                        setStep("approve");
-                        setApprovalHash(null);
-                        setRedeemTxHash(null);
+                        setStep("phone-input");
+                        setPhoneNumber("");
+                        setPhoneError("");
+                        setPhoneSuccess("");
+                        setTransactionHash(null);
                       }}
-                      disabled={isButtonDisabled}
+                      disabled={!hasSufficientBalance}
                       className={`py-2 px-4 rounded-lg text-sm font-medium transition text-white ${
-                        isButtonDisabled
+                        !hasSufficientBalance
                           ? "bg-gray-400 cursor-not-allowed"
                           : "bg-gray-700 hover:bg-gray-800"
                       }`}
                     >
                       Redeem Another Reward
-                    </button>
+                    </Button>
                   </div>
-                )} */}
+                )}
               </div>
             </div>
           </div>
         </div>
 
         {/* Redemption History */}
-        {/* <RedemptionHistory rewardId={rewardId} /> */}
+        <RedemptionHistory rewardId={rewardId} />
       </div>
     </main>
   );

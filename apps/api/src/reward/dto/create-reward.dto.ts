@@ -14,6 +14,12 @@ export class CreateRewardDto implements CreateReward {
   @IsOptional()
   description?: string;
 
+
+   @ApiProperty()
+  @IsString()
+  @IsOptional()
+  category?: string;
+
   @ApiProperty()
   @IsNumber()
   tokens: number; 

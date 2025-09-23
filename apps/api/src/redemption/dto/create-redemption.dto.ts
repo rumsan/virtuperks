@@ -1,33 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { CreateRedemption, RedemptionStatus } from '@workspace/sdk/type';
+import { CreateRedemption } from '@workspace/sdk/type';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateRedemptionDto implements CreateRedemption {
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  userAddress: string;
 
-  @ApiProperty()
+
+  @ApiProperty({ description: 'CUID of the reward being redeemed' })
   @IsString()
   @IsNotEmpty()
   rewardId: string;
 
-  @ApiProperty()
+  @IsOptional()
   @IsString()
-    @IsOptional()
-  transactionHash?: string;
+  phoneNumber?: string;
 
-  @ApiProperty({ required: false })
+
+  @ApiProperty({ description: 'Transaction hash from blockchain', required: false })
   @IsString()
-   status: RedemptionStatus;
-
-
-  @ApiProperty({ required: false })
-@IsNotEmpty()
-  @IsString()
-  userPhoneNumber: string;
-
-  
+  @IsOptional()
+  transactionHash: string;
 }
 

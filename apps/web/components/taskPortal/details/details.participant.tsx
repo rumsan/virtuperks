@@ -1,6 +1,7 @@
 import { ListTable } from "@/components/common/list/list.table";
 import { useGetWhiteListedParticipantByTask } from "@/hooks/subgraph/participant";
 import { useGetTaskDetailById } from "@/hooks/subgraph/taskDetail";
+import { TaskHistory } from "@/sampleData";
 import { shortAddress } from "@/utils/shortAddress";
 import {
   ColumnFiltersState,
@@ -47,7 +48,7 @@ const TaskPortalParticipant = ({ taskId }: TaskPortalParticipantProps) => {
 
   const columns = useHistoryColumns();
   const table = useReactTable({
-    data: whiteListedParticipants ?? [],
+    data: TaskHistory ?? [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

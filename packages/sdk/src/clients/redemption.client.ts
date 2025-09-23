@@ -1,6 +1,8 @@
 
+import { Pagination } from '@rumsan/sdk/types';
+import { formatResponse } from '@rumsan/sdk/utils/formatResponse.utils';
 import { AxiosInstance, AxiosRequestConfig } from 'axios';
-import { CreateRedemption } from '../types';
+import { CreateRedemption, Redemption } from '../types';
 
 export class RedemptionClient {
   private _client: AxiosInstance;
@@ -15,13 +17,31 @@ export class RedemptionClient {
     return response 
   }
 
-  async list(data?:any, config?: AxiosRequestConfig) {
+  async list(data?: Pagination, config?: AxiosRequestConfig) {
     const response = await this._client.get(`${this._prefix}`, {
       params: data,
       ...config,
     });
-    return response
+    return formatResponse<Redemption[]>(response);
   }
+
+  async search(
+    params?: Pagination,
+    filters?: any,
+    config?: AxiosRequestConfig,
+  ) {
+   
+     const response = await this._client.post(
+      `${this._prefix}/search`,
+      filters,
+      {
+        params,
+        ...config,
+      },
+    );
+    return formatResponse<Redemption[]>(response);
+  }
+
   
 
   async findOne(cuid: string, config?: AxiosRequestConfig) {

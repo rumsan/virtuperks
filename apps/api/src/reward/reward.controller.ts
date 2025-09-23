@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { CreatePhoneDto } from './dto/create-phone.dto';
 import { CreateRewardDto } from './dto/create-reward.dto';
 import { UpdateRewardDto } from './dto/update-reward.dto';
 import { RewardService } from './reward.service';
@@ -21,6 +22,11 @@ export class RewardController {
   @Post()
   create(@Body() payload: CreateRewardDto) {
     //return this.rewardService.create(payload);
+  }
+
+  @Post('/phone')
+  createPhone(@Body() payload: CreatePhoneDto) {
+    return this.rewardService.createPhone(payload);
   }
 
   @Put(':cuid')

@@ -4,6 +4,7 @@ import { CommonFields } from "./common.type";
 interface RewardBase {
   title: string;
   description?: string;
+  category?: string;
   tokens: number;
   isActive: boolean;
   wallet?: string;
@@ -18,9 +19,3 @@ export type EditReward = Partial<CreateReward> & { cuid: string };
 
 
 
-// export type RewardRedemption = {
-//   rewardId: string;
-//   userAddress: string;
-//   tokensRequired: number;
-//   status: "pending" | "completed";
-// } & CommonFields;

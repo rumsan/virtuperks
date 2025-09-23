@@ -8,6 +8,7 @@ const rewardsData = [
   {
     title: "Mobile Recharge",
     description: "Get a mobile recharge worth 100",
+    category: "Mobile-TopUp",
     tokens: 100,
     isActive: true,
     imageUrl: "https://assets.rumsan.net/rumsan-test/gift-card.jpg"

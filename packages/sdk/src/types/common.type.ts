@@ -3,6 +3,7 @@ export type CommonFields = {
   createdAt: Date;
   createdBy?: string;
   updatedAt: Date;
+  deletedAt?: Date | null;
   updatedBy?: string;
 };
 
