@@ -19,30 +19,18 @@ export class RedemptionService {
     }
 
     const where = {
-      deletedAt: null, // No deletedAt field in Redemption model
+      deletedAt: null,
     }
-    // Apply filters
+
     if (filters?.rewardId) {
       where['rewardId'] = filters.rewardId;
     }
     
     
-    if (filters?.phoneNumber) {
-      where['phone'] = {
-        phoneNumber: {
-          contains: filters.phoneNumber,
-          mode: 'insensitive',
-        },
-      };
-    }
-    
     if (filters?.walletAddress) {
-      where['phone'] = {
-        ...where['phone'],
-        userWalletAddress: {
-          contains: filters.walletAddress,
-          mode: 'insensitive',
-        },
+      where['phone'].is.userWalletAddress = {
+        contains: filters.walletAddress,
+        mode: 'insensitive',
       };
     }
 

@@ -30,7 +30,6 @@ export interface RewardDetailsProps {
 const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   const { data: rewardDetail, isLoading, error } = useGetRewardById(rewardId);
   const { toast } = useToast();
-  console.log(rewardDetail, "rewardDetail");
 
   const { address, isConnected } = useAccount();
   //hook to check participant balance

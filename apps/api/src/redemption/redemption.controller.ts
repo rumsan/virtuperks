@@ -17,7 +17,7 @@ export class RedemptionController {
   }
 
 @Post('search')
-async listCategoryWithFilter(
+async listRedemptionWithFilter(
     @Query() query: ListRedemptionDto,
     @Body() filters: RedemptionFilterDto,
   

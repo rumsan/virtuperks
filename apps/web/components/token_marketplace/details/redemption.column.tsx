@@ -80,7 +80,6 @@ export function useColumns(
       header: () => <div className="text-center w-full">Action</div>,
       id: "action",
       cell: ({ row }) => {
-        console.log(row.original, "row");
         const isCompleted = row.original.status === "SUCCESS";
         const isButtonLoading = updatingId === row.original.cuid;
         //TODO:NEED TO CALL OFFRAMP SERVICE HERE
