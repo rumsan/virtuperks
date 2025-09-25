@@ -18,8 +18,14 @@ type DialogButtonProps = {
   title: string;
   subTitle: string;
   buttonName: string;
-  submitType?: "Apply" | "Complete" | "Disperse" | "directdisburse";
-
+  submitType?:
+    | "Apply"
+    | "Complete"
+    | "Disperse"
+    | "directdisburse"
+    | "CreateReward"
+    | "Reject"
+    | "Verify";
   inputLabel?: string;
   inputPlaceholder?: string;
   availableTokens?: number;
@@ -117,6 +123,7 @@ export const DialogButton = ({
     try {
       let submitData: Parameters<NonNullable<typeof handleApplyTaskLogic>>[0] =
         {};
+
       if (submitType === "Complete") {
         submitData = { completionUrl: formData.completionUrl.trim() };
       } else if (submitType === "Disperse") {
@@ -128,7 +135,6 @@ export const DialogButton = ({
           remarks: formData.remarks.trim(),
         };
       }
-      console.log("Submitting data:", submitData); // Debug log
 
       await handleApplyTaskLogic?.(submitData);
 
@@ -146,10 +152,14 @@ export const DialogButton = ({
       let errorMessage = "Failed to apply for task";
       if (submitType === "Complete")
         errorMessage = "Failed to submit completion URL";
+      else if (submitType === "Verify")
+        errorMessage = "Failed to verify participant";
       else if (submitType === "Disperse")
         errorMessage = "Failed to disperse amount";
       else if (submitType === "directdisburse")
         errorMessage = "Failed to process direct disbursement";
+      else if (submitType === "Reject")
+        errorMessage = "Failed to reject participant";
 
       setError(errorMessage);
       toast({
@@ -290,6 +300,35 @@ export const DialogButton = ({
       );
     }
 
+    if (submitType === "Verify") {
+      return (
+        <div className="py-4">
+          <Label htmlFor="completionUrl">Completion URL</Label>
+          <Input
+            id="completionUrl"
+            type="url"
+            value={formData.completionUrl}
+            readOnly
+            className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 text-gray-700"
+          />
+        </div>
+      );
+    }
+
+    if (submitType === "Reject") {
+      return (
+        <div className="py-4">
+          <Label htmlFor="remarks">Remarks</Label>
+          <Input
+            id="remarks"
+            value={formData.remarks}
+            onChange={handleInputChange("remarks")}
+            placeholder="Enter remarks (optional)"
+          />
+        </div>
+      );
+    }
+
     return null;
   };
 
@@ -301,6 +340,7 @@ export const DialogButton = ({
         if (open) {
           setFormData((prev) => ({
             ...prev,
+            completionUrl: "",
             amount: availableTokens ? String(availableTokens) : "",
           }));
         } else {
