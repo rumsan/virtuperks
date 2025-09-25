@@ -43,7 +43,7 @@ import {
 } from "../generated/schema"
 
 
-import { addParticipantToWhitelist, fetchTaskDetails, updateParticipantTaskStatus } from "./utils"
+import { fetchTaskDetails, updateParticipantTaskStatus } from "./utils"
 
 
 export function handleAdditionalDisbursementToTask(
@@ -410,8 +410,18 @@ export function handleTaskRejected(event: TaskRejectedEvent): void {
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
+  let taskDetail = fetchTaskDetails(event.params.id, event.address);
+  entity.taskDetail = taskDetail.id;
 
   entity.save()
+  updateParticipantTaskStatus(
+    event.params.participant, 
+    event.params.id, 
+    'REJECTED', 
+    event.block.number, 
+    event.block.timestamp, 
+    taskDetail ? taskDetail.id : null
+  );
 }
 
 export function handleTaskVerified(event: TaskVerifiedEvent): void {
