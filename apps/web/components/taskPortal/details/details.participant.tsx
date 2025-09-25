@@ -1,6 +1,7 @@
 import { ListTable } from "@/components/common/list/list.table";
 import { useGetWhiteListedParticipantByTask } from "@/hooks/subgraph/participant";
 import { useGetTaskDetailById } from "@/hooks/subgraph/taskDetail";
+import { TaskHistory } from "@/sampleData";
 import { shortAddress } from "@/utils/shortAddress";
 import {
   ColumnFiltersState,
@@ -22,6 +23,7 @@ import {
 import { User } from "lucide-react";
 import { useState } from "react";
 import { useHistoryColumns } from "./history.column";
+
 type TaskPortalParticipantProps = { taskId: any };
 
 const TaskPortalParticipant = ({ taskId }: TaskPortalParticipantProps) => {
@@ -47,7 +49,7 @@ const TaskPortalParticipant = ({ taskId }: TaskPortalParticipantProps) => {
 
   const columns = useHistoryColumns();
   const table = useReactTable({
-    data: whiteListedParticipants ?? [],
+    data: TaskHistory,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

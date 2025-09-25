@@ -2,6 +2,7 @@ import { DialogButton } from "@/components/common/ui/dialog";
 import { useGetEntityRole } from "@/hooks/subgraph/entity";
 import {
   useAcceptParticipantMutation,
+  useRejectParticipantMutation,
   useVerifyParticipantMutation,
 } from "@/hooks/subgraph/querycall";
 import { getDialogContent } from "@/utils/dialog";
@@ -9,7 +10,7 @@ import hasRole from "@/utils/role";
 import { ColumnDef } from "@tanstack/react-table";
 import { TaskCreated } from "@workspace/sdk/types/task.type";
 import { useToast } from "@workspace/ui/hooks/use-toast";
-import { Check, CircleCheck, Copy, ExternalLink } from "lucide-react";
+import { Check, CircleCheck, Copy, ExternalLink, XCircle } from "lucide-react";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 
@@ -21,22 +22,34 @@ interface SelectedTask {
   entityId?: string;
 }
 
+type ActionType = "accept" | "verify" | "reject";
+
 export function useColumns(): ColumnDef<TaskCreated>[] {
   const [selectedTask, setSelectedTask] = useState<SelectedTask | null>(null);
   const [openTaskId, setOpenTaskId] = useState<string | null>(null);
+  const [actionType, setActionType] = useState<ActionType | null>(null);
+
   const acceptParticipantMutation = useAcceptParticipantMutation();
   const verifyParticipantMutation = useVerifyParticipantMutation();
+  const rejectParticipantMutation = useRejectParticipantMutation();
+
   const { toast } = useToast();
   const { address: userAddress } = useAccount();
 
   const isPending =
-    acceptParticipantMutation.isPending || verifyParticipantMutation.isPending;
+    acceptParticipantMutation.isPending ||
+    verifyParticipantMutation.isPending ||
+    rejectParticipantMutation.isPending;
 
-  const handleMutation = async (task: SelectedTask) => {
+  const handleMutation = async (
+    task: SelectedTask,
+    action: ActionType,
+    remarks?: string,
+  ) => {
     try {
       setOpenTaskId(null);
 
-      if (task.status === "PENDING") {
+      if (action === "accept" && task.status === "PENDING") {
         await acceptParticipantMutation.mutateAsync({
           taskId: task.id,
           participant: task.participant,
@@ -46,7 +59,9 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
           title: "Participant accepted successfully!",
           variant: "success",
         });
-      } else if (task.status === "COMPLETED") {
+      }
+
+      if (action === "verify" && task.status === "COMPLETED") {
         await verifyParticipantMutation.mutateAsync({
           taskId: task.id,
           participant: task.participant,
@@ -59,37 +74,61 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
         });
       }
 
+      if (action === "reject" && task.status === "COMPLETED") {
+        await rejectParticipantMutation.mutateAsync({
+          taskId: task.id,
+          participant: task.participant,
+          entityId: task.entityId ?? "0x",
+          remark: remarks ?? "Rejected by task owner",
+        });
+        toast({
+          title: "Participant rejected successfully!",
+          variant: "destructive",
+          duration: 2000,
+        });
+      }
+
       setSelectedTask(null);
+      setActionType(null);
     } catch (error) {
-      console.error(
-        `Error ${task.status === "PENDING" ? "accepting" : "verifying"} participant:`,
-        error,
-      );
-      toast({
-        title: `Failed to ${task.status === "PENDING" ? "accept" : "verify"} participant.`,
-        variant: "destructive",
-        duration: 2000,
-      });
+      console.error("Error handling mutation:", error);
+      toast({ title: "Action failed", variant: "destructive", duration: 2000 });
     }
   };
 
-  const handleAction = (row: any) => {
+  const handleAction = (row: any, action: ActionType) => {
     const status = row.getValue("status") as string;
-    if (status === "PENDING" || status === "COMPLETED") {
-      const task: SelectedTask = {
+
+    // Only allow correct transitions
+    if (action === "accept" && status === "PENDING") {
+      setSelectedTask({
         id: row.original.taskId,
         participant: row.getValue("participant") as string,
-        status: status as SelectedTask["status"],
+        status: "PENDING",
+        entityId: row.original.rewardManagement?.rewardManagement ?? "0x",
+      });
+      setOpenTaskId(row.original.taskId);
+      setActionType("accept");
+    }
+
+    if (
+      (action === "verify" || action === "reject") &&
+      status === "COMPLETED"
+    ) {
+      setSelectedTask({
+        id: row.original.taskId,
+        participant: row.getValue("participant") as string,
+        status: "COMPLETED",
         entityId: row.original.rewardManagement?.rewardManagement ?? "0x",
         completionUrl: row.getValue("completionUrl") as string | undefined,
-      };
-      setSelectedTask(task);
-      setOpenTaskId(task.id);
+      });
+      setOpenTaskId(row.original.taskId);
+      setActionType(action);
     }
   };
 
   return [
-    // Participant Column
+    // Participant
     {
       accessorKey: "participant",
       header: () => (
@@ -125,7 +164,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
       },
     },
 
-    // Completion URL Column
+    // Completion URL
     {
       accessorKey: "completionUrl",
       header: () => (
@@ -162,7 +201,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
       },
     },
 
-    // Status Column
+    // Status
     {
       accessorKey: "status",
       header: () => (
@@ -180,7 +219,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
       },
     },
 
-    // Actions Column
+    // Actions
     {
       id: "actions",
       header: () => (
@@ -195,28 +234,17 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
         const entityContractAddress =
           row.original.rewardManagement?.rewardManagement ?? "";
 
-        // Use role hook
         const { entityRole } = useGetEntityRole(entityContractAddress);
         const hasEntityOwnerRole = hasRole({ role: entityRole ?? "" });
 
         const isTaskOwner =
           userAddress?.toLowerCase() === taskOwnerAddress?.toLowerCase();
         const isAcceptAction = status === "PENDING";
-        const isVerifyAction = status === "COMPLETED";
-
+        const isVerifyRejectAction = status === "COMPLETED";
         const isDisabled =
           isPending ||
           (isAcceptAction && !hasEntityOwnerRole) ||
-          (isVerifyAction && !isTaskOwner) ||
-          !(status === "PENDING" || status === "COMPLETED");
-
-        const tooltipMessage = isPending
-          ? "Processing, please wait..."
-          : isAcceptAction && !hasEntityOwnerRole
-            ? "Only entity owners can accept participants"
-            : isVerifyAction && !isTaskOwner
-              ? "Only the task owner can verify participants"
-              : `Click to ${isAcceptAction ? "accept" : "verify"} participant`;
+          (isVerifyRejectAction && !isTaskOwner);
 
         if (!(status === "PENDING" || status === "COMPLETED")) {
           return (
@@ -226,45 +254,96 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
 
         return (
           <div className="flex items-center gap-2 relative">
-            {/* Show loader + message instead of CircleCheck when pending */}
             {isPending && selectedTask?.id === row.original.taskId ? (
               <div className="flex items-center gap-2 ml-1 text-sm text-gray-700">
                 <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
                 <span>
                   {selectedTask.status === "PENDING"
-                    ? "Accepting participant..."
-                    : "Verifying participant..."}
+                    ? "Accepting..."
+                    : actionType === "reject"
+                      ? "Rejecting..."
+                      : "Verifying..."}
                 </span>
               </div>
             ) : (
-              <button
-                onClick={() => handleAction(row)}
-                disabled={isDisabled}
-                title={tooltipMessage}
-                className="disabled:opacity-50 disabled:cursor-not-allowed relative"
-              >
-                <CircleCheck
-                  color={isDisabled ? "#A1A1AA" : "#03AB65"}
-                  strokeWidth={1.5}
-                  size={28}
-                />
-              </button>
+              <>
+                {isAcceptAction && (
+                  <button
+                    onClick={() => handleAction(row, "accept")}
+                    disabled={isDisabled}
+                    title="Accept participant"
+                  >
+                    <CircleCheck
+                      color={isDisabled ? "#A1A1AA" : "#03AB65"}
+                      strokeWidth={1.5}
+                      size={28}
+                    />
+                  </button>
+                )}
+
+                {isVerifyRejectAction && (
+                  <>
+                    <button
+                      onClick={() => handleAction(row, "verify")}
+                      disabled={isDisabled}
+                      title="Verify Task Completion"
+                    >
+                      <CircleCheck
+                        color={isDisabled ? "#A1A1AA" : "#03AB65"}
+                        strokeWidth={1.5}
+                        size={28}
+                      />
+                    </button>
+
+                    <button
+                      onClick={() => handleAction(row, "reject")}
+                      disabled={isDisabled}
+                      title="Reject Task Completion"
+                    >
+                      <XCircle
+                        color={isDisabled ? "#A1A1AA" : "#FF0000"}
+                        strokeWidth={1.5}
+                        size={28}
+                      />
+                    </button>
+                  </>
+                )}
+              </>
             )}
 
-            {/* Dialog for action */}
-            {selectedTask && openTaskId === row.original.taskId && (
-              <DialogButton
-                isOpen={!!openTaskId}
-                setIsOpen={() => setOpenTaskId(null)}
-                title={dialogContent.title}
-                subTitle={dialogContent.subTitle}
-                buttonName={
-                  isPending ? "Processing..." : dialogContent.buttonName
-                }
-                handleApplyTaskLogic={() => handleMutation(selectedTask)}
-                isDisabled={isPending}
-              />
-            )}
+            {/* Dialog */}
+            {selectedTask &&
+              openTaskId === row.original.taskId &&
+              actionType && (
+                <DialogButton
+                  isOpen={!!openTaskId}
+                  setIsOpen={() => setOpenTaskId(null)}
+                  title={
+                    actionType === "accept"
+                      ? "Accept this participant?"
+                      : actionType === "verify"
+                        ? "Verify this participant?"
+                        : "Reject this participant?"
+                  }
+                  subTitle={
+                    actionType === "reject"
+                      ? "Please provide a reason (optional)."
+                      : dialogContent.subTitle
+                  }
+                  buttonName={
+                    isPending
+                      ? "Processing..."
+                      : actionType === "reject"
+                        ? "Reject"
+                        : dialogContent.buttonName
+                  }
+                  submitType={actionType === "reject" ? "Reject" : undefined}
+                  handleApplyTaskLogic={(data) =>
+                    handleMutation(selectedTask, actionType, data?.remarks)
+                  }
+                  isDisabled={isPending}
+                />
+              )}
           </div>
         );
       },
