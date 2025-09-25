@@ -3,13 +3,13 @@
  * This is only a minimal backend to get started.
  */
 
-import {Logger, ValidationPipe} from '@nestjs/common';
-import {NestFactory} from '@nestjs/core';
-import {NestFastifyApplication} from '@nestjs/platform-fastify';
-import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
-import {WinstonModule} from 'nest-winston';
-import {AppModule} from './app/app.module';
-import {loggerInstance} from './helpers/logger/winston.logger';
+import { Logger, ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { NestFastifyApplication } from '@nestjs/platform-fastify';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { WinstonModule } from 'nest-winston';
+import { AppModule } from './app/app.module';
+import { loggerInstance } from './helpers/logger/winston.logger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, {
@@ -32,7 +32,7 @@ async function bootstrap() {
   // app.useGlobalInterceptors(new ResponseTransformInterceptor());
   app.setGlobalPrefix(globalPrefix);
 
-  const port = process.env.PORT || 3333;
+  const port = process.env.PORT || 3003;
 
   const config = new DocumentBuilder()
     .setTitle('Virtue Perks API')
