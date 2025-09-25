@@ -94,3 +94,16 @@ export const useCreateRedemption = () => {
     queryClient,
   );
 };
+
+export const useGetPhoneByWallet = (userWalletAddress: string) => {
+  const { apiClient } = useRemoteClient();
+
+  return useQuery({
+    queryKey: ["phoneDetail", userWalletAddress],
+    queryFn: async () => {
+      const res = await apiClient.reward.findPhonebyWallet(userWalletAddress);
+      return res.data;
+    },
+    enabled: !!userWalletAddress,
+  });
+};

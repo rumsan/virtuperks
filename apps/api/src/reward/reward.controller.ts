@@ -19,6 +19,11 @@ export class RewardController {
     return this.rewardService.findOne(cuid);
   }
 
+   @Get('/phone/:userWalletAddress')
+  findPhonebyWallet(@Param('userWalletAddress') userWalletAddress: string) {
+    return this.rewardService.findPhonebyWallet(userWalletAddress);
+  }
+
   @Post()
   create(@Body() payload: CreateRewardDto) {
     //return this.rewardService.create(payload);

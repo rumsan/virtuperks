@@ -7,6 +7,7 @@ import {
 import {
   useAddUserPhone,
   useCreateRedemption,
+  useGetPhoneByWallet,
   useGetRewardById,
 } from "@/hooks/subgraph/token-marketplace";
 import { Button } from "@workspace/ui/components/button";
@@ -34,6 +35,9 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   const { address, isConnected } = useAccount();
   //hook to check participant balance
   const { participantTotalToken } = useCheckParticipantBalance(
+    address as `0x${string}`,
+  );
+  const { data: phoneData, isPending: isPhonePending } = useGetPhoneByWallet(
     address as `0x${string}`,
   );
 

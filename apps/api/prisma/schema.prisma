@@ -13,7 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model Reward {
   cuid        String       @id @unique @default(cuid())
   title       String       @db.VarChar(255)
@@ -25,26 +24,22 @@ model Reward {
   imageUrl    String?      @db.VarChar(255)
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  deletedAt DateTime?
-  redemptions  Redemption[]
-
- 
+  deletedAt   DateTime?
+  redemptions Redemption[]
 }
 
 model Phone {
   cuid              String       @id @unique @default(cuid())
   phoneNumber       String       @unique @db.VarChar(20)
-  userWalletAddress String       @db.VarChar(42)
+  userWalletAddress String       @unique @db.VarChar(42)
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
-  deletedAt DateTime?
+  deletedAt         DateTime?
   redemptions       Redemption[]
-
 
   @@index([phoneNumber])
   @@index([userWalletAddress])
 }
-
 
 model Redemption {
   cuid            String           @id @unique @default(cuid())
@@ -52,11 +47,11 @@ model Redemption {
   phoneId         String
   reward          Reward           @relation(fields: [rewardId], references: [cuid])
   phone           Phone            @relation(fields: [phoneId], references: [cuid])
-  transactionHash String          @db.VarChar(66)
+  transactionHash String           @db.VarChar(66)
   status          RedemptionStatus @default(PENDING)
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
-  deletedAt DateTime?
+  deletedAt       DateTime?
 
   @@index([rewardId])
   @@index([phoneId])
@@ -69,7 +64,5 @@ enum RedemptionStatus {
   FAILED
   CANCELLED
   REJECTED
-  SUCCESS 
-
+  SUCCESS
 }
-

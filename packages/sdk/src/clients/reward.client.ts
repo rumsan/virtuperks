@@ -35,6 +35,11 @@ export class RewardClient {
     return response
   }
 
+  async findPhonebyWallet(userWalletAddress: string, config?: AxiosRequestConfig) {
+    const response = await this._client.get(`${this._prefix}/phone/${userWalletAddress}`, config);
+    return response
+  }
+
   
   async delete(cuid: string, config?: AxiosRequestConfig) {
     const response = await this._client.delete(`${this._prefix}/${cuid}`, config);

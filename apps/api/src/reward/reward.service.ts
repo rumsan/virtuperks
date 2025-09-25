@@ -18,6 +18,11 @@ export class RewardService {
     return reward;
   }
 
+ async findPhonebyWallet(userWalletAddress: string) {
+    const phone = await this.prisma.phone.findUnique({ where: { userWalletAddress } });
+    return phone;
+  }
+
   // async create(dto: CreateRewardDto) {
   //   const reward = await this.prisma.reward.create({ data: dto });
   //   return reward;
