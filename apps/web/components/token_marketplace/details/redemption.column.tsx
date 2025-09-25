@@ -5,8 +5,6 @@ import { CircleCheck, Loader } from "lucide-react";
 
 export function useColumns(
   requestToOfframp: (params: {
-    tokenAmount: number;
-    paymentProviderId: string;
     transactionHash: string;
     senderAddress: string;
     paymentDetails: Record<string, any>;
@@ -80,6 +78,7 @@ export function useColumns(
       header: () => <div className="text-center w-full">Action</div>,
       id: "action",
       cell: ({ row }) => {
+        console.log(row.original, "form the action column");
         const isCompleted = row.original.status === "SUCCESS";
         const isButtonLoading = updatingId === row.original.cuid;
         //TODO:NEED TO CALL OFFRAMP SERVICE HERE
@@ -90,11 +89,15 @@ export function useColumns(
               onClick={() => {
                 if (isButtonLoading || isCompleted) return; // prevent accidental triggers
                 requestToOfframp({
-                  tokenAmount: row.original.reward?.tokens || 0,
-                  paymentProviderId: paymentProviderId || "",
                   transactionHash: row.original.transactionHash || "",
                   senderAddress: row.original.reward?.wallet || "",
                   paymentDetails: {
+                    phonenumber: row.original.phone?.phoneNumber,
+                    //TODO:NEED TO MAKE OPERATOR DYNAMIC
+                    operatorCode: "NTC",
+                    amount: row.original.reward?.tokens,
+                    //TODO:NEED TO MAKE PRODUCT CODE DYNAMIC
+                    productCode: "PREPAID",
                     //TODO:NEED TO CALL OFFRAMP SERVICE HERE
                   },
                 });

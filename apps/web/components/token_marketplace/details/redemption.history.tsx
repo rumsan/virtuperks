@@ -48,12 +48,13 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const requestToOfframp = async (params: {
-    tokenAmount: number;
-    paymentProviderId: string;
     transactionHash: string;
     senderAddress: string;
     paymentDetails: Record<string, any>;
   }) => {
+    const paymentProviderId = process.env.NEXT_PUBLIC_OFFFRAMP_PROVIDER_ID;
+    console.log(paymentProviderId, "paymentProvederid");
+    console.log("requestToOfframp params", params);
     // setUpdatingId(params.redemptionId);
     try {
       //todo: api call
