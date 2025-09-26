@@ -453,6 +453,36 @@ export const GetCombineParticipantsByTask = `
         rewardManagement
       }
     }
+      rejectedParticipants: participantTaskStatuses(where: { taskId: $taskId, status: "REJECTED" }) {
+      id
+      participant
+      status
+      taskId
+      lastUpdatedBlock
+      lastUpdatedTimestamp
+      taskDetail {
+        acceptedParticipantCount
+        detailsUrl
+        id
+        expiryDate
+        isOpen
+        isTokenDisbursed
+        maxParticipants
+        name
+        owner
+        rewardToken
+        totalRewardAmount
+        requireApproval
+        isWhitelisted
+        verifiedParticipants
+      }
+      rewardManagement {
+        appId
+        id
+        name
+        rewardManagement
+      }
+    }
   }
 
   

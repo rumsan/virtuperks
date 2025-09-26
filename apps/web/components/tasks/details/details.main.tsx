@@ -69,17 +69,19 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const closeTaskMutation = useCloseTaskMutation();
 
   const taskReady = !taskDetailLoading;
-  const isDisburseButtonDisabled =
-    !taskReady ||
-    isTokenDisbursedFromContract ||
-    hasVerifiedParticipants == false;
-  const isCloseButtonDisabled = !taskReady || isTaskExpired;
+  // const isDisburseButtonDisabled =
+  //   !taskReady ||
+  //   isTokenDisbursedFromContract ||
+  //   hasVerifiedParticipants == false;
+  const isCloseButtonDisabled =
+    !taskReady || isTaskExpired || !hasEntityOwnerRole;
 
   const {
     pendingParticipants,
     acceptedParticipants,
     completedParticipants,
     verifiedPartcipants,
+    rejectedParticipants,
     combineParticipantsLoading: participantsLoading,
   } = useGetCombineStausByTask(taskData?.internal_id);
 
@@ -161,7 +163,9 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
                 {!hasEntityOwnerRole && (
                   <span>Only entity owners can disperse tokens</span>
                 )}
-                {!hasVerifiedParticipants && <span>Task not verified</span>}
+                {!hasVerifiedParticipants && (
+                  <span>Verified task can only be disburse</span>
+                )}
               </div>
             </div>
           </div>
@@ -243,7 +247,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
               handleApplyTaskLogic={handleDialogAction}
               availableTokens={Number(
                 taskData?.taskDetail?.totalRewardAmount ?? 0,
-              )} 
+              )}
             />
           </div>
         </div>
@@ -259,6 +263,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
             acceptedParticipants={acceptedParticipants}
             completedParticipants={completedParticipants}
             verifiedPartcipants={verifiedPartcipants}
+            rejectedParticipants={rejectedParticipants}
           />
         </div>
       </div>
