@@ -155,6 +155,7 @@ export const useGetCombineStausByTask = (taskId: any) => {
     acceptedParticipants: data?.data?.acceptedParticipants || [],
     completedParticipants: data?.data?.completedParticipants || [],
     verifiedPartcipants: data?.data?.verifiedParticipants || [],
+    rejectedParticipants: data?.data?.rejectedParticipants || [],
     combineParticipantsLoading: isLoading,
   };
 };
@@ -201,7 +202,7 @@ export const useRejectParticipantMutation = () => {
       taskId,
       participant,
       entityId,
-      remark, 
+      remark,
     }: {
       taskId: string;
       participant: string;
@@ -210,11 +211,7 @@ export const useRejectParticipantMutation = () => {
     }) => {
       const result = await writeContractAsync({
         address: (entityId as `0x${string}`) || "0x",
-        args: [
-          taskId as `0x${string}`,
-          participant as `0x${string}`,
-          remark, 
-        ],
+        args: [taskId as `0x${string}`, participant as `0x${string}`, remark],
       });
 
       return result;

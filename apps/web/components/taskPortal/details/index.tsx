@@ -168,7 +168,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
         </Button>
       );
     }
-  
 
     switch (effectiveStatus) {
       case 0:
