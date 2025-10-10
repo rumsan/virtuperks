@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { CreateRedemptionDto } from './dto/create-redemption.dto';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { CreateRedemptionDto, UpdateRedemptionDto } from './dto/create-redemption.dto';
 import { ListRedemptionDto } from './dto/list-redemption.dto';
 import { RedemptionFilterDto } from './dto/redemption-filter.dto';
 import { RedemptionService } from './redemption.service';
@@ -29,5 +29,10 @@ async listRedemptionWithFilter(
   @Post()
   create(@Body() payload: CreateRedemptionDto) {
     return this.redemptionService.create(payload);
+  }
+  @Put(':cuid')
+  update(@Param('cuid') cuid: string, @Body() payload: UpdateRedemptionDto) {
+  
+    return this.redemptionService.update(cuid, payload);
   }
 }

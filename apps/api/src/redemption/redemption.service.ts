@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@rumsan/prisma';
-import { CreateRedemptionDto } from './dto/create-redemption.dto';
+import { CreateRedemptionDto, UpdateRedemptionDto } from './dto/create-redemption.dto';
 import { ListRedemptionDto } from './dto/list-redemption.dto';
 
 import { paginator, PaginatorTypes } from '@rumsan/sdk/utils';
@@ -105,7 +105,7 @@ export class RedemptionService {
   }
 
   async create(dto: CreateRedemptionDto) {
-   console.log(dto, "dto");
+
    
     const reward = await this.prisma.reward.findUnique({
       where: { cuid: dto.rewardId },
@@ -138,6 +138,31 @@ export class RedemptionService {
     });
 
     return redemption;
+  }
+
+  async update(cuid: string, dto: UpdateRedemptionDto) {
+
+    
+    const redemption = await this.prisma.redemption.findUnique({
+      where: { cuid },
+    });
+   
+   
+
+    if (!redemption) {
+      throw new NotFoundException('Redemption not found');
+    }
+
+    if (redemption.status !== 'PENDING' && dto.status === 'SUCCESS') {
+      throw new BadRequestException('Only redemptions with status PENDING can be updated to SUCCESS');
+    }
+
+    return this.prisma.redemption.update({
+      where: { cuid },
+      data: {
+        status: dto.status,
+      },
+    });
   }
 
  

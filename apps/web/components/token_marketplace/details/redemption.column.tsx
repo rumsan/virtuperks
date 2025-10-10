@@ -7,6 +7,8 @@ export function useColumns(
   requestToOfframp: (params: {
     transactionHash: string;
     senderAddress: string;
+    tokenAmount: number;
+    redemptionId: string;
     paymentDetails: Record<string, any>;
   }) => void,
   updatingId: string | null,
@@ -78,10 +80,8 @@ export function useColumns(
       header: () => <div className="text-center w-full">Action</div>,
       id: "action",
       cell: ({ row }) => {
-        console.log(row.original, "form the action column");
         const isCompleted = row.original.status === "SUCCESS";
         const isButtonLoading = updatingId === row.original.cuid;
-        //TODO:NEED TO CALL OFFRAMP SERVICE HERE
 
         return hasDefaultAdminRole ? (
           <div className="flex justify-center items-center w-full">
@@ -89,15 +89,17 @@ export function useColumns(
               onClick={() => {
                 if (isButtonLoading || isCompleted) return; // prevent accidental triggers
                 requestToOfframp({
+                  redemptionId: row.original.cuid,
                   transactionHash: row.original.transactionHash || "",
                   senderAddress: row.original.reward?.wallet || "",
+                  tokenAmount: row.original.reward?.tokens || 0,
                   paymentDetails: {
-                    phonenumber: row.original.phone?.phoneNumber,
+                    phoneNumber: row.original.phone?.phoneNumber,
                     //TODO:NEED TO MAKE OPERATOR DYNAMIC
-                    operatorCode: "NTC",
+                    //operatorCode: "NTC",
                     amount: row.original.reward?.tokens,
                     //TODO:NEED TO MAKE PRODUCT CODE DYNAMIC
-                    productCode: "PREPAID",
+                    //productCode: "PREPAID",
                     //TODO:NEED TO CALL OFFRAMP SERVICE HERE
                   },
                 });

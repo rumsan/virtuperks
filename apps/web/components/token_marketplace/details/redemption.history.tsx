@@ -1,7 +1,11 @@
 "use client";
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
-import { useRedemptionList } from "@/hooks/subgraph/token-marketplace";
+import {
+  useRedemptionList,
+  useUpdateRedemption,
+} from "@/hooks/subgraph/token-marketplace";
+import { useExecuteOfframpMutation } from "@/offramp/offramp.service";
 import { RedemptionWithRelations } from "@/utils/types";
 import {
   flexRender,
@@ -15,6 +19,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
+import { useToast } from "@workspace/ui/hooks/use-toast";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { useColumns } from "./redemption.column";
@@ -25,41 +30,70 @@ interface RedemptionHistoryProps {
 
 const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
   const { address, isConnected } = useAccount();
+  const { toast } = useToast();
 
   const { data: redemptionList } = useRedemptionList({ rewardId });
-
-  // const getRedeemReward = useGetRedeemedReward(rewardId);
-  // const getParticipantReward = useGetRedeemedRewardByParticiant(
-  //   address as `0x${string}`,
-  // );
-  // const { rewardRole, roleLoading } = useGetRewardRole(rewardId);
+  const executeOfframpApi = useExecuteOfframpMutation();
+  const updateRedemption = useUpdateRedemption();
 
   const allRedemptions = redemptionList?.data as
     | RedemptionWithRelations[]
     | undefined;
-
-  // const redeemedRewardsByParticipant =
-  //   getParticipantReward?.data?.data?.redemptionStatuses ?? [];
-
-  // const { UpdateRedeemStatus: rawUpdateStatus, UpdateRedeemPending } =
-  //   useUpdateRedemptionStatus();
-  // const [isPending, setIsPending] = useState(false);
 
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const requestToOfframp = async (params: {
     transactionHash: string;
     senderAddress: string;
+    redemptionId: string;
+    tokenAmount: number;
     paymentDetails: Record<string, any>;
   }) => {
-    const paymentProviderId = process.env.NEXT_PUBLIC_OFFFRAMP_PROVIDER_ID;
-    console.log(paymentProviderId, "paymentProvederid");
-    console.log("requestToOfframp params", params);
-    // setUpdatingId(params.redemptionId);
+    setUpdatingId(params.redemptionId);
+
     try {
-      //todo: api call
-      // await rawUpdateStatus(params);
+      const paymentProviderId =
+        process.env.NEXT_PUBLIC_OFFFRAMP_PROVIDER_ID ?? "";
+
+      const payload = { ...params, paymentProviderId };
+
+      // Call offramp service
+      const offrampResponse = await executeOfframpApi.mutateAsync(payload);
+
+      const message = offrampResponse?.data?.transaction?.message;
+
+      // Update redemption if offramp was successful
+      if (
+        offrampResponse?.success &&
+        offrampResponse?.data?.transaction.status === "SUCCESS"
+      ) {
+        await updateRedemption.mutateAsync({
+          cuid: params.redemptionId,
+          data: { status: offrampResponse?.data?.transaction?.status },
+        });
+
+        // Show success message
+        toast({
+          title: "Redemption Updated Successfully!",
+          description:
+            message || "The redemption has been processed successfully.",
+          variant: "default",
+        });
+      } else {
+        // Show error/failure message if offramp was not successful
+        const errorMessage =
+          message || "Offramp processing failed. Please try again.";
+        toast({
+          title: "Redemption Processing Failed",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error processing offramp request:", error);
+      // Handle error - could show toast notification here
     } finally {
+      // Clear loading state regardless of success or failure
       setUpdatingId(null);
     }
   };
@@ -90,32 +124,6 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
       (allRedemptions?.length ?? 0) / paginationAll.pageSize,
     ),
   });
-
-  // const tableMine = useReactTable({
-  //   data: redeemedRewardsByParticipant,
-  //   columns,
-  //   getCoreRowModel: getCoreRowModel(),
-  //   getPaginationRowModel: getPaginationRowModel(),
-  //   state: { pagination: paginationMine },
-  //   onPaginationChange: setPaginationMine,
-  //   pageCount: Math.ceil(
-  //     redeemedRewardsByParticipant.length / paginationMine.pageSize,
-  //   ),
-  // });
-
-  // if (getRedeemReward.isLoading || getParticipantReward.isLoading) {
-  //   return (
-  //     <p className="text-gray-500 text-sm p-6">Loading redemption history...</p>
-  //   );
-  // }
-
-  // if (getRedeemReward.error || getParticipantReward.error) {
-  //   return (
-  //     <p className="text-red-600 text-sm p-6">
-  //       Failed to load redemption history.
-  //     </p>
-  //   );
-  // }
 
   return (
     <main className="flex flex-col gap-4 p-6 bg-white rounded-xl">

@@ -28,17 +28,20 @@ export const useRedemptionList = (
   const { apiClient } = useRemoteClient();
 
   return useQuery({
-    queryKey: ["redemptionList", { ...pagination, ...filters }],
+    queryKey: ["redemptionList"],
     queryFn: async () => {
       const { response } = await apiClient.redemption.search(
         pagination,
         filters,
       );
+
       return {
         data: response.data,
         meta: response.meta,
       };
     },
+    staleTime: 0, // Always consider data stale
+    gcTime: 0, // Don't cache data
   });
 };
 
@@ -86,9 +89,11 @@ export const useCreateRedemption = () => {
         return data;
       },
       onSuccess: () => {
-        // queryClient?.invalidateQueries({
-        //   queryKey: ["account_list"],
-        // });
+        // Force immediate invalidation and refetch
+        queryClient?.invalidateQueries({
+          queryKey: ["redemptionList"],
+          exact: true,
+        });
       },
     },
     queryClient,
@@ -106,4 +111,28 @@ export const useGetPhoneByWallet = (userWalletAddress: string) => {
     },
     enabled: !!userWalletAddress,
   });
+};
+
+export const useUpdateRedemption = () => {
+  const { apiClient, queryClient } = useRemoteClient();
+
+  return useMutation(
+    {
+      mutationFn: async (payload: { cuid: string; data: any }) => {
+        const res = await apiClient.redemption.update(
+          payload.cuid,
+          payload.data,
+        );
+        return res.data;
+      },
+      onSuccess: async (response) => {
+        console.log(response, "response");
+        // Force immediate invalidation and refetch
+        queryClient?.invalidateQueries({
+          queryKey: ["redemptionList"],
+        });
+      },
+    },
+    queryClient,
+  );
 };

@@ -54,4 +54,10 @@ export class RedemptionClient {
     const response = await this._client.delete(`${this._prefix}/${cuid}`, config);
     return response
   }
+  async update(cuid: string, dto: any, config?: AxiosRequestConfig) {
+    console.log(dto, 'dto')
+  
+    const response = await this._client.put(`${this._prefix}/${cuid}`, dto, config);
+    return response
+  }
 }

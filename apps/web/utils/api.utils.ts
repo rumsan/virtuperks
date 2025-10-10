@@ -6,7 +6,6 @@ import { ApiClient } from "@workspace/sdk/clients";
 const fallbackQueryClient = new QueryClient();
 export function useRemoteClient() {
   const { accessToken, appId, clientId } = useRumsanAppStore();
-  console.log({ appId, clientId, accessToken }, "from remote client");
 
   return {
     apiClient: new ApiClient({
