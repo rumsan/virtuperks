@@ -1,7 +1,7 @@
 import { useRemoteClient } from "@/utils/api.utils";
 import { Pagination } from "@rumsan/sdk/types";
 import { useMutation, useQuery, UseQueryResult } from "@tanstack/react-query";
-import { CreatePhone, CreateRedemption, Redemption } from "@workspace/sdk/type";
+import { CreateRedemption, Redemption } from "@workspace/sdk/type";
 
 export const useRewardList = () => {
   const { apiClient } = useRemoteClient();
@@ -56,26 +56,6 @@ export const useGetRewardById = (cuid: string) => {
     },
     enabled: !!cuid,
   });
-};
-
-export const useAddUserPhone = () => {
-  const { apiClient, queryClient } = useRemoteClient();
-
-  return useMutation(
-    {
-      mutationFn: async (payload: CreatePhone) => {
-        const { data } = await apiClient.reward.createPhone(payload);
-
-        return data;
-      },
-      onSuccess: () => {
-        // queryClient?.invalidateQueries({
-        //   queryKey: ["account_list"],
-        // });
-      },
-    },
-    queryClient,
-  );
 };
 
 export const useCreateRedemption = () => {

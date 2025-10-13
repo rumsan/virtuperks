@@ -88,21 +88,21 @@ export function useColumns(
             <button
               onClick={() => {
                 if (isButtonLoading || isCompleted) return; // prevent accidental triggers
-                requestToOfframp({
-                  redemptionId: row.original.cuid,
-                  transactionHash: row.original.transactionHash || "",
-                  senderAddress: row.original.reward?.wallet || "",
-                  tokenAmount: row.original.reward?.tokens || 0,
-                  paymentDetails: {
-                    phoneNumber: row.original.phone?.phoneNumber,
-                    //TODO:NEED TO MAKE OPERATOR DYNAMIC
-                    //operatorCode: "NTC",
-                    amount: row.original.reward?.tokens,
-                    //TODO:NEED TO MAKE PRODUCT CODE DYNAMIC
-                    //productCode: "PREPAID",
-                    //TODO:NEED TO CALL OFFRAMP SERVICE HERE
-                  },
-                });
+                // requestToOfframp({
+                //   redemptionId: row.original.cuid,
+                //   transactionHash: row.original.transactionHash || "",
+                //   senderAddress: row.original.reward?.wallet || "",
+                //   tokenAmount: row.original.reward?.tokens || 0,
+                //   paymentDetails: {
+                //     phoneNumber: row.original.phone?.phoneNumber,
+                //     //TODO:NEED TO MAKE OPERATOR DYNAMIC
+                //     //operatorCode: "NTC",
+                //     amount: row.original.reward?.tokens,
+                //     //TODO:NEED TO MAKE PRODUCT CODE DYNAMIC
+                //     //productCode: "PREPAID",
+                //     //TODO:NEED TO CALL OFFRAMP SERVICE HERE
+                //   },
+                // });
               }}
               disabled={isButtonLoading || isCompleted}
               className={`p-2 rounded-full transition ${

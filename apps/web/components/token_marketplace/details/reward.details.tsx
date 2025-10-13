@@ -5,23 +5,24 @@ import {
   useTokenTranfer,
 } from "@/hooks/subgraph/token";
 import {
-  useAddUserPhone,
   useCreateRedemption,
-  useGetPhoneByWallet,
   useGetRewardById,
+  useUpdateRedemption,
 } from "@/hooks/subgraph/token-marketplace";
+import { useExecuteOfframpMutation } from "@/offramp/offramp.service";
+import { validatePhoneNumber } from "@/utils/formatDate";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { useToast } from "@workspace/ui/hooks/use-toast";
 import { Coins } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAccount } from "wagmi";
 import { categoryColorMap } from "../img/imgLink";
 import RedemptionHistory from "./redemption.history";
 
-type Step = "phone-input" | "transfer" | "completed";
+type Step = "phone-input" | "processing" | "completed";
 
 export interface RewardDetailsProps {
   rewardId: string;
@@ -32,39 +33,23 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
   const { data: rewardDetail, isLoading, error } = useGetRewardById(rewardId);
   const { toast } = useToast();
 
-  const { address, isConnected } = useAccount();
-
+  const { address } = useAccount();
   const { participantTotalToken } = useCheckParticipantBalance(
-    address as `0x${string}`,
-  );
-  const { data: phoneData, isPending: isPhonePending } = useGetPhoneByWallet(
     address as `0x${string}`,
   );
 
   const [step, setStep] = useState<Step>("phone-input");
   const [loading, setLoading] = useState(false);
-  const [phoneLoading, setPhoneLoading] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState(phoneData?.phoneNumber || "");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [phoneError, setPhoneError] = useState("");
-  const [phoneSuccess, setPhoneSuccess] = useState("");
   const [transactionHash, setTransactionHash] = useState<string | null>(null);
-  const { mutateAsync: addUserPhone } = useAddUserPhone();
 
-  useEffect(() => {
-    if (phoneData?.phoneNumber) {
-      setPhoneNumber(phoneData.phoneNumber);
-    }
-  }, [phoneData]);
-  const validatePhoneNumber = (phone: string): boolean => {
-    const phoneRegex = /^\+?[\d\s\-()]{10,15}$/;
-    return phoneRegex.test(phone.trim());
-  };
-
-  const { tokenTransfer, transferPending, transferSuccess, transferError } =
-    useTokenTranfer();
-
+  const { tokenTransfer } = useTokenTranfer();
   const { mutateAsync: createRedemption } = useCreateRedemption();
-  const handlePhoneSubmit = async () => {
+  const { mutateAsync: updateRedemption } = useUpdateRedemption();
+  const executeOfframpApi = useExecuteOfframpMutation();
+
+  const handleOneClickRedemption = async () => {
     const trimmedPhone = phoneNumber.trim();
 
     if (!trimmedPhone) {
@@ -77,95 +62,72 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
       return;
     }
 
-    setPhoneLoading(true);
-    setPhoneError("");
-    setPhoneSuccess("");
-
-    try {
-      const response = await addUserPhone({
-        phoneNumber: trimmedPhone,
-        userWalletAddress: address as `0x${string}`,
-      });
-
-      if (response.status === "already_exists") {
-        setPhoneSuccess(
-          `Phone number ${trimmedPhone} is already registered. Proceeding to transfer.`,
-        );
-        toast({
-          title: "Phone Number Found",
-          description: `The phone number ${trimmedPhone} is already registered`,
-          variant: "default",
-        });
-        // Move to next step after a short delay
-        setTimeout(() => {
-          setStep("transfer");
-        }, 1500);
-      } else if (response.status === "created") {
-        setPhoneSuccess(
-          `Phone number ${trimmedPhone} registered successfully!`,
-        );
-        toast({
-          title: "Success!",
-          description: "Phone number registered successfully",
-          variant: "default",
-        });
-        // Move to next step after a short delay
-        setTimeout(() => {
-          setStep("transfer");
-        }, 1500);
-      }
-    } catch (error) {
-      console.error("Phone submission failed:", error);
-      setPhoneError("Failed to process phone number. Please try again.");
-      toast({
-        title: "Error",
-        description: "Failed to process phone number",
-        variant: "destructive",
-      });
-    } finally {
-      setPhoneLoading(false);
-    }
-  };
-
-  const handleTransfer = async () => {
-    if (!rewardDetail || !address) {
-      toast({
-        title: "Error",
-        description: "Missing reward details or wallet address",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setLoading(true);
+    setPhoneError("");
+    setStep("processing");
 
     try {
+      // Step 1: Token Transfer
       const txHash = await tokenTransfer({
-        amount: rewardDetail.tokens,
-        address: rewardDetail.wallet as `0x${string}`,
+        amount: rewardDetail?.tokens || 0,
+        address: rewardDetail?.wallet as string,
       });
+
       if (!txHash) {
-        throw new Error("Token transfer failed, no transaction hash returned");
+        throw new Error("Token transfer failed");
       }
 
-      await createRedemption({
-        rewardId: rewardDetail?.cuid,
-        phoneNumber: phoneNumber.trim(),
+      setTransactionHash(txHash);
 
+      // Step 2: Create Redemption
+      const redemption = await createRedemption({
+        rewardId: rewardDetail?.cuid,
+        userWalletAddress: address as string,
         transactionHash: txHash,
+        details: JSON.stringify({
+          phoneNumber: trimmedPhone,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+
+      // Step 3: Call Offramp API
+      const paymentProviderId =
+        process.env.NEXT_PUBLIC_OFFFRAMP_PROVIDER_ID ?? "";
+
+      await executeOfframpApi.mutateAsync({
+        transactionHash: txHash,
+        tokenAmount: rewardDetail?.tokens || 0,
+        paymentProviderId: paymentProviderId,
+        senderAddress: address as string,
+        paymentDetails: {
+          phoneNumber: trimmedPhone,
+          amount: rewardDetail?.tokens || 0,
+        },
+      });
+
+      // Step 4: Update Redemption Status
+      await updateRedemption({
+        cuid: redemption.cuid,
+        data: { status: "SUCCESS" },
       });
 
       setStep("completed");
+
       toast({
         title: "Success!",
-        description: "Redemption initiated successfully",
+        description: "Your reward has been successfully redeemed!",
         variant: "default",
       });
     } catch (error) {
-      console.error("Transfer failed:", error);
+      console.error("Redemption failed:", error);
+      setPhoneError(
+        error instanceof Error ? error.message : "Redemption failed",
+      );
+      setStep("phone-input");
+
       toast({
-        title: "Transfer Failed",
-        description: "Failed to transfer tokens. Please try again.",
+        title: "Error",
+        description: "Failed to redeem reward. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -173,10 +135,20 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
     }
   };
 
-  const hasSufficientBalance =
+  // Check if user has sufficient tokens
+  const hasEnoughTokens =
     participantTotalToken !== undefined &&
     rewardDetail?.tokens &&
     BigInt(participantTotalToken.toString()) >= BigInt(rewardDetail.tokens);
+
+  if (isLoading) {
+    return (
+      <main className="bg-gray-50 flex flex-col items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <p className="mt-4 text-gray-600">Loading reward details...</p>
+      </main>
+    );
+  }
 
   if (isLoading) {
     return <div className="p-6 text-gray-500">Loading reward details...</div>;
@@ -279,169 +251,88 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
               {/* Redemption Steps */}
               <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded text-xs text-green-700 text-center flex flex-col justify-between min-h-[150px] transition-all">
                 {/* Insufficient balance message */}
-                {!hasSufficientBalance && (
+                {!hasEnoughTokens && (
                   <div className="text-red-500 font-bold mb-2 text-base">
                     Insufficient balance to redeem this reward.
                   </div>
                 )}
 
-                {/* Loading phone data */}
-                {isPhonePending && (
+                {/* Phone input step */}
+                {step === "phone-input" && (
                   <div className="flex flex-col gap-3 justify-center">
                     <p className="font-semibold text-gray-700">
-                      Checking your registered phone number...
+                      Enter your phone number to redeem
                     </p>
-                    <div className="flex justify-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    <div className="space-y-3">
+                      <Input
+                        type="tel"
+                        placeholder="Enter phone number"
+                        value={phoneNumber}
+                        onChange={(e) => {
+                          setPhoneNumber(e.target.value);
+                          setPhoneError("");
+                        }}
+                        className="w-full"
+                      />
+
+                      {phoneError && (
+                        <div className="text-red-500 text-sm">{phoneError}</div>
+                      )}
+
+                      <Button
+                        onClick={handleOneClickRedemption}
+                        disabled={loading || !hasEnoughTokens}
+                        className="w-full"
+                      >
+                        {loading ? "Processing..." : "Redeem Reward"}
+                      </Button>
                     </div>
                   </div>
                 )}
 
-                {!isPhonePending && step === "phone-input" && (
-                  <div className="flex flex-col gap-3 justify-center">
-                    {phoneData?.phoneNumber ? (
-                      // Show existing phone number
-                      <div className="space-y-3">
-                        <p className="font-semibold text-gray-700">
-                          Phone number verification:
-                        </p>
-                        <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center justify-center gap-2">
-                          <svg
-                            className="w-5 h-5 text-green-600"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          <p className="text-green-800 font-medium text-sm">
-                            Your phone number is already registered
-                          </p>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          Ready to proceed with token redemption
-                        </p>
-                        <Button
-                          onClick={() => setStep("transfer")}
-                          className="py-2 px-4 rounded-lg text-sm font-medium transition text-white bg-green-600 hover:bg-green-700"
-                        >
-                          Proceed to Transfer
-                        </Button>
-                      </div>
-                    ) : (
-                      // Show phone input form
-                      <div className="space-y-3">
-                        <p className="font-semibold text-gray-700">
-                          Enter your phone number to proceed with redemption
-                        </p>
-                        <div className="space-y-2">
-                          <Input
-                            type="tel"
-                            placeholder="Enter your phone number"
-                            value={phoneNumber}
-                            onChange={(e) => {
-                              setPhoneNumber(e.target.value);
-                              setPhoneError("");
-                              setPhoneSuccess("");
-                            }}
-                            className="text-center"
-                            disabled={phoneLoading || isPhonePending}
-                          />
-                          {phoneError && (
-                            <p className="text-red-500 text-xs">{phoneError}</p>
-                          )}
-                          {phoneSuccess && (
-                            <p className="text-green-600 text-xs">
-                              {phoneSuccess}
-                            </p>
-                          )}
-                        </div>
-                        <Button
-                          onClick={handlePhoneSubmit}
-                          disabled={
-                            !phoneNumber.trim() ||
-                            phoneLoading ||
-                            isPhonePending
-                          }
-                          className={`py-2 px-4 rounded-lg text-sm font-medium transition text-white ${
-                            !phoneNumber.trim() ||
-                            phoneLoading ||
-                            isPhonePending
-                              ? "bg-gray-400 cursor-not-allowed"
-                              : "bg-blue-600 hover:bg-blue-700"
-                          }`}
-                        >
-                          {phoneLoading || isPhonePending
-                            ? "Processing..."
-                            : "Continue to Transfer"}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {step === "transfer" && (
+                {/* Processing step */}
+                {step === "processing" && (
                   <div className="flex flex-col gap-3 justify-center">
                     <p className="font-semibold text-gray-700">
-                      Phone number verified ✓
+                      Processing your redemption...
                     </p>
+                    <div className="flex justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    </div>
                     <p className="text-sm text-gray-600">
-                      Transfer {rewardDetail.tokens} tokens to complete
-                      redemption
+                      Please wait while we transfer tokens and process your
+                      reward
                     </p>
-                    {!hasSufficientBalance && (
-                      <div className="text-red-500 font-bold mb-2 text-sm">
-                        Insufficient balance to complete this redemption.
-                      </div>
-                    )}
-                    <Button
-                      onClick={handleTransfer}
-                      disabled={loading || !hasSufficientBalance}
-                      className={`py-2 px-4 rounded-lg text-sm font-medium transition text-white ${
-                        loading || !hasSufficientBalance
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-green-600 hover:bg-green-700"
-                      }`}
-                    >
-                      {loading ? "Processing..." : "Transfer Tokens & Redeem"}
-                    </Button>
                   </div>
                 )}
 
+                {/* Completed step */}
                 {step === "completed" && (
-                  <div className="flex flex-col gap-3 items-center justify-center">
+                  <div className="flex flex-col gap-3 justify-center">
+                    <div className="flex justify-center">
+                      <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <svg
+                          className="w-6 h-6 text-green-600"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                    </div>
                     <p className="font-semibold text-green-700">
-                      Redemption successful! Your reward will be processed
-                      shortly.
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Phone number verified and tokens transferred
+                      Redemption completed successfully!
                     </p>
                     {transactionHash && (
-                      <p className="text-green-700 text-xs break-all">
-                        Transaction: {transactionHash}
+                      <p className="text-xs text-gray-600">
+                        Transaction: {transactionHash.slice(0, 10)}...
+                        {transactionHash.slice(-8)}
                       </p>
                     )}
-                    <Button
-                      onClick={() => {
-                        setStep("phone-input");
-                        setPhoneNumber("");
-                        setPhoneError("");
-                        setPhoneSuccess("");
-                        setTransactionHash(null);
-                      }}
-                      disabled={!hasSufficientBalance}
-                      className={`py-2 px-4 rounded-lg text-sm font-medium transition text-white ${
-                        !hasSufficientBalance
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-gray-700 hover:bg-gray-800"
-                      }`}
-                    >
-                      Redeem Another Reward
-                    </Button>
                   </div>
                 )}
               </div>

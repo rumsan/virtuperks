@@ -132,6 +132,7 @@ export class RedemptionService {
     const redemption = await this.prisma.redemption.findUnique({
       where: { cuid },
     });
+    
    
    
 
@@ -139,7 +140,7 @@ export class RedemptionService {
       throw new NotFoundException('Redemption not found');
     }
 
-    if (redemption.status === 'PENDING') {
+    if (redemption.status !== 'PENDING') {
       throw new BadRequestException('Only redemptions with status PENDING can be updated to SUCCESS');
     }
 
