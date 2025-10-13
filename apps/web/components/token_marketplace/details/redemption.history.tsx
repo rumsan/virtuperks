@@ -42,63 +42,7 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
 
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  const requestToOfframp = async (params: {
-    transactionHash: string;
-    senderAddress: string;
-    redemptionId: string;
-    tokenAmount: number;
-    paymentDetails: Record<string, any>;
-  }) => {
-    setUpdatingId(params.redemptionId);
-
-    try {
-      const paymentProviderId =
-        process.env.NEXT_PUBLIC_OFFFRAMP_PROVIDER_ID ?? "";
-
-      const payload = { ...params, paymentProviderId };
-
-      // Call offramp service
-      const offrampResponse = await executeOfframpApi.mutateAsync(payload);
-
-      const message = offrampResponse?.data?.transaction?.message;
-
-      // Update redemption if offramp was successful
-      if (
-        offrampResponse?.success &&
-        offrampResponse?.data?.transaction.status === "SUCCESS"
-      ) {
-        await updateRedemption.mutateAsync({
-          cuid: params.redemptionId,
-          data: { status: offrampResponse?.data?.transaction?.status },
-        });
-
-        // Show success message
-        toast({
-          title: "Redemption Updated Successfully!",
-          description:
-            message || "The redemption has been processed successfully.",
-          variant: "default",
-        });
-      } else {
-        // Show error/failure message if offramp was not successful
-        const errorMessage =
-          message || "Offramp processing failed. Please try again.";
-        toast({
-          title: "Redemption Processing Failed",
-          description: errorMessage,
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("Error processing offramp request:", error);
-      // Handle error - could show toast notification here
-    } finally {
-      // Clear loading state regardless of success or failure
-      setUpdatingId(null);
-    }
-  };
-
-  const columns = useColumns(requestToOfframp, updatingId);
+  const columns = useColumns();
 
   const [paginationAll, setPaginationAll] = useState({
     pageIndex: 0,

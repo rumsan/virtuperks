@@ -1,19 +1,9 @@
 import hasRole from "@/utils/role";
 import { RedemptionWithRelations } from "@/utils/types";
 import { ColumnDef } from "@tanstack/react-table";
-import { CircleCheck, Loader } from "lucide-react";
+import { CircleCheck } from "lucide-react";
 
-export function useColumns(
-  requestToOfframp: (params: {
-    transactionHash: string;
-    senderAddress: string;
-    tokenAmount: number;
-    redemptionId: string;
-    paymentDetails: Record<string, any>;
-  }) => void,
-  updatingId: string | null,
-  paymentProviderId?: string,
-): ColumnDef<RedemptionWithRelations>[] {
+export function useColumns(): ColumnDef<RedemptionWithRelations>[] {
   const adminRole = process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE;
   const hasDefaultAdminRole = hasRole({
     role: adminRole || "",
@@ -47,9 +37,9 @@ export function useColumns(
     },
     {
       header: "Wallet",
-      accessorKey: "phone.userWalletAddress",
+      accessorKey: "userWalletAddress",
       cell: ({ row }) => {
-        const wallet = row.original.phone?.userWalletAddress;
+        const wallet = row.original.userWalletAddress;
         return (
           <span className="font-medium text-gray-800">
             {wallet
@@ -81,61 +71,29 @@ export function useColumns(
       id: "action",
       cell: ({ row }) => {
         const isCompleted = row.original.status === "SUCCESS";
-        const isButtonLoading = updatingId === row.original.cuid;
 
         return hasDefaultAdminRole ? (
           <div className="flex justify-center items-center w-full">
-            <button
-              onClick={() => {
-                if (isButtonLoading || isCompleted) return; // prevent accidental triggers
-                // requestToOfframp({
-                //   redemptionId: row.original.cuid,
-                //   transactionHash: row.original.transactionHash || "",
-                //   senderAddress: row.original.reward?.wallet || "",
-                //   tokenAmount: row.original.reward?.tokens || 0,
-                //   paymentDetails: {
-                //     phoneNumber: row.original.phone?.phoneNumber,
-                //     //TODO:NEED TO MAKE OPERATOR DYNAMIC
-                //     //operatorCode: "NTC",
-                //     amount: row.original.reward?.tokens,
-                //     //TODO:NEED TO MAKE PRODUCT CODE DYNAMIC
-                //     //productCode: "PREPAID",
-                //     //TODO:NEED TO CALL OFFRAMP SERVICE HERE
-                //   },
-                // });
-              }}
-              disabled={isButtonLoading || isCompleted}
-              className={`p-2 rounded-full transition ${
-                isButtonLoading || isCompleted
-                  ? "opacity-60 cursor-not-allowed"
-                  : "hover:bg-green-300"
-              }`}
+            <div
+              className="p-2 rounded-full"
               title={
-                isCompleted
-                  ? "Already marked as completed"
-                  : isButtonLoading
-                    ? "Updating..."
-                    : "Mark as Completed"
+                isCompleted ? "Redemption completed" : "Redemption processing"
               }
             >
-              {isButtonLoading ? (
-                <Loader className="w-6 h-6 text-green-800 animate-spin" />
-              ) : isCompleted ? (
-                // Different icon when disabled (completed state)
-                <CircleCheck className="w-6 h-6 text-gray-400" />
-              ) : (
-                // Default active icon
-                <CircleCheck className="w-6 h-6 text-green-800" />
-              )}
-            </button>
+              <CircleCheck
+                className={`w-6 h-6 ${
+                  isCompleted ? "text-green-600" : "text-gray-400"
+                }`}
+              />
+            </div>
           </div>
         ) : (
           <div className="flex justify-center items-center w-full">
             <span
               className="relative group cursor-not-allowed"
-              title="You don't have permission to update"
+              title="You don't have permission to view details"
             >
-              <CircleCheck className="w-6 h-6 text-green-800 opacity-50 " />
+              <CircleCheck className="w-6 h-6 text-green-800 opacity-50" />
             </span>
           </div>
         );
