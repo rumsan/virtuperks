@@ -1,6 +1,6 @@
 
 import { AxiosInstance, AxiosRequestConfig } from 'axios';
-import { CreatePhone, CreateReward } from '../types';
+import { CreateReward } from '../types';
 
 export class RewardClient {
   private _client: AxiosInstance;
@@ -15,10 +15,6 @@ export class RewardClient {
     return response 
   }
 
-   async createPhone(data: CreatePhone, config?: AxiosRequestConfig) {
-    const response = await this._client.post(`${this._prefix}/phone`, data, config);
-    return response 
-  }
 
   async list(data?:any, config?: AxiosRequestConfig) {
     const response = await this._client.get(`${this._prefix}`, {

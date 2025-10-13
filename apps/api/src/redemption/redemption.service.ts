@@ -43,7 +43,6 @@ export class RedemptionService {
         orderBy,
         include: {
           reward: true,
-          phone: true,
         },
       },
       { page: dto.page , perPage: dto.limit },
@@ -56,7 +55,6 @@ export class RedemptionService {
       where: { cuid },
       include: {
         reward: true,
-        phone: true,
       },
     });
 
@@ -67,36 +65,30 @@ export class RedemptionService {
     return redemption;
   }
 
-  async findByPhoneNumber(phoneNumber: string) {
-    const phone = await this.prisma.phone.findUnique({
-      where: { phoneNumber },
-    });
+  // async findByPhoneNumber(phoneNumber: string) {
+  //   const phone = await this.prisma.phone.findUnique({
+  //     where: { phoneNumber },
+  //   });
 
-    if (!phone) {
-      throw new NotFoundException('Phone number not registered');
-    }
+  //   if (!phone) {
+  //     throw new NotFoundException('Phone number not registered');
+  //   }
 
-    return this.prisma.redemption.findMany({
-      where: { phoneId: phone.cuid },
-      include: {
-        reward: true,
-        phone: true,
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-  }
+  //   return this.prisma.redemption.findMany({
+  //     where: { phoneId: phone.cuid },
+  //     include: {
+  //       reward: true,
+  //     },
+  //     orderBy: { createdAt: 'desc' },
+  //   });
+  // }
 
   async findByRewardAndWallet(rewardId: string, walletAddress: string) {
     const redemptions = await this.prisma.redemption.findMany({
       where: {
-        rewardId,
-        phone: {
-          userWalletAddress: walletAddress,
-        },
       },
       include: {
         reward: true,
-        phone: true,
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -121,19 +113,13 @@ export class RedemptionService {
       throw new BadRequestException('Reward is not active');
     }
 
-    const phone = await this.prisma.phone.findUnique({
-      where: { phoneNumber: dto.phoneNumber },
-    });
-
-    if (!phone) {
-      throw new NotFoundException('Phone not found');
-    }
    const redemption = await this.prisma.redemption.create({
       data: {
         rewardId: dto.rewardId,
-        phoneId: phone?.cuid,
+        userWalletAddress: dto.userWalletAddress,
         transactionHash: dto.transactionHash,
         status: 'PENDING',
+        details: dto.details 
       },
     });
 
@@ -153,7 +139,7 @@ export class RedemptionService {
       throw new NotFoundException('Redemption not found');
     }
 
-    if (redemption.status !== 'PENDING' && dto.status === 'SUCCESS') {
+    if (redemption.status === 'PENDING') {
       throw new BadRequestException('Only redemptions with status PENDING can be updated to SUCCESS');
     }
 

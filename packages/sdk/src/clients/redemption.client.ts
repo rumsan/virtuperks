@@ -55,7 +55,7 @@ export class RedemptionClient {
     return response
   }
   async update(cuid: string, dto: any, config?: AxiosRequestConfig) {
-    console.log(dto, 'dto')
+
   
     const response = await this._client.put(`${this._prefix}/${cuid}`, dto, config);
     return response

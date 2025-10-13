@@ -23,6 +23,15 @@ export class CreateRedemptionDto implements CreateRedemption {
   @IsString()
   @IsOptional()
   transactionHash: string;
+
+  @ApiProperty({ description: 'User wallet address', required: false })
+  @IsString()
+  @IsNotEmpty()
+  userWalletAddress : string;
+
+  @ApiProperty({ description: 'Additional details for the redemption', required: false })
+  @IsOptional()
+  details?: any;
 }
 
 export class UpdateRedemptionDto  extends PartialType(CreateRedemptionDto) {}

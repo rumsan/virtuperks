@@ -5,9 +5,6 @@ export class RedemptionFilterDto {
   @IsString()
   rewardId?: string;
 
-  @IsOptional()
-  @IsString()
-  phoneNumber?: string;
 
   @IsOptional()
   @IsString()
