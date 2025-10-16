@@ -1,33 +1,12 @@
 import hasRole from "@/utils/role";
+import { RedemptionWithRelations } from "@/utils/types";
 import { ColumnDef } from "@tanstack/react-table";
-import { CircleCheck, Loader } from "lucide-react";
+import { CircleCheck } from "lucide-react";
 
-// interface ExtendedRewardRedemption extends RewardRedemption {
-//   rewardRedemption: {
-//     rewardRedemption: string;
-//   };
-// }
-
-export function useColumns<
-  T extends {
-    redemptionId: string;
-    status: number;
-    from: string;
-    blockTimestamp: string;
-    transactionHash: string;
-    rewardRedemption: { rewardRedemption: string };
-  },
->(
-  updateStatus: (params: {
-    userAddress: string;
-    rewardAddress: string;
-    redemptionId: string;
-  }) => void,
-  updatingId: string | null,
-  rewardRole?: string,
-): ColumnDef<T>[] {
+export function useColumns(): ColumnDef<RedemptionWithRelations>[] {
+  const adminRole = process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE;
   const hasDefaultAdminRole = hasRole({
-    role: rewardRole || "",
+    role: adminRole || "",
   });
 
   return [
@@ -35,25 +14,32 @@ export function useColumns<
       header: "Status",
       accessorKey: "status",
       cell: ({ row }) => {
-        const status = row.original.status === 1 ? "completed" : "pending";
+        const status = row.original.status;
+        const statusDisplay = status?.toLowerCase() || "pending";
+        const isCompleted = status === "SUCCESS";
+
         return (
           <span
             className={`px-2 py-1 text-xs font-medium rounded-full ${
-              status === "completed"
+              isCompleted
                 ? "bg-green-100 text-green-700"
-                : "bg-yellow-100 text-yellow-700"
+                : status === "FAILED" || status === "REJECTED"
+                  ? "bg-red-100 text-red-700"
+                  : status === "PROCESSING"
+                    ? "bg-blue-100 text-blue-700"
+                    : "bg-yellow-100 text-yellow-700"
             }`}
           >
-            {status}
+            {statusDisplay}
           </span>
         );
       },
     },
     {
       header: "Wallet",
-      accessorKey: "from",
+      accessorKey: "userWalletAddress",
       cell: ({ row }) => {
-        const wallet = row.original.from;
+        const wallet = row.original.userWalletAddress;
         return (
           <span className="font-medium text-gray-800">
             {wallet
@@ -65,10 +51,10 @@ export function useColumns<
     },
     {
       header: "Date",
-      accessorKey: "blockTimestamp",
+      accessorKey: "createdAt",
       cell: ({ row }) => {
-        const timestamp = Number(row.original.blockTimestamp) * 1000;
-        const date = new Date(timestamp);
+        const createdAt = row.original.createdAt;
+        const date = new Date(createdAt);
         return date.toLocaleDateString();
       },
     },
@@ -84,52 +70,30 @@ export function useColumns<
       header: () => <div className="text-center w-full">Action</div>,
       id: "action",
       cell: ({ row }) => {
-        const isCompleted = row.original.status === 1;
-        const isButtonLoading = updatingId === row.original.redemptionId;
+        const isCompleted = row.original.status === "SUCCESS";
 
         return hasDefaultAdminRole ? (
           <div className="flex justify-center items-center w-full">
-            <button
-              onClick={() => {
-                if (isButtonLoading || isCompleted) return; // prevent accidental triggers
-                updateStatus({
-                  userAddress: row.original.from,
-                  rewardAddress: row.original.rewardRedemption.rewardRedemption,
-                  redemptionId: row.original.redemptionId,
-                });
-              }}
-              disabled={isButtonLoading || isCompleted}
-              className={`p-2 rounded-full transition ${
-                isButtonLoading || isCompleted
-                  ? "opacity-60 cursor-not-allowed"
-                  : "hover:bg-green-300"
-              }`}
+            <div
+              className="p-2 rounded-full"
               title={
-                isCompleted
-                  ? "Already marked as completed"
-                  : isButtonLoading
-                    ? "Updating..."
-                    : "Mark as Completed"
+                isCompleted ? "Redemption completed" : "Redemption processing"
               }
             >
-              {isButtonLoading ? (
-                <Loader className="w-6 h-6 text-green-800 animate-spin" />
-              ) : isCompleted ? (
-                // Different icon when disabled (completed state)
-                <CircleCheck className="w-6 h-6 text-gray-400" />
-              ) : (
-                // Default active icon
-                <CircleCheck className="w-6 h-6 text-green-800" />
-              )}
-            </button>
+              <CircleCheck
+                className={`w-6 h-6 ${
+                  isCompleted ? "text-green-600" : "text-gray-400"
+                }`}
+              />
+            </div>
           </div>
         ) : (
           <div className="flex justify-center items-center w-full">
             <span
               className="relative group cursor-not-allowed"
-              title="You don’t have permission to update"
+              title="You don't have permission to view details"
             >
-              <CircleCheck className="w-6 h-6 text-green-800 opacity-50 " />
+              <CircleCheck className="w-6 h-6 text-green-800 opacity-50" />
             </span>
           </div>
         );

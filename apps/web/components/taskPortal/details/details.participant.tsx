@@ -49,7 +49,7 @@ const TaskPortalParticipant = ({ taskId }: TaskPortalParticipantProps) => {
 
   const columns = useHistoryColumns();
   const table = useReactTable({
-    data: TaskHistory,
+    data: TaskHistory ?? [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

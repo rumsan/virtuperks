@@ -1,35 +1,38 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { CreateRedemption, RedemptionStatus } from '@workspace/sdk/type';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateRedemptionDto implements CreateRedemption {
-  @ApiProperty()
-  @IsString()
-  userAddress: string;
 
-  @ApiProperty()
-  @IsString()
-  rewardId: string;
-  
-  @ApiProperty()
-  @IsNumber()
-  tokens: number; 
 
-  @ApiProperty()
+  @ApiProperty({ description: 'CUID of the reward being redeemed' })
   @IsString()
-    @IsOptional()
-  transactionHash?: string;
-
-  @ApiProperty({ required: false })
   @IsNotEmpty()
-  @IsString()
-  status: RedemptionStatus;
+  rewardId: string;
 
-  @ApiProperty()
   @IsOptional()
   @IsString()
-  taskId?: string;
+  phoneNumber?: string;
 
-  
+  @IsOptional()
+  @IsString()
+   status?: RedemptionStatus
+
+
+  @ApiProperty({ description: 'Transaction hash from blockchain', required: false })
+  @IsString()
+  @IsOptional()
+  transactionHash: string;
+
+  @ApiProperty({ description: 'User wallet address', required: false })
+  @IsString()
+  @IsNotEmpty()
+  userWalletAddress : string;
+
+  @ApiProperty({ description: 'Additional details for the redemption', required: false })
+  @IsOptional()
+  details?: any;
 }
+
+export class UpdateRedemptionDto  extends PartialType(CreateRedemptionDto) {}
 

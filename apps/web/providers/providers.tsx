@@ -13,9 +13,8 @@ export function Providers({ children }: QueryProviderProps) {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        refetchOnWindowFocus:false,
+        refetchOnWindowFocus: false,
         retry: false,
-      
       },
       mutations: {
         retry: false,
@@ -25,9 +24,8 @@ export function Providers({ children }: QueryProviderProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <WalletProvider>
-      <ConnectKitProvider >{children}</ConnectKitProvider>
-     
-        </WalletProvider>
+        <ConnectKitProvider>{children}</ConnectKitProvider>
+      </WalletProvider>
     </QueryClientProvider>
   );
 }

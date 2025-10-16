@@ -1,3 +1,4 @@
+import { PhoneNumberUtil } from "google-libphonenumber";
 import moment from "moment";
 
 export const formatDate = (date: number) => {
@@ -21,5 +22,16 @@ export const formatTokenAmount = (
   } catch (error) {
     console.error("Error formatting token amount:", error);
     return "0";
+  }
+};
+
+export const validatePhoneNumber = (phone: string, region = "NP"): boolean => {
+  const phoneUtil = PhoneNumberUtil.getInstance();
+  try {
+    const number = phoneUtil.parse(phone, region);
+    return phoneUtil.isValidNumber(number);
+  } catch (error) {
+    console.error("Error validating phone number:", error);
+    return false;
   }
 };

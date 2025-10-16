@@ -17,6 +17,7 @@
     "reset": "cd tools/local-setup && bash reset.sh",
     "deploy": "cd ./packages/contracts && npx hardhat run scripts/deploy-factory.ts --network ganache ",
     "deployContract": "npx ts-node tools/deploy/deployment.ts",
+    "generate:rewards": "npx ts-node apps/api/prisma/seed.add-reward.ts",
     "graph:codegen": "cd ./apps/subgraph && graph codegen",
     "graph:deploy-studio": "cd ./apps/subgraph && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://thegraph.com/studio/subgraph/virtueperks-dev",
     "graph:build": "cd ./apps/subgraph && graph build",

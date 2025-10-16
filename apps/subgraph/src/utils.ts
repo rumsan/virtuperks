@@ -1,5 +1,5 @@
 import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
-import { ParticipantTaskStatus, ParticipantWhitelisted, TaskCreated, TaskDetail, TaskIdMapping } from "../generated/schema";
+import { ParticipantTaskStatus, TaskCreated, TaskDetail, TaskIdMapping } from "../generated/schema";
 import { RewardManagement } from "../generated/templates/RewardManagement/RewardManagement";
 
 
@@ -107,7 +107,6 @@ export function addParticipantToWhitelist(
 ): void {
   let whitelistId = taskId.concat(participant);
   
-
   // let whitelistEntity = new ParticipantWhitelisted(whitelistId);
   // whitelistEntity.taskId = taskId;
   // whitelistEntity.participant = participant;
@@ -115,7 +114,6 @@ export function addParticipantToWhitelist(
   // whitelistEntity.blockNumber = blockNumber;
   // whitelistEntity.blockTimestamp = blockTimestamp;
   // whitelistEntity.save();
-
   
   let taskDetail = TaskDetail.load(taskId);
   if (taskDetail) {
