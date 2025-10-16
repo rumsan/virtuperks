@@ -403,9 +403,6 @@ importers:
 
   packages/sdk:
     dependencies:
-      '@rumsan/sdk':
-        specifier: ^0.2.10
-        version: 0.2.13(axios@1.12.2)
       axios:
         specifier: ^1.12.2
         version: 1.12.2
