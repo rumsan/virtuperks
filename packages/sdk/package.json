@@ -16,7 +16,7 @@
       "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-     "./clients": {
+    "./clients": {
       "import": "./dist/clients/index.js",
       "require": "./dist/clients/index.js",
       "types": "./dist/clients/index.d.ts"
@@ -43,7 +43,6 @@
     }
   },
   "dependencies": {
-    "axios": "^1.12.2",
-   "@rumsan/sdk": "^0.2.10"
+    "axios": "^1.12.2"
   }
 }

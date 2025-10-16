@@ -1,5 +1,5 @@
 import { useCheckParticipantBalance } from "@/hooks/subgraph/token";
-import { useRewardList } from "@/hooks/subgraph/token-marketplace";
+// import { useRewardList } from "@/hooks/subgraph/token-marketplace";
 import { useGetOfframp } from "@/offramp/offramp.service";
 import { PATHS } from "@/routes/paths";
 import { getCategoryIcon } from "@/utils/rewardIcon";
@@ -20,12 +20,13 @@ const TokenMarketListCard = () => {
   const { participantTotalToken } = useCheckParticipantBalance(
     address as `0x${string}`,
   );
-
-  const getAllReward = useRewardList();
+  //todo: fix this
+  // const getAllReward = useRewardList();
   const { data: offrampData } = useGetOfframp();
   console.log("offrampData", offrampData?.data);
 
-  const rewardList = getAllReward?.data || [];
+  // const rewardList = getAllReward?.data || [];
+  const rewardList: any[] = [];
 
   const totalRewards = rewardList.length;
   const affordableRewards = rewardList.filter(

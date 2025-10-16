@@ -1,11 +1,10 @@
 "use client";
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
-import {
-  useRedemptionList,
-  useUpdateRedemption,
-} from "@/hooks/subgraph/token-marketplace";
-import { useExecuteOfframpMutation } from "@/offramp/offramp.service";
+// import {
+//   useRedemptionList,
+//   useUpdateRedemption,
+// } from "@/hooks/subgraph/token-marketplace";
 import { RedemptionWithRelations } from "@/utils/types";
 import {
   flexRender,
@@ -31,14 +30,15 @@ interface RedemptionHistoryProps {
 const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
   const { address, isConnected } = useAccount();
   const { toast } = useToast();
+  //todo: fix this
+  // const { data: redemptionList } = useRedemptionList({ rewardId });
+  // const executeOfframpApi = useExecuteOfframpMutation();
+  // const updateRedemption = useUpdateRedemption();
 
-  const { data: redemptionList } = useRedemptionList({ rewardId });
-  const executeOfframpApi = useExecuteOfframpMutation();
-  const updateRedemption = useUpdateRedemption();
-
-  const allRedemptions = redemptionList?.data as
-    | RedemptionWithRelations[]
-    | undefined;
+  // const allRedemptions = redemptionList?.data as
+  //   | RedemptionWithRelations[]
+  //   | undefined;
+  const allRedemptions: RedemptionWithRelations[] = [];
 
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 

@@ -1,15 +1,12 @@
 "use client";
 
-import {
-  useCheckParticipantBalance,
-  useTokenTranfer,
-} from "@/hooks/subgraph/token";
-import {
-  useCreateRedemption,
-  useGetRewardById,
-  useUpdateRedemption,
-} from "@/hooks/subgraph/token-marketplace";
-import { useExecuteOfframpMutation } from "@/offramp/offramp.service";
+import { useCheckParticipantBalance } from "@/hooks/subgraph/token";
+// import {
+//   useCreateRedemption,
+//   useGetRewardById,
+//   useUpdateRedemption,
+// } from "@/hooks/subgraph/token-marketplace";
+// import { useExecuteOfframpMutation } from "@/offramp/offramp.service"; // TODO: Uncomment when API is ready
 import { validatePhoneNumber } from "@/utils/formatDate";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
@@ -30,7 +27,23 @@ export interface RewardDetailsProps {
 }
 
 const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
-  const { data: rewardDetail, isLoading, error } = useGetRewardById(rewardId);
+  //todo:fix this
+  // const { data: rewardDetail, isLoading, error } = useGetRewardById(rewardId);
+
+  // Static reward data for testing
+  const rewardDetail = {
+    cuid: rewardId,
+    title: "Mobile Top-Up Reward",
+    description:
+      "Get instant mobile credit to your phone. Perfect for staying connected with friends and family. This reward can be redeemed quickly and securely through our platform.",
+    tokens: 100,
+    wallet: "0x742d35Cc6634C0532925a3b8D2C1C3E3e6A5C13d",
+    category: "Mobile-TopUp",
+    imageUrl:
+      "https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg",
+    isActive: true,
+  };
+
   const { toast } = useToast();
 
   const { address } = useAccount();
@@ -38,16 +51,21 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
     address as `0x${string}`,
   );
 
+  // Static fallback for testing when no wallet is connected
+  const totalTokens = participantTotalToken || BigInt(500); // Default 500 tokens for testing
+
   const [step, setStep] = useState<Step>("phone-input");
   const [loading, setLoading] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [transactionHash, setTransactionHash] = useState<string | null>(null);
 
-  const { tokenTransfer } = useTokenTranfer();
-  const { mutateAsync: createRedemption } = useCreateRedemption();
-  const { mutateAsync: updateRedemption } = useUpdateRedemption();
-  const executeOfframpApi = useExecuteOfframpMutation();
+  // TODO: Uncomment when API is ready
+  // const { tokenTransfer } = useTokenTranfer();
+  //todo: fix this
+  // const { mutateAsync: createRedemption } = useCreateRedemption();
+  // const { mutateAsync: updateRedemption } = useUpdateRedemption();
+  // const executeOfframpApi = useExecuteOfframpMutation();
 
   const handleOneClickRedemption = async () => {
     const trimmedPhone = phoneNumber.trim();
@@ -67,37 +85,29 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
     setStep("processing");
 
     try {
-      // Step 1: Token Transfer
-      const txHash = await tokenTransfer({
-        amount: rewardDetail?.tokens || 0,
-        address: rewardDetail?.wallet as string,
-      });
+      // Simulate Step 1: Token Transfer
+      const simulatedTxHash =
+        "0x" + Math.random().toString(16).substring(2, 66);
+      setTransactionHash(simulatedTxHash);
 
-      if (!txHash) {
-        throw new Error("Token transfer failed");
-      }
+      // Simulate delay for processing
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      setTransactionHash(txHash);
-
-      // Step 2: Create Redemption
-      const redemption = await createRedemption({
+      // Step 2: Create Redemption (simulated)
+      console.log("Creating redemption:", {
         rewardId: rewardDetail?.cuid,
         userWalletAddress: address as string,
-        transactionHash: txHash,
+        transactionHash: simulatedTxHash,
         details: JSON.stringify({
           phoneNumber: trimmedPhone,
           timestamp: new Date().toISOString(),
         }),
       });
 
-      // Step 3: Call Offramp API
-      const paymentProviderId =
-        process.env.NEXT_PUBLIC_OFFFRAMP_PROVIDER_ID ?? "";
-
-      await executeOfframpApi.mutateAsync({
-        transactionHash: txHash,
+      // Step 3: Call Offramp API (simulated)
+      console.log("Calling offramp API:", {
+        transactionHash: simulatedTxHash,
         tokenAmount: rewardDetail?.tokens || 0,
-        paymentProviderId: paymentProviderId,
         senderAddress: address as string,
         paymentDetails: {
           phoneNumber: trimmedPhone,
@@ -105,11 +115,8 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
         },
       });
 
-      // Step 4: Update Redemption Status
-      await updateRedemption({
-        cuid: redemption.cuid,
-        data: { status: "SUCCESS" },
-      });
+      // Step 4: Update Redemption Status (simulated)
+      console.log("Updating redemption status to SUCCESS");
 
       setStep("completed");
 
@@ -137,38 +144,38 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
 
   // Check if user has sufficient tokens
   const hasEnoughTokens =
-    participantTotalToken !== undefined &&
+    totalTokens !== undefined &&
     rewardDetail?.tokens &&
-    BigInt(participantTotalToken.toString()) >= BigInt(rewardDetail.tokens);
+    BigInt(totalTokens.toString()) >= BigInt(rewardDetail.tokens);
 
-  if (isLoading) {
-    return (
-      <main className="bg-gray-50 flex flex-col items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        <p className="mt-4 text-gray-600">Loading reward details...</p>
-      </main>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <main className="bg-gray-50 flex flex-col items-center justify-center min-h-screen">
+  //       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  //       <p className="mt-4 text-gray-600">Loading reward details...</p>
+  //     </main>
+  //   );
+  // }
 
-  if (isLoading) {
-    return <div className="p-6 text-gray-500">Loading reward details...</div>;
-  }
+  // if (isLoading) {
+  //   return <div className="p-6 text-gray-500">Loading reward details...</div>;
+  // }
 
-  if (error || !rewardDetail) {
-    return (
-      <div className="p-6">
-        <p className="text-red-600 font-semibold">
-          Failed to load reward details.
-        </p>
-        <button
-          onClick={() => router.push("/token_marketplace")}
-          className="text-blue-600 text-sm mt-2"
-        >
-          &larr; Back to Marketplace
-        </button>
-      </div>
-    );
-  }
+  // if (error || !rewardDetail) {
+  //   return (
+  //     <div className="p-6">
+  //       <p className="text-red-600 font-semibold">
+  //         Failed to load reward details.
+  //       </p>
+  //       <button
+  //         onClick={() => router.push("/token_marketplace")}
+  //         className="text-blue-600 text-sm mt-2"
+  //       >
+  //         &larr; Back to Marketplace
+  //       </button>
+  //     </div>
+  //   );
+  // }
 
   return (
     <main className="w-full gap-4 p-4 sm:px-8 sm:py-4 md:gap-8 lg:px-16 bg-gray-50">
@@ -188,9 +195,11 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
             {/* Image Section */}
             <div className="relative rounded-xl overflow-hidden h-72 mb-6">
               <Image
-                alt={rewardDetail?.title}
+                alt={rewardDetail?.title || "Reward"}
                 src={
-                  categoryColorMap["Mobile-TopUp"]?.image ??
+                  rewardDetail?.imageUrl ||
+                  categoryColorMap[rewardDetail?.category || "Mobile-TopUp"]
+                    ?.image ||
                   "https://assets.rumsan.net/rumsan-test/virtualperks-tokenmanagement-defaultimg.jpg"
                 }
                 width={800}
@@ -199,25 +208,25 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               <div className="absolute bottom-3 left-3 bg-white/90 text-gray-800 text-xs px-3 py-1 rounded-full shadow">
-                {
-                  "Mobile-TopUp" /* Replace with dynamic category if available */
-                }
+                {rewardDetail?.category || "Mobile-TopUp"}
               </div>
             </div>
 
             {/* Title & Description */}
             <h2 className="text-3xl font-bold text-gray-900 mb-3">
-              {rewardDetail?.title}
+              {rewardDetail?.title || "Reward Title"}
             </h2>
             <p className="text-gray-700 mb-6 leading-relaxed">
-              {rewardDetail?.description}
+              {rewardDetail?.description ||
+                "Reward description will appear here."}
             </p>
 
             {/* Token Info */}
             <div className="flex items-center gap-2 text-gray-700 mb-4">
               <span className="font-medium">Required Tokens:</span>
               <span className="text-blue-600 flex items-center gap-1 font-semibold text-lg">
-                {rewardDetail?.tokens} <Coins size={20} strokeWidth={2.4} />
+                {rewardDetail?.tokens || 0}{" "}
+                <Coins size={20} strokeWidth={2.4} />
               </span>
             </div>
 
@@ -234,7 +243,7 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
                 </p>
                 <div className="flex justify-center items-center text-blue-700 text-2xl font-bold gap-2">
                   {/* Correctly display bigint as string */}
-                  {participantTotalToken?.toString() ?? 0} <Coins size={24} />
+                  {totalTokens?.toString() ?? 0} <Coins size={24} />
                 </div>
               </div>
 
@@ -242,7 +251,8 @@ const RewardDetails = ({ rewardId, router }: RewardDetailsProps) => {
                 Token Required to Redeem
               </h3>
               <div className="text-blue-600 text-2xl font-bold text-center my-2 flex items-center justify-center gap-2">
-                {rewardDetail?.tokens} <Coins size={24} strokeWidth={2.65} />
+                {rewardDetail?.tokens || 0}{" "}
+                <Coins size={24} strokeWidth={2.65} />
               </div>
               <p className="text-xs text-gray-500 text-center mt-1">
                 By redeeming, you agree to the terms.
