@@ -1,7 +1,4 @@
-import { DataTablePagination } from "@/components/common/list/list.pagination";
-import { ListTable } from "@/components/common/list/list.table";
 // import { useGetAllParticipantsByRole } from "@/hooks/subgraph/participant";
-import { PATHS } from "@/routes/paths";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -12,13 +9,9 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { Button } from "@workspace/ui/components/button";
-import { Card } from "@workspace/ui/components/card";
-import { Plus } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import React from "react";
 import { useColumns } from "./list.columns";
-import ListToolBar from "./list.toolbar";
 
 type ParticipantListProps = {
   router: AppRouterInstance;
@@ -47,7 +40,7 @@ const ParticipantList = ({ router }: ParticipantListProps) => {
 
   const table = useReactTable({
     //data: AllParticipants || [],
-    data:  [],
+    data: [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -80,14 +73,14 @@ const ParticipantList = ({ router }: ParticipantListProps) => {
             List of all the participants
           </h3>
         </div>
-        <div className="flex justify-end ml-auto mt-0">
+        {/* <div className="flex justify-end ml-auto mt-0">
           <Button onClick={() => router.push(PATHS.PARTICIPANT.ADD)}>
             <Plus size={20} strokeWidth={2.5} /> <span>Add Participant</span>
           </Button>
-        </div>
+        </div> */}
       </div>
 
-      <Card className="p-4">
+      {/* <Card className="p-4">
         <ListToolBar />
         <ListTable table={table} columns={columns} />
         <DataTablePagination
@@ -95,7 +88,7 @@ const ParticipantList = ({ router }: ParticipantListProps) => {
           setPagination={setPagination}
           pagination={pagination}
         />
-      </Card>
+      </Card> */}
     </main>
   );
 };
