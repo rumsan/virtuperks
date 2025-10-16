@@ -13,38 +13,43 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
-
 model Reward {
   cuid        String       @id @unique @default(cuid())
   title       String       @db.VarChar(255)
-  description String
+  description String?
+  category    String?
   tokens      Int
-  category    String?      @db.VarChar(100)
+  wallet      String
   isActive    Boolean      @default(true)
   imageUrl    String?      @db.VarChar(255)
-  stock       Int?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
   redemptions Redemption[]
 }
 
 model Redemption {
-  cuid              Int              @id @default(autoincrement())
-  userAddress     String           @db.VarChar(42)
-  rewardId        String
-  reward          Reward           @relation(fields: [rewardId], references: [cuid])
-  tokens          Int
-  transactionHash String?          @db.VarChar(66)
-  status          RedemptionStatus @default(PENDING)
-  taskId          String?          @db.VarChar(66)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  cuid              String           @id @unique @default(cuid())
+  rewardId          String
+  userWalletAddress String           @db.VarChar(42)
+  reward            Reward           @relation(fields: [rewardId], references: [cuid])
+  transactionHash   String           @db.VarChar(66)
+  status            RedemptionStatus @default(PENDING)
+  details           Json? // Store phone number and other details as JSON
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  deletedAt         DateTime?
+
+  @@index([rewardId])
+  @@index([userWalletAddress])
+  @@index([status])
 }
 
 enum RedemptionStatus {
   PENDING
-  COMPLETED
+  PROCESSING
+  FAILED
+  CANCELLED
+  REJECTED
+  SUCCESS
 }
-

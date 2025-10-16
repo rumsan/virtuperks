@@ -8,9 +8,9 @@ dataSources:
     name: AppRegistry
     network: base-sepolia
     source:
-      address: "0x3e3Adc1226E816d08c6106C2Ca82CF399f0BF55c"
+      address: "0xd258EE403eEa5b9d90631CfBCE81b6c7B729e6C5"
       abi: AppRegistry
-      startBlock: 29092725
+      startBlock: 31240728
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -46,9 +46,9 @@ dataSources:
     name: RewardToken
     network: base-sepolia
     source:
-      address: "0x133D83bd1C744e4125746dC024de0B2bc743A5b8"
+      address: "0xD6BA3357fdb5423030Ba81E7268Ea786aF70b39B"
       abi: RewardToken
-      startBlock: 29092751
+      startBlock: 31240749
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -69,9 +69,9 @@ dataSources:
     name: RewardManagementFactory
     network: base-sepolia
     source:
-      address: "0x01e46aD5c6f2D3bf8f557c9A409E7Ab20fE45974"
+      address: "0x6baE87178836d3eE036751a2d3B6693eAd0188a8"
       abi: RewardManagementFactory
-      startBlock: 29092758
+      startBlock: 31240756
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -85,26 +85,6 @@ dataSources:
         - event: RewardManagementCreated(address,address,bytes32,string,bytes32)
           handler: handleRewardManagementCreated
       file: ./src/reward-management-factory.ts
-  - kind: ethereum
-    name: RewardRedemptionFactory
-    network: base-sepolia
-    source:
-      address: "0xC56f9e53570a3aa10bdB59D62997d898A9c58f53"
-      abi: RewardRedemptionFactory
-      startBlock: 29092766
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.9
-      language: wasm/assemblyscript
-      entities:
-        - RewardRedemptionCreated
-      abis:
-        - name: RewardRedemptionFactory
-          file: ./abis/RewardRedemptionFactory.json
-      eventHandlers:
-        - event: RewardRedemptionCreated(address,string,uint256,string,bytes32)
-          handler: handleRewardRedemptionCreated
-      file: ./src/reward-redemption-factory.ts
 templates:
   - kind: ethereum
     name: RewardManagement
@@ -130,6 +110,7 @@ templates:
         - TaskCompleted
         - TaskCreated
         - TaskDetailsUpdated
+        - TaskRejected
         - TaskVerified
         - TokenTransferred
       abis:
@@ -164,30 +145,10 @@ templates:
           handler: handleTaskCreated
         - event: TaskDetailsUpdated(indexed bytes32,indexed address)
           handler: handleTaskDetailsUpdated
+        - event: TaskRejected(indexed bytes32,indexed address,indexed address,string)
+          handler: handleTaskRejected
         - event: TaskVerified(indexed bytes32,indexed address,indexed address)
           handler: handleTaskVerified
         - event: TokenTransferred(indexed address,indexed address,uint256,string,indexed address)
           handler: handleTokenTransferred
       file: ./src/reward-management.ts
-
-  - kind: ethereum
-    name: RewardRedemption
-    network: base-sepolia
-    source:
-      abi: RewardRedemption
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.9
-      language: wasm/assemblyscript
-      entities:
-        - RewardRedeem
-        - RewardReleased
-      abis:
-        - name: RewardRedemption
-          file: ./abis/RewardRedemption.json
-      eventHandlers:
-        - event: RewardRedeem(indexed address,uint256,uint8,uint256)
-          handler: handleRewardRedeem
-        - event: RewardReleased(indexed address,uint256,uint8,uint256)
-          handler: handleRewardReleased
-      file: ./src/reward-redemption.ts

@@ -7,7 +7,8 @@ interface IRewardManagement {
         PENDING,
         ACCEPTED,
         COMPLETED,
-        VERIFIED
+        VERIFIED,
+        REJECTED
     }
 
     struct Task {
@@ -26,6 +27,7 @@ interface IRewardManagement {
         uint256 maxParticipants;
         uint256 acceptedParticipantCount;
         address[] verifiedParticipants;
+        address[] rejectedParticipants;
     }
     struct TaskAssignment {
         address participant;
@@ -40,6 +42,12 @@ interface IRewardManagement {
     event ParticipantApplied(bytes32 indexed id, address indexed participant);
     event TaskCompleted(bytes32 indexed id, address indexed participant);
     event TaskApproved(bytes32 indexed id, address indexed approver);
+    event TaskRejected(
+    bytes32 indexed id,
+    address indexed participant,
+    address indexed rejectedBy,
+    string reason 
+);
     event TaskVerified(bytes32 indexed id, address indexed participant, address indexed verifier);
     event TaskDetailsUpdated(bytes32 indexed id, address indexed updatedBy);
 
@@ -84,6 +92,7 @@ interface IRewardManagement {
     function participate(bytes32 taskId) external;
     function acceptParticipant(bytes32 taskId, address participant) external;
     function completeTask(bytes32 taskId, string memory completionUrl) external;
+     function rejectParticipant(bytes32 taskId, address participant, string memory reason) external;
     function verifyTask(bytes32 taskId, address participant) external;
     function closeTask(bytes32 taskId) external;
     function closeExpiredTasks() external;

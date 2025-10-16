@@ -1,15 +1,14 @@
 export type CommonFields = {
-  id: string;
-  internal_id?: string;
+  cuid: string;
+  createdAt: Date;
   createdBy?: string;
-  blockNumber: string;
-  blockTimestamp: string;
-  transactionHash: string;
-  __typename: string;
+  updatedAt: Date;
+  deletedAt?: Date | null;
+  updatedBy?: string;
 };
 
 export type VirtueperkCommonField = {
-  cuid: string;
+  id: string;
   createdBy?: string;
   updatedBy?: string;
 }

@@ -1,5 +1,5 @@
 import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
-import { ParticipantTaskStatus, RedemptionStatus, RewardRedemptionCreated, TaskCreated, TaskDetail, TaskIdMapping } from "../generated/schema";
+import { ParticipantTaskStatus, TaskCreated, TaskDetail, TaskIdMapping } from "../generated/schema";
 import { RewardManagement } from "../generated/templates/RewardManagement/RewardManagement";
 
 
@@ -97,51 +97,56 @@ export function updateParticipantTaskStatus(
   ]);
 }
 
-
-export function updateRedemptionStatus(
-  participant: Bytes,
-  rewardRedemptionAddress: Bytes,
-  amount: BigInt,
-  status: i32,
-  redemptionId: BigInt,
-  blockNumber: BigInt,
+// New helper function to add a participant to the whitelisted array
+export function addParticipantToWhitelist(
+  taskId: Bytes, 
+  participant: Bytes, 
+  blockNumber: BigInt, 
   blockTimestamp: BigInt,
-  transactionHash: Bytes
+  by: Bytes
 ): void {
-  // Create a unique ID based on participant and redemptionId only
-  let id = participant.concat(Bytes.fromUTF8(redemptionId.toString()));
+  let whitelistId = taskId.concat(participant);
   
-  let statusEntity = RedemptionStatus.load(id);
-  if (!statusEntity) {
-    statusEntity = new RedemptionStatus(id);
-    statusEntity.redemptionId = redemptionId;
-    statusEntity.from = participant;
-    statusEntity.amount = amount;
-  }
+  // let whitelistEntity = new ParticipantWhitelisted(whitelistId);
+  // whitelistEntity.taskId = taskId;
+  // whitelistEntity.participant = participant;
+  // whitelistEntity.by = by;
+  // whitelistEntity.blockNumber = blockNumber;
+  // whitelistEntity.blockTimestamp = blockTimestamp;
+  // whitelistEntity.save();
   
-  // Update the status and timestamps
-  statusEntity.status = status;
-  statusEntity.blockNumber = blockNumber;
-  statusEntity.blockTimestamp = blockTimestamp;
-  statusEntity.transactionHash = transactionHash;
-  
-  let rewardRedemption = RewardRedemptionCreated.load(rewardRedemptionAddress);
-  if (rewardRedemption) {
-    statusEntity.rewardRedemption = rewardRedemption.id;
-  }
-  
-  statusEntity.save();
-  
-  log.info(
-    "Updated RedemptionStatus: participant={}, redemptionId={}, status={}", 
-    [
-      participant.toHexString(),
-      redemptionId.toString(),
-      status.toString()
-    ]
-  );
-}
+  let taskDetail = TaskDetail.load(taskId);
+  if (taskDetail) {
+    let whitelistedParticipants: Bytes[] = [];
+    
 
+    
+    // Check if participant is already in the array using a traditional loop
+    let isAlreadyWhitelisted = false;
+    for (let i = 0; i < whitelistedParticipants.length; i++) {
+      if (whitelistedParticipants[i].equals(participant)) {
+        isAlreadyWhitelisted = true;
+        break;
+      }
+    }
+    
+    // Add participant if not already in the array
+    if (!isAlreadyWhitelisted) {
+      whitelistedParticipants.push(participant);
+      taskDetail.whitelistedParticipants = whitelistedParticipants;
+      taskDetail.save();
+      
+      log.info("Added participant {} to whitelist for task {}", [
+        participant.toHexString(),
+        taskId.toHexString()
+      ]);
+    }
+  } else {
+    log.warning("Could not find TaskDetail for taskId {} when trying to add to whitelist", [
+      taskId.toHexString()
+    ]);
+  }
+}
 
 
 

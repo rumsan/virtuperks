@@ -1,4 +1,4 @@
-import { CommonFields } from "./common.type";
+import { CommonFields, VirtueperkCommonField } from "./common.type";
 import { EntityTaskManagerCreated } from "./entity.type";
 import { TaskDetail } from "./taskDetail.type";
 
@@ -19,8 +19,9 @@ export type RewardManagement = {
   rewardManagement: string; 
 };
 
-export type TaskCreated = CommonFields & {
+export type TaskCreated = VirtueperkCommonField & {
   internal_id: string;
+
   entityTaskManager?: EntityTaskManagerCreated;
   rewardManagement?: RewardManagement; 
   status: string;

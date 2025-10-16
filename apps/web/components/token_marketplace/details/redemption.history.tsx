@@ -2,11 +2,11 @@
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import {
-  useGetRedeemedReward,
-  useGetRedeemedRewardByParticiant,
-  useGetRewardRole,
-  useUpdateRedemptionStatus,
+  useRedemptionList,
+  useUpdateRedemption,
 } from "@/hooks/subgraph/token-marketplace";
+import { useExecuteOfframpMutation } from "@/offramp/offramp.service";
+import { RedemptionWithRelations } from "@/utils/types";
 import {
   flexRender,
   getCoreRowModel,
@@ -19,6 +19,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
+import { useToast } from "@workspace/ui/hooks/use-toast";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { useColumns } from "./redemption.column";
@@ -29,91 +30,44 @@ interface RedemptionHistoryProps {
 
 const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
   const { address, isConnected } = useAccount();
+  const { toast } = useToast();
 
-  const getRedeemReward = useGetRedeemedReward(rewardId);
-  const getParticipantReward = useGetRedeemedRewardByParticiant(
-    address as `0x${string}`,
-  );
-  const { rewardRole, roleLoading } = useGetRewardRole(rewardId);
+  const { data: redemptionList } = useRedemptionList({ rewardId });
+  const executeOfframpApi = useExecuteOfframpMutation();
+  const updateRedemption = useUpdateRedemption();
 
-  const allRedemptions = getRedeemReward?.data?.data?.redemptionStatuses ?? [];
-
-  const redeemedRewardsByParticipant =
-    getParticipantReward?.data?.data?.redemptionStatuses ?? [];
-
-  const { UpdateRedeemStatus: rawUpdateStatus, UpdateRedeemPending } =
-    useUpdateRedemptionStatus();
-  const [isPending, setIsPending] = useState(false);
+  const allRedemptions = redemptionList?.data as
+    | RedemptionWithRelations[]
+    | undefined;
 
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  const updateStatus = async (params: {
-    userAddress: string;
-    rewardAddress: string;
-    redemptionId: string;
-  }) => {
-    setUpdatingId(params.redemptionId);
-    try {
-      await rawUpdateStatus(params);
-    } finally {
-      setUpdatingId(null);
-    }
-  };
-
-  const columns = useColumns<(typeof allRedemptions)[0]>(
-    updateStatus,
-    updatingId,
-    rewardRole,
-  );
+  const columns = useColumns();
 
   const [paginationAll, setPaginationAll] = useState({
     pageIndex: 0,
     pageSize: 10,
   });
-  const [paginationMine, setPaginationMine] = useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
+  // const [paginationMine, setPaginationMine] = useState({
+  //   pageIndex: 0,
+  //   pageSize: 10,
+  // });
 
   // const getRewardOwnerAddress = useGetRewardOwner(rewardId);
 
   const [tab, setTab] = useState<"all" | "mine">("all");
 
   const tableAll = useReactTable({
-    data: allRedemptions,
+    data: allRedemptions ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     state: { pagination: paginationAll },
     onPaginationChange: setPaginationAll,
-    pageCount: Math.ceil(allRedemptions.length / paginationAll.pageSize),
-  });
-
-  const tableMine = useReactTable({
-    data: redeemedRewardsByParticipant,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    state: { pagination: paginationMine },
-    onPaginationChange: setPaginationMine,
     pageCount: Math.ceil(
-      redeemedRewardsByParticipant.length / paginationMine.pageSize,
+      (allRedemptions?.length ?? 0) / paginationAll.pageSize,
     ),
   });
-
-  if (getRedeemReward.isLoading || getParticipantReward.isLoading) {
-    return (
-      <p className="text-gray-500 text-sm p-6">Loading redemption history...</p>
-    );
-  }
-
-  if (getRedeemReward.error || getParticipantReward.error) {
-    return (
-      <p className="text-red-600 text-sm p-6">
-        Failed to load redemption history.
-      </p>
-    );
-  }
 
   return (
     <main className="flex flex-col gap-4 p-6 bg-white rounded-xl">
@@ -132,7 +86,7 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
           setTab(v as "all" | "mine");
           // Reset pagination for the newly selected tab
           if (v === "all") setPaginationAll((p) => ({ ...p, pageIndex: 0 }));
-          if (v === "mine") setPaginationMine((p) => ({ ...p, pageIndex: 0 }));
+          // if (v === "mine") setPaginationMine((p) => ({ ...p, pageIndex: 0 }));
         }}
       >
         <TabsList className="mb-2">
@@ -210,7 +164,7 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
         </TabsContent>
 
         {/* My History Tab */}
-        <TabsContent value="mine">
+        {/* <TabsContent value="mine">
           <div
             className="border rounded-lg"
             style={{ minHeight: `${paginationMine.pageSize * 48 + 56}px` }}
@@ -276,7 +230,7 @@ const RedemptionHistory = ({ rewardId }: RedemptionHistoryProps) => {
               setPagination={setPaginationMine}
             />
           </div>
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
     </main>
   );

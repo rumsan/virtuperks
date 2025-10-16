@@ -30,7 +30,7 @@ describe('RewardManagement Contract', function() {
 
   describe('Task Creation and Management', function() {
     it('should create task with valid parameters', async function() {
-      const { rewardManagement, user2, rewardToken, appRegistry, APP_ID } = await fixture();
+      const { rewardManagement, user2, user1, rewardToken, appRegistry, APP_ID } = await fixture();
       
     
       
@@ -51,7 +51,8 @@ describe('RewardManagement Contract', function() {
         isTokenDisbursed: false,
         maxParticipants: 10,
         acceptedParticipantCount: 0,
-        verifiedParticipants: []
+        verifiedParticipants: [],
+       rejectedParticipants: []
       };
 
       await expect(rewardManagement.connect(user2).createTask(taskId, task, []))
@@ -80,7 +81,8 @@ describe('RewardManagement Contract', function() {
         isTokenDisbursed: false,
         maxParticipants: 10,
         acceptedParticipantCount: 0,
-        verifiedParticipants: []
+        verifiedParticipants: [],
+        rejectedParticipants: []
       };
 
       await rewardManagement.connect(user2).createTask(taskId, task, []);
@@ -120,7 +122,8 @@ describe('RewardManagement Contract', function() {
         isTokenDisbursed: false,
         maxParticipants: 10,
         acceptedParticipantCount: 0,
-        verifiedParticipants: []
+        verifiedParticipants: [],
+        rejectedParticipants: []
       };
 
       // Create whitelisted task
@@ -162,7 +165,8 @@ describe('RewardManagement Contract', function() {
         isTokenDisbursed: false,
         maxParticipants: 10,
         acceptedParticipantCount: 0,
-        verifiedParticipants: []
+        verifiedParticipants: [],
+        rejectedParticipants: []
       };
 
       // Create task and add to whitelist
@@ -202,7 +206,8 @@ describe('RewardManagement Contract', function() {
         isTokenDisbursed: false,
         maxParticipants: 10,
         acceptedParticipantCount: 0,
-        verifiedParticipants: []
+        verifiedParticipants: [],
+        rejectedParticipants: []
       };
 
       // Create task
@@ -243,7 +248,8 @@ describe('RewardManagement Contract', function() {
         isTokenDisbursed: false,
         maxParticipants: 10,
         acceptedParticipantCount: 0,
-        verifiedParticipants: []
+        verifiedParticipants: [],
+        rejectedParticipants: []
       };
 
       // Create three tasks
@@ -281,7 +287,8 @@ describe('RewardManagement Contract', function() {
         isTokenDisbursed: false,
         maxParticipants: 10,
         acceptedParticipantCount: 0,
-        verifiedParticipants: []
+        verifiedParticipants: [],
+        rejectedParticipants: []
       };
 
       // Create task
@@ -327,7 +334,8 @@ describe('RewardManagement Contract', function() {
         isTokenDisbursed: false,
         maxParticipants: 10,
         acceptedParticipantCount: 0,
-        verifiedParticipants: []
+        verifiedParticipants: [],
+        rejectedParticipants: []
       };
 
       const task2 = {
@@ -387,7 +395,8 @@ describe('RewardManagement Contract', function() {
         isTokenDisbursed: false,
         maxParticipants: 10,
         acceptedParticipantCount: 0,
-        verifiedParticipants: []
+        verifiedParticipants: [],
+        rejectedParticipants: []
       };
 
       // Create task
@@ -425,7 +434,8 @@ describe('RewardManagement Contract', function() {
         isTokenDisbursed: false,
         maxParticipants: 10,
         acceptedParticipantCount: 0,
-        verifiedParticipants: []
+        verifiedParticipants: [],
+        rejectedParticipants: []
       };
 
       await rewardManagement.connect(user2).createTask(taskId, task, []);
@@ -458,7 +468,8 @@ describe('RewardManagement Contract', function() {
         isTokenDisbursed: false,
         maxParticipants: 10,
         acceptedParticipantCount: 0,
-        verifiedParticipants: []
+        verifiedParticipants: [],
+        rejectedParticipants: []
       };
 
       await rewardManagement.connect(user2).createTask(taskId, task, []);
@@ -502,7 +513,8 @@ describe('RewardManagement Contract', function() {
         isTokenDisbursed: false,
         maxParticipants: 1, // Set max to 1 for testing
         acceptedParticipantCount: 0,
-        verifiedParticipants: []
+        verifiedParticipants: [],
+        rejectedParticipants: []
       };
 
       await rewardManagement.connect(user2).createTask(taskId, task, []);
@@ -542,7 +554,8 @@ describe('RewardManagement Contract', function() {
         isTokenDisbursed: false,
         maxParticipants: 10,
         acceptedParticipantCount: 0,
-        verifiedParticipants: []
+        verifiedParticipants: [],
+        rejectedParticipants: []
       };
 
       await rewardManagement.connect(user2).createTask(taskId, task, []);
@@ -570,7 +583,8 @@ describe('RewardManagement Contract', function() {
         isTokenDisbursed: false,
         maxParticipants: 10,
         acceptedParticipantCount: 0,
-        verifiedParticipants: []
+        verifiedParticipants: [],
+        rejectedParticipants: []
       };
 
       await rewardManagement.connect(user2).createTask(taskId, task, []);
@@ -601,6 +615,62 @@ describe('RewardManagement Contract', function() {
       expect(updatedTask.acceptedParticipantCount).to.equal(1);
     });
 
+    it('should allow task owner to reject participant', async function () {
+      const { rewardManagement, user2, participant1, rewardToken } = await fixture();
+      const taskId = ethers.id('REJECT_TASK');
+        const task = {
+        name: "Verify Task",
+        detailsUrl: "https://verify.com",
+        owner: user2.address,
+        expiryDate: Math.floor(Date.now() / 1000) + 86400,
+        rewardToken: await rewardToken.getAddress(),
+        totalRewardAmount: BigInt(100),
+        isOpen: true,
+        requireApproval: true,
+        isWhitelisted: false,
+        isTokenDisbursed: false,
+        maxParticipants: 10,
+        acceptedParticipantCount: 0,
+        verifiedParticipants: [],
+        rejectedParticipants: [],
+      };
+
+      // Create and setup task
+      await rewardManagement.connect(user2).createTask(taskId, task, []);
+      await rewardManagement.connect(participant1).participate(taskId);
+      await rewardManagement.connect(user2).acceptParticipant(taskId, participant1.address);
+      
+      // Complete task
+      const completionUrl = "https://completion.com";
+      await rewardManagement.connect(participant1).completeTask(taskId, completionUrl);
+      
+      // Verify initial state
+      let statusBeforeVerification = await rewardManagement.getParticipantStatus(taskId, participant1.address);
+      expect(statusBeforeVerification).to.equal(3); // AssignmentStatus.COMPLETED = 3
+
+
+        // Task reject the participant
+      await expect(rewardManagement.connect(user2).rejectParticipant(taskId, participant1.address, 'task has some issues'))
+        .to.emit(rewardManagement, 'TaskRejected')
+        .withArgs(taskId, participant1.address, user2.address, 'task has some issues');
+      
+ // Verify final state
+      const statusAfterVerification = await rewardManagement.getParticipantStatus(taskId, participant1.address);
+      expect(statusAfterVerification).to.equal(5); // AssignmentStatus.VERIFIED = 4
+
+      // Verify participant is added to verifiedParticipants array
+      const rejectedParticipants = await rewardManagement.getTaskRejectedParticipants(taskId);
+      expect(rejectedParticipants).to.include(participant1.address);
+      
+     
+
+
+
+
+
+
+  })
+
     it('should allow task owner to verify completed task', async function() {
       const { rewardManagement, user2, participant1, rewardToken } = await fixture();
       const taskId = ethers.id('VERIFY_TASK');
@@ -618,7 +688,8 @@ describe('RewardManagement Contract', function() {
         isTokenDisbursed: false,
         maxParticipants: 10,
         acceptedParticipantCount: 0,
-        verifiedParticipants: []
+        verifiedParticipants: [],
+        rejectedParticipants: [],
       };
 
       // Create and setup task
@@ -671,7 +742,8 @@ describe('RewardManagement Contract', function() {
         isTokenDisbursed: false,
         maxParticipants: 10,
         acceptedParticipantCount: 0,
-        verifiedParticipants: []
+        verifiedParticipants: [],
+        rejectedParticipants: []
       };
 
       // Setup complete task flow
@@ -751,7 +823,8 @@ describe('RewardManagement Contract', function() {
         isTokenDisbursed: false,
         maxParticipants: 10,
         acceptedParticipantCount: 0,
-        verifiedParticipants: []
+        verifiedParticipants: [],
+        rejectedParticipants: []
       };
 
       // Setup complete task flow and initial disbursement
@@ -805,7 +878,8 @@ describe('RewardManagement Contract', function() {
         isTokenDisbursed: false,
         maxParticipants: 10,
         acceptedParticipantCount: 0,
-        verifiedParticipants: []
+        verifiedParticipants: [],
+        rejectedParticipants: []
       };
 
       // Create task (this will allocate tokens)
