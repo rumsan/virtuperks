@@ -17,7 +17,7 @@ import { PATHS } from "@/routes/paths";
 import hasRole from "@/utils/role";
 import { Button } from "@workspace/ui/components/button";
 import { useToast } from "@workspace/ui/hooks/use-toast";
-import { CheckCircle, CircleX, Loader2 } from "lucide-react";
+import { Ban, CheckCircle, CircleX, Loader2 } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 import TaskParticipant from "./details.participant";
@@ -69,17 +69,19 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const closeTaskMutation = useCloseTaskMutation();
 
   const taskReady = !taskDetailLoading;
-  const isDisburseButtonDisabled =
-    !taskReady ||
-    isTokenDisbursedFromContract ||
-    hasVerifiedParticipants == false;
-  const isCloseButtonDisabled = !taskReady || isTaskExpired;
+  // const isDisburseButtonDisabled =
+  //   !taskReady ||
+  //   isTokenDisbursedFromContract ||
+  //   hasVerifiedParticipants == false;
+  const isCloseButtonDisabled =
+    !taskReady || isTaskExpired || !hasEntityOwnerRole;
 
   const {
     pendingParticipants,
     acceptedParticipants,
     completedParticipants,
     verifiedPartcipants,
+    rejectedParticipants,
     combineParticipantsLoading: participantsLoading,
   } = useGetCombineStausByTask(taskData?.internal_id);
 
@@ -161,7 +163,9 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
                 {!hasEntityOwnerRole && (
                   <span>Only entity owners can disperse tokens</span>
                 )}
-                {!hasVerifiedParticipants && <span>Task not verified</span>}
+                {!hasVerifiedParticipants && (
+                  <span>Verified task can only be disburse</span>
+                )}
               </div>
             </div>
           </div>
@@ -211,27 +215,38 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
             </h3>
           </div>
 
-          <div className="flex items-center ml-auto gap-4 mb-5">
+          <div className="flex items-center ml-auto gap-8 mb-5">
             {getDisburseButton()}
+            <div className="relative group">
+              {/* Wrapper hides cursor */}
+              <div className={`${isCloseButtonDisabled ? "cursor-none" : ""}`}>
+                <Button
+                  variant="outline"
+                  className="border border-[#E44134] flex items-center gap-2 hover:bg-gray-50"
+                  onClick={handleCloseTask}
+                  disabled={isCloseButtonDisabled}
+                >
+                  {closeTaskMutation.isPending ? (
+                    <span className="flex items-center gap-2 text-[#E44134]">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Closing...
+                    </span>
+                  ) : (
+                    <>
+                      <span className="text-[#E44134]">Close</span>
+                      <CircleX color="#E44134" strokeWidth={2.5} size={20} />
+                    </>
+                  )}
+                </Button>
+              </div>
 
-            <Button
-              variant="outline"
-              className="border border-[#E44134]"
-              onClick={handleCloseTask}
-              disabled={isCloseButtonDisabled}
-            >
-              {closeTaskMutation.isPending ? (
-                <span className="text-[#E44134] flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Closing...
-                </span>
-              ) : (
-                <>
-                  <span className="text-[#E44134]">Close</span>
-                  <CircleX color="#E44134" strokeWidth={2.5} size={20} />
-                </>
+              {/* Show Ban icon when disabled and hovered */}
+              {isCloseButtonDisabled && (
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+                  <Ban color="#E44134" strokeWidth={2.5} size={24} />
+                </div>
               )}
-            </Button>
+            </div>
 
             <DialogButton
               isOpen={isOpen}
@@ -243,7 +258,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
               handleApplyTaskLogic={handleDialogAction}
               availableTokens={Number(
                 taskData?.taskDetail?.totalRewardAmount ?? 0,
-              )} 
+              )}
             />
           </div>
         </div>
@@ -259,6 +274,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
             acceptedParticipants={acceptedParticipants}
             completedParticipants={completedParticipants}
             verifiedPartcipants={verifiedPartcipants}
+            rejectedParticipants={rejectedParticipants}
           />
         </div>
       </div>

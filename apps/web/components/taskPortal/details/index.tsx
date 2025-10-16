@@ -243,6 +243,14 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             <span className="text-[#F8FAFC]">Verified</span>
           </Button>
         );
+      case "REJECTED":
+      case 5:
+        return (
+          <Button className="bg-[#EF4444]" disabled>
+            <span className="text-[#F8FAFC]">Rejected</span>
+          </Button>
+        );
+
       default:
         return null;
     }

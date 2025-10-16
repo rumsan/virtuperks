@@ -3,6 +3,7 @@
 import {
   useCheckTotalUnallocatedTokens,
   useGetAllEntity,
+  useGetEntityById,
 } from "@/hooks/subgraph/entity";
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
@@ -29,6 +30,7 @@ import {
 } from "@workspace/ui/components/select";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { isAddress } from "viem";
@@ -64,6 +66,9 @@ export default function TaskBaseForm({
   const [walletAddresses, setWalletAddresses] = useState<string[]>([]);
   const getAllEntity = useGetAllEntity();
   const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
+  const params = useParams();
+  const cuid = params?.id as string;
+  const { data: entity, isLoading: entityLoading } = useGetEntityById(cuid);
 
   const {
     watch,
@@ -80,16 +85,23 @@ export default function TaskBaseForm({
   );
 
   useEffect(() => {
-    if (entityAddress && unallocatedTokens !== undefined) {
-      if (unallocatedTokens === BigInt(0)) {
-        setError("entityAddress", {
-          type: "manual",
-          message:
-            "Selected entity has no tokens available. Please mint tokens first.",
-        });
-      } else {
-        clearErrors("entityAddress");
-      }
+    if (entity?.rewardManagement) {
+      form.setValue("entityAddress", entity.rewardManagement);
+    }
+  }, [entity, form]);
+
+  useEffect(() => {
+    if (!entityAddress) return;
+    if (unallocatedTokens === undefined) return;
+
+    if (unallocatedTokens === BigInt(0)) {
+      setError("entityAddress", {
+        type: "manual",
+        message:
+          "This entity has no tokens available. Please mint tokens first.",
+      });
+    } else {
+      clearErrors("entityAddress");
     }
   }, [entityAddress, unallocatedTokens, setError, clearErrors]);
 
@@ -280,38 +292,36 @@ export default function TaskBaseForm({
               name="entityAddress"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Select Entity</FormLabel>
+                  <FormLabel>Entity</FormLabel>
                   <FormControl>
-                    <Select
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                      }}
-                      value={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select Entity" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {entityList?.map((entity: EntityType) => (
-                          <SelectItem
-                            key={entity.id}
-                            value={entity.rewardManagement}
-                          >
-                            {entity.name}
-                            {unallocatedTokens !== undefined &&
-                              entity.rewardManagement === entityAddress &&
-                              ` (Available: ${unallocatedTokens.toString()} tokens)`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex flex-col gap-2">
+                      <Input
+                        type="text"
+                        value={entity?.name || "Loading..."}
+                        disabled
+                        className="bg-gray-100 cursor-not-allowed"
+                      />
+                      {/* keep only the rewardManagement address in form submission */}
+                      <input
+                        type="hidden"
+                        {...field}
+                        value={entity?.rewardManagement || ""}
+                      />
+
+                      {/* 👇 Display available tokens here */}
+                      {unallocatedTokens !== undefined && (
+                        <span className="text-sm text-gray-500">
+                          Available Tokens: {unallocatedTokens.toString()}
+                        </span>
+                      )}
+                    </div>
                   </FormControl>
-                  <FormMessage className="text-red-500" />
+                  <FormMessage />
                 </FormItem>
               )}
             />
 
-            <FormField
+            {/* <FormField
               control={form.control}
               name="isOpen"
               render={({ field }) => (
@@ -336,7 +346,7 @@ export default function TaskBaseForm({
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
             <FormField
               control={form.control}

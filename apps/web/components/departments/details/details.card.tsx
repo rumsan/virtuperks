@@ -61,14 +61,7 @@ export default function DepartmentDetailsCard({
   } = useDirectTokenTransfer();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [transferAmount, setTransferAmount] = useState<number>(0);
-  const [isAmountValid, setIsAmountValid] = useState(true);
   const [copiedOwner, setCopiedOwner] = React.useState<string | null>(null);
-
-  const handleAmountChange = (value: number) => {
-    setTransferAmount(value);
-    setIsAmountValid(value <= (unallocatedTokens ?? 0));
-  };
 
   const params = useParams();
   const cuid = params?.id as string;

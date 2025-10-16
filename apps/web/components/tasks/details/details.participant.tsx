@@ -27,14 +27,15 @@ type TaskParticipantProps = {
   acceptedParticipants: any[];
   completedParticipants: any[];
   verifiedPartcipants: any[];
+  rejectedParticipants: any[];
 };
 
 const TaskParticipant = ({
-  taskData,
   pendingParticipants,
   acceptedParticipants,
   completedParticipants,
   verifiedPartcipants,
+  rejectedParticipants,
 }: TaskParticipantProps) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -56,8 +57,14 @@ const TaskParticipant = ({
       ...(pendingParticipants || []),
       ...(completedParticipants || []),
       ...(verifiedPartcipants || []),
+      ...(rejectedParticipants || []),
     ];
-  }, [pendingParticipants, completedParticipants, verifiedPartcipants]);
+  }, [
+    pendingParticipants,
+    completedParticipants,
+    verifiedPartcipants,
+    rejectedParticipants,
+  ]);
 
   const table = useReactTable({
     data: pendingAndAcceptedParticipants,

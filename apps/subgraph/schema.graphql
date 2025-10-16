@@ -295,6 +295,7 @@ type TaskRejected @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  taskDetail: TaskDetail
 }
 
 type TaskVerified @entity(immutable: true) {
