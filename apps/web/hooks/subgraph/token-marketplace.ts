@@ -1,5 +1,5 @@
 import { useRemoteClient } from "@/utils/api.utils";
-import { Pagination } from "@rumsan/sdk/types";
+
 import { useMutation, useQuery, UseQueryResult } from "@tanstack/react-query";
 import { CreateRedemption, Redemption } from "@workspace/sdk/type";
 
@@ -17,7 +17,7 @@ export const useRewardList = () => {
 
 export const useRedemptionList = (
   filters: any,
-  pagination?: Pagination,
+  pagination?: any,
 ): UseQueryResult<
   {
     data: Redemption[] | null;
