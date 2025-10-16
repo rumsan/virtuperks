@@ -2,23 +2,6 @@ import { ColumnDef } from "@tanstack/react-table";
 
 type TableType = "transfer" | "disbursement";
 
-interface TransferRow {
-  id: string;
-  token: string;
-  to: string;
-  remarks?: string;
-  amount: string;
-  transferredBy: string;
-}
-
-interface DisbursementRow {
-  id: string;
-  amount: string;
-  disbursedBy: string;
-  recipient: string;
-  purpose?: string;
-}
-
 export function useColumns(type: TableType): ColumnDef<any>[] {
   if (type === "transfer") {
     console.log("Type: ", type);
@@ -56,7 +39,7 @@ export function useColumns(type: TableType): ColumnDef<any>[] {
       },
     ];
   }
-  // Disbursement Columns
+
   return [
     {
       accessorKey: "id",

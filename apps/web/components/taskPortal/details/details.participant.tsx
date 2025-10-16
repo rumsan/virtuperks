@@ -23,6 +23,7 @@ import {
 import { User } from "lucide-react";
 import { useState } from "react";
 import { useHistoryColumns } from "./history.column";
+
 type TaskPortalParticipantProps = { taskId: any };
 
 const TaskPortalParticipant = ({ taskId }: TaskPortalParticipantProps) => {

@@ -7,6 +7,7 @@ import {
   useWriteRewardManagementAcceptParticipant,
   useWriteRewardManagementCompleteTask,
   useWriteRewardManagementParticipate,
+  useWriteRewardManagementRejectParticipant,
   useWriteRewardManagementVerifyTask,
 } from "../wagmi/contracts";
 
@@ -79,7 +80,6 @@ export const useCompleteTaskMutation = () => {
       entityId: string;
       completionUrl?: string;
     }) => {
-      
       const result = await writeContractAsync({
         address: (entityId as `0x${string}`) || "0x",
         args: [taskId as `0x${string}`, completionUrl || ""],
@@ -102,11 +102,6 @@ export const useCompleteTaskMutation = () => {
     completeSuccess: mutation.isSuccess,
   };
 };
-
-
-
-
-
 
 export const useAcceptParticipantMutation = () => {
   const queryClient = useQueryClient();
@@ -152,26 +147,23 @@ export const useGetCombineStausByTask = (taskId: any) => {
     },
     enabled: !!taskId,
   });
-  
 
-//  const filterData = data?.data?.participantTaskStatuses || [];
+  //  const filterData = data?.data?.participantTaskStatuses || [];
 
   return {
     pendingParticipants: data?.data?.pendingParticipants || [],
     acceptedParticipants: data?.data?.acceptedParticipants || [],
     completedParticipants: data?.data?.completedParticipants || [],
-    verifiedPartcipants:data?.data?.verifiedParticipants || [],
+    verifiedPartcipants: data?.data?.verifiedParticipants || [],
+    rejectedParticipants: data?.data?.rejectedParticipants || [],
     combineParticipantsLoading: isLoading,
-    
-  }
+  };
 };
-
-
 
 export const useVerifyParticipantMutation = () => {
   const queryClient = useQueryClient();
   const { writeContractAsync, isPending, isSuccess } =
-    useWriteRewardManagementVerifyTask()
+    useWriteRewardManagementVerifyTask();
 
   return useMutation({
     mutationFn: async ({
@@ -186,6 +178,40 @@ export const useVerifyParticipantMutation = () => {
       const result = await writeContractAsync({
         address: (entityId as `0x${string}`) || "0x",
         args: [taskId as `0x${string}`, participant as `0x${string}`],
+      });
+
+      return result;
+    },
+
+    onSuccess: async (result, variable) => {
+      await new Promise((resolve) => setTimeout(resolve, 9000));
+      await queryClient.invalidateQueries({
+        queryKey: ["AllParticipantsStatus", variable.taskId],
+      });
+    },
+  });
+};
+
+export const useRejectParticipantMutation = () => {
+  const queryClient = useQueryClient();
+  const { writeContractAsync, isPending, isSuccess } =
+    useWriteRewardManagementRejectParticipant();
+
+  return useMutation({
+    mutationFn: async ({
+      taskId,
+      participant,
+      entityId,
+      remark,
+    }: {
+      taskId: string;
+      participant: string;
+      entityId: string;
+      remark: string;
+    }) => {
+      const result = await writeContractAsync({
+        address: (entityId as `0x${string}`) || "0x",
+        args: [taskId as `0x${string}`, participant as `0x${string}`, remark],
       });
 
       return result;
