@@ -32,7 +32,7 @@ async function bootstrap() {
   // app.useGlobalInterceptors(new ResponseTransformInterceptor());
   app.setGlobalPrefix(globalPrefix);
 
-  const port = process.env.PORT || 3003;
+  const port = process.env.PORT || 3007;
 
   const config = new DocumentBuilder()
     .setTitle('Virtue Perks API')

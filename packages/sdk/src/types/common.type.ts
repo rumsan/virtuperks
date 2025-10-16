@@ -8,7 +8,7 @@ export type CommonFields = {
 };
 
 export type VirtueperkCommonField = {
-  cuid: string;
+  id: string;
   createdBy?: string;
   updatedBy?: string;
 }
