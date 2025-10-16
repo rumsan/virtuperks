@@ -1,4 +1,3 @@
-import { categoryColorMap } from "@/components/token_marketplace/img/imgLink";
 import { Button } from "@workspace/ui/components/button";
 import {
   Dialog,
@@ -19,12 +18,8 @@ type DialogButtonProps = {
   title: string;
   subTitle: string;
   buttonName: string;
-  submitType?:
-    | "Apply"
-    | "Complete"
-    | "Disperse"
-    | "directdisburse"
-    | "CreateReward";
+  submitType?: "Apply" | "Complete" | "Disperse" | "directdisburse";
+
   inputLabel?: string;
   inputPlaceholder?: string;
   availableTokens?: number;
@@ -102,15 +97,6 @@ export const DialogButton = ({
         return `Amount exceeds available tokens (${availableTokens})`;
       if (!formData.to.trim()) return "Recipient address is required";
     }
-    if (
-      submitType === "CreateReward" &&
-      (!formData.name.trim() ||
-        !formData.amount.trim() ||
-        !formData.ownerAddress.trim() ||
-        !formData.category.trim())
-    ) {
-      return "Reward name, amount, category, and owner Address are required";
-    }
 
     return null;
   };
@@ -141,14 +127,8 @@ export const DialogButton = ({
           to: formData.to.trim(),
           remarks: formData.remarks.trim(),
         };
-      } else if (submitType === "CreateReward") {
-        submitData = {
-          name: formData.name.trim(),
-          amount: formData.amount.trim(),
-          ownerAddress: formData.ownerAddress.trim(),
-          category: formData.category.trim(),
-        };
       }
+      console.log("Submitting data:", submitData); // Debug log
 
       await handleApplyTaskLogic?.(submitData);
 
@@ -170,8 +150,6 @@ export const DialogButton = ({
         errorMessage = "Failed to disperse amount";
       else if (submitType === "directdisburse")
         errorMessage = "Failed to process direct disbursement";
-      else if (submitType === "CreateReward")
-        errorMessage = "Failed to create reward";
 
       setError(errorMessage);
       toast({
@@ -312,60 +290,6 @@ export const DialogButton = ({
       );
     }
 
-    if (submitType === "CreateReward") {
-      return (
-        <div className="py-4 space-y-4">
-          <div>
-            <Label htmlFor="name">Reward Name</Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={handleInputChange("name")}
-              placeholder="Enter reward name"
-            />
-          </div>
-          <div>
-            <Label htmlFor="amount">Amount</Label>
-            <Input
-              id="amount"
-              value={formData.amount}
-              onChange={handleInputChange("amount")}
-              placeholder="Enter reward amount"
-            />
-          </div>
-          <div>
-            <Label htmlFor="ownerAddress">Owner Address</Label>
-            <Input
-              id="ownerAddress"
-              value={formData.ownerAddress}
-              onChange={handleInputChange("ownerAddress")}
-              placeholder="Enter owner Address"
-            />
-          </div>
-          <div>
-            <Label htmlFor="category">Category</Label>
-            <select
-              id="category"
-              value={formData.category}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, category: e.target.value }))
-              }
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-            >
-              <option value="">Select category</option>
-              {Object.entries(categoryColorMap).map(
-                ([category, { bg, text }]) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ),
-              )}
-            </select>
-          </div>
-        </div>
-      );
-    }
-
     return null;
   };
 
@@ -422,9 +346,7 @@ export const DialogButton = ({
               (submitType === "Complete" && !formData.completionUrl.trim()) ||
               ((submitType === "Disperse" || submitType === "directdisburse") &&
                 !formData.amount.trim()) ||
-              (submitType === "directdisburse" && !formData.to.trim()) ||
-              (submitType === "CreateReward" &&
-                (!formData.amount.trim() || !formData.name.trim()))
+              (submitType === "directdisburse" && !formData.to.trim())
             }
             className="bg-blue-500 text-white hover:bg-blue-800 disabled:bg-gray-400 disabled:text-gray-200"
           >

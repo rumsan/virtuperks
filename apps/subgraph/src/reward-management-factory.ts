@@ -9,7 +9,7 @@ export function handleRewardManagementCreated(
 ): void {
   let entity = new RewardManagementCreated(
     event.params.rewardManagement
-  )
+)
   entity.rewardManagement = event.params.rewardManagement
   entity.registry = event.params.registry
   entity.appId = event.params.appId
@@ -22,8 +22,7 @@ export function handleRewardManagementCreated(
 
   entity.save()
 
-   entity.save()
-    log.debug("EntityTaskManagerCreated: {}", [entity.rewardManagement.toHexString()]);
+  log.debug("EntityTaskManagerCreated: {}", [entity.rewardManagement.toHexString()]);
 
   RewardManagement.create(event.params.rewardManagement);
   log.debug("entityTemplateAdded: {}", [entity.rewardManagement.toHexString()]);

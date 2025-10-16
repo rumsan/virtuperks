@@ -15,6 +15,7 @@ import {
   TaskCompleted as TaskCompletedEvent,
   TaskCreated as TaskCreatedEvent,
   TaskDetailsUpdated as TaskDetailsUpdatedEvent,
+  TaskRejected as TaskRejectedEvent,
   TaskVerified as TaskVerifiedEvent,
   TokenTransferred as TokenTransferredEvent,
 } from "../generated/RewardManagement/RewardManagement"
@@ -36,10 +37,14 @@ import {
   TaskDetail,
   TaskDetailsUpdated,
   TaskIdMapping,
+  TaskRejected,
   TaskVerified,
   TokenTransferred,
 } from "../generated/schema"
-import { fetchTaskDetails, updateParticipantTaskStatus } from "./utils"
+
+
+import { addParticipantToWhitelist, fetchTaskDetails, updateParticipantTaskStatus } from "./utils"
+
 
 export function handleAdditionalDisbursementToTask(
   event: AdditionalDisbursementToTaskEvent,
@@ -185,6 +190,18 @@ export function handleParticipantWhitelisted(
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  // addParticipantToWhitelist(
+  //   event.params.taskId,
+  //   event.params.participant,
+  //   event.block.number,
+  //   event.block.timestamp,
+  //   event.params.by
+
+
+
+  // )
+
 }
 
 export function handleTaskAccepted(event: TaskAcceptedEvent): void {
@@ -379,6 +396,24 @@ export function handleTaskDetailsUpdated(event: TaskDetailsUpdatedEvent): void {
   entity.save()
 }
 
+
+
+export function handleTaskRejected(event: TaskRejectedEvent): void {
+  let entity = new TaskRejected(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.internal_id = event.params.id
+  entity.participant = event.params.participant
+  entity.rejectedBy = event.params.rejectedBy
+  entity.reason = event.params.reason
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
 export function handleTaskVerified(event: TaskVerifiedEvent): void {
   let entity = new TaskVerified(
     event.transaction.hash.concatI32(event.logIndex.toI32()),
@@ -454,3 +489,11 @@ export function handleTokenTransferred(event: TokenTransferredEvent): void {
 
   entity.save()
 }
+
+
+
+
+
+
+
+

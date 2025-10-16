@@ -1,0 +1,18 @@
+"use client";
+
+import DepartmentAdd from "@/components/departments/department_form/department.add";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
+
+function Page() {
+  const router = useRouter();
+  return (
+    <div>
+      <DepartmentAdd router={router} />
+    </div>
+  );
+}
+
+export default dynamic(() => Promise.resolve(Page), {
+  ssr: false,
+});

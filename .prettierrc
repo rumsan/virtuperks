@@ -1,8 +1,7 @@
 {
   "singleQuote": true,
-  "printWidth": 80,
+  "arrowParens": "always",
   "trailingComma": "all",
-  "bracketSpacing": false,
   "overrides": [
     {
       "files": "*.sol",

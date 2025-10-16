@@ -332,6 +332,37 @@
       {
         "indexed": true,
         "internalType": "address",
+        "name": "rejectedBy",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
+      }
+    ],
+    "name": "TaskRejected",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "id",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "participant",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "verifier",
         "type": "address"
       }
@@ -506,6 +537,11 @@
             "internalType": "address[]",
             "name": "verifiedParticipants",
             "type": "address[]"
+          },
+          {
+            "internalType": "address[]",
+            "name": "rejectedParticipants",
+            "type": "address[]"
           }
         ],
         "internalType": "struct IRewardManagement.Task",
@@ -650,12 +686,28 @@
             "internalType": "address[]",
             "name": "verifiedParticipants",
             "type": "address[]"
+          },
+          {
+            "internalType": "address[]",
+            "name": "rejectedParticipants",
+            "type": "address[]"
           }
         ],
         "internalType": "struct IRewardManagement.Task",
         "name": "task",
         "type": "tuple"
       }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "taskId", "type": "bytes32" }
+    ],
+    "name": "getTaskRejectedParticipants",
+    "outputs": [
+      { "internalType": "address[]", "name": "", "type": "address[]" }
     ],
     "stateMutability": "view",
     "type": "function"
@@ -758,6 +810,17 @@
     "name": "paused",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "taskId", "type": "bytes32" },
+      { "internalType": "address", "name": "participant", "type": "address" },
+      { "internalType": "string", "name": "reason", "type": "string" }
+    ],
+    "name": "rejectParticipant",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

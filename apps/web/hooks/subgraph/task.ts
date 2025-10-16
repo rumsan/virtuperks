@@ -17,6 +17,7 @@ export const useTaskAdd = () => {
   const mutation = useMutation({
     mutationFn: async (data: any) => {
       const verifiedParticipants = data.verifiedParticipants || [];
+      const rejectedParticipants = data.rejectedParticipants || [];
       const result = await writeContractAsync({
         address: data.entityAddress as `0x${string}`,
         args: [
@@ -36,7 +37,10 @@ export const useTaskAdd = () => {
             acceptedParticipantCount: BigInt(data.acceptedParticipantCount),
             verifiedParticipants:
               verifiedParticipants as readonly `0x${string}`[],
+            rejectedParticipants:
+              rejectedParticipants as readonly `0x${string}`[],
           },
+
           data.whitelistedParticipants,
         ],
       });

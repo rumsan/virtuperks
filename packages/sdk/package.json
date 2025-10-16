@@ -16,12 +16,22 @@
       "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
+    "./clients": {
+      "import": "./dist/clients/index.js",
+      "require": "./dist/clients/index.js",
+      "types": "./dist/clients/index.d.ts"
+    },
+    "./clients/*": {
+      "import": "./dist/clients/*.js",
+      "require": "./dist/clients/*.js",
+      "types": "./dist/clients/*.d.ts"
+    },
     "./type": {
       "import": "./dist/types/index.js",
       "require": "./dist/types/index.js",
       "types": "./dist/types/index.d.ts"
     },
-     "./types/*": {
+    "./types/*": {
       "import": "./dist/types/*.js",
       "require": "./dist/types/*.js",
       "types": "./dist/types/*.d.ts"
@@ -31,5 +41,8 @@
       "require": "./dist/constants/events.js",
       "types": "./dist/constants/events.d.ts"
     }
+  },
+  "dependencies": {
+    "axios": "^1.12.2"
   }
 }
