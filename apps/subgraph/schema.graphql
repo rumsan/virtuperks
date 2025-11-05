@@ -267,6 +267,7 @@ type ParticipantTaskStatus @entity(immutable: false) {
   lastUpdatedTimestamp: BigInt!
   taskDetail: TaskDetail
   completionUrl: String # string
+  rejectedReason: String # reason for rejection if status is REJECTED
   rewardManagement: RewardManagementCreated
 }
 

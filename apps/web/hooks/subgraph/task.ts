@@ -245,3 +245,20 @@ export const useGetTasksOwnedByIndividual = (
     enabled: !!createdBy && !skip,
   });
 };
+
+export const useGetRejectedParticipants = (taskId: string) => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["rejectedParticipants", taskId],
+    queryFn: async () => {
+      if (!queryService) {
+        throw new Error("Query service is not initialized");
+      }
+      const response =
+        await queryService.getRejectedParticipantsByTaskId(taskId);
+      return response;
+    },
+    enabled: !!taskId && !!queryService,
+  });
+};

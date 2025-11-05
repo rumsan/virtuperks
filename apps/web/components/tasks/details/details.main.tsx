@@ -10,6 +10,7 @@ import {
   useCheckTaskStatus,
   useCheckTaskVerifiedParticipant,
   useCloseTaskMutation,
+  useGetRejectedParticipants,
   useGetTaskById,
 } from "@/hooks/subgraph/task";
 import { useDisburseTokenToTask } from "@/hooks/subgraph/token";
@@ -48,6 +49,11 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
       taskData?.internal_id,
       taskData?.rewardManagement?.rewardManagement,
     );
+  const fetchRejectedParticipant = useGetRejectedParticipants(cuid.id);
+  console.log(
+    fetchRejectedParticipant?.data?.data?.taskRejecteds,
+    "rejectedparticipants----",
+  );
 
   const { verifiedTaskParticipant: verifiedParticipants } =
     useCheckTaskVerifiedParticipant(
