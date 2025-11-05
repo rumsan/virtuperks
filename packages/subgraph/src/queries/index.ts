@@ -458,6 +458,7 @@ export const GetCombineParticipantsByTask = `
       participant
       status
       taskId
+      rejectedReason
       lastUpdatedBlock
       lastUpdatedTimestamp
       taskDetail {
@@ -781,6 +782,22 @@ query GetWhiteListedParticipantByTask($taskId: Bytes!) {
     taskId
     participant
     by
+    blockNumber
+    blockTimestamp
+  }
+}
+`;
+
+
+
+export  const GetRejectedParticipant = `
+query GetRejected($taskId: Bytes!) {
+  taskRejecteds(where: { internal_id: $taskId }) {
+    id
+    internal_id
+    participant
+    reason
+    rejectedBy
     blockNumber
     blockTimestamp
   }

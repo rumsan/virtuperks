@@ -420,7 +420,9 @@ export function handleTaskRejected(event: TaskRejectedEvent): void {
     'REJECTED', 
     event.block.number, 
     event.block.timestamp, 
-    taskDetail ? taskDetail.id : null
+    taskDetail ? taskDetail.id : null,
+    null, // completionUrl - not applicable for rejected tasks
+    event.params.reason // rejectedReason - correct position (8th parameter)
   );
 }
 

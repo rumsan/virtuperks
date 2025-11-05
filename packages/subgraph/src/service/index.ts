@@ -8,6 +8,7 @@ import {
   getParticipantTaskStatistics,
   GetRedeemedReward,
   GetRedeemedRewardsByParticipant,
+  GetRejectedParticipant,
   getRewardById,
   GetRewardManagement,
   GetRewardManagementCreatedByAddress,
@@ -283,6 +284,21 @@ return { data, error };
       return { data, error };
     } catch (error) {
       console.error('Error fetching whitelisted participants by task ID:', error);
+      return { data: null, error };
+    }
+  }
+
+  //service function to get rejected participant  list of the task
+  async getRejectedParticipantsByTaskId(taskId: string) {
+    try {
+      const { data, error } = await this.subgraphQuery.query(
+        GetRejectedParticipant,
+        { taskId }
+      );
+    
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching rejected participants by task ID:', error);
       return { data: null, error };
     }
   }
