@@ -549,24 +549,52 @@ export const getParticipantTaskStatistics = `
       where: { participant: $participant}
     ) {
       id
+      taskDetail{
+      name
+      detailsUrl
+      expiryDate
+      totalRewardAmount
+      
+      }
     }
     
     accepted:taskAccepteds (
       where: { participant: $participant }
     ) {
       id
+      taskDetail{
+      name
+      detailsUrl
+      expiryDate
+      totalRewardAmount
+      
+      }
     }
     
     completed: taskCompleteds(
       where: { participant: $participant}
     ) {
       id
+      taskDetail{
+      name
+      detailsUrl
+      expiryDate
+      totalRewardAmount
+      
+      }
     }
     
     verified: taskVerifieds(
       where: { participant: $participant }
     ) {
       id
+      taskDetail{
+      name
+      detailsUrl
+      expiryDate
+      totalRewardAmount
+      
+      }
     }
     
   }
