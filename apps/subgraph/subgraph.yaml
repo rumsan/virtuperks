@@ -8,9 +8,9 @@ dataSources:
     name: AppRegistry
     network: base-sepolia
     source:
-      address: "0xd258EE403eEa5b9d90631CfBCE81b6c7B729e6C5"
+      address: "0x1544b51b48985CCd89974A60e0c83135aA95cF78"
       abi: AppRegistry
-      startBlock: 31240728
+      startBlock: 33320871
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -46,9 +46,9 @@ dataSources:
     name: RewardToken
     network: base-sepolia
     source:
-      address: "0xD6BA3357fdb5423030Ba81E7268Ea786aF70b39B"
+      address: "0x4e56e055448d61ab1c7CC4c5cE1dBcB8C0E58dB5"
       abi: RewardToken
-      startBlock: 31240749
+      startBlock: 33320887
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -69,21 +69,24 @@ dataSources:
     name: RewardManagementFactory
     network: base-sepolia
     source:
-      address: "0x6baE87178836d3eE036751a2d3B6693eAd0188a8"
+      address: "0xcd7f7f4AEB44Ac12b57B54f8F733df91bc20E00d"
       abi: RewardManagementFactory
-      startBlock: 31240756
+      startBlock: 33320892
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - RewardManagementCreated
+        - OwnerAdded
       abis:
         - name: RewardManagementFactory
           file: ./abis/RewardManagementFactory.json
       eventHandlers:
         - event: RewardManagementCreated(address,address,bytes32,string,bytes32)
           handler: handleRewardManagementCreated
+        - event: OwnerAdded(bytes32, address)
+          handler: handleOwnerAdded
       file: ./src/reward-management-factory.ts
 templates:
   - kind: ethereum

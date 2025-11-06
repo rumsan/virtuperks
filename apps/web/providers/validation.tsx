@@ -1,8 +1,6 @@
 "use client";
 
-import EntityOwnerNav from "@/components/layout/nav/entity_owner.nav";
 import TaskPortalNav from "@/components/layout/nav/task_portal.nav";
-import TreasurerNav from "@/components/layout/nav/treasurer.nav";
 import UnifiedNav from "@/components/layout/nav/unified.nav";
 import { AppRegistryABI } from "@workspace/contracts/abis";
 import { ConnectKitButton } from "connectkit";
@@ -94,10 +92,10 @@ const Validation = ({ children }: ValidationProps) => {
     switch (currentRole) {
       case "BOTH":
         return <UnifiedNav>{children}</UnifiedNav>;
-      case "ADMIN":
-        return <EntityOwnerNav>{children}</EntityOwnerNav>;
-      case "TREASURER":
-        return <TreasurerNav>{children}</TreasurerNav>;
+      // case "ADMIN":
+      //   return <EntityOwnerNav>{children}</EntityOwnerNav>;
+      // case "TREASURER":
+      //   return <TreasurerNav>{children}</TreasurerNav>;
       case "PARTICIPANT":
       case "NONE":
         return <TaskPortalNav>{children}</TaskPortalNav>;

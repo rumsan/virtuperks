@@ -14,4 +14,11 @@ interface IRewardManagementFactory {
         string name,
         bytes32 entityId
     );
+
+    event OwnerAdded (
+        bytes32 indexed entityId,
+        string name,
+        address indexed entityOwner
+    );
 }
+ 

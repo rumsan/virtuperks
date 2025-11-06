@@ -90,6 +90,16 @@ type Transfer @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+type OwnerAdded @entity(immutable: true) {
+  id: Bytes!
+  entityId: Bytes! # bytes32
+  owner: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
 type RewardManagementCreated @entity (immutable: false) {
   id: Bytes!
   rewardManagement: Bytes! # address

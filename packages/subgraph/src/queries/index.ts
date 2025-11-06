@@ -816,6 +816,16 @@ query GetWhiteListedParticipantByTask($taskId: Bytes!) {
 }
 `;
 
+export const GetEntityOwner = `
+query GetUserRewardManagements($userAddress: Bytes!) {
+  rewardManagementCreateds(where: { entityOwner: $userAddress }) {
+    id
+    contractAddress
+    entityOwner
+  }
+}
+`
+
 
 
 export  const GetRejectedParticipant = `
