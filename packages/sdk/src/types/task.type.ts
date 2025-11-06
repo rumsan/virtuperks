@@ -27,6 +27,7 @@ export type TaskCreated = VirtueperkCommonField & {
   status: string;
   taskDetail: TaskDetail;
   taskId: string;
+  rejectedReason?: string; 
 };
 
 

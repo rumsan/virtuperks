@@ -134,7 +134,10 @@ export const DialogButton = ({
           to: formData.to.trim(),
           remarks: formData.remarks.trim(),
         };
+      }else if (submitType === "Reject") {
+        submitData = { remarks: formData.remarks.trim() };
       }
+      
 
       await handleApplyTaskLogic?.(submitData);
 
