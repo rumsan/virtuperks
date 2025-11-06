@@ -3,6 +3,7 @@ import {
   AppRegistryQueries,
   getCloseTasks,
   GetCombineParticipantsByTask,
+  GetEntityOwner,
   getOpenTasks,
   getParticipantTasks,
   getParticipantTaskStatistics,
@@ -302,6 +303,52 @@ return { data, error };
       return { data: null, error };
     }
   }
+
+  //service funtion to get entity owner by user address
+  async getEntityOwnerByUserAddress(userAddress: string): Promise<boolean> {
+    try {
+      const { data, error } = await this.subgraphQuery.query(
+        GetEntityOwner,
+        { userAddress }
+      );
+      
+      if (error) {
+        console.error('Error fetching entity owner by user address:', error);
+        return false;
+      }
+  
+      
+      // Return true if ownerAddeds array exists and has at least one entry
+      return !!(data?.ownerAddeds && data.ownerAddeds.length > 0);
+    } catch (error) {
+      console.error('Error fetching entity owner by user address:', error);
+      return false;
+    }
+  }
+
+  // service to check task owner by address
+  // async getTaskOwnerUserAddress(userAddress: string): Promise<boolean> {
+  //   try {
+  //     const { data, error } = await this.subgraphQuery.query(
+  //       GetTaskOwner,
+  //       { userAddress }
+  //     );
+      
+  //     if (error) {
+  //       console.error('Error fetching task owner by user address:', error);
+  //       return false;
+  //     }
+
+  //     console.log('Task owner data:', data);
+      
+  //     // Return true if taskDetails array exists and has at least one entry
+  //     return !!(data?.taskDetails && Array.isArray(data.taskDetails) && data.taskDetails.length > 0);
+  //   } catch (error) {
+  //     console.error('Error fetching task owner by user address:', error);
+  //     return false;
+  //   }
+  // }
+  
 }
 
 

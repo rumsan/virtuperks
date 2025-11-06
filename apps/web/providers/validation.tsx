@@ -2,9 +2,11 @@
 
 import TaskPortalNav from "@/components/layout/nav/task_portal.nav";
 import UnifiedNav from "@/components/layout/nav/unified.nav";
+import { useFindEntityOwner } from "@/hooks/subgraph/entity";
 import { AppRegistryABI } from "@workspace/contracts/abis";
 import { ConnectKitButton } from "connectkit";
 import { AlertTriangle, Wallet } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAccount, useReadContract } from "wagmi";
 
@@ -16,7 +18,10 @@ interface ValidationProps {
 
 const Validation = ({ children }: ValidationProps) => {
   const [currentRole, setCurrentRole] = useState<Role | null>(null);
+  const [hasRedirected, setHasRedirected] = useState(false);
   const { address, isConnected, isConnecting } = useAccount();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const { data: hasDefaultAdminRole } = useReadContract({
     address: process.env.NEXT_PUBLIC_APPREGISTRY as `0x${string}`,
@@ -40,24 +45,90 @@ const Validation = ({ children }: ValidationProps) => {
     ],
   });
 
+  const { data: hasParticipantRole } = useReadContract({
+    address: process.env.NEXT_PUBLIC_APPREGISTRY as `0x${string}`,
+    abi: AppRegistryABI,
+    functionName: "hasRole",
+    args: [
+      process.env.NEXT_PUBLIC_APP_ID,
+      process.env.NEXT_PUBLIC_PARTICIPANT_ROLE,
+      address,
+    ],
+  });
+
+  // Check for privileged roles first
+  const hasBasicPrivilegedRole = hasDefaultAdminRole || hasTreasurerRole;
+
+  // Only check entity owner and task owner if user doesn't have basic privileged roles
+  // This reduces unnecessary subgraph calls
+  const { data: hasEntityOwnerRole } = useFindEntityOwner(
+    !hasBasicPrivilegedRole && isConnected ? (address ?? "0x") : "0x",
+  );
+  // will implement later
+  // const { data: hasTaskOwnerRole } = useFindTaskOwner(
+  //   !hasBasicPrivilegedRole && !hasEntityOwnerRole && isConnected
+  //     ? (address ?? "0x")
+  //     : "0x",
+  // );
+
   useEffect(() => {
     if (isConnecting) return;
 
     if (!isConnected) {
       setCurrentRole("NONE");
+      setHasRedirected(false); // Reset redirect flag when disconnected
       return;
     }
 
-    if (hasDefaultAdminRole && hasTreasurerRole) {
+    // Check if user has any privileged role (Admin, Treasurer, Entity Owner, or Task Owner)
+    const hasPrivilegedRole =
+      hasDefaultAdminRole || hasTreasurerRole || hasEntityOwnerRole;
+
+    if (hasPrivilegedRole && hasParticipantRole) {
       setCurrentRole("BOTH");
-    } else if (hasDefaultAdminRole) {
-      setCurrentRole("ADMIN");
-    } else if (hasTreasurerRole) {
-      setCurrentRole("TREASURER");
-    } else {
+      setHasRedirected(false); // Reset when role changes to privileged
+    } else if (hasPrivilegedRole) {
+      setCurrentRole("BOTH");
+      setHasRedirected(false); // Reset when role changes to privileged
+    } else if (hasParticipantRole) {
       setCurrentRole("PARTICIPANT");
+
+      const adminOnlyRoutes = ["/department", "/tasks", "/token_marketplace"];
+      const isOnAdminRoute = adminOnlyRoutes.some((route) =>
+        pathname.startsWith(route),
+      );
+
+      // Only redirect once per role change
+      if (isOnAdminRoute && !hasRedirected) {
+        setHasRedirected(true);
+        router.push("/task_portal");
+      }
+    } else {
+      // No roles at all
+      setCurrentRole("NONE");
+
+      // Redirect to home or task_portal for users with no roles
+      if (
+        pathname !== "/" &&
+        !pathname.startsWith("/task_portal") &&
+        !pathname.startsWith("/token_marketplace") &&
+        !hasRedirected
+      ) {
+        setHasRedirected(true);
+        router.push("/task_portal");
+      }
     }
-  }, [isConnected, isConnecting, hasDefaultAdminRole, hasTreasurerRole]);
+  }, [
+    isConnected,
+    isConnecting,
+    hasDefaultAdminRole,
+    hasTreasurerRole,
+    hasEntityOwnerRole,
+    hasParticipantRole,
+    pathname,
+    router,
+    hasRedirected,
+  ]);
 
   const renderOverlay = () => (
     <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50 pointer-events-auto">
@@ -91,13 +162,13 @@ const Validation = ({ children }: ValidationProps) => {
   const renderNav = () => {
     switch (currentRole) {
       case "BOTH":
+      case "ADMIN":
+      case "TREASURER":
+        // Anyone with admin, treasurer, or entity owner role sees UnifiedNav
         return <UnifiedNav>{children}</UnifiedNav>;
-      // case "ADMIN":
-      //   return <EntityOwnerNav>{children}</EntityOwnerNav>;
-      // case "TREASURER":
-      //   return <TreasurerNav>{children}</TreasurerNav>;
       case "PARTICIPANT":
       case "NONE":
+        // Participants and non-role users see TaskPortalNav
         return <TaskPortalNav>{children}</TaskPortalNav>;
       default:
         return null;
