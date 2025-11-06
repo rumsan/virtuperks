@@ -1,79 +1,61 @@
+"use client";
+
 import { ColumnDef } from "@tanstack/react-table";
-import { Eye } from "lucide-react";
+import { Check, Copy, User } from "lucide-react";
+import { useState } from "react";
 
-export function useColumns<T>(): ColumnDef<T>[] {
+export function useColumns<T extends { participant: string }>(): ColumnDef<T>[] {
   return [
-    {
-      accessorKey: "title",
-      header: () => (
-        <div className="text-left text-gray-600 font-bold">Title</div>
-      ),
-
-      cell: () => {
-        return <p></p>;
-      },
-    },
-    {
-      accessorKey: "status",
-      header: () => (
-        <div className="text-left text-gray-600 font-bold">Status</div>
-      ),
-
-      cell: () => {
-        return <p></p>;
-      },
-    },
-    {
-      accessorKey: "url",
-      header: () => (
-        <div className="text-left text-gray-600 font-bold">Url</div>
-      ),
-
-      cell: () => {
-        return <p></p>;
-      },
-    },
     {
       accessorKey: "participant",
       header: () => (
-        <div className="text-left text-gray-600 font-bold">Participants</div>
+        <div className="text-left text-gray-600 font-semibold tracking-wide">
+          Wallet Address
+        </div>
       ),
+      cell: ({ row }) => {
+        const wallet = row.original.participant;
+        const [copied, setCopied] = useState(false);
 
-      cell: () => {
-        return <p></p>;
-      },
-    },
-    {
-      accessorKey: "date",
-      header: () => (
-        <div className="text-left text-gray-600 font-bold">Date</div>
-      ),
+        const handleCopy = async () => {
+          try {
+            await navigator.clipboard.writeText(wallet);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+          } catch (err) {
+            console.error("Failed to copy address:", err);
+          }
+        };
 
-      cell: () => {
-        return <p></p>;
-      },
-    },
-    {
-      accessorKey: "tokens",
-      header: () => (
-        <div className="text-left text-gray-600 font-bold">Tokens</div>
-      ),
-
-      cell: () => {
-        return <p></p>;
-      },
-    },
-    {
-      id: "actions",
-      header: () => (
-        <div className="text-left text-gray-600 font-bold">Action</div>
-      ),
-      enableHiding: false,
-      cell: () => {
         return (
-          <p>
-            <Eye />
-          </p>
+          <div className="flex items-center gap-6 group transition-all">
+
+  <div className="flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-r from-slate-100 to-slate-200 shadow-sm">
+    <User className="text-slate-600" size={20} />
+  </div>
+
+  
+  <div className="flex items-center gap-2">
+    <span
+      title={wallet}
+      className="font-mono text-lg text-gray-800 cursor-pointer group-hover:text-blue-600 transition-colors"
+    >
+      {wallet} 
+    </span>
+
+    <button
+      onClick={handleCopy}
+      className="flex items-center text-xl text-gray-500 hover:text-blue-500 transition-colors"
+      aria-label="Copy wallet address"
+    >
+      {copied ? (
+        <Check size={25} className="text-green-500" />
+      ) : (
+        <Copy size={22} />
+      )}
+    </button>
+  </div>
+</div>
         );
       },
     },

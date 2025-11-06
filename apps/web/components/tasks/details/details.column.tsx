@@ -21,6 +21,10 @@ interface SelectedTask {
   status: "PENDING" | "COMPLETED" | "VERIFIED";
   entityId?: string;
 }
+interface TaskCreatedWithRejectReason extends TaskCreated {
+  rejectedReason?: string;
+}
+
 
 type ActionType = "accept" | "verify" | "reject";
 
@@ -79,15 +83,15 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
           taskId: task.id,
           participant: task.participant,
           entityId: task.entityId ?? "0x",
-          remark: remarks ?? "Rejected by task owner",
+          remark: remarks?.trim() || "", 
         });
+        console.log("✅ Reject mutation completed successfully");
         toast({
           title: "Participant rejected successfully!",
           variant: "destructive",
           duration: 2000,
         });
       }
-
       setSelectedTask(null);
       setActionType(null);
     } catch (error) {
@@ -164,42 +168,54 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
       },
     },
 
+    
     // Completion URL
-    {
-      accessorKey: "completionUrl",
-      header: () => (
-        <div className="text-left text-gray-600 font-bold">Completion URL</div>
-      ),
-      cell: ({ row }) => {
-        const completionUrl = row.getValue("completionUrl") as
-          | string
-          | undefined;
-        if (!completionUrl) return null;
+{
+  accessorKey: "completionUrl",
+  header: ({ table }) => {
+    // If all rows are rejected, hide the header
+    const hasNonRejected = table.getRowModel().rows.some(
+      row => row.getValue("status") !== "REJECTED"
+    );
+    if (!hasNonRejected) return null;
+    return (
+      <div className="text-left text-gray-600 font-bold">Completion URL</div>
+    );
+  },
+  cell: ({ row }) => {
+    const status = row.getValue("status") as string;
 
-        const absoluteUrl =
-          completionUrl.startsWith("http://") ||
-          completionUrl.startsWith("https://")
-            ? completionUrl
-            : `https://${completionUrl}`;
+    // Hide Completion URL for rejected participants
+    if (status === "REJECTED") return null;
 
-        let displayUrl = completionUrl;
-        try {
-          displayUrl = new URL(absoluteUrl).hostname;
-        } catch {}
+    const completionUrl = row.getValue("completionUrl") as string | undefined;
+    if (!completionUrl) return null;
 
-        return (
-          <a
-            href={absoluteUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 hover:underline decoration-2"
-          >
-            <span className="text-sm truncate max-w-[200px]">{displayUrl}</span>
-            <ExternalLink size={16} />
-          </a>
-        );
-      },
-    },
+    const absoluteUrl =
+      completionUrl.startsWith("http://") ||
+      completionUrl.startsWith("https://")
+        ? completionUrl
+        : `https://${completionUrl}`;
+
+    let displayUrl = completionUrl;
+    try {
+      displayUrl = new URL(absoluteUrl).hostname;
+    } catch {}
+
+    return (
+      <a
+        href={absoluteUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-2 text-blue-600 hover:text-blue-700 hover:underline decoration-2"
+      >
+        <span className="text-sm truncate max-w-[200px]">{displayUrl}</span>
+        <ExternalLink size={16} />
+      </a>
+    );
+  },
+},
+
 
     // Status
     {
@@ -220,133 +236,145 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
     },
 
     // Actions
-    {
-      id: "actions",
-      header: () => (
-        <div className="text-left text-gray-600 font-bold">Action</div>
-      ),
-      enableHiding: false,
-      cell: ({ row }) => {
-        const status = row.getValue("status") as string;
-        const dialogContent = getDialogContent(status);
+    // Actions / Remark Column
+{
+  id: "actions",
+  header: () => (
+    <div className="text-left text-gray-600 font-bold">
+      Action / Remark
+    </div>
+  ),
+  enableHiding: false,
+  cell: ({ row }) => {
+    const status = row.getValue("status") as string;
 
-        const taskOwnerAddress = row.original.taskDetail.owner;
-        const entityContractAddress =
-          row.original.rewardManagement?.rewardManagement ?? "";
+   
+    if (status === "REJECTED") {
+      return (
+        <span className="text-sm text-red-600">
+          {row.original.rejectedReason || "No reason provided"}
+        </span>
+      );
+    }
 
-        const { entityRole } = useGetEntityRole(entityContractAddress);
-        const hasEntityOwnerRole = hasRole({ role: entityRole ?? "" });
+    const dialogContent = getDialogContent(status);
+    const taskOwnerAddress = row.original.taskDetail.owner;
+    const entityContractAddress =
+      row.original.rewardManagement?.rewardManagement ?? "";
 
-        const isTaskOwner =
-          userAddress?.toLowerCase() === taskOwnerAddress?.toLowerCase();
-        const isAcceptAction = status === "PENDING";
-        const isVerifyRejectAction = status === "COMPLETED";
-        const isDisabled =
-          isPending ||
-          (isAcceptAction && !hasEntityOwnerRole) ||
-          (isVerifyRejectAction && !isTaskOwner);
+    const { entityRole } = useGetEntityRole(entityContractAddress);
+    const hasEntityOwnerRole = hasRole({ role: entityRole ?? "" });
+    const isTaskOwner =
+      userAddress?.toLowerCase() === taskOwnerAddress?.toLowerCase();
 
-        if (!(status === "PENDING" || status === "COMPLETED")) {
-          return (
-            <span className="text-sm text-gray-500">No action available</span>
-          );
-        }
+    const isAcceptAction = status === "PENDING";
+    const isVerifyRejectAction = status === "COMPLETED";
+    const isDisabled =
+      isPending ||
+      (isAcceptAction && !hasEntityOwnerRole) ||
+      (isVerifyRejectAction && !isTaskOwner);
 
-        return (
-          <div className="flex items-center gap-2 relative">
-            {isPending && selectedTask?.id === row.original.taskId ? (
-              <div className="flex items-center gap-2 ml-1 text-sm text-gray-700">
-                <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                <span>
-                  {selectedTask.status === "PENDING"
-                    ? "Accepting..."
-                    : actionType === "reject"
-                      ? "Rejecting..."
-                      : "Verifying..."}
-                </span>
-              </div>
-            ) : (
-              <>
-                {isAcceptAction && (
-                  <button
-                    onClick={() => handleAction(row, "accept")}
-                    disabled={isDisabled}
-                    title="Accept participant"
-                  >
-                    <CircleCheck
-                      color={isDisabled ? "#A1A1AA" : "#03AB65"}
-                      strokeWidth={1.5}
-                      size={28}
-                    />
-                  </button>
-                )}
+    if (!(status === "PENDING" || status === "COMPLETED")) {
+      return (
+        <span className="text-sm text-gray-500">No action available</span>
+      );
+    }
 
-                {isVerifyRejectAction && (
-                  <>
-                    <button
-                      onClick={() => handleAction(row, "verify")}
-                      disabled={isDisabled}
-                      title="Verify Task Completion"
-                    >
-                      <CircleCheck
-                        color={isDisabled ? "#A1A1AA" : "#03AB65"}
-                        strokeWidth={1.5}
-                        size={28}
-                      />
-                    </button>
-
-                    <button
-                      onClick={() => handleAction(row, "reject")}
-                      disabled={isDisabled}
-                      title="Reject Task Completion"
-                    >
-                      <XCircle
-                        color={isDisabled ? "#A1A1AA" : "#FF0000"}
-                        strokeWidth={1.5}
-                        size={28}
-                      />
-                    </button>
-                  </>
-                )}
-              </>
+    return (
+      <div className="flex items-center gap-2 relative">
+        {isPending && selectedTask?.id === row.original.taskId ? (
+          <div className="flex items-center gap-2 ml-1 text-sm text-gray-700">
+            <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            <span>
+              {selectedTask.status === "PENDING"
+                ? "Accepting..."
+                : actionType === "reject"
+                  ? "Rejecting..."
+                  : "Verifying..."}
+            </span>
+          </div>
+        ) : (
+          <>
+            {isAcceptAction && (
+              <button
+                onClick={() => handleAction(row, "accept")}
+                disabled={isDisabled}
+                title="Accept participant"
+              >
+                <CircleCheck
+                  color={isDisabled ? "#A1A1AA" : "#03AB65"}
+                  strokeWidth={1.5}
+                  size={28}
+                />
+              </button>
             )}
 
-            {/* Dialog */}
-            {selectedTask &&
-              openTaskId === row.original.taskId &&
-              actionType && (
-                <DialogButton
-                  isOpen={!!openTaskId}
-                  setIsOpen={() => setOpenTaskId(null)}
-                  title={
-                    actionType === "accept"
-                      ? "Accept this participant?"
-                      : actionType === "verify"
-                        ? "Verify this participant?"
-                        : "Reject this participant?"
-                  }
-                  subTitle={
-                    actionType === "reject"
-                      ? "Please provide a reason (optional)."
-                      : dialogContent.subTitle
-                  }
-                  buttonName={
-                    isPending
-                      ? "Processing..."
-                      : actionType === "reject"
-                        ? "Reject"
-                        : dialogContent.buttonName
-                  }
-                  submitType={actionType === "reject" ? "Reject" : undefined}
-                  handleApplyTaskLogic={(data) =>
-                    handleMutation(selectedTask, actionType, data?.remarks)
-                  }
-                  isDisabled={isPending}
-                />
-              )}
-          </div>
-        );
-      },
-    },
+            {isVerifyRejectAction && (
+              <>
+                <button
+                  onClick={() => handleAction(row, "verify")}
+                  disabled={isDisabled}
+                  title="Verify Task Completion"
+                >
+                  <CircleCheck
+                    color={isDisabled ? "#A1A1AA" : "#03AB65"}
+                    strokeWidth={1.5}
+                    size={28}
+                  />
+                </button>
+
+                <button
+                  onClick={() => handleAction(row, "reject")}
+                  disabled={isDisabled}
+                  title="Reject Task Completion"
+                >
+                  <XCircle
+                    color={isDisabled ? "#A1A1AA" : "#FF0000"}
+                    strokeWidth={1.5}
+                    size={28}
+                  />
+                </button>
+              </>
+            )}
+          </>
+        )}
+
+        {/* Dialog */}
+        {selectedTask &&
+          openTaskId === row.original.taskId &&
+          actionType && (
+            <DialogButton
+              isOpen={!!openTaskId}
+              setIsOpen={() => setOpenTaskId(null)}
+              title={
+                actionType === "accept"
+                  ? "Accept this participant?"
+                  : actionType === "verify"
+                    ? "Verify this participant?"
+                    : "Reject this participant?"
+              }
+              subTitle={
+                actionType === "reject"
+                  ? "Please provide a reason (optional)."
+                  : dialogContent.subTitle
+              }
+              buttonName={
+                isPending
+                  ? "Processing..."
+                  : actionType === "reject"
+                    ? "Reject"
+                    : dialogContent.buttonName
+              }
+              submitType={actionType === "reject" ? "Reject" : undefined}
+              handleApplyTaskLogic={(data) =>
+                handleMutation(selectedTask, actionType, data?.remarks)
+              }
+              isDisabled={isPending}
+            />
+          )}
+      </div>
+    );
+  },
+},
   ];
 }
