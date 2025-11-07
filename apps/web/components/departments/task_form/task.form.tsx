@@ -433,56 +433,97 @@ export default function TaskBaseForm({
             />
           </div>
 
-          <FormField
-            control={form.control}
-            name="whitelistedParticipants"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Add Participant Addresses</FormLabel>
-                <div className="space-y-4">
-                  <div className="flex gap-2">
-                    <Input
-                      type="text"
-                      placeholder="Paste wallet address"
-                      value={currentWallet}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (value.length === 1 && value[0] === " ") return;
-                        setCurrentWallet(value);
-                      }}
-                    />
-                    <Button
-                      type="button"
-                      onClick={handleAddWallet}
-                      disabled={!isAddress(currentWallet)}
-                    >
-                      Add
-                    </Button>
+          {/* isWhitelisted Toggle */}
+          <div className="mb-5">
+            <FormField
+              control={form.control}
+              name="isWhitelisted"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base">
+                      Whitelist Participants
+                    </FormLabel>
+                    <p className="text-sm text-gray-500">
+                      Enable this to restrict task to specific wallet addresses
+                    </p>
                   </div>
+                  <FormControl>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="sr-only peer"
+                        checked={field.value}
+                        onChange={(e) => {
+                          field.onChange(e.target.checked);
+                          // Clear whitelisted participants when disabling
+                          if (!e.target.checked) {
+                            setWalletAddresses([]);
+                            form.setValue("whitelistedParticipants", []);
+                          }
+                        }}
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
 
-                  {/* Display added addresses */}
-                  <div className="flex flex-wrap gap-2">
-                    {walletAddresses.map((address) => (
-                      <div
-                        key={address}
-                        className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full"
+          {/* Conditionally render whitelisted participants field */}
+          {watch("isWhitelisted") && (
+            <FormField
+              control={form.control}
+              name="whitelistedParticipants"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Add Participant Addresses</FormLabel>
+                  <div className="space-y-4">
+                    <div className="flex gap-2">
+                      <Input
+                        type="text"
+                        placeholder="Paste wallet address"
+                        value={currentWallet}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value.length === 1 && value[0] === " ") return;
+                          setCurrentWallet(value);
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        onClick={handleAddWallet}
+                        disabled={!isAddress(currentWallet)}
                       >
-                        <span className="text-sm">{address}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeWallet(address)}
-                          className="text-gray-500 hover:text-red-500"
+                        Add
+                      </Button>
+                    </div>
+
+                    {/* Display added addresses */}
+                    <div className="flex flex-wrap gap-2">
+                      {walletAddresses.map((address) => (
+                        <div
+                          key={address}
+                          className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full"
                         >
-                          ×
-                        </button>
-                      </div>
-                    ))}
+                          <span className="text-sm">{address}</span>
+                          <button
+                            type="button"
+                            onClick={() => removeWallet(address)}
+                            className="text-gray-500 hover:text-red-500"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           <div className="w-full flex justify-end gap-4">
             <Button

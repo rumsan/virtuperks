@@ -19,6 +19,7 @@ const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
     e.stopPropagation();
     window.open(url, "_blank", "noopener,noreferrer");
   };
+  console.log(taskData, "taskData in details component");
   return (
     <>
       <Card className="w-[80%] h-full p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
@@ -86,6 +87,28 @@ const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
               </span>
             </span>
           </span>
+
+          {/* Eligibility Description */}
+          <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <p className="text-sm text-gray-700">
+              <span className="font-semibold text-blue-700">Eligibility: </span>
+              {taskData?.taskDetail?.isWhitelisted ? (
+                <span>
+                  Only{" "}
+                  <span className="font-semibold">
+                    whitelisted participants
+                  </span>{" "}
+                  can apply.
+                </span>
+              ) : (
+                <span>
+                  Open to all{" "}
+                  <span className="font-semibold">registered participants</span>{" "}
+                  with the participant role.
+                </span>
+              )}
+            </p>
+          </div>
         </div>
       </Card>
 
