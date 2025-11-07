@@ -53,6 +53,13 @@ const ListCardDetails = ({
           <CardTitle className="flex flex-col p-4 gap-2">
             <div className="flex items-center gap-2 text-[#334155]">
               <span>{task?.taskDetail?.name}</span>
+              <span
+                className={`px-2 py-0.5 rounded text-white text-xs font-semibold ${
+                  task?.taskDetail?.isOpen ? "bg-green-500" : "bg-red-500"
+                }`}
+              >
+                {task?.taskDetail?.isOpen ? "Open" : "Closed"}
+              </span>
             </div>
 
             <div className="flex flex-col gap-1 text-sm">
