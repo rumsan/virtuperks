@@ -86,10 +86,10 @@ const DepartmentDetailsTable = <T extends { type?: string }>({
               value="direct"
               className="px-4 py-2 text-sm rounded-md"
             >
-              Direct Transferred
+              Bonus Transfered
             </TabsTrigger>
             <TabsTrigger value="task" className="px-4 py-2 text-sm rounded-md ">
-              Task Token
+              Task Token Transfered
             </TabsTrigger>
           </TabsList>
         </div>

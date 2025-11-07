@@ -49,7 +49,7 @@ export default function DepartmentDetails({
     entity?.rewardManagement,
   );
   const { data: tokenTransferData } = useGetTokenTransfers(
-    entity?.rewardManagement,
+    entity?.rewardManagement
   );
 
   const { taskCloseExpired, taskPending: closePending } = useCloseExpiredTask();
@@ -129,7 +129,7 @@ export default function DepartmentDetails({
         handleCloseExpiredTasks={handleCloseExpiredTasks}
         closePending={closePending}
       />
-      ;
+      
       <DepartmentDetailsTable
         cuid={entity.rewardManagement}
         setPagination={setPagination}
