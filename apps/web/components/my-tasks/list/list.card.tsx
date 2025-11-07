@@ -3,6 +3,8 @@ import { TaskCreated } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Coins, Dot } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { useEffect } from "react";
+
 type ListCardDetailsProps = {
   taskList: TaskCreated[];
   router: AppRouterInstance;
@@ -14,29 +16,26 @@ const ListCardDetails = ({
   router,
   tabStatus,
 }: ListCardDetailsProps) => {
-  const filteredTaskList = () => {
-    if (!taskList || !Array.isArray(taskList)) {
-      return [];
-    }
+  
+  const allTasks = Array.isArray(taskList) ? taskList : [];
 
-    if (tabStatus === "active") {
-      return taskList.filter((task) => {
-        return (
-          task?.taskDetail?.isOpen === true &&
-          !task?.taskDetail?.isTokenDisbursed
-        );
+  
+  useEffect(() => {
+    if (allTasks.length > 0) {
+      console.log("📋 All Task Statuses:");
+      allTasks.forEach((task) => {
+        console.log({
+          id: task?.id,
+          name: task?.taskDetail?.name,
+          isOpen: task?.taskDetail?.isOpen,
+          isTokenDisbursed: task?.taskDetail?.isTokenDisbursed,
+          expiryDate: task?.taskDetail?.expiryDate,
+        });
       });
-    } else if (tabStatus === "completed") {
-      return taskList.filter((task) => {
-        return (
-          task?.taskDetail?.isOpen === false ||
-          task?.taskDetail?.isTokenDisbursed
-        );
-      });
+    } else {
+      console.log("⚠️ No tasks available to display.");
     }
-
-    return taskList;
-  };
+  }, [allTasks]);
 
   const handleUrlClick = (e: React.MouseEvent, url: string) => {
     e.stopPropagation();
@@ -45,22 +44,15 @@ const ListCardDetails = ({
 
   return (
     <div className="grid grid-cols-2 gap-4 overflow-visible">
-      {filteredTaskList().map((task) => (
+      {allTasks.map((task) => (
         <Card
           key={task?.id}
           className="cursor-pointer"
-          //  onClick={() => task?.id && router.push(PATHS.TASKS.DETAILS(task?.id))}
+          // onClick={() => task?.id && router.push(PATHS.TASKS.DETAILS(task?.id))}
         >
           <CardTitle className="flex flex-col p-4 gap-2">
             <div className="flex items-center gap-2 text-[#334155]">
               <span>{task?.taskDetail?.name}</span>
-              <span
-                className={`px-2 py-0.5 rounded text-white text-xs font-semibold ${
-                  task?.taskDetail?.isOpen ? "bg-green-500" : "bg-red-500"
-                }`}
-              >
-                {task?.taskDetail?.isOpen ? "Open" : "Closed"}
-              </span>
             </div>
 
             <div className="flex flex-col gap-1 text-sm">
