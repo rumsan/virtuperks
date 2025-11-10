@@ -1,12 +1,20 @@
 import { formatDate } from "@/utils/formatDate";
 import { Card, CardTitle } from "@workspace/ui/components/card";
-import { ExternalLink, Timer, Trophy, UserRoundCog, Users } from "lucide-react";
+import {
+  Building2,
+  ExternalLink,
+  Timer,
+  Trophy,
+  UserRoundCog,
+  Users,
+} from "lucide-react";
 
 type TaskDetailsProps = {
   taskData: any;
 };
 
 const TaskDetails = ({ taskData }: TaskDetailsProps) => {
+  console.log(taskData, "taskData in details component");
   const formattedDate = formatDate(taskData?.taskDetail?.expiryDate);
   const handleUrlClick = (e: React.MouseEvent, url: string) => {
     e.stopPropagation();
@@ -75,6 +83,13 @@ const TaskDetails = ({ taskData }: TaskDetailsProps) => {
           <span className="flex items-center gap-3">
             <Timer color="#64748B" size={22} strokeWidth={2.5} /> Deadline:{" "}
             <span className="font-semibold">{formattedDate}</span>
+          </span>
+          <span className="flex items-center gap-3">
+            <Building2 color="#64748B" size={22} strokeWidth={2.5} />{" "}
+            Department:{" "}
+            <span className="font-semibold">
+              {taskData?.rewardManagement?.name || "N/A"}
+            </span>
           </span>
         </div>
       </Card>
