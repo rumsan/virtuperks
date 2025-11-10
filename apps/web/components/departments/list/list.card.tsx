@@ -20,7 +20,6 @@ const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
     role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
     address,
   });
-
   const canAddDepartment = Boolean(hasAdminOwnerRole);
 
   return (

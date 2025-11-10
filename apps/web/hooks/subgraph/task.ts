@@ -1,5 +1,6 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAccount } from "wagmi";
 import {
   useReadRewardManagementGetOpenTasks,
   useReadRewardManagementGetTask,
@@ -8,6 +9,7 @@ import {
   useWriteRewardManagementCloseExpiredTasks,
   useWriteRewardManagementCloseTask,
   useWriteRewardManagementCreateTask,
+  useWriteRewardManagementResubmitAfterRejection,
 } from "../wagmi/contracts";
 
 export const useTaskAdd = () => {
@@ -261,4 +263,47 @@ export const useGetRejectedParticipants = (taskId: string) => {
     },
     enabled: !!taskId && !!queryService,
   });
+};
+
+
+
+export const useResubmitTaskMutation = () => {
+  const queryClient = useQueryClient();
+  const { writeContractAsync } = useWriteRewardManagementResubmitAfterRejection();
+  const { address: participant } = useAccount();
+
+  const mutation = useMutation({
+    mutationFn: async ({
+      taskId,
+      entityId,
+      completionUrl,
+    }: {
+      taskId: string;
+      entityId: string;
+      completionUrl?: string;
+    }) => {
+
+      const result = await writeContractAsync({
+        address: (entityId as `0x${string}`) || "0x",
+        args: [taskId as `0x${string}`, completionUrl || ""],
+      });
+      return result;
+    },
+
+    onSuccess: (result, variable) => {
+      if (participant) {
+        setTimeout(() => {
+          queryClient.invalidateQueries({
+            queryKey: ["participantTaskStatus", participant, variable.taskId],
+          });
+        }, 5000);
+      }
+    },
+  });
+
+  return {
+    resubmitTask: mutation.mutateAsync,
+    resubmitPending: mutation.isPending,
+    resubmitSuccess: mutation.isSuccess,
+  };
 };
