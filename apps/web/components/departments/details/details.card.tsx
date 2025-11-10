@@ -21,7 +21,7 @@ import {
   Copy,
   Gift,
   Loader2,
-  Plus
+  Plus,
 } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useParams } from "next/navigation";
@@ -48,7 +48,10 @@ export default function DepartmentDetailsCard({
   handleCloseExpiredTasks,
 }: DepartmentDetailsCardProps) {
   const { address } = useAccount();
-  const roleData = hasRole({ role: process.env.NEXT_PUBLIC_MINTER_ROLE! });
+  const roleData = hasRole({
+    role: process.env.NEXT_PUBLIC_MINTER_ROLE!,
+    address,
+  });
   const canAllocateToken = Boolean(roleData);
 
   const { entityRole, roleLoading } = useGetEntityRole(
@@ -57,6 +60,7 @@ export default function DepartmentDetailsCard({
 
   const hasEntityOwnerRole = hasRole({
     role: entityRole || "",
+    address,
   });
 
   const canTransferToken = Boolean(hasEntityOwnerRole);
@@ -208,13 +212,13 @@ export default function DepartmentDetailsCard({
 
             {canTransferToken && (
               <Button
-              className="h-12 w-48 fw-[600] flex items-center justify-center"
-              variant="default"
-              onClick={() => router.push(PATHS.DEPARTMENT.TASK_ADD(cuid))}
-            >
-              <Plus size={22} strokeWidth={2.75} />
-              <span>Create Task</span>
-            </Button>
+                className="h-12 w-48 fw-[600] flex items-center justify-center"
+                variant="default"
+                onClick={() => router.push(PATHS.DEPARTMENT.TASK_ADD(cuid))}
+              >
+                <Plus size={22} strokeWidth={2.75} />
+                <span>Create Task</span>
+              </Button>
             )}
 
             {!directTransferPending && canTransferToken && (
@@ -309,7 +313,6 @@ export default function DepartmentDetailsCard({
           </CardTitle>
         </Card>
 
-    
         <Card className="font-normal text-base h-50 flex flex-col">
           <CardHeader className="flex-grow">
             <CardTitle className="flex p-0 mb-4 text-[#0F172A]">
@@ -322,38 +325,39 @@ export default function DepartmentDetailsCard({
         </Card>
 
         <Card className="font-normal text-base flex flex-col justify-between p-5 space-y-4 h-50 shadow-sm border border-slate-200 relative overflow-hidden">
- 
-  <CardHeader className="p-0">
-    <CardTitle className="text-[#0F172A] text-lg font-semibold">
-      Total Tokens Available
-    </CardTitle>
-  </CardHeader>
+          <CardHeader className="p-0">
+            <CardTitle className="text-[#0F172A] text-lg font-semibold">
+              Total Tokens Available
+            </CardTitle>
+          </CardHeader>
 
-  
-  <CardFooter className="p-0">
-    <div className="text-blue-600 text-3xl font-bold">
-      {unallocatedTokens ?? "-"}
-    </div>
-  </CardFooter>
+          <CardFooter className="p-0">
+            <div className="text-blue-600 text-3xl font-bold">
+              {unallocatedTokens ?? "-"}
+            </div>
+          </CardFooter>
 
-  
-  {unallocatedTokens !== undefined && unallocatedTokens <= 0 && (
-    <div className="absolute inset-x-3 bottom-3 flex items-center gap-2 rounded-md border border-red-300 bg-red-50 p-2 shadow-sm">
-      <div className="flex items-center justify-center rounded-full bg-red-100 p-1">
-        <AlertTriangle className="h-4 w-4 text-red-600" strokeWidth={2.5} />
-      </div>
-      <div className="flex flex-col leading-tight">
-        <span className="font-semibold text-red-600 text-xs">
-          No Available Tokens
-        </span>
-        <span className="text-[10px] text-red-500">
-          Please contact a <span className="font-medium text-red-600">Minter</span> to allocate more.
-        </span>
-      </div>
-    </div>
-  )}
-</Card>
-
+          {unallocatedTokens !== undefined && unallocatedTokens <= 0 && (
+            <div className="absolute inset-x-3 bottom-3 flex items-center gap-2 rounded-md border border-red-300 bg-red-50 p-2 shadow-sm">
+              <div className="flex items-center justify-center rounded-full bg-red-100 p-1">
+                <AlertTriangle
+                  className="h-4 w-4 text-red-600"
+                  strokeWidth={2.5}
+                />
+              </div>
+              <div className="flex flex-col leading-tight">
+                <span className="font-semibold text-red-600 text-xs">
+                  No Available Tokens
+                </span>
+                <span className="text-[10px] text-red-500">
+                  Please contact a{" "}
+                  <span className="font-medium text-red-600">Minter</span> to
+                  allocate more.
+                </span>
+              </div>
+            </div>
+          )}
+        </Card>
 
         <Card className="font-normal text-base h-50 flex flex-col">
           <CardHeader className="flex-grow">
