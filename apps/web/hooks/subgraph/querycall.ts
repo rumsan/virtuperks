@@ -209,7 +209,6 @@ export const useRejectParticipantMutation = () => {
       entityId: string;
       remark: string;
     }) => {
-      console.log(remark, "remark---");
       const result = await writeContractAsync({
         address: (entityId as `0x${string}`) || "0x",
         args: [taskId as `0x${string}`, participant as `0x${string}`, remark],

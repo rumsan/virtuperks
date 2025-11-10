@@ -87,6 +87,13 @@ export default function DepartmentBaseForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Add Owner Addresses</FormLabel>
+                    <p className="text-sm text-gray-500 mb-2">
+                      You can assign up to{" "}
+                      <span className="font-semibold text-blue-600">
+                        5 owners
+                      </span>{" "}
+                      for this department
+                    </p>
                     <div className="space-y-4">
                       <div className="flex gap-2">
                         <Input

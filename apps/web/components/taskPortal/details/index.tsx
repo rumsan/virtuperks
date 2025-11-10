@@ -45,6 +45,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const hasParticipantRole = hasRole({ role: participantRole, address });
 
   const isWhitelisted = taskData?.taskDetail?.isWhitelisted;
+  console.log(isWhitelisted, "isWhitelisted in task portal main");
 
   const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(
     taskData?.internal_id,
@@ -71,18 +72,32 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
       return;
     }
 
-    const isWhitelisted = whiteListedParticipants.some(
-      (participantList: { participant: string }) =>
-        participantList.participant === address?.toLowerCase(),
-    );
+    // Check eligibility based on task whitelist status
+    if (isWhitelisted) {
+      // If task is whitelisted, check if user is in the whitelist
+      const isUserWhitelisted = whiteListedParticipants.some(
+        (participantList: { participant: string }) =>
+          participantList.participant === address?.toLowerCase(),
+      );
 
-    if (!isWhitelisted) {
-      toast({
-        title: "Not Eligible",
-        description: "Your wallet is not whitelisted for this task.",
-        variant: "destructive",
-      });
-      return;
+      if (!isUserWhitelisted) {
+        toast({
+          title: "Not Eligible",
+          description: "Your wallet is not whitelisted for this task.",
+          variant: "destructive",
+        });
+        return;
+      }
+    } else {
+      // If task is not whitelisted, check if user has PARTICIPANT role
+      if (!hasParticipantRole) {
+        toast({
+          title: "Not Eligible",
+          description: "You need the participant role to apply for this task.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     try {

@@ -55,14 +55,18 @@ const Validation = ({ children }: ValidationProps) => {
       address,
     ],
   });
+  console.log(hasDefaultAdminRole, "hasDefaultAdminRole in validation");
+  console.log(hasTreasurerRole, "hasTreasurerRole in validation");
   console.log(hasParticipantRole, "hasParticipantRole in validation");
   // Check for privileged roles first
   const hasBasicPrivilegedRole = hasDefaultAdminRole || hasTreasurerRole;
 
   // Only check entity owner and task owner if user doesn't have basic privileged roles
   // This reduces unnecessary subgraph calls
+  const shouldCheckEntityOwner =
+    !hasBasicPrivilegedRole && isConnected && !!address;
   const { data: hasEntityOwnerRole } = useFindEntityOwner(
-    !hasBasicPrivilegedRole && isConnected ? (address ?? "0x") : "0x",
+    shouldCheckEntityOwner ? (address as string) : "",
   );
   // will implement later
   // const { data: hasTaskOwnerRole } = useFindTaskOwner(
@@ -92,11 +96,10 @@ const Validation = ({ children }: ValidationProps) => {
       shouldCheckEntityOwner && hasEntityOwnerRole === undefined;
 
     if (rolesAreLoading || entityOwnerLoading) {
-      // Don't set role or redirect while loading
       return;
     }
 
-    // Check if user has any privileged role
+    //check privileged role
     const hasPrivilegedRole =
       hasDefaultAdminRole || hasTreasurerRole || hasEntityOwnerRole;
 
