@@ -19,7 +19,6 @@ const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
     e.stopPropagation();
     window.open(url, "_blank", "noopener,noreferrer");
   };
-  console.log(taskData, "taskData in details component");
   return (
     <>
       <Card className="w-[80%] h-full p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
