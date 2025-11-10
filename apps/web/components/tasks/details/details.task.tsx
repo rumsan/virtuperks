@@ -20,6 +20,7 @@ const TaskDetails = ({ taskData }: TaskDetailsProps) => {
     e.stopPropagation();
     window.open(url, "_blank", "noopener,noreferrer");
   };
+  const isWhiteListed = taskData?.taskDetail?.isWhitelisted;
 
   return (
     <>
@@ -91,6 +92,28 @@ const TaskDetails = ({ taskData }: TaskDetailsProps) => {
               {taskData?.rewardManagement?.name || "N/A"}
             </span>
           </span>
+
+          {/* Eligibility Description */}
+          <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <p className="text-sm text-gray-700">
+              <span className="font-semibold text-blue-700">Eligibility: </span>
+              {isWhiteListed ? (
+                <span>
+                  Only{" "}
+                  <span className="font-semibold">
+                    whitelisted participants
+                  </span>{" "}
+                  can participate.
+                </span>
+              ) : (
+                <span>
+                  Anyone with the{" "}
+                  <span className="font-semibold">participant role</span> can
+                  participate.
+                </span>
+              )}
+            </p>
+          </div>
         </div>
       </Card>
 

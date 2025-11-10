@@ -1,5 +1,6 @@
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { DialogButton } from "@/components/common/ui/dialog";
+import { DisperseButton } from "@/components/common/ui/disperse-button";
 import { Cuid } from "@/components/departments/details/details.main";
 import { useGetEntityRole } from "@/hooks/subgraph/entity";
 import {
@@ -18,7 +19,7 @@ import { PATHS } from "@/routes/paths";
 import hasRole from "@/utils/role";
 import { Button } from "@workspace/ui/components/button";
 import { useToast } from "@workspace/ui/hooks/use-toast";
-import { Ban, CheckCircle, CircleX, Loader2 } from "lucide-react";
+import { Ban, CircleX, Loader2 } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
 import { useAccount } from "wagmi";
@@ -42,7 +43,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const { entityRole, roleLoading } = useGetEntityRole(
     taskData?.rewardManagement?.rewardManagement || "",
   );
-  const hasEntityOwnerRole = hasRole({
+  const hasEntityOwnerRole = !!hasRole({
     role: entityRole || "",
     address,
   });
@@ -131,54 +132,9 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     }
   };
 
-  const getDisburseButton = () => {
-    const showTooltip = !hasVerifiedParticipants || !hasEntityOwnerRole;
-    const isButtonDisabled =
-      !taskReady ||
-      isTokenDisbursedFromContract ||
-      !hasVerifiedParticipants ||
-      !hasEntityOwnerRole;
-    console.log(isButtonDisabled, "isButtonDisabled---");
-
-    return (
-      <div className="relative group flex items-center">
-        <Button
-          variant="outline"
-          disabled={isButtonDisabled}
-          className="border border-[#03AB65] disabled:cursor-not-allowed disabled:hover:bg-transparent"
-          onClick={() => setIsOpen(true)}
-        >
-          <span className="text-[#03AB65]">Disperse Token</span>
-          <CheckCircle
-            className="ml-2"
-            style={{
-              color: "#03AB65",
-              strokeWidth: 2.5,
-              width: 20,
-              height: 20,
-            }}
-          />
-        </Button>
-
-        {/* Tooltip */}
-        {showTooltip && (
-          <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 hidden group-hover:flex flex-col items-start gap-1 bg-yellow-100 border border-yellow-300 text-yellow-700 text-sm rounded-md px-3 py-2 shadow w-max max-w-xs">
-            <div className="flex items-start gap-2">
-              <span className="text-lg">⚠️</span>
-              <div className="flex flex-col gap-1">
-                {!hasEntityOwnerRole && (
-                  <span>Only entity owners can disperse tokens</span>
-                )}
-                {!hasVerifiedParticipants && (
-                  <span>Verified task can only be disburse</span>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
+  // Calculate if button should be disabled
+  const isDisburseButtonDisabled =
+    !taskReady || !hasVerifiedParticipants || !hasEntityOwnerRole;
 
   const isLoading =
     getTaskDetail.isLoading ||
@@ -222,7 +178,13 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
           </div>
 
           <div className="flex items-center ml-auto gap-8 mb-5">
-            {getDisburseButton()}
+            <DisperseButton
+              isDispersed={!!isTokenDisbursedFromContract}
+              isDisabled={isDisburseButtonDisabled}
+              hasVerifiedParticipants={hasVerifiedParticipants}
+              hasEntityOwnerRole={hasEntityOwnerRole}
+              onClick={() => setIsOpen(true)}
+            />
             <div className="relative group">
               {/* Wrapper hides cursor */}
               <div className={`${isCloseButtonDisabled ? "cursor-none" : ""}`}>
