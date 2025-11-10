@@ -21,6 +21,7 @@ import { useToast } from "@workspace/ui/hooks/use-toast";
 import { Ban, CheckCircle, CircleX, Loader2 } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useState } from "react";
+import { useAccount } from "wagmi";
 import TaskParticipant from "./details.participant";
 import TaskDetails from "./details.task";
 
@@ -34,6 +35,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [isDisbursed, setIsDisbursed] = useState(false);
+  const { address } = useAccount();
 
   const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
 
@@ -42,6 +44,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   );
   const hasEntityOwnerRole = hasRole({
     role: entityRole || "",
+    address,
   });
 
   const { status: participantStatus, isLoading: statusLoading } =
@@ -50,10 +53,6 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
       taskData?.rewardManagement?.rewardManagement,
     );
   const fetchRejectedParticipant = useGetRejectedParticipants(cuid.id);
-  console.log(
-    fetchRejectedParticipant?.data?.data?.taskRejecteds,
-    "rejectedparticipants----",
-  );
 
   const { verifiedTaskParticipant: verifiedParticipants } =
     useCheckTaskVerifiedParticipant(
@@ -139,6 +138,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
       isTokenDisbursedFromContract ||
       !hasVerifiedParticipants ||
       !hasEntityOwnerRole;
+    console.log(isButtonDisabled, "isButtonDisabled---");
 
     return (
       <div className="relative group flex items-center">
