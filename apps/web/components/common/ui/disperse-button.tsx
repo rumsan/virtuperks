@@ -7,6 +7,7 @@ interface DisperseButtonProps {
   hasVerifiedParticipants: boolean;
   hasEntityOwnerRole: boolean;
   onClick: () => void;
+  isDisbursed?: boolean; // Local state to show immediate feedback
 }
 
 export const DisperseButton = ({
@@ -15,9 +16,10 @@ export const DisperseButton = ({
   hasVerifiedParticipants,
   hasEntityOwnerRole,
   onClick,
+  isDisbursed = false,
 }: DisperseButtonProps) => {
-  // If tokens are already disbursed, show "Dispersed Token" state
-  if (isDispersed) {
+  // If tokens are already disbursed (from contract or local state), show "Dispersed Token" state
+  if (isDispersed || isDisbursed) {
     return (
       <div className="relative group flex items-center">
         <Button

@@ -184,6 +184,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
               hasVerifiedParticipants={hasVerifiedParticipants}
               hasEntityOwnerRole={hasEntityOwnerRole}
               onClick={() => setIsOpen(true)}
+              isDisbursed={isDisbursed}
             />
             <div className="relative group">
               {/* Wrapper hides cursor */}
