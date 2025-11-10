@@ -10,6 +10,7 @@ import {
 } from "@/hooks/subgraph/querycall";
 import { useGetTaskById } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
+import hasRole from "@/utils/role";
 import { Button } from "@workspace/ui/components/button";
 import { useToast } from "@workspace/ui/hooks/use-toast";
 import { ArrowRight, Loader2 } from "lucide-react";
@@ -38,6 +39,12 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
     [getTaskDetail],
   );
   const isTaskOpen = taskData?.taskDetail?.isOpen;
+  const participantRole = process.env.NEXT_PUBLIC_PARTICIPANT_ROLE || "";
+  console.log(participantRole, "participantRole in task portal main");
+
+  const hasParticipantRole = hasRole({ role: participantRole, address });
+  console.log(hasParticipantRole, "hasParticipantRole in task portal main");
+  const isWhitelisted = taskData?.taskDetail?.isWhitelisted;
 
   const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(
     taskData?.internal_id,
