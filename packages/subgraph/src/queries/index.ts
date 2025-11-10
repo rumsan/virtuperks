@@ -554,7 +554,7 @@ export const getParticipantTaskStatistics = `
       detailsUrl
       expiryDate
       totalRewardAmount
-      
+      isOpen
       }
     }
     
@@ -567,7 +567,7 @@ export const getParticipantTaskStatistics = `
       detailsUrl
       expiryDate
       totalRewardAmount
-      
+      isOpen
       }
     }
     
@@ -580,7 +580,7 @@ export const getParticipantTaskStatistics = `
       detailsUrl
       expiryDate
       totalRewardAmount
-      
+      isOpen
       }
     }
     
@@ -593,7 +593,7 @@ export const getParticipantTaskStatistics = `
       detailsUrl
       expiryDate
       totalRewardAmount
-      
+       isOpen
       }
     }
     
