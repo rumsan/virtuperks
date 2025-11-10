@@ -48,8 +48,10 @@ export default function DepartmentDetailsCard({
   handleCloseExpiredTasks,
 }: DepartmentDetailsCardProps) {
   const { address } = useAccount();
-
-  const roleData = hasRole({ role: process.env.NEXT_PUBLIC_MINTER_ROLE! });
+  const roleData = hasRole({
+    role: process.env.NEXT_PUBLIC_MINTER_ROLE!,
+    address,
+  });
   const canAllocateToken = Boolean(roleData);
 
   const { entityRole, roleLoading } = useGetEntityRole(
@@ -58,6 +60,7 @@ export default function DepartmentDetailsCard({
 
   const hasEntityOwnerRole = hasRole({
     role: entityRole || "",
+    address,
   });
 
   const canTransferToken = Boolean(hasEntityOwnerRole);
