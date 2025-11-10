@@ -5,6 +5,7 @@ import { DepartmentDetails } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { ArrowRight, Building, Plus } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { useAccount } from "wagmi";
 
 interface DepartmentListCardProps {
   router: AppRouterInstance;
@@ -13,9 +14,11 @@ interface DepartmentListCardProps {
 
 const DepartmentListCard = ({ router }: DepartmentListCardProps) => {
   const getAllEntity = useGetAllEntity();
+  const { address, isConnected, isConnecting } = useAccount();
   const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
   const hasAdminOwnerRole = hasRole({
     role: process.env.NEXT_PUBLIC_DEFAULT_ADMIN_ROLE || "",
+    address,
   });
 
   const canAddDepartment = Boolean(hasAdminOwnerRole);
