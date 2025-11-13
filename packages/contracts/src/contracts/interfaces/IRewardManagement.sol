@@ -7,8 +7,9 @@ interface IRewardManagement {
         PENDING,
         ACCEPTED,
         COMPLETED,
-        VERIFIED,
-        REJECTED
+        APPROVED,
+        REJECTED,
+        DISBURSED
     }
 
     struct Task {
@@ -26,8 +27,7 @@ interface IRewardManagement {
         //----
         uint256 maxParticipants;
         uint256 acceptedParticipantCount;
-        address[] verifiedParticipants;
-        address[] rejectedParticipants;
+        address[] approvedParticipants;
     }
     struct TaskAssignment {
         address participant;
@@ -38,20 +38,21 @@ interface IRewardManagement {
     event TaskCreated(bytes32 indexed id, address indexed createdBy);
     event TaskClosed(bytes32 indexed id, address indexed closedBy);
 
-    event TaskAccepted(bytes32 indexed id, address indexed participant);
-    event ParticipantApplied(bytes32 indexed id, address indexed participant);
-    event TaskCompleted(bytes32 indexed id, address indexed participant);
-    event TaskApproved(bytes32 indexed id, address indexed approver);
-    event TaskRejected(
-    bytes32 indexed id,
-    address indexed participant,
-    address indexed rejectedBy,
-    string reason 
-);
-    event ParticipantResubmitted(bytes32 indexed taskId, address indexed participant);
-    event TaskVerified(bytes32 indexed id, address indexed participant, address indexed verifier);
+    event TaskAssignmentAccepted(bytes32 indexed id, address indexed participant);
+    event TaskAssignmentApplied(bytes32 indexed id, address indexed participant);
+    event TaskAssignmentCompleted(bytes32 indexed id, address indexed participant);
+    event TaskAssignmentApproved(bytes32 indexed id, address indexed approver);
+    
+    event TaskAssignmentRejected(
+        bytes32 indexed id,
+        address indexed participant,
+        address indexed rejectedBy,
+        string reason 
+    );
+    event TaskAssignmentVerified(bytes32 indexed id, address indexed participant, address indexed verifier);
     event TaskDetailsUpdated(bytes32 indexed id, address indexed updatedBy);
 
+    event DisbursementToParticipant(bytes32 indexed taskId, uint256 amount, address indexed participant, address indexed disbursedBy);
     event DisbursementToTask(bytes32 indexed taskId, uint256 amount, address indexed disbursedBy);
     event AdditionalDisbursementToTask(
         bytes32 indexed taskId,

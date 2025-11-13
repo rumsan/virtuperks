@@ -165,7 +165,7 @@ contract RewardManagement is IRewardManagement, Multicall, ReentrancyGuard {
 
         // Set participant status
         taskAssignments[taskId][msg.sender].status = AssignmentStatus.PENDING;
-        emit ParticipantApplied(taskId, msg.sender);
+        emit TaskAssignmentApplied(taskId, msg.sender);
     }
 
     function acceptParticipant(bytes32 taskId, address participant) public onlyRole(OWNER) {
@@ -176,7 +176,7 @@ contract RewardManagement is IRewardManagement, Multicall, ReentrancyGuard {
         // Increment accepted participant count
         task.acceptedParticipantCount++;
         taskAssignments[taskId][participant].status = AssignmentStatus.ACCEPTED;
-        emit TaskAccepted(taskId, participant);
+        emit TaskAssignmentAccepted(taskId, participant);
     }
 
     /// @notice This function will change the status of the task
@@ -197,49 +197,26 @@ contract RewardManagement is IRewardManagement, Multicall, ReentrancyGuard {
 
         taskAssignment.status = AssignmentStatus.COMPLETED;
         taskAssignment.completionUrl = completionUrl;
-        emit TaskCompleted(taskId, msg.sender);
+        emit TaskAssignmentCompleted(taskId, msg.sender);
     }
 
-    /// @notice Allows a rejected participant to reset their status and try again
-/// @param taskId The unique identifier of the task
-function resubmitAfterRejection(bytes32 taskId, string memory completionUrl) public isEligibleToParticipate(taskId) whenNotPaused {
+
+
+function _getOpenTaskAssignment(bytes32 taskId, address participant) internal view returns(TaskAssignment memory assignment) {
     _isTaskOpen(taskId);
-    TaskAssignment storage taskAssignment = taskAssignments[taskId][msg.sender];
-    
-    require(
-        taskAssignment.status == AssignmentStatus.REJECTED,
-        "Only rejected participants can resubmit"
-    );
-    
-    
-    // Update status back to COMPLETED with new completion URL
-    taskAssignment.status = AssignmentStatus.COMPLETED;
-    taskAssignment.completionUrl = completionUrl;
-    
-    // Remove from rejected participants array (optional, for cleaner data)
-    _removeFromRejectedArray(taskId, msg.sender);
-    
- emit ParticipantResubmitted(taskId, msg.sender);
-  emit TaskCompleted(taskId, msg.sender);
+    TaskAssignment storage taskAssignment = taskAssignments[taskId][participant];
+    return taskAssignment;
 }
 
-// Helper function to remove from rejected array
-function _removeFromRejectedArray(bytes32 taskId, address participant) internal {
-    address[] storage rejected = tasks[taskId].rejectedParticipants;
-    for (uint256 i = 0; i < rejected.length; i++) {
-        if (rejected[i] == participant) {
-            rejected[i] = rejected[rejected.length - 1];
-            rejected.pop();
-            break;
-        }
-    }
+function _changeTaskAssignmentStatus(TaskAssignment memory taskAssignment, AssignmentStatus status )internal {
+    require(taskAssignment.status != AssignmentStatus.DISBURSED, "Participant has already been disbursed.");
+    taskAssignment.status = status;
 }
 
     /// @notice This function will change the status of the task
     /// @param taskId The id of the task
-    function verifyTask(bytes32 taskId, address participant) public onlyTaskOwner(taskId) {
-        _isTaskOpen(taskId);
-        TaskAssignment storage taskAssignment = taskAssignments[taskId][participant];
+    function approveTaskAssignment(bytes32 taskId, address participant) public onlyTaskOwner(taskId) {
+         TaskAssignment storage taskAssignment = _getOpenTaskAssignment(taskId, participant);
 
         require(
             taskAssignment.status == AssignmentStatus.COMPLETED,
@@ -249,44 +226,42 @@ function _removeFromRejectedArray(bytes32 taskId, address participant) internal 
         Task storage task = tasks[taskId];
         if (task.maxParticipants > 0) {
             require(
-                task.verifiedParticipants.length < task.maxParticipants,
+                task.approvedParticipants.length < task.maxParticipants,
                 "Maximum verified participants limit reached"
             );
         }
 
-        taskAssignment.status = AssignmentStatus.VERIFIED;
-        tasks[taskId].verifiedParticipants.push(participant);
+        _changeTaskAssignmentStatus(taskAssignment, AssignmentStatus.APPROVED);
+        tasks[taskId].approvedParticipants.push(participant);
 
-        emit TaskVerified(taskId, participant, msg.sender);
+        emit TaskAssignmentVerified(taskId, participant, msg.sender);
 
         if (task.maxParticipants > 0) {
-            if (task.verifiedParticipants.length == task.maxParticipants) {
+            if (task.approvedParticipants.length == task.maxParticipants) {
                 _closeTask(taskId);
             }
         }
     }
 
     /// @notice This function allows the task owner to reject a participant with a reason
-/// @param taskId The unique identifier of the task
-/// @param participant The address of the participant to reject
-/// @param reason The reason for rejecting the participant
-function rejectParticipant(bytes32 taskId, address participant, string memory reason) public onlyTaskOwner(taskId) {
-    _isTaskOpen(taskId);
-    TaskAssignment storage taskAssignment = taskAssignments[taskId][participant];
+    /// @param taskId The unique identifier of the task
+    /// @param participant The address of the participant to reject
+    /// @param reason The reason for rejecting the participant
+    function rejectTaskAssignment(bytes32 taskId, address participant, string memory reason) public onlyTaskOwner(taskId) {
+         TaskAssignment storage taskAssignment = _getOpenTaskAssignment(taskId, participant);
 
-    // Ensure the participant is in a valid state to be rejected
-    require(
-         taskAssignment.status == AssignmentStatus.COMPLETED,
-        "Participant cannot be rejected in the current state"
-    );
+        // Ensure the participant is in a valid state to be rejected
+        require(
+            taskAssignment.status == AssignmentStatus.COMPLETED,
+            "Participant cannot be rejected in the current state"
+        );
 
-    // Update the participant's status to REJECTED
-    taskAssignment.status = AssignmentStatus.REJECTED;
-    tasks[taskId].rejectedParticipants.push(participant);
+        // Update the participant's status to REJECTED
+        _changeTaskAssignmentStatus(taskAssignment, AssignmentStatus.REJECTED);
 
-    // Emit the TaskRejected event with the reason
-    emit TaskRejected(taskId, participant, msg.sender, reason);
-}
+        // Emit the TaskRejected event with the reason
+        emit TaskAssignmentRejected(taskId, participant, msg.sender, reason);
+    }
 
     /// @notice Retrieves all details of a specific task
     /// @param taskId The unique identifier of the task
@@ -302,7 +277,7 @@ function rejectParticipant(bytes32 taskId, address participant, string memory re
     }
 
     /// @notice Get tasks owned by a specific address
-    /// @param owner The address of the task owner
+    /// @param owner The address of the task owner 
     /// @return taskIds Array of task IDs owned by the specified address
     function getTasksByOwner(address owner) public view returns (bytes32[] memory) {
         // First count the number of matching tasks
@@ -365,6 +340,48 @@ function rejectParticipant(bytes32 taskId, address participant, string memory re
         }
     }
 
+    function _disburseToParticipant(
+        bytes32 taskId,
+        address participant,
+        uint256 amount
+    ) internal {
+        Task storage task = tasks[taskId];
+        TaskAssignment storage taskAssignment = taskAssignments[taskId][participant];
+        IERC20 token = IERC20(task.rewardToken);
+        require(token.balanceOf(address(this)) >= amount,"Insufficient token balance for disbursement");
+        
+        if(taskAssignment.status != AssignmentStatus.DISBURSED){
+            // Transfer tokens to the participant
+            token.safeTransfer(participant, amount);
+
+            // Update total allocated tokens
+            totalAllocatedTokens[task.rewardToken] -= amount;
+
+            // Update participant status to DISBURSED
+            taskAssignment.status = AssignmentStatus.DISBURSED;
+
+            emit DisbursementToParticipant(taskId, amount, participant, msg.sender);
+        }
+    }
+
+    function disburseToSingleParticipant(
+        bytes32 taskId,
+        address participant,
+        uint256 amount,
+        string memory completionUrl
+    ) public onlyOwner nonReentrant whenNotPaused {
+        Task storage task = tasks[taskId];
+        if(amount == 0){
+            amount = task.totalRewardAmount/task.maxParticipants;
+        }
+        _isTaskOpen(taskId);
+        TaskAssignment storage taskAssignment = _getOpenTaskAssignment(taskId, participant);
+        require(taskAssignment.status!=AssignmentStatus.DISBURSED, "Participant has already been disbursed.");
+        taskAssignment.completionUrl = completionUrl;
+
+        _disburseToParticipant(taskId, participant, amount);
+    }
+
     function disburseTokensToTask(
         bytes32 taskId,
         uint256 amount
@@ -373,36 +390,37 @@ function rejectParticipant(bytes32 taskId, address participant, string memory re
         IERC20 token = IERC20(task.rewardToken);
         require(amount > 0, "Amount must be greater than 0");
         require(task.totalRewardAmount >= amount, "Amount exceeds total reward amount");
-        require(
-            token.balanceOf(address(this)) >= amount,
-            "Insufficient token balance for disbursement"
-        );
+
+        //TODO: is this still necessary?
         require(task.isTokenDisbursed == false, "Tokens already disbursed");
-        if (task.verifiedParticipants.length == 0) {
+        if (task.approvedParticipants.length == 0) {
             revert("No verified participants to disburse tokens");
         }
 
-        // If the task is still open, close it
-        if (task.isOpen) {
-            _closeTask(taskId);
-        }
 
-        uint256 participantCount = task.verifiedParticipants.length;
+        // ----- Token Disbursement ---
+
+        uint256 participantCount = task.approvedParticipants.length;
         uint256 rewardPerParticipant = amount / participantCount;
         uint256 remainingAmount = amount - (rewardPerParticipant * participantCount);
 
         for (uint256 i = 0; i < participantCount; i++) {
-            address participant = task.verifiedParticipants[i];
+            address participant = task.approvedParticipants[i];
             // Add the remainder to the last participant
             uint256 participantAmount = rewardPerParticipant;
             if (i == participantCount - 1) {
                 participantAmount += remainingAmount;
             }
-            token.safeTransfer(participant, participantAmount);
+            _disburseToParticipant(taskId, participant, amount);
         }
 
-        totalAllocatedTokens[task.rewardToken] -= task.totalRewardAmount;
+        //totalAllocatedTokens[task.rewardToken] -= task.totalRewardAmount;
         task.isTokenDisbursed = true;
+        
+        // If the task is still open, close it
+        if (task.isOpen) {
+            _closeTask(taskId);
+        }
         emit DisbursementToTask(taskId, amount, msg.sender);
     }
 
@@ -421,12 +439,12 @@ function rejectParticipant(bytes32 taskId, address participant, string memory re
             "Insufficient available token for additional disbursement"
         );
 
-        uint256 participantCount = task.verifiedParticipants.length;
+        uint256 participantCount = task.approvedParticipants.length;
         uint256 amountPerParticipant = amount / participantCount;
         uint256 remainingAmount = amount - (amountPerParticipant * participantCount);
 
         for (uint256 i = 0; i < participantCount; i++) {
-            address participant = task.verifiedParticipants[i];
+            address participant = task.approvedParticipants[i];
             // Add the remainder to the last participant
             uint256 participantAmount = amountPerParticipant;
             if (i == participantCount - 1) {
@@ -449,6 +467,7 @@ function rejectParticipant(bytes32 taskId, address participant, string memory re
         require(amount > 0, "Amount must be greater than 0");
 
         IERC20 token = IERC20(tokenAddress);
+        //TODO: doble check if this is correct
         require(
             getTotalUnallocatedTokens(tokenAddress) >= amount,
             "Insufficient available token for transfer"
@@ -557,16 +576,8 @@ function rejectParticipant(bytes32 taskId, address participant, string memory re
     /// @notice Get all verified participants for a task
     /// @param taskId The unique identifier of the task
     /// @return participants Array of verified participant addresses
-    function getTaskVerifiedParticipants(bytes32 taskId) public view returns (address[] memory) {
-        return tasks[taskId].verifiedParticipants;
-    }
-
-
-      /// @notice Get all rejected  participants for a task
-    /// @param taskId The unique identifier of the task
-    /// @return participants Array of rejected participant addresses
-    function getTaskRejectedParticipants(bytes32 taskId) public view returns (address[] memory) {
-        return tasks[taskId].rejectedParticipants;
+    function getTaskApprovedParticipants(bytes32 taskId) public view returns (address[] memory) {
+        return tasks[taskId].approvedParticipants;
     }
 
     /// @notice Check if a task has reached its maximum participant limit
