@@ -670,6 +670,35 @@ describe('RewardManagement Contract', function () {
         .to.emit(rewardManagement, 'DisbursementToTask')
         .withArgs(taskId, totalRewardAmount, user2.address);
     });
+    it(' should allow entity owner to reject participant assignment', async function () {
+      const totalRewardAmount = BigInt(100);
+      await rewardManagement.connect(participant1).participate(taskId);
+
+      await rewardManagement
+        .connect(user2)
+        .acceptParticipant(taskId, participant1.address);
+      await rewardManagement
+        .connect(participant1)
+        .completeTask(taskId, 'https://completion.com');
+
+      // owner reject the participant assignment
+      await expect(
+        rewardManagement
+          .connect(user2)
+          .rejectTaskAssignment(
+            taskId,
+            participant1.address,
+            'Incomplete work',
+          ),
+      )
+        .to.emit(rewardManagement, 'TaskAssignmentRejected')
+        .withArgs(
+          taskId,
+          participant1.address,
+          user2.address,
+          'Incomplete work',
+        );
+    });
   });
 
   describe('test for disburseToSingleParticipant and disburseAdditionalTokenToTaskParticipants', function () {
@@ -766,6 +795,26 @@ describe('RewardManagement Contract', function () {
       )
         .to.emit(rewardManagement, 'AdditionalDisbursementToTask')
         .withArgs(taskId, totalRewardAmount, remarks, user2.address);
+    });
+    it('should allocate token to task', async function () {
+      const initialAmount = BigInt(100);
+      const totalRewardAmount = BigInt(100);
+      const remarks = 'Additional reward for extra effort';
+      const getTokenAddress = await rewardToken.getAddress();
+
+      // call allocae tokens to  task
+      await expect(
+        rewardManagement
+          .connect(user2)
+          .allocateTokensToTask(
+            taskId,
+            getTokenAddress,
+            treasury.address,
+            initialAmount,
+          ),
+      )
+        .to.emit(rewardManagement, 'TokensAllocatedToTask')
+        .withArgs(taskId, getTokenAddress, initialAmount, user2.address);
     });
   });
 });
