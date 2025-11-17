@@ -100,6 +100,20 @@ export const useClosedTask = () => {
   });
 };
 
+export const useGetTaskByName = (taskName: string) => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["taskByName", taskName],
+    queryFn: async () => {
+      if (!taskName) return null;
+      const taskDetail = await queryService?.getTaskByName(taskName);
+      return taskDetail;
+    },
+    enabled: !!queryService && !!taskName,
+  });
+};
+
 export const useCloseExpiredTask = () => {
   const queryClient = useQueryClient();
   const { writeContractAsync } = useWriteRewardManagementCloseExpiredTasks();
@@ -307,3 +321,6 @@ export const useResubmitTaskMutation = () => {
     resubmitSuccess: mutation.isSuccess,
   };
 };
+
+
+
