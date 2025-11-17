@@ -816,5 +816,25 @@ describe('RewardManagement Contract', function () {
         .to.emit(rewardManagement, 'TokensAllocatedToTask')
         .withArgs(taskId, getTokenAddress, initialAmount, user2.address);
     });
+    //  it('should allocate token to task', async function () {
+    //    const initialAmount = BigInt(100);
+    //    const totalRewardAmount = BigInt(100);
+    //    const remarks = 'Additional reward for extra effort';
+    //    const getTokenAddress = await rewardToken.getAddress();
+
+    //    // call allocae tokens to  task
+    //    await expect(
+    //      rewardManagement
+    //        .connect(user2)
+    //        .allocateTokensToTask(
+    //          taskId,
+    //          getTokenAddress,
+    //          treasury.address,
+    //          initialAmount,
+    //        ),
+    //    )
+    //      .to.emit(rewardManagement, 'TokensAllocatedToTask')
+    //      .withArgs(taskId, getTokenAddress, initialAmount, user2.address);
+    //  });
   });
 });
