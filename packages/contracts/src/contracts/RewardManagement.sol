@@ -84,6 +84,7 @@ contract RewardManagement is IRewardManagement, Multicall, ReentrancyGuard {
     function createTask(
         bytes32 taskId,
         Task memory task,
+        address treasuryAddress,
         address[] memory _whitelistParticipants
     ) public onlyRole(OWNER) whenNotPaused {
         require(tasks[taskId].owner == address(0), "Task ID already exists");
@@ -97,19 +98,19 @@ contract RewardManagement is IRewardManagement, Multicall, ReentrancyGuard {
         require(task.totalRewardAmount > 0, "Reward amount must be greater than 0");
         require(task.maxParticipants > 0, "Max participants must be greater than 0");
 
-        require(
-            getTotalUnallocatedTokens(task.rewardToken) >= task.totalRewardAmount,
-            "Total reward amount exceeds available tokens"
-        );
-
-        totalAllocatedTokens[task.rewardToken] += task.totalRewardAmount;
+        // require(
+        //     getTotalUnallocatedTokens(task.rewardToken) >= task.totalRewardAmount,
+        //     "Total reward amount exceeds available tokens"
+        // );
+        // totalAllocatedTokens[task.rewardToken] += task.totalRewardAmount;
 
         // Set the isOpen flag before storing to avoid separate storage write
         task.isOpen = true;
-
         // Store task only once
         tasks[taskId] = task;
         openTasks.push(taskId);
+
+        allocateTokensToTask(taskId, task.rewardToken, treasuryAddress, task.totalRewardAmount);
 
         if (task.isWhitelisted) {
             for (uint256 i = 0; i < _whitelistParticipants.length; i++) {
@@ -202,13 +203,12 @@ contract RewardManagement is IRewardManagement, Multicall, ReentrancyGuard {
 
 
 
-function _getOpenTaskAssignment(bytes32 taskId, address participant) internal view returns(TaskAssignment memory assignment) {
+function _getOpenTaskAssignment(bytes32 taskId, address participant) internal returns(TaskAssignment storage) {
     _isTaskOpen(taskId);
-    TaskAssignment storage taskAssignment = taskAssignments[taskId][participant];
-    return taskAssignment;
+    return taskAssignments[taskId][participant];
 }
 
-function _changeTaskAssignmentStatus(TaskAssignment memory taskAssignment, AssignmentStatus status )internal {
+function _changeTaskAssignmentStatus(TaskAssignment storage taskAssignment, AssignmentStatus status) internal {
     require(taskAssignment.status != AssignmentStatus.DISBURSED, "Participant has already been disbursed.");
     taskAssignment.status = status;
 }
@@ -376,18 +376,20 @@ function _changeTaskAssignmentStatus(TaskAssignment memory taskAssignment, Assig
         }
         _isTaskOpen(taskId);
         TaskAssignment storage taskAssignment = _getOpenTaskAssignment(taskId, participant);
+        require(amount > 0, "Amount must be greater than 0");
+        require(task.totalRewardAmount >= amount, "Amount exceeds total reward amount");
         require(taskAssignment.status!=AssignmentStatus.DISBURSED, "Participant has already been disbursed.");
+        require(task.isTokenDisbursed == false, "Tokens already disbursed");
         taskAssignment.completionUrl = completionUrl;
 
         _disburseToParticipant(taskId, participant, amount);
     }
 
-    function disburseTokensToTask(
+    function disburseTokensToTaskParticipants(
         bytes32 taskId,
         uint256 amount
     ) public onlyOwner nonReentrant whenNotPaused {
         Task storage task = tasks[taskId];
-        IERC20 token = IERC20(task.rewardToken);
         require(amount > 0, "Amount must be greater than 0");
         require(task.totalRewardAmount >= amount, "Amount exceeds total reward amount");
 
@@ -424,7 +426,7 @@ function _changeTaskAssignmentStatus(TaskAssignment memory taskAssignment, Assig
         emit DisbursementToTask(taskId, amount, msg.sender);
     }
 
-    function disburseAdditionalTokenToTask(
+    function disburseAdditionalTokenToTaskParticipants(
         bytes32 taskId,
         uint256 amount,
         string memory remarks
@@ -616,5 +618,35 @@ function _changeTaskAssignmentStatus(TaskAssignment memory taskAssignment, Assig
         }
 
         emit TaskDetailsUpdated(taskId, msg.sender);
+    }
+
+    /// @notice Transfer ERC20 tokens to this contract and allocate them to a specific task
+    /// @dev Users must first approve this contract to spend their tokens before calling this function
+    /// @param taskId The unique identifier of the task to allocate tokens to
+    /// @param tokenAddress The address of the ERC20 token to transfer
+    /// @param amount The amount of tokens to transfer and allocate
+    function allocateTokensToTask(
+        bytes32 taskId,
+        address tokenAddress,
+        address treasuryAddress,
+        uint256 amount
+    ) public nonReentrant whenNotPaused {
+        require(amount > 0, "Amount must be greater than 0");
+        require(tokenAddress != address(0), "Token address cannot be zero");
+        
+        Task storage task = tasks[taskId];
+        require(task.owner != address(0), "Task does not exist");
+        require(task.isOpen, "Task is not open");
+        require(task.rewardToken == tokenAddress, "Token address does not match task reward token");
+
+        // Transfer tokens from user to this contract
+        IERC20 token = IERC20(tokenAddress);
+        token.safeTransferFrom(treasuryAddress, address(this), amount);
+
+        // Update task's total reward amount and allocated tokens
+        task.totalRewardAmount += amount;
+        totalAllocatedTokens[tokenAddress] += amount;
+
+        emit TokensAllocatedToTask(taskId, tokenAddress, amount, msg.sender);
     }
 }
