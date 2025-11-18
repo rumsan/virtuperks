@@ -10,6 +10,7 @@ import { Calendar } from "@workspace/ui/components/calendar";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -372,9 +373,8 @@ export default function TaskBaseForm({
                             <Button
                               type="button"
                               variant="outline"
-                              className={`w-full font-normal ${
-                                !field.value && "text-muted-foreground"
-                              }`}
+                              className={`w-full font-normal ${!field.value && "text-muted-foreground"
+                                }`}
                             >
                               {field.value ? (
                                 format(new Date(field.value), "MM/dd/yyyy")
@@ -431,6 +431,32 @@ export default function TaskBaseForm({
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="requireApproval"
+              render={({ field }) => (
+                <FormItem className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="space-y-1">
+                    <FormLabel>Approval Required</FormLabel>
+                    <FormDescription>
+                      Enable if tasks require owner approval.
+                    </FormDescription>
+                  </div>
+
+                  <FormControl>
+                    <input
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      className="h-5 w-5 accent-blue-600 cursor-pointer"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+
           </div>
 
           {/* isWhitelisted Toggle */}
@@ -529,11 +555,10 @@ export default function TaskBaseForm({
             <Button
               variant="outline"
               type="button"
-              className={`w-[170px] flex justify-center items-center gap-2 ${
-                isPending
-                  ? "cursor-not-allowed opacity-70"
-                  : "hover:bg-gray-100"
-              }`}
+              className={`w-[170px] flex justify-center items-center gap-2 ${isPending
+                ? "cursor-not-allowed opacity-70"
+                : "hover:bg-gray-100"
+                }`}
               onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                 e.preventDefault();
                 if (!isPending) history.back();

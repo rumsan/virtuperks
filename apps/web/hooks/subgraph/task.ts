@@ -42,7 +42,6 @@ export const useTaskAdd = () => {
             rejectedParticipants:
               rejectedParticipants as readonly `0x${string}`[],
           },
-
           data.whitelistedParticipants,
         ],
       });
