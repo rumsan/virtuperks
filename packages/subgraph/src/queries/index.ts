@@ -77,7 +77,7 @@ export const AppRegistryQueries = {
     }
   }
 `,
-getRoleRevokedById: `
+  getRoleRevokedById: `
 query GetRoleRevokedById($id: ID!) {
   roleRevoked(id: $id) {
     id
@@ -89,7 +89,7 @@ query GetRoleRevokedById($id: ID!) {
   }
 }
 `,
-getRoleAdminGrantedById: `
+  getRoleAdminGrantedById: `
   query GetRoleAdminGrantedById($id: ID!) {
     roleAdminGranted(id: $id) {
       id
@@ -101,7 +101,7 @@ getRoleAdminGrantedById: `
     }
   }
 `,
-getRoleAdminRevokedById: `
+  getRoleAdminRevokedById: `
   query GetRoleAdminRevokedById($id: ID!) {
     roleAdminRevoked(id: $id) {
       id
@@ -113,7 +113,7 @@ getRoleAdminRevokedById: `
     }
   }
 `,
-  
+
 };
 
 // RewardToken Queries
@@ -214,7 +214,7 @@ export const getTaskCreation = `
 
 
 
-  export const getOpenTasks = `
+export const getOpenTasks = `
     query GetOpenTasks {
       taskCreateds(first: 10, orderBy: blockTimestamp, orderDirection: desc, where: { taskDetail_: { isOpen: true } }
       ) {
@@ -254,7 +254,7 @@ export const getTaskCreation = `
 
 
 
-  export const getCloseTasks = `
+export const getCloseTasks = `
     query GetCloseTasks {
       taskCreateds(first: 100, orderBy: blockTimestamp, orderDirection: desc, where:{ taskDetail_:{ isOpen:false }}) {
         id
@@ -458,6 +458,7 @@ export const GetCombineParticipantsByTask = `
       participant
       status
       taskId
+      rejectedReason
       lastUpdatedBlock
       lastUpdatedTimestamp
       taskDetail {
@@ -505,7 +506,7 @@ export const GetRewardManagement = `
       }
     }
   `;
- export const GetRewardManagementCreatedByAddress = `
+export const GetRewardManagementCreatedByAddress = `
   query GetRewardManagementCreatedByAddress($entityId: Bytes!) {
     rewardManagementCreateds(where: { entityId: $entityId }) {
      id
@@ -548,24 +549,52 @@ export const getParticipantTaskStatistics = `
       where: { participant: $participant}
     ) {
       id
+      taskDetail{
+      name
+      detailsUrl
+      expiryDate
+      totalRewardAmount
+      isOpen
+      }
     }
     
     accepted:taskAccepteds (
       where: { participant: $participant }
     ) {
       id
+      taskDetail{
+      name
+      detailsUrl
+      expiryDate
+      totalRewardAmount
+      isOpen
+      }
     }
     
     completed: taskCompleteds(
       where: { participant: $participant}
     ) {
       id
+      taskDetail{
+      name
+      detailsUrl
+      expiryDate
+      totalRewardAmount
+      isOpen
+      }
     }
     
     verified: taskVerifieds(
       where: { participant: $participant }
     ) {
       id
+      taskDetail{
+      name
+      detailsUrl
+      expiryDate
+      totalRewardAmount
+       isOpen
+      }
     }
     
   }
@@ -573,7 +602,7 @@ export const getParticipantTaskStatistics = `
 
 
 
-export const getParticipantTasks=`
+export const getParticipantTasks = `
    query GetParticipantTasks($participant: Bytes!) {
     participantTaskStatuses(where: { participant: $participant }) {
       id
@@ -641,7 +670,42 @@ query GetParticipantTasks($createdBy: Bytes!) {
 }
 `
 
-  export const GetRewardManagementTokenTransfers = `
+export const GetTaskByName = `
+  query GetTaskByName($taskName: String!) {
+     taskCreateds(where: { taskDetail_: { name_contains_nocase: $taskName } }) {
+      id
+      internal_id
+      taskDetail {
+        id
+        name
+        detailsUrl
+        expiryDate
+        isOpen
+        isTokenDisbursed
+        maxParticipants
+        owner
+        rewardToken
+        totalRewardAmount
+        requireApproval
+        isWhitelisted
+        verifiedParticipants
+      }
+      rewardManagement {
+        appId
+        id
+        name
+        rewardManagement
+      }
+      createdBy
+      blockNumber
+      blockTimestamp
+      transactionHash
+    }
+  }
+`;
+
+
+export const GetRewardManagementTokenTransfers = `
   query GetRewardManagementTokenTransfers($rewardManagement: Bytes!) {
     rewardManagementCreateds(where: { rewardManagement: $rewardManagement }) {
      id
@@ -700,7 +764,7 @@ export const GetRewards = `
     }
   `;
 
-  
+
 export const getRewardById = `
   query GetRewardById($rewardRedemption: Bytes!) {
     rewardRedemptionCreateds(where: { rewardRedemption: $rewardRedemption }) {
@@ -774,7 +838,7 @@ query GetRedeemedRewardsByParticipant($participant: Bytes!) {
   }
 }
 `
-export  const GetWhiteListedParticipantByTask = `
+export const GetWhiteListedParticipantByTask = `
 query GetWhiteListedParticipantByTask($taskId: Bytes!) {
   participantWhitelisteds(where: { taskId: $taskId }) {
     id
@@ -786,3 +850,42 @@ query GetWhiteListedParticipantByTask($taskId: Bytes!) {
   }
 }
 `;
+
+export const GetEntityOwner = `
+query GetEntityOwner($userAddress: Bytes!) {
+  ownerAddeds(where: { entityOwner: $userAddress }) {
+    id
+    entityId
+    name
+    entityOwner
+  }
+}
+`
+
+
+
+export const GetRejectedParticipant = `
+query GetRejected($taskId: Bytes!) {
+  taskRejecteds(where: { internal_id: $taskId }) {
+    id
+    internal_id
+    participant
+    reason
+    rejectedBy
+    blockNumber
+    blockTimestamp
+  }
+}
+`;
+
+export const GetTaskOwner = `
+query GetTaskOwner($userAddress: Bytes!) {
+  taskDetails(where: { owner: $userAddress }) {
+    id
+    owner
+    name
+  }
+}
+
+`
+

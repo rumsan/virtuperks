@@ -1,6 +1,34 @@
 import { newMockEvent } from "matchstick-as"
-import { ethereum, Address, Bytes } from "@graphprotocol/graph-ts"
-import { RewardManagementCreated } from "../generated/RewardManagementFactory/RewardManagementFactory"
+import { ethereum, Bytes, Address } from "@graphprotocol/graph-ts"
+import {
+  OwnerAdded,
+  RewardManagementCreated
+} from "../generated/RewardManagementFactory/RewardManagementFactory"
+
+export function createOwnerAddedEvent(
+  entityId: Bytes,
+  name: string,
+  entityOwner: Address
+): OwnerAdded {
+  let ownerAddedEvent = changetype<OwnerAdded>(newMockEvent())
+
+  ownerAddedEvent.parameters = new Array()
+
+  ownerAddedEvent.parameters.push(
+    new ethereum.EventParam("entityId", ethereum.Value.fromFixedBytes(entityId))
+  )
+  ownerAddedEvent.parameters.push(
+    new ethereum.EventParam("name", ethereum.Value.fromString(name))
+  )
+  ownerAddedEvent.parameters.push(
+    new ethereum.EventParam(
+      "entityOwner",
+      ethereum.Value.fromAddress(entityOwner)
+    )
+  )
+
+  return ownerAddedEvent
+}
 
 export function createRewardManagementCreatedEvent(
   rewardManagement: Address,

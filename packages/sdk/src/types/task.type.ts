@@ -27,6 +27,7 @@ export type TaskCreated = VirtueperkCommonField & {
   status: string;
   taskDetail: TaskDetail;
   taskId: string;
+  rejectedReason?: string; 
 };
 
 
@@ -67,6 +68,7 @@ export interface Tasks {
     isOpen: boolean;
     detailsUrl: string;
     maxParticipants: number;
+    isWhitelisted: boolean;
     expiryDate: number;
     totalRewardAmount: number;
     acceptedParticipantCount: number;

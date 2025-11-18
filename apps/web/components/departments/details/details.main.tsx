@@ -38,6 +38,7 @@ export default function DepartmentDetails({
     isError,
     error,
   } = useGetEntityById(cuid.id);
+
   const { totalAllocatedTokens, statusLoading: allocatedLoading } =
     useCheckTotalAllocatedTokens(entity?.rewardManagement);
   const { unallocatedTokens, statusLoading: unallocatedLoading } =
@@ -76,7 +77,6 @@ export default function DepartmentDetails({
         variant: "success",
       });
     } catch (err) {
-      
       toast({
         title: "Failed to close expired tasks.",
         variant: "destructive",
@@ -129,7 +129,7 @@ export default function DepartmentDetails({
         handleCloseExpiredTasks={handleCloseExpiredTasks}
         closePending={closePending}
       />
-      ;
+
       <DepartmentDetailsTable
         cuid={entity.rewardManagement}
         setPagination={setPagination}

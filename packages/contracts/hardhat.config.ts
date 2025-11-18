@@ -17,8 +17,9 @@ const config: HardhatUserConfig = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200,
-      }
+        runs: 800,  // Increased for smaller bytecode
+      },
+      viaIR: true  // Enable IR-based code generation for better optimization
     }
 
 

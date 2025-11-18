@@ -8,9 +8,9 @@ dataSources:
     name: AppRegistry
     network: base-sepolia
     source:
-      address: "0xd258EE403eEa5b9d90631CfBCE81b6c7B729e6C5"
+      address: "0x4304DAcb27Ab56b436211A5816b36B83deE16faB"
       abi: AppRegistry
-      startBlock: 31240728
+      startBlock: 33322998
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -46,9 +46,9 @@ dataSources:
     name: RewardToken
     network: base-sepolia
     source:
-      address: "0xD6BA3357fdb5423030Ba81E7268Ea786aF70b39B"
+      address: "0xBEa4dF1Fb0C3c1b4F51406ea5C9263A75C633ca1"
       abi: RewardToken
-      startBlock: 31240749
+      startBlock: 33323018
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -69,19 +69,22 @@ dataSources:
     name: RewardManagementFactory
     network: base-sepolia
     source:
-      address: "0x6baE87178836d3eE036751a2d3B6693eAd0188a8"
+      address: "0x1fE52774D5188176999A4010EdAaC9697B155596"
       abi: RewardManagementFactory
-      startBlock: 31240756
+      startBlock: 33323023
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
+        - OwnerAdded
         - RewardManagementCreated
       abis:
         - name: RewardManagementFactory
           file: ./abis/RewardManagementFactory.json
       eventHandlers:
+        - event: OwnerAdded(indexed bytes32,string,indexed address)
+          handler: handleOwnerAdded
         - event: RewardManagementCreated(address,address,bytes32,string,bytes32)
           handler: handleRewardManagementCreated
       file: ./src/reward-management-factory.ts
@@ -103,6 +106,7 @@ templates:
         - EtherWithdrawn
         - ParticipantApplied
         - ParticipantRemovedFromWhitelist
+        - ParticipantResubmitted
         - ParticipantWhitelisted
         - TaskAccepted
         - TaskApproved
@@ -131,6 +135,8 @@ templates:
           handler: handleParticipantApplied
         - event: ParticipantRemovedFromWhitelist(indexed bytes32,indexed address,indexed address)
           handler: handleParticipantRemovedFromWhitelist
+        - event: ParticipantResubmitted(indexed bytes32,indexed address)
+          handler: handleParticipantResubmitted
         - event: ParticipantWhitelisted(indexed bytes32,indexed address,indexed address)
           handler: handleParticipantWhitelisted
         - event: TaskAccepted(indexed bytes32,indexed address)

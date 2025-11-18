@@ -14,7 +14,15 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { toast } from "@workspace/ui/hooks/use-toast";
-import { Building, Clock, Copy, Loader2, Plus } from "lucide-react";
+import {
+  AlertTriangle,
+  Building,
+  Clock,
+  Copy,
+  Gift,
+  Loader2,
+  Plus,
+} from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useParams } from "next/navigation";
 import React, { useState } from "react";
@@ -40,7 +48,10 @@ export default function DepartmentDetailsCard({
   handleCloseExpiredTasks,
 }: DepartmentDetailsCardProps) {
   const { address } = useAccount();
-  const roleData = hasRole({ role: process.env.NEXT_PUBLIC_MINTER_ROLE! });
+  const roleData = hasRole({
+    role: process.env.NEXT_PUBLIC_MINTER_ROLE!,
+    address,
+  });
   const canAllocateToken = Boolean(roleData);
 
   const { entityRole, roleLoading } = useGetEntityRole(
@@ -49,6 +60,7 @@ export default function DepartmentDetailsCard({
 
   const hasEntityOwnerRole = hasRole({
     role: entityRole || "",
+    address,
   });
 
   const canTransferToken = Boolean(hasEntityOwnerRole);
@@ -137,9 +149,9 @@ export default function DepartmentDetailsCard({
           {directTransferPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <Plus size={16} strokeWidth={2.75} />
+            <Gift size={16} strokeWidth={2.75} />
           )}
-          {directTransferPending ? "Processing..." : "Transfer Token"}
+          {directTransferPending ? "Processing..." : "Bonus Token"}
         </span>
       </Button>
     );
@@ -195,7 +207,7 @@ export default function DepartmentDetailsCard({
             </h3>
           </div>
           <div className="flex gap-10">
-            {/* Transfer Button */}
+            {/* Bonus Drop Button */}
             {canTransferToken && getTransferButton()}
 
             {canTransferToken && (
@@ -209,7 +221,6 @@ export default function DepartmentDetailsCard({
               </Button>
             )}
 
-            {/* Dialog stays conditional because it only makes sense when user can transfer */}
             {!directTransferPending && canTransferToken && (
               <DialogButton
                 isOpen={isOpen}
@@ -217,7 +228,7 @@ export default function DepartmentDetailsCard({
                 title="Are you sure you want to transfer token amount?"
                 subTitle="This action cannot be undone"
                 buttonName={
-                  directTransferPending ? "Processing..." : "Transfer Token"
+                  directTransferPending ? "Processing..." : "Bonus Token"
                 }
                 submitType="directdisburse"
                 handleApplyTaskLogic={handleDialogAction}
@@ -227,7 +238,6 @@ export default function DepartmentDetailsCard({
               />
             )}
 
-            {/* Allocate Button */}
             {canAllocateToken && (
               <Button
                 className="h-12 w-48 fw-[600] flex items-center justify-center"
@@ -238,11 +248,10 @@ export default function DepartmentDetailsCard({
                 }
               >
                 <Plus size={22} strokeWidth={2.75} />
-                <span className="ml-2">Allocate Token</span>
+                <span className="ml-2">Mint Token</span>
               </Button>
             )}
 
-            {/* Close Expired Tasks Button */}
             {canTransferToken && getCloseExpiredButton()}
           </div>
         </div>
@@ -304,7 +313,6 @@ export default function DepartmentDetailsCard({
           </CardTitle>
         </Card>
 
-        {/* Token Cards */}
         <Card className="font-normal text-base h-50 flex flex-col">
           <CardHeader className="flex-grow">
             <CardTitle className="flex p-0 mb-4 text-[#0F172A]">
@@ -316,15 +324,39 @@ export default function DepartmentDetailsCard({
           </CardFooter>
         </Card>
 
-        <Card className="font-normal text-base h-50 flex flex-col">
-          <CardHeader className="flex-grow">
-            <CardTitle className="flex p-0 mb-4 text-[#0F172A]">
+        <Card className="font-normal text-base flex flex-col justify-between p-5 space-y-4 h-50 shadow-sm border border-slate-200 relative overflow-hidden">
+          <CardHeader className="p-0">
+            <CardTitle className="text-[#0F172A] text-lg font-semibold">
               Total Tokens Available
             </CardTitle>
           </CardHeader>
-          <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {unallocatedTokens ?? "-"}
+
+          <CardFooter className="p-0">
+            <div className="text-blue-600 text-3xl font-bold">
+              {unallocatedTokens ?? "-"}
+            </div>
           </CardFooter>
+
+          {unallocatedTokens !== undefined && unallocatedTokens <= 0 && (
+            <div className="absolute inset-x-3 bottom-3 flex items-center gap-2 rounded-md border border-red-300 bg-red-50 p-2 shadow-sm">
+              <div className="flex items-center justify-center rounded-full bg-red-100 p-1">
+                <AlertTriangle
+                  className="h-4 w-4 text-red-600"
+                  strokeWidth={2.5}
+                />
+              </div>
+              <div className="flex flex-col leading-tight">
+                <span className="font-semibold text-red-600 text-xs">
+                  No Available Tokens
+                </span>
+                <span className="text-[10px] text-red-500">
+                  Please contact a{" "}
+                  <span className="font-medium text-red-600">Minter</span> to
+                  allocate more.
+                </span>
+              </div>
+            </div>
+          )}
         </Card>
 
         <Card className="font-normal text-base h-50 flex flex-col">

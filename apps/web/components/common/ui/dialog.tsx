@@ -21,6 +21,7 @@ type DialogButtonProps = {
   submitType?:
     | "Apply"
     | "Complete"
+    | "Resubmit" 
     | "Disperse"
     | "directdisburse"
     | "CreateReward"
@@ -119,12 +120,11 @@ export const DialogButton = ({
       });
       return;
     }
-
+  
     try {
-      let submitData: Parameters<NonNullable<typeof handleApplyTaskLogic>>[0] =
-        {};
-
-      if (submitType === "Complete") {
+      let submitData: Parameters<NonNullable<typeof handleApplyTaskLogic>>[0] = {};
+  
+      if (submitType === "Complete" || submitType === "Resubmit") {
         submitData = { completionUrl: formData.completionUrl.trim() };
       } else if (submitType === "Disperse") {
         submitData = { amount: formData.amount.trim() };
@@ -134,10 +134,11 @@ export const DialogButton = ({
           to: formData.to.trim(),
           remarks: formData.remarks.trim(),
         };
+      } else if (submitType === "Reject") {
+        submitData = { remarks: formData.remarks.trim() };
       }
-
+  
       await handleApplyTaskLogic?.(submitData);
-
       setFormData({
         completionUrl: "",
         amount: "",
@@ -150,17 +151,13 @@ export const DialogButton = ({
       setIsOpen(false);
     } catch (error) {
       let errorMessage = "Failed to apply for task";
-      if (submitType === "Complete")
-        errorMessage = "Failed to submit completion URL";
-      else if (submitType === "Verify")
-        errorMessage = "Failed to verify participant";
-      else if (submitType === "Disperse")
-        errorMessage = "Failed to disperse amount";
-      else if (submitType === "directdisburse")
-        errorMessage = "Failed to process direct disbursement";
-      else if (submitType === "Reject")
-        errorMessage = "Failed to reject participant";
-
+      if (submitType === "Complete") errorMessage = "Failed to submit completion URL";
+      else if (submitType === "Resubmit") errorMessage = "Failed to resubmit task";
+      else if (submitType === "Verify") errorMessage = "Failed to verify participant";
+      else if (submitType === "Disperse") errorMessage = "Failed to disperse amount";
+      else if (submitType === "directdisburse") errorMessage = "Failed to process direct disbursement";
+      else if (submitType === "Reject") errorMessage = "Failed to reject participant";
+  
       setError(errorMessage);
       toast({
         title: "Error",
@@ -168,10 +165,10 @@ export const DialogButton = ({
         variant: "destructive",
       });
     }
-  };
+  };  
 
   const renderInputFields = () => {
-    if (submitType === "Complete") {
+    if (submitType === "Complete" || submitType === "Resubmit") {
       return (
         <div className="py-4">
           <Label

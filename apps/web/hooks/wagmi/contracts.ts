@@ -781,6 +781,25 @@ export const rewardManagementAbi = [
         type: 'address',
         indexed: true,
       },
+    ],
+    name: 'ParticipantResubmitted',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'taskId',
+        internalType: 'bytes32',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'participant',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
       { name: 'by', internalType: 'address', type: 'address', indexed: true },
     ],
     name: 'ParticipantWhitelisted',
@@ -1308,6 +1327,16 @@ export const rewardManagementAbi = [
   {
     type: 'function',
     inputs: [
+      { name: 'taskId', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'completionUrl', internalType: 'string', type: 'string' },
+    ],
+    name: 'resubmitAfterRejection',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
       { name: '', internalType: 'bytes32', type: 'bytes32' },
       { name: '', internalType: 'address', type: 'address' },
     ],
@@ -1409,6 +1438,26 @@ export const rewardManagementAbi = [
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export const rewardManagementFactoryAbi = [
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'entityId',
+        internalType: 'bytes32',
+        type: 'bytes32',
+        indexed: true,
+      },
+      { name: 'name', internalType: 'string', type: 'string', indexed: false },
+      {
+        name: 'entityOwner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'OwnerAdded',
+  },
   {
     type: 'event',
     anonymous: false,
@@ -2373,6 +2422,15 @@ export const useWriteRewardManagementRemoveFromWhitelist =
   })
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"resubmitAfterRejection"`
+ */
+export const useWriteRewardManagementResubmitAfterRejection =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: rewardManagementAbi,
+    functionName: 'resubmitAfterRejection',
+  })
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"transferToken"`
  */
 export const useWriteRewardManagementTransferToken =
@@ -2541,6 +2599,15 @@ export const useSimulateRewardManagementRemoveFromWhitelist =
   })
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"resubmitAfterRejection"`
+ */
+export const useSimulateRewardManagementResubmitAfterRejection =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: rewardManagementAbi,
+    functionName: 'resubmitAfterRejection',
+  })
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"transferToken"`
  */
 export const useSimulateRewardManagementTransferToken =
@@ -2652,6 +2719,15 @@ export const useWatchRewardManagementParticipantRemovedFromWhitelistEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: rewardManagementAbi,
     eventName: 'ParticipantRemovedFromWhitelist',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementAbi}__ and `eventName` set to `"ParticipantResubmitted"`
+ */
+export const useWatchRewardManagementParticipantResubmittedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: rewardManagementAbi,
+    eventName: 'ParticipantResubmitted',
   })
 
 /**
@@ -2803,6 +2879,15 @@ export const useSimulateRewardManagementFactoryCreateRewardManagement =
  */
 export const useWatchRewardManagementFactoryEvent =
   /*#__PURE__*/ createUseWatchContractEvent({ abi: rewardManagementFactoryAbi })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementFactoryAbi}__ and `eventName` set to `"OwnerAdded"`
+ */
+export const useWatchRewardManagementFactoryOwnerAddedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: rewardManagementFactoryAbi,
+    eventName: 'OwnerAdded',
+  })
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementFactoryAbi}__ and `eventName` set to `"RewardManagementCreated"`

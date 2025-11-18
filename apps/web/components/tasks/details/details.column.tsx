@@ -21,6 +21,9 @@ interface SelectedTask {
   status: "PENDING" | "COMPLETED" | "VERIFIED";
   entityId?: string;
 }
+interface TaskCreatedWithRejectReason extends TaskCreated {
+  rejectedReason?: string;
+}
 
 type ActionType = "accept" | "verify" | "reject";
 
@@ -28,6 +31,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
   const [selectedTask, setSelectedTask] = useState<SelectedTask | null>(null);
   const [openTaskId, setOpenTaskId] = useState<string | null>(null);
   const [actionType, setActionType] = useState<ActionType | null>(null);
+  const [pendingTaskIds, setPendingTaskIds] = useState<Set<string>>(new Set());
 
   const acceptParticipantMutation = useAcceptParticipantMutation();
   const verifyParticipantMutation = useVerifyParticipantMutation();
@@ -36,17 +40,14 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
   const { toast } = useToast();
   const { address: userAddress } = useAccount();
 
-  const isPending =
-    acceptParticipantMutation.isPending ||
-    verifyParticipantMutation.isPending ||
-    rejectParticipantMutation.isPending;
-
   const handleMutation = async (
     task: SelectedTask,
     action: ActionType,
     remarks?: string,
   ) => {
     try {
+
+      setPendingTaskIds((prev) => new Set(prev).add(task.id));
       setOpenTaskId(null);
 
       if (action === "accept" && task.status === "PENDING") {
@@ -79,27 +80,33 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
           taskId: task.id,
           participant: task.participant,
           entityId: task.entityId ?? "0x",
-          remark: remarks ?? "Rejected by task owner",
+          remark: remarks?.trim() || "",
         });
+        console.log("✅ Reject mutation completed successfully");
         toast({
           title: "Participant rejected successfully!",
           variant: "destructive",
           duration: 2000,
         });
       }
-
       setSelectedTask(null);
       setActionType(null);
     } catch (error) {
       console.error("Error handling mutation:", error);
       toast({ title: "Action failed", variant: "destructive", duration: 2000 });
+    } finally {
+
+      setPendingTaskIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(task.id);
+        return newSet;
+      });
     }
   };
 
   const handleAction = (row: any, action: ActionType) => {
     const status = row.getValue("status") as string;
 
-    // Only allow correct transitions
     if (action === "accept" && status === "PENDING") {
       setSelectedTask({
         id: row.original.taskId,
@@ -111,10 +118,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
       setActionType("accept");
     }
 
-    if (
-      (action === "verify" || action === "reject") &&
-      status === "COMPLETED"
-    ) {
+    if ((action === "verify" || action === "reject") && status === "COMPLETED") {
       setSelectedTask({
         id: row.original.taskId,
         participant: row.getValue("participant") as string,
@@ -167,25 +171,33 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
     // Completion URL
     {
       accessorKey: "completionUrl",
-      header: () => (
-        <div className="text-left text-gray-600 font-bold">Completion URL</div>
-      ),
+      header: ({ table }) => {
+        const hasNonRejected = table
+          .getRowModel()
+          .rows.some((row) => row.getValue("status") !== "REJECTED");
+        if (!hasNonRejected) return null;
+        return (
+          <div className="text-left text-gray-600 font-bold">
+            Completion URL
+          </div>
+        );
+      },
       cell: ({ row }) => {
-        const completionUrl = row.getValue("completionUrl") as
-          | string
-          | undefined;
+        const status = row.getValue("status") as string;
+        if (status === "REJECTED") return null;
+
+        const completionUrl = row.getValue("completionUrl") as string | undefined;
         if (!completionUrl) return null;
 
         const absoluteUrl =
-          completionUrl.startsWith("http://") ||
-          completionUrl.startsWith("https://")
+          completionUrl.startsWith("http://") || completionUrl.startsWith("https://")
             ? completionUrl
             : `https://${completionUrl}`;
 
         let displayUrl = completionUrl;
         try {
           displayUrl = new URL(absoluteUrl).hostname;
-        } catch {}
+        } catch { }
 
         return (
           <a
@@ -219,30 +231,41 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
       },
     },
 
-    // Actions
+    // Actions / Remark Column
     {
       id: "actions",
       header: () => (
-        <div className="text-left text-gray-600 font-bold">Action</div>
+        <div className="text-left text-gray-600 font-bold">Action / Remark</div>
       ),
       enableHiding: false,
       cell: ({ row }) => {
         const status = row.getValue("status") as string;
-        const dialogContent = getDialogContent(status);
 
+        if (status === "REJECTED") {
+          return (
+            <span className="text-sm text-red-600">
+              {row.original.rejectedReason || "No reason provided"}
+            </span>
+          );
+        }
+
+        const dialogContent = getDialogContent(status);
         const taskOwnerAddress = row.original.taskDetail.owner;
         const entityContractAddress =
           row.original.rewardManagement?.rewardManagement ?? "";
 
         const { entityRole } = useGetEntityRole(entityContractAddress);
-        const hasEntityOwnerRole = hasRole({ role: entityRole ?? "" });
-
+        const hasEntityOwnerRole = hasRole({
+          role: entityRole ?? "",
+          address: userAddress,
+        });
         const isTaskOwner =
           userAddress?.toLowerCase() === taskOwnerAddress?.toLowerCase();
+
         const isAcceptAction = status === "PENDING";
         const isVerifyRejectAction = status === "COMPLETED";
         const isDisabled =
-          isPending ||
+          (pendingTaskIds.has(row.original.taskId)) ||
           (isAcceptAction && !hasEntityOwnerRole) ||
           (isVerifyRejectAction && !isTaskOwner);
 
@@ -254,11 +277,11 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
 
         return (
           <div className="flex items-center gap-2 relative">
-            {isPending && selectedTask?.id === row.original.taskId ? (
+            {pendingTaskIds.has(row.original.taskId) ? (
               <div className="flex items-center gap-2 ml-1 text-sm text-gray-700">
                 <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
                 <span>
-                  {selectedTask.status === "PENDING"
+                  {selectedTask?.status === "PENDING"
                     ? "Accepting..."
                     : actionType === "reject"
                       ? "Rejecting..."
@@ -311,7 +334,6 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
               </>
             )}
 
-            {/* Dialog */}
             {selectedTask &&
               openTaskId === row.original.taskId &&
               actionType && (
@@ -331,7 +353,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
                       : dialogContent.subTitle
                   }
                   buttonName={
-                    isPending
+                    pendingTaskIds.has(row.original.taskId)
                       ? "Processing..."
                       : actionType === "reject"
                         ? "Reject"
@@ -341,7 +363,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
                   handleApplyTaskLogic={(data) =>
                     handleMutation(selectedTask, actionType, data?.remarks)
                   }
-                  isDisabled={isPending}
+                  isDisabled={pendingTaskIds.has(row.original.taskId)}
                 />
               )}
           </div>

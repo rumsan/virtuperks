@@ -189,6 +189,25 @@
         "internalType": "address",
         "name": "participant",
         "type": "address"
+      }
+    ],
+    "name": "ParticipantResubmitted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "taskId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "participant",
+        "type": "address"
       },
       {
         "indexed": true,
@@ -829,6 +848,16 @@
       { "internalType": "address", "name": "participant", "type": "address" }
     ],
     "name": "removeFromWhitelist",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "taskId", "type": "bytes32" },
+      { "internalType": "string", "name": "completionUrl", "type": "string" }
+    ],
+    "name": "resubmitAfterRejection",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

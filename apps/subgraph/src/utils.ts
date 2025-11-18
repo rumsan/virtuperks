@@ -44,8 +44,9 @@ export function updateParticipantTaskStatus(
   status: string,
   blockNumber: BigInt,
   blockTimestamp: BigInt,
-  taskDetailId: Bytes | null ,
-  completionUrl: string | null = null
+  taskDetailId: Bytes | null,
+  completionUrl: string | null = null,
+  rejectedReason: string | null = null,
 ): void {
   let id = participant.toHexString() + "-" + taskId.toHexString();
   let idBytes = Bytes.fromUTF8(id);
@@ -86,6 +87,16 @@ export function updateParticipantTaskStatus(
    // Store the completion URL if provided
   if (completionUrl) {
      statusEntity.completionUrl = completionUrl;
+  }
+
+  // Store the rejected reason if status is REJECTED and reason is provided
+  if (status === "REJECTED" && rejectedReason) {
+    statusEntity.rejectedReason = rejectedReason;
+    log.info("Added rejection reason for participant {}, taskId {}: {}", [
+      participant.toHexString(),
+      taskId.toHexString(),
+      rejectedReason
+    ]);
   }
  
 
@@ -147,6 +158,5 @@ export function addParticipantToWhitelist(
     ]);
   }
 }
-
 
 

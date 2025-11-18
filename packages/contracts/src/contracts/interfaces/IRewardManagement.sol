@@ -48,6 +48,7 @@ interface IRewardManagement {
     address indexed rejectedBy,
     string reason 
 );
+    event ParticipantResubmitted(bytes32 indexed taskId, address indexed participant);
     event TaskVerified(bytes32 indexed id, address indexed participant, address indexed verifier);
     event TaskDetailsUpdated(bytes32 indexed id, address indexed updatedBy);
 
@@ -92,6 +93,7 @@ interface IRewardManagement {
     function participate(bytes32 taskId) external;
     function acceptParticipant(bytes32 taskId, address participant) external;
     function completeTask(bytes32 taskId, string memory completionUrl) external;
+    function resubmitAfterRejection(bytes32 taskId, string memory completionUrl) external;
      function rejectParticipant(bytes32 taskId, address participant, string memory reason) external;
     function verifyTask(bytes32 taskId, address participant) external;
     function closeTask(bytes32 taskId) external;

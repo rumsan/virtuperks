@@ -216,7 +216,6 @@ export const useRejectParticipantMutation = () => {
 
       return result;
     },
-
     onSuccess: async (result, variable) => {
       await new Promise((resolve) => setTimeout(resolve, 9000));
       await queryClient.invalidateQueries({

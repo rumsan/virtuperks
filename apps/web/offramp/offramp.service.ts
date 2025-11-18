@@ -1,5 +1,5 @@
-import { api } from "@/utils/api";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+//import { api } from "@/utils/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 interface OfframpPayload {
   tokenAmount: number;
   paymentProviderId: string;
@@ -9,12 +9,12 @@ interface OfframpPayload {
 }
 
 const createOfframp = async (payload: OfframpPayload) => {
-  const res = await api.post("/offramp-request", payload);
-  return res.data;
+  //const res = await api.post("/offramp-request", payload);
+  return {}; //res.data;
 };
 const executeOfframp = async (payload: OfframpPayload) => {
-  const res = await api.post(`/offramp-request/instant`, payload);
-  return res.data;
+  // const res = await api.post(`/offramp-request/instant`, payload);
+  return {};
 };
 
 export const useExecuteOfframpMutation = () => {
@@ -44,32 +44,32 @@ interface OfframpParams {
   limit?: number;
 }
 
-export const useGetOfframp = (params?: OfframpParams) => {
-  return useQuery({
-    queryKey: ["offramp", params],
-    queryFn: () =>
-      api
-        .get("/offramp-request", {
-          params: {
-            page: params?.page || 1,
-            limit: params?.limit || 10,
-          },
-        })
-        .then((res) => res.data),
-  });
-};
+// export const useGetOfframp = (params?: OfframpParams) => {
+//   return useQuery({
+//     queryKey: ["offramp", params],
+//     queryFn: () =>
+//       api
+//         .get("/offramp-request", {
+//           params: {
+//             page: params?.page || 1,
+//             limit: params?.limit || 10,
+//           },
+//         })
+//         .then((res) => res.data),
+//   });
+// };
 
-export const useUpdateOfframp = (
-  cuid: string,
-  { status }: { status: string },
-) => {
-  const qc = useQueryClient();
+// export const useUpdateOfframp = (
+//   cuid: string,
+//   { status }: { status: string },
+// ) => {
+//   const qc = useQueryClient();
 
-  return useMutation({
-    mutationFn: (status) =>
-      api.put(`/offramp-request/${cuid}`, { status }).then((res) => res.data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["offramp"] });
-    },
-  });
-};
+//   return useMutation({
+//     mutationFn: (status) =>
+//       api.put(`/offramp-request/${cuid}`, { status }).then((res) => res.data),
+//     onSuccess: () => {
+//       qc.invalidateQueries({ queryKey: ["offramp"] });
+//     },
+//   });
+// };

@@ -56,6 +56,30 @@ export const useGetParticipantStatistic = (participantAddress: string) => {
   };
 };
 
+export const useGetParticipantTaskBasedOnStatus = (participantAddress: string) => {
+  const { queryService } = useGraphService();
+
+  const response = useQuery({
+    queryKey: ["participantStatistic", participantAddress],
+    queryFn: async () => {
+      if (!queryService) {
+        throw new Error("Subgraph query service is not initialized.");
+      }
+      const taskDetail =
+        await queryService?.getParticipantTaskStatistics(participantAddress);
+      return taskDetail;
+    },
+    enabled: !!participantAddress && !!queryService,
+  });
+
+  return {
+    applied: response?.data?.data?.applied || 0,
+    completed: response?.data?.data?.completed || 0,
+    verified: response?.data?.data?.verified || 0,
+    accepted: response?.data?.data?.accepted || 0,
+  };
+};
+
 export const useGetWhiteListedParticipantByTask = (
   taskId: string,
   skip: boolean = false,

@@ -7,6 +7,7 @@ import {
   EtherWithdrawn as EtherWithdrawnEvent,
   ParticipantApplied as ParticipantAppliedEvent,
   ParticipantRemovedFromWhitelist as ParticipantRemovedFromWhitelistEvent,
+  ParticipantResubmitted as ParticipantResubmittedEvent,
   ParticipantWhitelisted as ParticipantWhitelistedEvent,
   RewardManagement,
   TaskAccepted as TaskAcceptedEvent,
@@ -27,6 +28,7 @@ import {
   EtherWithdrawn,
   ParticipantApplied,
   ParticipantRemovedFromWhitelist,
+  ParticipantResubmitted,
   ParticipantWhitelisted,
   RewardManagementCreated,
   TaskAccepted,
@@ -41,10 +43,7 @@ import {
   TaskVerified,
   TokenTransferred,
 } from "../generated/schema"
-
-
 import { fetchTaskDetails, updateParticipantTaskStatus } from "./utils"
-
 
 export function handleAdditionalDisbursementToTask(
   event: AdditionalDisbursementToTaskEvent,
@@ -91,7 +90,7 @@ export function handleContractUnpaused(event: ContractUnpausedEvent): void {
 }
 
 export function handleDisbursementToTask(event: DisbursementToTaskEvent): void {
-  let entity = new DisbursementToTask(
+ let entity = new DisbursementToTask(
     event.transaction.hash.concatI32(event.logIndex.toI32()),
   )
   entity.taskId = event.params.taskId
@@ -129,7 +128,7 @@ export function handleEtherWithdrawn(event: EtherWithdrawnEvent): void {
 }
 
 export function handleParticipantApplied(event: ParticipantAppliedEvent): void {
-  let entity = new ParticipantApplied(
+    let entity = new ParticipantApplied(
     event.transaction.hash.concatI32(event.logIndex.toI32()),
   )
   entity.internal_id = event.params.id
@@ -155,7 +154,6 @@ export function handleParticipantApplied(event: ParticipantAppliedEvent): void {
     event.block.timestamp, 
     taskDetail ? taskDetail.id : null
   );
-
 }
 
 export function handleParticipantRemovedFromWhitelist(
@@ -175,6 +173,56 @@ export function handleParticipantRemovedFromWhitelist(
   entity.save()
 }
 
+export function handleParticipantResubmitted(
+  event: ParticipantResubmittedEvent,
+): void {
+  let entity = new ParticipantResubmitted(
+    event.transaction.hash.concatI32(event.logIndex.toI32()),
+  )
+  entity.taskId = event.params.taskId
+  entity.participant = event.params.participant
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+    // Create TaskDetail entity first
+  let taskDetail = fetchTaskDetails(event.params.taskId, event.address);
+  entity.taskDetail = taskDetail.id;
+  // Get the completion URL from the contract
+  let contract = RewardManagement.bind(event.address);
+  let taskAssignmentResult = contract.try_getParticipantTaskAssignment(
+    event.params.taskId, 
+    event.params.participant
+  );
+   if (!taskAssignmentResult.reverted) {
+    let taskAssignment = taskAssignmentResult.value;
+    entity.completionUrl = taskAssignment.completionUrl;
+    log.info("Completion URL found for task {} and participant {}: {}", [
+      event.params.taskId.toHexString(),
+      event.params.participant.toHexString(),
+      taskAssignment.completionUrl
+    ]);
+  } else {
+    log.error("Failed to fetch task assignment for task {} and participant {}", [
+      event.params.taskId.toHexString(),
+      event.params.participant.toHexString()
+    ]);
+  }
+
+  
+
+  entity.save()
+   updateParticipantTaskStatus(
+    event.params.participant, 
+    event.params.taskId, 
+    'COMPLETED', 
+    event.block.number, 
+    event.block.timestamp, 
+    taskDetail?taskDetail.id: null,
+     entity.completionUrl
+  );
+}
+
 export function handleParticipantWhitelisted(
   event: ParticipantWhitelistedEvent,
 ): void {
@@ -190,18 +238,6 @@ export function handleParticipantWhitelisted(
   entity.transactionHash = event.transaction.hash
 
   entity.save()
-
-  // addParticipantToWhitelist(
-  //   event.params.taskId,
-  //   event.params.participant,
-  //   event.block.number,
-  //   event.block.timestamp,
-  //   event.params.by
-
-
-
-  // )
-
 }
 
 export function handleTaskAccepted(event: TaskAcceptedEvent): void {
@@ -245,7 +281,7 @@ export function handleTaskApproved(event: TaskApprovedEvent): void {
 }
 
 export function handleTaskClosed(event: TaskClosedEvent): void {
-  let entity = new TaskClosed(
+let entity = new TaskClosed(
     event.transaction.hash.concatI32(event.logIndex.toI32()),
   )
   entity.internal_id = event.params.id
@@ -291,7 +327,7 @@ export function handleTaskClosed(event: TaskClosedEvent): void {
 }
 
 export function handleTaskCompleted(event: TaskCompletedEvent): void {
-  let entity = new TaskCompleted(
+   let entity = new TaskCompleted(
     event.transaction.hash.concatI32(event.logIndex.toI32()),
   )
   entity.internal_id = event.params.id
@@ -341,7 +377,7 @@ export function handleTaskCompleted(event: TaskCompletedEvent): void {
 }
 
 export function handleTaskCreated(event: TaskCreatedEvent): void {
-  // Create TaskCreated entity
+   // Create TaskCreated entity
   let entityId = event.transaction.hash.concatI32(event.logIndex.toI32());
   const entity = new TaskCreated(
    entityId
@@ -396,8 +432,6 @@ export function handleTaskDetailsUpdated(event: TaskDetailsUpdatedEvent): void {
   entity.save()
 }
 
-
-
 export function handleTaskRejected(event: TaskRejectedEvent): void {
   let entity = new TaskRejected(
     event.transaction.hash.concatI32(event.logIndex.toI32()),
@@ -420,7 +454,9 @@ export function handleTaskRejected(event: TaskRejectedEvent): void {
     'REJECTED', 
     event.block.number, 
     event.block.timestamp, 
-    taskDetail ? taskDetail.id : null
+    taskDetail ? taskDetail.id : null,
+    null, // completionUrl - not applicable for rejected tasks
+    event.params.reason // rejectedReason - correct position (8th parameter)
   );
 }
 
@@ -474,6 +510,7 @@ export function handleTaskVerified(event: TaskVerifiedEvent): void {
      taskDetail ? taskDetail.id : null,
     entity.completionUrl
   );
+  
 }
 
 export function handleTokenTransferred(event: TokenTransferredEvent): void {
@@ -498,12 +535,5 @@ export function handleTokenTransferred(event: TokenTransferredEvent): void {
   }
 
   entity.save()
+
 }
-
-
-
-
-
-
-
-

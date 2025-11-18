@@ -4,9 +4,8 @@ import { DataTablePagination } from "@/components/common/list/list.pagination";
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import {
   useGetParticipantStatistic,
-  useGetTaskListByParticipant,
+  useGetParticipantTaskBasedOnStatus,
 } from "@/hooks/subgraph/participant";
-import { useGetTasksOwnedByIndividual } from "@/hooks/subgraph/task";
 import { useWallet } from "@/providers/walletProvider";
 import {
   ColumnFiltersState,
@@ -33,7 +32,7 @@ import {
 } from "@workspace/ui/components/tabs";
 import { AlertCircle, CheckCircle, User, Users } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useColumns } from "../details/details.column";
 import ListCardDetails from "./list.card";
 
@@ -42,96 +41,73 @@ interface TaskListMainProps {
 }
 
 export default function TaskListMain({ router }: TaskListMainProps) {
-  const [tab, setTab] = useState<"owned" | "participating">("owned");
+  const [tab, setTab] = useState<"applied" | "accepted" | "completed" | "verified">(
+    "applied"
+  );
+
   const ROW_HEIGHT = 50;
   const MIN_ROWS = 10;
   const TABLE_MIN_HEIGHT = ROW_HEIGHT * MIN_ROWS;
-  // shared states
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
-  const [rowSelection, setRowSelection] = React.useState({});
 
-  // separate pagination states
-  const [paginationOwned, setPaginationOwned] = React.useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-  const [paginationParticipating, setPaginationParticipating] = React.useState({
+  // Shared table states
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [rowSelection, setRowSelection] = useState({});
+  const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
   });
 
   const { address } = useWallet();
   const { applied, completed, verified } = useGetParticipantStatistic(
-    address as `0x${string}`,
+    address as `0x${string}`
   );
 
-  const { data: dataOwned, isLoading: isLoadingOwned } =
-    useGetTasksOwnedByIndividual(address as `0x${string}`);
-  const ownedTaskList = dataOwned?.data?.taskCreateds ?? [];
+  const {
+    applied: taskApplied = [],
+    completed: taskCompleted = [],
+    verified: taskVerified = [],
+    accepted: taskAccepted = [],
+  } = useGetParticipantTaskBasedOnStatus(address as `0x${string}`);
 
-  const { data: dataParticipating } = useGetTaskListByParticipant(
-    address as `0x${string}`,
-    !address,
-  );
-  const participatingTask =
-    dataParticipating?.data?.participantTaskStatuses ?? [];
-
+  console.log("Completed: ", taskCompleted)
   const columns = useColumns();
 
-  // table for owned tasks
-  const tableOwned = useReactTable<TaskCreated>({
-    data: ownedTaskList,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-      pagination: paginationOwned,
-    },
-    onPaginationChange: setPaginationOwned,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    pageCount: Math.ceil(ownedTaskList.length / paginationOwned.pageSize),
-  });
+  
+  const createTable = (data: TaskCreated[]) =>
+    useReactTable<TaskCreated>({
+      data,
+      columns,
+      state: {
+        sorting,
+        columnFilters,
+        columnVisibility,
+        rowSelection,
+        pagination,
+      },
+      onSortingChange: setSorting,
+      onColumnFiltersChange: setColumnFilters,
+      onColumnVisibilityChange: setColumnVisibility,
+      onRowSelectionChange: setRowSelection,
+      onPaginationChange: setPagination,
+      getCoreRowModel: getCoreRowModel(),
+      getPaginationRowModel: getPaginationRowModel(),
+      getSortedRowModel: getSortedRowModel(),
+      getFilteredRowModel: getFilteredRowModel(),
+      pageCount: Math.ceil((data?.length || 0) / pagination.pageSize),
+    });
 
-  // table for participating tasks
-  const tableParticipating = useReactTable<TaskCreated>({
-    data: participatingTask,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-      pagination: paginationParticipating,
-    },
-    onPaginationChange: setPaginationParticipating,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    pageCount: Math.ceil(
-      participatingTask.length / paginationParticipating.pageSize,
-    ),
-  });
+  const tableApplied = createTable(taskApplied);
+  const tableAccepted = createTable(taskAccepted);
+  const tableCompleted = createTable(taskCompleted);
+  const tableVerified = createTable(taskVerified);
 
-  if (isLoadingOwned) {
+  
+
+  const isLoading = false;
+
+  if (isLoading) {
     return (
       <LoaderSkeleton
         title
@@ -142,7 +118,7 @@ export default function TaskListMain({ router }: TaskListMainProps) {
         gridCols="grid-cols-3"
         cardHeight="h-24"
         showTabs
-        tabsCount={2}
+        tabsCount={4}
         rowCount={5}
         rowHeight="h-20"
         showPagination
@@ -156,9 +132,9 @@ export default function TaskListMain({ router }: TaskListMainProps) {
         {/* Header */}
         <div className="flex items-center mt-5">
           <div className="flex flex-col w-[80%] gap-1">
-            <h1 className="font-bold text-3xl">My List</h1>
+            <h1 className="font-bold text-3xl">My Tasks</h1>
             <h3 className="text-gray-500 font-normal text-sm">
-              List of all the tasks you participated in
+              Filter and view tasks by their status
             </h3>
           </div>
         </div>
@@ -181,7 +157,7 @@ export default function TaskListMain({ router }: TaskListMainProps) {
             <CardHeader className="flex-grow">
               <CardTitle className="flex items-center gap-2 p-0 mb-2 text-[#0F172A]">
                 <Users className="text-purple-500" size={20} />
-                Participating
+                Applied
               </CardTitle>
               <CardFooter className="text-blue-500 text-2xl font-bold">
                 {applied}
@@ -193,7 +169,7 @@ export default function TaskListMain({ router }: TaskListMainProps) {
             <CardHeader className="flex-grow">
               <CardTitle className="flex items-center gap-2 p-0 mb-2 text-[#0F172A]">
                 <CheckCircle className="text-green-600" size={20} />
-                Total Task Completed
+                Completed
               </CardTitle>
               <CardFooter className="text-blue-500 text-2xl font-bold">
                 {completed}
@@ -206,99 +182,125 @@ export default function TaskListMain({ router }: TaskListMainProps) {
         <Tabs
           value={tab}
           onValueChange={(v) => {
-            setTab(v as "owned" | "participating");
-            if (v === "owned")
-              setPaginationOwned((p) => ({ ...p, pageIndex: 0 }));
-            if (v === "participating")
-              setPaginationParticipating((p) => ({ ...p, pageIndex: 0 }));
+            setTab(v as "applied" | "accepted" | "completed" | "verified");
+            setPagination((p) => ({ ...p, pageIndex: 0 }));
           }}
         >
           <div className="flex items-center mt-10 mb-10">
-            <div className="w-[400px]">
+            <div className="w-[800px]">
               <TabsList className="flex bg-blue-50 h-10">
-                <TabsTrigger value="owned" className="w-full h-8">
-                  Owned
+                <TabsTrigger value="applied" className="w-full h-8">
+                  Applied
                 </TabsTrigger>
-                <TabsTrigger value="participating" className="w-full h-8">
-                  Participating
+                <TabsTrigger value="accepted" className="w-full h-8">
+                  Accepted
+                </TabsTrigger>
+                <TabsTrigger value="completed" className="w-full h-8">
+                  Completed
+                </TabsTrigger>
+                <TabsTrigger value="verified" className="w-full h-8">
+                  Verified
                 </TabsTrigger>
               </TabsList>
             </div>
           </div>
 
-          {/* Owned Tab */}
-          <TabsContent className="w-full" value="owned">
-            {tableOwned.getRowModel().rows.length === 0 ? (
-              <div className="text-gray-500 text-center py-6 flex flex-col items-center gap-2">
-                <AlertCircle className="text-gray-400" size={32} />
-                <p>No owned tasks found.</p>
-                <p className="text-sm text-gray-400 max-w-md">
-                  You currently don’t have any tasks that you own. Tasks appear
-                  here once they are assigned or created by you.
-                </p>
-              </div>
-            ) : (
-              <>
-                <div
-                  className="overflow-y-auto"
-                  style={{ minHeight: TABLE_MIN_HEIGHT }}
-                >
-                  <ListCardDetails
-                    taskList={tableOwned
-                      .getRowModel()
-                      .rows.map((r) => r.original)}
-                    router={router}
-                    tabStatus="owned"
-                  />
-                </div>
-                <div className="mt-5 mb-5">
-                  <DataTablePagination
-                    table={tableOwned}
-                    pagination={paginationOwned}
-                    setPagination={setPaginationOwned}
-                  />
-                </div>
-              </>
-            )}
+          
+          <TabsContent value="applied">
+            <TaskTable
+              table={tableApplied}
+              data={taskApplied}
+              label="applied"
+              router={router}
+              TABLE_MIN_HEIGHT={TABLE_MIN_HEIGHT}
+              pagination={pagination}
+              setPagination={setPagination}
+            />
           </TabsContent>
 
-          {/* Participating Tab */}
-          <TabsContent className="w-full" value="participating">
-            {tableParticipating.getRowModel().rows.length === 0 ? (
-              <div className="text-gray-500 text-center py-6 flex flex-col items-center gap-2">
-                <AlertCircle className="text-gray-400" size={32} />
-                <p>No participating tasks found.</p>
-                <p className="text-sm text-gray-400 max-w-md">
-                  You are not currently participating in any tasks. Once you
-                  join or are assigned to a task, it will appear here.
-                </p>
-              </div>
-            ) : (
-              <>
-                <div
-                  className="overflow-y-auto"
-                  style={{ minHeight: TABLE_MIN_HEIGHT }}
-                >
-                  <ListCardDetails
-                    taskList={tableParticipating
-                      .getRowModel()
-                      .rows.map((r) => r.original)}
-                    router={router}
-                    tabStatus="participating"
-                  />
-                </div>
-                <div className="mt-5 mb-5">
-                  <DataTablePagination
-                    table={tableParticipating}
-                    pagination={paginationParticipating}
-                    setPagination={setPaginationParticipating}
-                  />
-                </div>
-              </>
-            )}
+          <TabsContent value="accepted">
+            <TaskTable
+              table={tableAccepted}
+              data={taskAccepted}
+              label="accepted"
+              router={router}
+              TABLE_MIN_HEIGHT={TABLE_MIN_HEIGHT}
+              pagination={pagination}
+              setPagination={setPagination}
+            />
+          </TabsContent>
+
+          <TabsContent value="completed">
+            <TaskTable
+              table={tableCompleted}
+              data={taskCompleted}
+              label="completed"
+              router={router}
+              TABLE_MIN_HEIGHT={TABLE_MIN_HEIGHT}
+              pagination={pagination}
+              setPagination={setPagination}
+            />
+          </TabsContent>
+
+          <TabsContent value="verified">
+            <TaskTable
+              table={tableVerified}
+              data={taskVerified}
+              label="verified"
+              router={router}
+              TABLE_MIN_HEIGHT={TABLE_MIN_HEIGHT}
+              pagination={pagination}
+              setPagination={setPagination}
+            />
           </TabsContent>
         </Tabs>
       </div>
     </main>
+  );
+}
+
+
+function TaskTable({
+  table,
+  data,
+  label,
+  router,
+  TABLE_MIN_HEIGHT,
+  pagination,
+  setPagination,
+}: any) {
+  console.log(label, {
+    dataLength: data.length,
+    rowCount: table.getRowModel().rows.length,
+    pageIndex: pagination.pageIndex,
+    pageSize: pagination.pageSize,
+  });
+  
+  if (!data || data.length === 0) {
+    return (
+      <div className="text-gray-500 text-center py-6 flex flex-col items-center gap-2">
+        <AlertCircle className="text-gray-400" size={32} />
+        <p>No {label} tasks found.</p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="overflow-y-auto" style={{ minHeight: TABLE_MIN_HEIGHT }}>
+        <ListCardDetails
+          taskList={table.getRowModel().rows.map((r: any) => r.original)}
+          router={router}
+          tabStatus={label}
+        />
+      </div>
+      <div className="mt-5 mb-5">
+        <DataTablePagination
+          table={table}
+          pagination={pagination}
+          setPagination={setPagination}
+        />
+      </div>
+    </>
   );
 }

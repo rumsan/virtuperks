@@ -8,8 +8,9 @@ import {
   useCompleteTaskMutation,
   useParticipateTaskMutation,
 } from "@/hooks/subgraph/querycall";
-import { useGetTaskById } from "@/hooks/subgraph/task";
+import { useGetTaskById, useResubmitTaskMutation } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
+import hasRole from "@/utils/role";
 import { Button } from "@workspace/ui/components/button";
 import { useToast } from "@workspace/ui/hooks/use-toast";
 import { ArrowRight, Loader2 } from "lucide-react";
@@ -38,6 +39,13 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
     [getTaskDetail],
   );
   const isTaskOpen = taskData?.taskDetail?.isOpen;
+  const participantRole = process.env.NEXT_PUBLIC_PARTICIPANT_ROLE || "";
+  
+
+  const hasParticipantRole = hasRole({ role: participantRole, address });
+
+  const isWhitelisted = taskData?.taskDetail?.isWhitelisted;
+  console.log(isWhitelisted, "isWhitelisted in task portal main");
 
   const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(
     taskData?.internal_id,
@@ -64,18 +72,32 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
       return;
     }
 
-    const isWhitelisted = whiteListedParticipants.some(
-      (participantList: { participant: string }) =>
-        participantList.participant === address?.toLowerCase(),
-    );
+    // Check eligibility based on task whitelist status
+    if (isWhitelisted) {
+      // If task is whitelisted, check if user is in the whitelist
+      const isUserWhitelisted = whiteListedParticipants.some(
+        (participantList: { participant: string }) =>
+          participantList.participant === address?.toLowerCase(),
+      );
 
-    if (!isWhitelisted) {
-      toast({
-        title: "Not Eligible",
-        description: "Your wallet is not whitelisted for this task.",
-        variant: "destructive",
-      });
-      return;
+      if (!isUserWhitelisted) {
+        toast({
+          title: "Not Eligible",
+          description: "Your wallet is not whitelisted for this task.",
+          variant: "destructive",
+        });
+        return;
+      }
+    } else {
+      // If task is not whitelisted, check if user has PARTICIPANT role
+      if (!hasParticipantRole) {
+        toast({
+          title: "Not Eligible",
+          description: "You need the participant role to apply for this task.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     try {
@@ -138,6 +160,40 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
       console.error("Error completing task:", error);
     }
   };
+
+  const { resubmitTask, resubmitPending } = useResubmitTaskMutation();
+
+const handleResubmitTask = async (data: any) => {
+  try {
+    await resubmitTask(
+      {
+        taskId: taskData?.internal_id,
+        entityId: taskData?.rewardManagement?.rewardManagement || "0x",
+        completionUrl: data.completionUrl,
+      },
+      {
+        onSuccess: () => {
+          setIsOpen(false);
+          setLocalStatus("WAITING");
+          toast({
+            title: "Task Resubmitted Successfully!",
+            variant: "success",
+          });
+        },
+        onError: (error) => {
+          console.error("Error resubmitting task:", error);
+          toast({
+            title: "Failed to resubmit task. Please try again.",
+            variant: "destructive",
+          });
+        },
+      },
+    );
+  } catch (error) {
+    console.error("Error in resubmit:", error);
+  }
+};
+
 
   useEffect(() => {
     if (localStatus && participantStatus) {
@@ -246,11 +302,35 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
       case "REJECTED":
       case 5:
         return (
-          <Button className="bg-[#EF4444]" disabled>
-            <span className="text-[#F8FAFC]">Rejected</span>
-          </Button>
-        );
-
+              <>
+                <Button
+                  className="bg-[#297AD6]"
+                  onClick={() => setIsOpen(true)}
+                  disabled={resubmitPending}
+                >
+                  {resubmitPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Processing...
+                    </>
+                  ) : (
+                    <span className="text-[#F8FAFC]">Resubmit Task</span>
+                  )}
+                </Button>
+          
+                {!resubmitPending && isOpen && (
+                  <DialogButton
+                    isOpen={isOpen}
+                    setIsOpen={setIsOpen}
+                    title="Resubmit Task"
+                    subTitle="Please provide the updated completion URL"
+                    buttonName="Submit"
+                    submitType="Resubmit"
+                    handleApplyTaskLogic={handleResubmitTask}
+                  />
+                )}
+              </>
+            );
       default:
         return null;
     }

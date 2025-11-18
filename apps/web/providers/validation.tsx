@@ -1,13 +1,13 @@
 "use client";
 
-import EntityOwnerNav from "@/components/layout/nav/entity_owner.nav";
 import TaskPortalNav from "@/components/layout/nav/task_portal.nav";
-import TreasurerNav from "@/components/layout/nav/treasurer.nav";
 import UnifiedNav from "@/components/layout/nav/unified.nav";
+import { useFindEntityOwner } from "@/hooks/subgraph/entity";
 import { AppRegistryABI } from "@workspace/contracts/abis";
 import { ConnectKitButton } from "connectkit";
 import { AlertTriangle, Wallet } from "lucide-react";
-import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { useAccount, useReadContract } from "wagmi";
 
 type Role = "ADMIN" | "TREASURER" | "PARTICIPANT" | "NONE" | "BOTH";
@@ -19,6 +19,9 @@ interface ValidationProps {
 const Validation = ({ children }: ValidationProps) => {
   const [currentRole, setCurrentRole] = useState<Role | null>(null);
   const { address, isConnected, isConnecting } = useAccount();
+  const router = useRouter();
+  const pathname = usePathname();
+  const previousRoleRef = useRef<Role | null>(null);
 
   const { data: hasDefaultAdminRole } = useReadContract({
     address: process.env.NEXT_PUBLIC_APPREGISTRY as `0x${string}`,
@@ -42,24 +45,106 @@ const Validation = ({ children }: ValidationProps) => {
     ],
   });
 
+  const { data: hasParticipantRole } = useReadContract({
+    address: process.env.NEXT_PUBLIC_APPREGISTRY as `0x${string}`,
+    abi: AppRegistryABI,
+    functionName: "hasRole",
+    args: [
+      process.env.NEXT_PUBLIC_APP_ID,
+      process.env.NEXT_PUBLIC_PARTICIPANT_ROLE,
+      address,
+    ],
+  });
+  console.log(hasDefaultAdminRole, "hasDefaultAdminRole in validation");
+  console.log(hasTreasurerRole, "hasTreasurerRole in validation");
+  console.log(hasParticipantRole, "hasParticipantRole in validation");
+  // Check for privileged roles first
+  const hasBasicPrivilegedRole = hasDefaultAdminRole || hasTreasurerRole;
+
+  // Only check entity owner and task owner if user doesn't have basic privileged roles
+  // This reduces unnecessary subgraph calls
+  const shouldCheckEntityOwner =
+    !hasBasicPrivilegedRole && isConnected && !!address;
+  const { data: hasEntityOwnerRole } = useFindEntityOwner(
+    shouldCheckEntityOwner ? (address as string) : "",
+  );
+  // will implement later
+  // const { data: hasTaskOwnerRole } = useFindTaskOwner(
+  //   !hasBasicPrivilegedRole && !hasEntityOwnerRole && isConnected
+  //     ? (address ?? "0x")
+  //     : "0x",
+  // );
+
   useEffect(() => {
     if (isConnecting) return;
 
     if (!isConnected) {
       setCurrentRole("NONE");
+      previousRoleRef.current = null;
       return;
     }
 
-    if (hasDefaultAdminRole && hasTreasurerRole) {
-      setCurrentRole("BOTH");
-    } else if (hasDefaultAdminRole) {
-      setCurrentRole("ADMIN");
-    } else if (hasTreasurerRole) {
-      setCurrentRole("TREASURER");
-    } else {
-      setCurrentRole("PARTICIPANT");
+    // Wait for role data to load before making decisions
+    const rolesAreLoading =
+      hasDefaultAdminRole === undefined ||
+      hasTreasurerRole === undefined ||
+      hasParticipantRole === undefined;
+
+    // For entity owner, only wait if we're actually checking it
+    const shouldCheckEntityOwner = !hasBasicPrivilegedRole && isConnected;
+    const entityOwnerLoading =
+      shouldCheckEntityOwner && hasEntityOwnerRole === undefined;
+
+    if (rolesAreLoading || entityOwnerLoading) {
+      return;
     }
-  }, [isConnected, isConnecting, hasDefaultAdminRole, hasTreasurerRole]);
+
+    //check privileged role
+    const hasPrivilegedRole =
+      hasDefaultAdminRole || hasTreasurerRole || hasEntityOwnerRole;
+
+    let newRole: Role;
+
+    if (hasPrivilegedRole && hasParticipantRole) {
+      newRole = "BOTH";
+    } else if (hasPrivilegedRole) {
+      newRole = "BOTH";
+    } else if (hasParticipantRole) {
+      newRole = "PARTICIPANT";
+    } else {
+      newRole = "NONE";
+    }
+
+    // Update current role and track previous role
+    setCurrentRole(newRole);
+    previousRoleRef.current = newRole;
+  }, [
+    isConnected,
+    isConnecting,
+    hasDefaultAdminRole,
+    hasTreasurerRole,
+    hasEntityOwnerRole,
+    hasParticipantRole,
+    hasBasicPrivilegedRole,
+  ]);
+
+  // Separate effect for handling redirects based on pathname and role
+  useEffect(() => {
+    if (!currentRole || isConnecting || !isConnected) return;
+
+    // Only redirect participants and NONE users from restricted routes
+    if (currentRole === "PARTICIPANT" || currentRole === "NONE") {
+      const adminOnlyRoutes = ["/departments", "/tasks", "/participants"];
+      const isOnAdminRoute = adminOnlyRoutes.some((route) =>
+        pathname.startsWith(route),
+      );
+
+      if (isOnAdminRoute) {
+        // Use replace instead of push to avoid adding to history
+        router.replace("/task_portal");
+      }
+    }
+  }, [currentRole, pathname, isConnected, isConnecting, router]);
 
   const renderOverlay = () => (
     <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50 pointer-events-auto">
@@ -93,13 +178,13 @@ const Validation = ({ children }: ValidationProps) => {
   const renderNav = () => {
     switch (currentRole) {
       case "BOTH":
-        return <UnifiedNav>{children}</UnifiedNav>;
       case "ADMIN":
-        return <EntityOwnerNav>{children}</EntityOwnerNav>;
       case "TREASURER":
-        return <TreasurerNav>{children}</TreasurerNav>;
+        // Anyone with admin, treasurer, or entity owner role sees UnifiedNav
+        return <UnifiedNav>{children}</UnifiedNav>;
       case "PARTICIPANT":
       case "NONE":
+        // Participants and non-role users see TaskPortalNav
         return <TaskPortalNav>{children}</TaskPortalNav>;
       default:
         return null;

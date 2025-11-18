@@ -1,6 +1,6 @@
 import { useCheckParticipantBalance } from "@/hooks/subgraph/token";
 // import { useRewardList } from "@/hooks/subgraph/token-marketplace";
-import { useGetOfframp } from "@/offramp/offramp.service";
+//import { useGetOfframp } from "@/offramp/offramp.service";
 import { PATHS } from "@/routes/paths";
 import { getCategoryIcon } from "@/utils/rewardIcon";
 import {
@@ -22,8 +22,8 @@ const TokenMarketListCard = () => {
   );
   //todo: fix this
   // const getAllReward = useRewardList();
-  const { data: offrampData } = useGetOfframp();
-  console.log("offrampData", offrampData?.data);
+  //const { data: offrampData } = useGetOfframp();
+  //console.log("offrampData", offrampData?.data);
 
   // const rewardList = getAllReward?.data || [];
   const rewardList: any[] = [];

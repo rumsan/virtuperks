@@ -28,7 +28,7 @@ const defaultValues = {
   isOpen: true,
   isTokenDisbursed: false,
   requireApproval: true,
-  isWhitelisted: true,
+  isWhitelisted: false,
   maxParticipants: 0,
   whitelistedParticipants: [],
 };
