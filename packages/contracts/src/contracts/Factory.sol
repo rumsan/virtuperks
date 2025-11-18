@@ -29,13 +29,15 @@ contract RewardManagementFactory is IRewardManagementFactory {
         IAppRegistry appRegistry = IAppRegistry(registry);
         for (uint i = 0; i < entity.entityOwners.length; i++) {
             appRegistry.grantRole(appId, ownerRole, entity.entityOwners[i]);
+            emit OwnerAdded(entityId, entity.name, entity.entityOwners[i]);
+            
         }
        
         //store entity with entity owners
         entities[entityId] = entity;
 
         //Emit an event when a new contract is deployed
-        emit RewardManagementCreated(address(newRewardManagement), registry, appId, entity.name,entityId);
+        emit RewardManagementCreated(address(newRewardManagement), registry, appId, entity.name, entityId);
     }
 
     // Public function to get entityOwners for a RewardManagement contract

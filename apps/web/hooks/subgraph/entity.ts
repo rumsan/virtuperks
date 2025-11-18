@@ -210,3 +210,55 @@ export const useGetEntityRole = (entityId: string) => {
     roleLoading: isLoading,
   };
 };
+
+export const useFindEntityOwner = (ownerAddress: string) => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["entityOwnerCheck", ownerAddress],
+    enabled:
+      !!ownerAddress &&
+      ownerAddress !== "0x" &&
+      ownerAddress !== "" &&
+      !!queryService,
+    queryFn: async () => {
+      if (!queryService) {
+        throw new Error("Subgraph query service is not initialized.");
+      }
+
+      const result = await queryService.getEntityOwnerByUserAddress(
+        ownerAddress as `0x${string}`,
+      );
+
+      return result;
+    },
+    retry: 1,
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+  });
+};
+
+export const useFindTaskOwner = (ownerAddress: string) => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["entityTaskCheck", ownerAddress],
+    enabled:
+      !!ownerAddress &&
+      ownerAddress !== "0x" &&
+      ownerAddress !== "" &&
+      !!queryService,
+    queryFn: async () => {
+      if (!queryService) {
+        throw new Error("Subgraph query service is not initialized.");
+      }
+
+      // const result = await queryService.getTaskOwnerUserAddress(
+      //   ownerAddress as `0x${string}`,
+      // );
+
+      // return result;
+    },
+    retry: 1,
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+  });
+};

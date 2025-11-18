@@ -3,6 +3,7 @@ import {
   AppRegistryQueries,
   getCloseTasks,
   GetCombineParticipantsByTask,
+  GetEntityOwner,
   getOpenTasks,
   getParticipantTasks,
   getParticipantTaskStatistics,
@@ -15,16 +16,16 @@ import {
   GetRewardManagementDisbursements,
   GetRewardManagementTokenTransfers,
   GetRewards,
+  GetTaskByName,
   getTaskCreatedById,
   getTaskCreation,
   GetTaskOwnedByIndividual,
   GetWhiteListedParticipantByTask,
-
   TokenQueries
 } from '../queries';
 
 
-const SUBGRAPH_URL = process.env.NEXT_PUBLIC_SUBGRAPH_URL!; 
+const SUBGRAPH_URL = process.env.NEXT_PUBLIC_SUBGRAPH_URL!;
 
 export class SubgraphService {
   private subgraphQuery: Client;
@@ -66,19 +67,19 @@ export class SubgraphService {
     return { data, error };
   }
 
- 
+
   async getOpenTasks() {
-    
-      const { data, error } = await this.subgraphQuery.query(getOpenTasks, {})
-      return { data, error };
-    
+
+    const { data, error } = await this.subgraphQuery.query(getOpenTasks, {})
+    return { data, error };
+
   }
 
- 
+
   async getCloseTasks() {
-    
-      const { data, error } = await this.subgraphQuery.query(getCloseTasks, {})
-      return { data, error };
+
+    const { data, error } = await this.subgraphQuery.query(getCloseTasks, {})
+    return { data, error };
   }
 
 
@@ -88,10 +89,27 @@ export class SubgraphService {
     const { data, error } = await this.subgraphQuery.query(getTaskCreatedById, { internal_id: id })
     return { data, error }
   }
-  
-  
 
-  
+
+
+  async getTaskByName(taskName: string) {
+    if (!taskName) throw new Error("Task name is required");
+
+    try {
+      const { data, error } = await this.subgraphQuery.query(
+        GetTaskByName,
+        { taskName }
+      );
+
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching task by name:', error);
+      return { data: null, error };
+    }
+  }
+
+
+
 
 
   async getCombineParticipantsByTask(taskId: string) {
@@ -112,7 +130,7 @@ export class SubgraphService {
   //   try {
 
   //   } catch () {
-      
+
   //   }
   // }
 
@@ -134,7 +152,7 @@ export class SubgraphService {
         GetRewardManagementCreatedByAddress,
         { entityId }
       );
-  
+
       if (error) {
         throw error;
       }
@@ -161,20 +179,20 @@ export class SubgraphService {
 
   async getTasksOwnedByIndividual(createdBy: string) {
     if (!createdBy) throw new Error("Creator address is required");
-  
+
     try {
       const { data, error } = await this.subgraphQuery.query(
         GetTaskOwnedByIndividual,
         { createdBy: createdBy.toLowerCase() } // match GraphQL variable
       );
-  
+
       return { data, error };
     } catch (error) {
       console.error("Error fetching tasks owned by individual:", error);
       return { data: null, error };
     }
   }
-  
+
 
 
   // service function to get participant task statistics
@@ -193,7 +211,7 @@ export class SubgraphService {
   }
 
 
-  
+
   async getRewardManagementTokenTransfers(rewardManagementAddress: string) {
     try {
       const { data, error } = await this.subgraphQuery.query(
@@ -209,7 +227,7 @@ export class SubgraphService {
       return { data: null, error };
     }
   }
-  
+
   async getRewardManagementDisbursements(rewardManagementAddress: string) {
     try {
       const { data, error } = await this.subgraphQuery.query(
@@ -227,20 +245,20 @@ export class SubgraphService {
   }
 
   // reward sevice function
-  async getRewards (){
-try {
-  const { data, error } = await this.subgraphQuery.query(GetRewards, {});
-return { data, error };
-}catch(error) {
-    console.error('Error fetching rewards:', error);
-    return { data: null, error };
-}
+  async getRewards() {
+    try {
+      const { data, error } = await this.subgraphQuery.query(GetRewards, {});
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching rewards:', error);
+      return { data: null, error };
+    }
   }
 
 
   async getRewardById(rewardRedemption: string) {
     try {
-      const { data, error } = await this.subgraphQuery.query(getRewardById, {rewardRedemption });
+      const { data, error } = await this.subgraphQuery.query(getRewardById, { rewardRedemption });
       return { data, error };
     } catch (error) {
       console.error('Error fetching reward by ID:', error);
@@ -248,17 +266,17 @@ return { data, error };
     }
   }
 
-    // service to get redeemed rewards
-  async getRedeemedReward (rewardRedemption: string) {
+  // service to get redeemed rewards
+  async getRedeemedReward(rewardRedemption: string) {
 
-try {
-  const { data, error } = await this.subgraphQuery.query(GetRedeemedReward, {rewardRedemption});
-return { data, error };
-}catch(error) {
-    console.error('Error fetching rewards:', error);
-    return { data: null, error };
-}
-  } 
+    try {
+      const { data, error } = await this.subgraphQuery.query(GetRedeemedReward, { rewardRedemption });
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching rewards:', error);
+      return { data: null, error };
+    }
+  }
 
   //service to get redeemed rewards by participant address
   async getRedeemedRewardsByParticipant(participantAddress: string) {
@@ -295,13 +313,59 @@ return { data, error };
         GetRejectedParticipant,
         { taskId }
       );
-    
+
       return { data, error };
     } catch (error) {
       console.error('Error fetching rejected participants by task ID:', error);
       return { data: null, error };
     }
   }
+
+  //service funtion to get entity owner by user address
+  async getEntityOwnerByUserAddress(userAddress: string): Promise<boolean> {
+    try {
+      const { data, error } = await this.subgraphQuery.query(
+        GetEntityOwner,
+        { userAddress }
+      );
+
+      if (error) {
+        console.error('Error fetching entity owner by user address:', error);
+        return false;
+      }
+
+
+      // Return true if ownerAddeds array exists and has at least one entry
+      return !!(data?.ownerAddeds && data.ownerAddeds.length > 0);
+    } catch (error) {
+      console.error('Error fetching entity owner by user address:', error);
+      return false;
+    }
+  }
+
+  // service to check task owner by address
+  // async getTaskOwnerUserAddress(userAddress: string): Promise<boolean> {
+  //   try {
+  //     const { data, error } = await this.subgraphQuery.query(
+  //       GetTaskOwner,
+  //       { userAddress }
+  //     );
+
+  //     if (error) {
+  //       console.error('Error fetching task owner by user address:', error);
+  //       return false;
+  //     }
+
+  //     console.log('Task owner data:', data);
+
+  //     // Return true if taskDetails array exists and has at least one entry
+  //     return !!(data?.taskDetails && Array.isArray(data.taskDetails) && data.taskDetails.length > 0);
+  //   } catch (error) {
+  //     console.error('Error fetching task owner by user address:', error);
+  //     return false;
+  //   }
+  // }
+
 }
 
 

@@ -6,7 +6,7 @@ import {
   AvatarImage,
 } from "@workspace/ui/components/avatar";
 import { ConnectKitButton } from "connectkit";
-import { Layers, LayoutList, ShoppingBag, Wallet } from "lucide-react";
+import { LayoutList, ShoppingBag, Wallet } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -54,27 +54,6 @@ export default function TaskPortalNav({ children }: PropsWithChildren) {
             />
           </Link>
           {/* Nav items with equal spacing */}
-          <Link
-            href="/participants"
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.PARTICIPANTS)}`}
-          >
-            <LayoutList size={18} strokeWidth={2.65} />
-            Participant
-          </Link>
-          <Link
-            href="/departments"
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.DEPARTMENTS)}`}
-          >
-            <Layers size={18} strokeWidth={2.65} />
-            Department
-          </Link>
-          <Link
-            href="/tasks"
-            className={`flex items-center gap-2 text-sm font-normal transition-colors h-full p-2 ${getNavItemClasses(NavItem.TASKS)}`}
-          >
-            <Layers size={18} strokeWidth={2.65} />
-            Task Management
-          </Link>
           <Link
             href="/token_marketplace"
             className={`flex items-center gap-2 text-sm font-medium h-full p-2 ${getNavItemClasses(NavItem.TOKEN_MARKETPLACE)}`}

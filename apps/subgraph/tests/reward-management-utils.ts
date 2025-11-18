@@ -8,6 +8,7 @@ import {
   EtherWithdrawn,
   ParticipantApplied,
   ParticipantRemovedFromWhitelist,
+  ParticipantResubmitted,
   ParticipantWhitelisted,
   TaskAccepted,
   TaskApproved,
@@ -166,6 +167,28 @@ export function createParticipantRemovedFromWhitelistEvent(
   )
 
   return participantRemovedFromWhitelistEvent
+}
+
+export function createParticipantResubmittedEvent(
+  taskId: Bytes,
+  participant: Address
+): ParticipantResubmitted {
+  let participantResubmittedEvent =
+    changetype<ParticipantResubmitted>(newMockEvent())
+
+  participantResubmittedEvent.parameters = new Array()
+
+  participantResubmittedEvent.parameters.push(
+    new ethereum.EventParam("taskId", ethereum.Value.fromFixedBytes(taskId))
+  )
+  participantResubmittedEvent.parameters.push(
+    new ethereum.EventParam(
+      "participant",
+      ethereum.Value.fromAddress(participant)
+    )
+  )
+
+  return participantResubmittedEvent
 }
 
 export function createParticipantWhitelistedEvent(

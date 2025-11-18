@@ -200,6 +200,41 @@ contract RewardManagement is IRewardManagement, Multicall, ReentrancyGuard {
         emit TaskCompleted(taskId, msg.sender);
     }
 
+    /// @notice Allows a rejected participant to reset their status and try again
+/// @param taskId The unique identifier of the task
+function resubmitAfterRejection(bytes32 taskId, string memory completionUrl) public isEligibleToParticipate(taskId) whenNotPaused {
+    _isTaskOpen(taskId);
+    TaskAssignment storage taskAssignment = taskAssignments[taskId][msg.sender];
+    
+    require(
+        taskAssignment.status == AssignmentStatus.REJECTED,
+        "Only rejected participants can resubmit"
+    );
+    
+    
+    // Update status back to COMPLETED with new completion URL
+    taskAssignment.status = AssignmentStatus.COMPLETED;
+    taskAssignment.completionUrl = completionUrl;
+    
+    // Remove from rejected participants array (optional, for cleaner data)
+    _removeFromRejectedArray(taskId, msg.sender);
+    
+ emit ParticipantResubmitted(taskId, msg.sender);
+  emit TaskCompleted(taskId, msg.sender);
+}
+
+// Helper function to remove from rejected array
+function _removeFromRejectedArray(bytes32 taskId, address participant) internal {
+    address[] storage rejected = tasks[taskId].rejectedParticipants;
+    for (uint256 i = 0; i < rejected.length; i++) {
+        if (rejected[i] == participant) {
+            rejected[i] = rejected[rejected.length - 1];
+            rejected.pop();
+            break;
+        }
+    }
+}
+
     /// @notice This function will change the status of the task
     /// @param taskId The id of the task
     function verifyTask(bytes32 taskId, address participant) public onlyTaskOwner(taskId) {

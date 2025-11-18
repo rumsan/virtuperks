@@ -3,6 +3,31 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "entityId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "entityOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnerAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": false,
         "internalType": "address",
         "name": "rewardManagement",

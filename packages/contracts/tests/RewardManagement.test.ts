@@ -661,15 +661,214 @@ describe('RewardManagement Contract', function() {
       // Verify participant is added to verifiedParticipants array
       const rejectedParticipants = await rewardManagement.getTaskRejectedParticipants(taskId);
       expect(rejectedParticipants).to.include(participant1.address);
+    });
+
+    it('should allow rejected participant to resubmit with new completion URL', async function() {
+      const { rewardManagement, user2, participant1, rewardToken } = await fixture();
+      const taskId = ethers.id('RESUBMIT_TASK');
       
-     
+      const task = {
+        name: "Resubmit Task",
+        detailsUrl: "https://resubmit.com",
+        owner: user2.address,
+        expiryDate: Math.floor(Date.now() / 1000) + 86400,
+        rewardToken: await rewardToken.getAddress(),
+        totalRewardAmount: BigInt(100),
+        isOpen: true,
+        requireApproval: true,
+        isWhitelisted: false,
+        isTokenDisbursed: false,
+        maxParticipants: 10,
+        acceptedParticipantCount: 0,
+        verifiedParticipants: [],
+        rejectedParticipants: []
+      };
 
+      // Create and setup task
+      await rewardManagement.connect(user2).createTask(taskId, task, []);
+      await rewardManagement.connect(participant1).participate(taskId);
+      await rewardManagement.connect(user2).acceptParticipant(taskId, participant1.address);
+      
+      // Complete task
+      const initialCompletionUrl = "https://initial-completion.com";
+      await rewardManagement.connect(participant1).completeTask(taskId, initialCompletionUrl);
+      
+      // Reject the participant
+      await rewardManagement.connect(user2).rejectParticipant(taskId, participant1.address, 'Needs improvement');
+      
+      // Verify status is REJECTED
+      let statusAfterRejection = await rewardManagement.getParticipantStatus(taskId, participant1.address);
+      expect(statusAfterRejection).to.equal(5); // AssignmentStatus.REJECTED = 5
+      
+      // Verify participant is in rejected array
+      let rejectedParticipants = await rewardManagement.getTaskRejectedParticipants(taskId);
+      expect(rejectedParticipants).to.include(participant1.address);
+      expect(rejectedParticipants.length).to.equal(1);
+      
+      // Resubmit with corrected work
+      const newCompletionUrl = "https://corrected-completion.com";
+      await expect(rewardManagement.connect(participant1).resubmitAfterRejection(taskId, newCompletionUrl))
+        .to.emit(rewardManagement, 'ParticipantResubmitted')
+        .withArgs(taskId, participant1.address)
+        .and.to.emit(rewardManagement, 'TaskCompleted')
+        .withArgs(taskId, participant1.address);
+      
+      // Verify status changed back to COMPLETED
+      const statusAfterResubmit = await rewardManagement.getParticipantStatus(taskId, participant1.address);
+      expect(statusAfterResubmit).to.equal(3); // AssignmentStatus.COMPLETED = 3
+      
+      // Verify completion URL was updated
+      const taskAssignment = await rewardManagement.getParticipantTaskAssignment(taskId, participant1.address);
+      expect(taskAssignment.completionUrl).to.equal(newCompletionUrl);
+      
+      // Verify participant was removed from rejected array
+      const rejectedParticipantsAfter = await rewardManagement.getTaskRejectedParticipants(taskId);
+      expect(rejectedParticipantsAfter).to.not.include(participant1.address);
+      expect(rejectedParticipantsAfter.length).to.equal(0);
+    });
 
+    it('should only allow rejected participants to resubmit', async function() {
+      const { rewardManagement, user2, participant1, rewardToken } = await fixture();
+      const taskId = ethers.id('RESUBMIT_RESTRICTION_TASK');
+      
+      const task = {
+        name: "Resubmit Restriction Task",
+        detailsUrl: "https://resubmit-restriction.com",
+        owner: user2.address,
+        expiryDate: Math.floor(Date.now() / 1000) + 86400,
+        rewardToken: await rewardToken.getAddress(),
+        totalRewardAmount: BigInt(100),
+        isOpen: true,
+        requireApproval: true,
+        isWhitelisted: false,
+        isTokenDisbursed: false,
+        maxParticipants: 10,
+        acceptedParticipantCount: 0,
+        verifiedParticipants: [],
+        rejectedParticipants: []
+      };
 
+      // Create and setup task
+      await rewardManagement.connect(user2).createTask(taskId, task, []);
+      await rewardManagement.connect(participant1).participate(taskId);
+      await rewardManagement.connect(user2).acceptParticipant(taskId, participant1.address);
+      
+      // Try to resubmit while in ACCEPTED status (should fail)
+      await expect(
+        rewardManagement.connect(participant1).resubmitAfterRejection(taskId, "https://completion.com")
+      ).to.be.revertedWith("Only rejected participants can resubmit");
+      
+      // Complete task
+      await rewardManagement.connect(participant1).completeTask(taskId, "https://completion.com");
+      
+      // Try to resubmit while in COMPLETED status (should fail)
+      await expect(
+        rewardManagement.connect(participant1).resubmitAfterRejection(taskId, "https://new-completion.com")
+      ).to.be.revertedWith("Only rejected participants can resubmit");
+    });
 
+    it('should allow task owner to verify resubmitted task', async function() {
+      const { rewardManagement, user2, participant1, rewardToken } = await fixture();
+      const taskId = ethers.id('VERIFY_RESUBMIT_TASK');
+      
+      const task = {
+        name: "Verify Resubmit Task",
+        detailsUrl: "https://verify-resubmit.com",
+        owner: user2.address,
+        expiryDate: Math.floor(Date.now() / 1000) + 86400,
+        rewardToken: await rewardToken.getAddress(),
+        totalRewardAmount: BigInt(100),
+        isOpen: true,
+        requireApproval: true,
+        isWhitelisted: false,
+        isTokenDisbursed: false,
+        maxParticipants: 10,
+        acceptedParticipantCount: 0,
+        verifiedParticipants: [],
+        rejectedParticipants: []
+      };
 
+      // Create and setup task
+      await rewardManagement.connect(user2).createTask(taskId, task, []);
+      await rewardManagement.connect(participant1).participate(taskId);
+      await rewardManagement.connect(user2).acceptParticipant(taskId, participant1.address);
+      
+      // Complete task
+      await rewardManagement.connect(participant1).completeTask(taskId, "https://initial.com");
+      
+      // Reject the participant
+      await rewardManagement.connect(user2).rejectParticipant(taskId, participant1.address, 'Please fix issues');
+      
+      // Resubmit with corrected work
+      await rewardManagement.connect(participant1).resubmitAfterRejection(taskId, "https://corrected.com");
+      
+      // Verify the resubmitted task
+      await expect(rewardManagement.connect(user2).verifyTask(taskId, participant1.address))
+        .to.emit(rewardManagement, 'TaskVerified')
+        .withArgs(taskId, participant1.address, user2.address);
+      
+      // Verify final status
+      const finalStatus = await rewardManagement.getParticipantStatus(taskId, participant1.address);
+      expect(finalStatus).to.equal(4); // AssignmentStatus.VERIFIED = 4
+      
+      // Verify participant is in verified array
+      const verifiedParticipants = await rewardManagement.getTaskVerifiedParticipants(taskId);
+      expect(verifiedParticipants).to.include(participant1.address);
+    });
 
-  })
+    it('should allow task owner to reject resubmitted task again', async function() {
+      const { rewardManagement, user2, participant1, rewardToken } = await fixture();
+      const taskId = ethers.id('REJECT_RESUBMIT_TASK');
+      
+      const task = {
+        name: "Reject Resubmit Task",
+        detailsUrl: "https://reject-resubmit.com",
+        owner: user2.address,
+        expiryDate: Math.floor(Date.now() / 1000) + 86400,
+        rewardToken: await rewardToken.getAddress(),
+        totalRewardAmount: BigInt(100),
+        isOpen: true,
+        requireApproval: true,
+        isWhitelisted: false,
+        isTokenDisbursed: false,
+        maxParticipants: 10,
+        acceptedParticipantCount: 0,
+        verifiedParticipants: [],
+        rejectedParticipants: []
+      };
+
+      // Create and setup task
+      await rewardManagement.connect(user2).createTask(taskId, task, []);
+      await rewardManagement.connect(participant1).participate(taskId);
+      await rewardManagement.connect(user2).acceptParticipant(taskId, participant1.address);
+      
+      // Complete task - first attempt
+      await rewardManagement.connect(participant1).completeTask(taskId, "https://attempt1.com");
+      
+      // First rejection
+      await rewardManagement.connect(user2).rejectParticipant(taskId, participant1.address, 'First rejection');
+      
+      // First resubmission
+      await rewardManagement.connect(participant1).resubmitAfterRejection(taskId, "https://attempt2.com");
+      
+      // Second rejection
+      await expect(rewardManagement.connect(user2).rejectParticipant(taskId, participant1.address, 'Second rejection'))
+        .to.emit(rewardManagement, 'TaskRejected')
+        .withArgs(taskId, participant1.address, user2.address, 'Second rejection');
+      
+      // Verify status is REJECTED again
+      const status = await rewardManagement.getParticipantStatus(taskId, participant1.address);
+      expect(status).to.equal(5); // AssignmentStatus.REJECTED = 5
+      
+      // Second resubmission
+      await expect(rewardManagement.connect(participant1).resubmitAfterRejection(taskId, "https://attempt3.com"))
+        .to.emit(rewardManagement, 'ParticipantResubmitted')
+        .withArgs(taskId, participant1.address);
+      
+      // Verify status is COMPLETED again
+      const finalStatus = await rewardManagement.getParticipantStatus(taskId, participant1.address);
+      expect(finalStatus).to.equal(3); // AssignmentStatus.COMPLETED = 3
+    });
 
     it('should allow task owner to verify completed task', async function() {
       const { rewardManagement, user2, participant1, rewardToken } = await fixture();
