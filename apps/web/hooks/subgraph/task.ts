@@ -73,6 +73,19 @@ export const useGetAllTask = () => {
   });
 };
 
+export const useGetTasksNoApproval = () => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["tasksNoApproval"],
+    queryFn: async () => {
+      const taskDetail = await queryService?.getTasksNoApproval();
+      return taskDetail;
+    },
+    enabled: !!queryService,
+  });
+};
+
 export const useOpenTask = () => {
   const { queryService } = useGraphService();
 

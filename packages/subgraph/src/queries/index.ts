@@ -176,11 +176,16 @@ export const TokenQueries = {
 
 
 export const getTaskCreation = `
-    query GetTaskCreation {
-      taskCreateds(first: 100, orderBy: blockTimestamp, orderDirection: desc) {
-        id
-        internal_id
-        taskDetail {
+  query GetTaskCreationWithApproval {
+    taskCreateds(
+      first: 100,
+      orderBy: blockTimestamp,
+      orderDirection: desc,
+      where: { taskDetail_: { requireApproval: true } }
+    ) {
+      id
+      internal_id
+      taskDetail {
         acceptedParticipantCount
         detailsUrl
         id
@@ -195,22 +200,62 @@ export const getTaskCreation = `
         requireApproval
         isWhitelisted
         verifiedParticipants
-        
-        }
-        rewardManagement{
+      }
+      rewardManagement {
         appId
         id
         name
         rewardManagement
-        }
-        createdBy
-        blockNumber
-        blockTimestamp
-        transactionHash
       }
-  
+      createdBy
+      blockNumber
+      blockTimestamp
+      transactionHash
     }
-  `;
+  }
+`;
+
+
+export const getTaskNoApproval = `
+  query GetTaskCreationNoApproval {
+    taskCreateds(
+      first: 100,
+      orderBy: blockTimestamp,
+      orderDirection: desc,
+      where: { taskDetail_: { requireApproval: false } }
+    ) {
+      id
+      internal_id
+      taskDetail {
+        acceptedParticipantCount
+        detailsUrl
+        id
+        expiryDate
+        isOpen
+        isTokenDisbursed
+        maxParticipants
+        name
+        owner
+        rewardToken
+        totalRewardAmount
+        requireApproval
+        isWhitelisted
+        verifiedParticipants
+      }
+      rewardManagement {
+        appId
+        id
+        name
+        rewardManagement
+      }
+      createdBy
+      blockNumber
+      blockTimestamp
+      transactionHash
+    }
+  }
+`;
+
 
 
 
