@@ -280,12 +280,18 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
             {pendingTaskIds.has(row.original.taskId) ? (
               <div className="flex items-center gap-2 ml-1 text-sm text-gray-700">
                 <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+
                 <span>
-                  {selectedTask?.status === "PENDING"
-                    ? "Accepting..."
-                    : actionType === "reject"
-                      ? "Rejecting..."
-                      : "Verifying..."}
+                  {(() => {
+                    const rowStatus = row.getValue("status") as string;
+
+                    // If this row is still PENDING, it's an Accept action
+                    if (rowStatus === "PENDING") return "Accepting...";
+
+                    // If COMPLETED, determine if reject or verify
+                    if (actionType === "reject") return "Rejecting...";
+                    return "Verifying...";
+                  })()}
                 </span>
               </div>
             ) : (
@@ -333,6 +339,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
                 )}
               </>
             )}
+
 
             {selectedTask &&
               openTaskId === row.original.taskId &&

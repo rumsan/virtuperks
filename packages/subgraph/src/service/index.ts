@@ -19,6 +19,7 @@ import {
   GetTaskByName,
   getTaskCreatedById,
   getTaskCreation,
+  getTaskNoApproval,
   GetTaskOwnedByIndividual,
   GetWhiteListedParticipantByTask,
   TokenQueries
@@ -64,6 +65,11 @@ export class SubgraphService {
   // RewardManagement Related Services
   async getAllTasks() {
     const { data, error } = await this.subgraphQuery.query(getTaskCreation, {});
+    return { data, error };
+  }
+
+  async getTasksNoApproval() {
+    const { data, error } = await this.subgraphQuery.query(getTaskNoApproval, {});
     return { data, error };
   }
 
