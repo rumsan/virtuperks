@@ -27,7 +27,8 @@
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
-    "prettier": "^3.2.5",
+    "prettier": "^3.6.2",
+    "prettier-plugin-solidity": "^2.2.0",
     "ts-node": "^10.9.2",
     "turbo": "^2.3.0",
     "typescript": "5.5.4"
