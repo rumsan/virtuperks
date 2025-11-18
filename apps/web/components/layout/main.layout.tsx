@@ -1,4 +1,4 @@
-import DesktopNav from "./nav/desktop.nav";
+// import DesktopNav from "./nav/desktop.nav";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -8,7 +8,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <div>
       <main className="flex w-full flex-col bg-muted/40">
-        <DesktopNav />
+        {/* <DesktopNav /> */}
         <div>{children}</div>
       </main>
     </div>
