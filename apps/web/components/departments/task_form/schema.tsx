@@ -81,22 +81,6 @@ export const taskSchema = () => {
         .optional()
         .default([]),
     })
-    .refine(
-      (data) => {
-        if (data.isWhitelisted) {
-          return (
-            data.whitelistedParticipants &&
-            data.whitelistedParticipants.length > 0
-          );
-        }
-        return true;
-      },
-      {
-        message:
-          "At least one participant address is required when task is whitelisted",
-        path: ["whitelistedParticipants"],
-      },
-    );
 };
 
 export type TaskFormData = z.infer<ReturnType<typeof taskSchema>>;

@@ -65,6 +65,7 @@ export default function TaskBaseForm({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [currentWallet, setCurrentWallet] = useState("");
   const [walletAddresses, setWalletAddresses] = useState<string[]>([]);
+  const [showAddParticipants, setShowAddParticipants] = useState(false);
   const getAllEntity = useGetAllEntity();
   const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
   const params = useParams();
@@ -497,59 +498,77 @@ export default function TaskBaseForm({
             />
           </div>
 
-          {/* Conditionally render whitelisted participants field */}
-          {watch("isWhitelisted") && (
-            <FormField
-              control={form.control}
-              name="whitelistedParticipants"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Add Participant Addresses</FormLabel>
-                  <div className="space-y-4">
-                    <div className="flex gap-2">
-                      <Input
-                        type="text"
-                        placeholder="Paste wallet address"
-                        value={currentWallet}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          if (value.length === 1 && value[0] === " ") return;
-                          setCurrentWallet(value);
-                        }}
-                      />
-                      <Button
-                        type="button"
-                        onClick={handleAddWallet}
-                        disabled={!isAddress(currentWallet)}
-                      >
-                        Add
-                      </Button>
-                    </div>
+          {/* When task is whitelisted, show button to add participants */}
+          {watch("isWhitelisted") && !showAddParticipants && (
+  <div className="mt-2 p-2 border border-blue-300 bg-blue-50 rounded-lg mb-5">
+    <p className="text-sm text-gray-700 mb-2">
+      Whitelisting is enabled for this task. You can add participants or continue without adding any.
+    </p>
 
-                    {/* Display added addresses */}
-                    <div className="flex flex-wrap gap-2">
-                      {walletAddresses.map((address) => (
-                        <div
-                          key={address}
-                          className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full"
-                        >
-                          <span className="text-sm">{address}</span>
-                          <button
-                            type="button"
-                            onClick={() => removeWallet(address)}
-                            className="text-gray-500 hover:text-red-500"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
+    <Button
+      type="button"
+      className="mt-1"
+      onClick={() => setShowAddParticipants(true)}
+    >
+      Add Participants
+    </Button>
+  </div>
+)}
+
+
+
+
+          {/* Conditionally render whitelisted participants field */}
+          {watch("isWhitelisted") && showAddParticipants && (
+  <FormField
+    control={form.control}
+    name="whitelistedParticipants"
+    render={({ field }) => (
+      <FormItem>
+        <FormLabel>Add Participant Addresses</FormLabel>
+
+        <div className="space-y-4">
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              placeholder="Paste wallet address"
+              value={currentWallet}
+              onChange={(e) => setCurrentWallet(e.target.value)}
             />
-          )}
+            <Button
+              type="button"
+              onClick={handleAddWallet}
+              disabled={!isAddress(currentWallet)}
+            >
+              Add
+            </Button>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {walletAddresses.map((address) => (
+              <div
+                key={address}
+                className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full"
+              >
+                <span className="text-sm">{address}</span>
+                <button
+                  type="button"
+                  onClick={() => removeWallet(address)}
+                  className="text-gray-500 hover:text-red-500"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+)}
+
 
           <div className="w-full flex justify-end gap-4">
             <Button
