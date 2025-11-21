@@ -215,6 +215,22 @@ export const getTaskCreation = `
   }
 `;
 
+export const getTaskUpdated = `
+  query GetTaskUpdateds($taskId: BigInt!) {
+    taskUpdateds(where: { taskId: $taskId }) {
+      id
+      taskId
+      detailsUrl
+      expiryDate
+      updatedBy
+      blockNumber
+      blockTimestamp
+      transactionHash
+    }
+  }
+`;
+
+
 
 export const getTaskNoApproval = `
   query GetTaskCreationNoApproval {
@@ -908,6 +924,7 @@ query GetRemovedWhiteListedParticipantByTask($taskId: Bytes!) {
   }
 }
 `;
+
 
 export const GetEntityOwner = `
 query GetEntityOwner($userAddress: Bytes!) {
