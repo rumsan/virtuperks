@@ -10,6 +10,7 @@ import {
   GetRedeemedReward,
   GetRedeemedRewardsByParticipant,
   GetRejectedParticipant,
+  GetRemoveWhiteListedParticipantByTask,
   getRewardById,
   GetRewardManagement,
   GetRewardManagementCreatedByAddress,
@@ -308,6 +309,21 @@ export class SubgraphService {
       return { data, error };
     } catch (error) {
       console.error('Error fetching whitelisted participants by task ID:', error);
+      return { data: null, error };
+    }
+  }
+
+
+  //servie to remove whitelisted participants by task Id
+  async getRemovedWhitelistedParticipantsByTaskId(taskId: string) {
+    try {
+      const { data, error } = await this.subgraphQuery.query(
+        GetRemoveWhiteListedParticipantByTask,
+        { taskId }
+      );
+      return { data, error };
+    } catch (error) {
+      console.error('Error fetching removed whitelisted participants by task ID:', error);
       return { data: null, error };
     }
   }

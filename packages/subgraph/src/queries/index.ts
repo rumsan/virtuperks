@@ -896,6 +896,19 @@ query GetWhiteListedParticipantByTask($taskId: Bytes!) {
 }
 `;
 
+export const GetRemoveWhiteListedParticipantByTask = `
+query GetRemovedWhiteListedParticipantByTask($taskId: Bytes!) {
+  participantRemovedFromWhitelists(where: { taskId: $taskId }) {
+    id
+    taskId
+    participant
+    by
+    blockNumber
+    blockTimestamp
+  }
+}
+`;
+
 export const GetEntityOwner = `
 query GetEntityOwner($userAddress: Bytes!) {
   ownerAddeds(where: { entityOwner: $userAddress }) {
