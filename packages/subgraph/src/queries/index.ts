@@ -897,7 +897,7 @@ query GetWhiteListedParticipantByTask($taskId: Bytes!) {
 `;
 
 export const GetRemoveWhiteListedParticipantByTask = `
-query GetWhiteListedParticipantByTask($taskId: Bytes!) {
+query GetRemovedWhiteListedParticipantByTask($taskId: Bytes!) {
   participantRemovedFromWhitelists(where: { taskId: $taskId }) {
     id
     taskId

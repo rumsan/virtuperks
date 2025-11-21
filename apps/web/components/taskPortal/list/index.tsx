@@ -17,8 +17,8 @@ import { Tasks } from "@workspace/sdk/type";
 import { Activity, Droplet, Search } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import React from "react";
-import { useColumns } from "../details/details.column";
 import TaskPortalCard from "./list.card";
+import { useColumns } from "./list.column";
 
 interface TaskPortalMainProps {
   router: AppRouterInstance;
@@ -28,7 +28,7 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [taskInput, setTaskInput] = React.useState<string>("");
   const [debouncedTaskName, setDebouncedTaskName] = React.useState<string>("");
-  const [activeTab, setActiveTab] = React.useState<string>("activities"); // default tab
+  const [activeTab, setActiveTab] = React.useState<string>("activities"); 
 
 
   React.useEffect(() => {
