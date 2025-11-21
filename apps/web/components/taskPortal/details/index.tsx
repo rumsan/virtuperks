@@ -29,10 +29,8 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [alertDialog, setAlertDialog] = useState(false);
   const [localStatus, setLocalStatus] = useState<string | null>(null);
-
   const { isConnected, address } = useAccount();
   const { toast } = useToast();
-
   const getTaskDetail = useGetTaskById(cuid.id);
   const taskData = useMemo(
     () => getTaskDetail?.data?.data?.taskCreateds?.[0],
@@ -40,13 +38,10 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   );
   const isTaskOpen = taskData?.taskDetail?.isOpen;
   const participantRole = process.env.NEXT_PUBLIC_PARTICIPANT_ROLE || "";
-
-
   const hasParticipantRole = hasRole({ role: participantRole, address });
 
   const isWhitelisted = taskData?.taskDetail?.isWhitelisted;
   console.log(isWhitelisted, "isWhitelisted in task portal main");
-
   const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(
     taskData?.internal_id,
   );
@@ -65,7 +60,9 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
   const effectiveStatus =
     localStatus !== null ? localStatus : participantStatus;
-
+   
+  
+  
   const handleApplyTask = async () => {
     if (!isConnected) {
       setAlertDialog(true);
@@ -194,6 +191,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
     }
   };
 
+  
 
   useEffect(() => {
     if (localStatus && participantStatus) {
@@ -422,7 +420,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
           <TaskPortalDetails taskData={taskData} />
         </div>
         <div className="flex w-full gap-4 flex-nowrap">
-          <TaskPortalParticipant taskId={cuid} />
+          <TaskPortalParticipant taskId={cuid} isWhitelisted={taskData.taskDetail.isWhitelisted} taskData={taskData}/>
         </div>
       </div>
     </main>

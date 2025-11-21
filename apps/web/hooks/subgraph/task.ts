@@ -6,10 +6,12 @@ import {
   useReadRewardManagementGetTask,
   useReadRewardManagementGetTaskVerifiedParticipants,
   useReadRewardManagementIsTaskExpired,
+  useWriteRewardManagementAddToWhitelist,
   useWriteRewardManagementCloseExpiredTasks,
   useWriteRewardManagementCloseTask,
   useWriteRewardManagementCreateTask,
-  useWriteRewardManagementResubmitAfterRejection,
+  useWriteRewardManagementRemoveFromWhitelist,
+  useWriteRewardManagementResubmitAfterRejection
 } from "../wagmi/contracts";
 
 export const useTaskAdd = () => {
@@ -334,5 +336,82 @@ export const useResubmitTaskMutation = () => {
   };
 };
 
+
+export const useAddToWhitelist = () => {
+  const queryClient = useQueryClient();
+
+  const { writeContractAsync } = useWriteRewardManagementAddToWhitelist();
+
+  const addMutation = useMutation({
+    mutationFn: async ({
+      entityAddress,
+      taskId,
+      participant,
+    }: {
+      entityAddress: `0x${string}`;
+      taskId: string;
+      participant: string;
+    }) => {
+      return await writeContractAsync({
+        address: entityAddress,
+        args: [taskId as `0x${string}`, participant as `0x${string}`, true],
+      });
+    },
+
+    onSuccess: async (_, variables) => {
+      await new Promise((r) => setTimeout(r, 5000));
+    
+      await queryClient.invalidateQueries({
+        queryKey: ["whiteListedParticipantByTask", variables.taskId],
+      });
+    }    
+  });
+
+  return {
+    addToWhitelist: addMutation.mutateAsync,
+    addPending: addMutation.isPending,
+    addSuccess: addMutation.isSuccess,
+  };
+};
+
+
+export const useRemoveFromWhitelist = () => {
+  const queryClient = useQueryClient();
+
+  const { writeContractAsync } =
+    useWriteRewardManagementRemoveFromWhitelist();
+
+  const removeMutation = useMutation({
+    mutationFn: async ({
+      entityAddress,
+      taskId,
+      participant,
+    }: {
+      entityAddress: `0x${string}`;
+      taskId: string;
+      participant: string;
+    }) => {
+      return await writeContractAsync({
+        address: entityAddress,
+        args: [taskId as `0x${string}`, participant as `0x${string}`],
+      });
+    },
+
+    onSuccess: async (_, variables) => {
+      await new Promise((r) => setTimeout(r, 5000));
+    
+      await queryClient.invalidateQueries({
+        queryKey: ["whiteListedParticipantByTask", variables.taskId],
+      });
+    }
+    
+  });
+
+  return {
+    removeFromWhitelist: removeMutation.mutateAsync,
+    removePending: removeMutation.isPending,
+    removeSuccess: removeMutation.isSuccess,
+  };
+};
 
 
