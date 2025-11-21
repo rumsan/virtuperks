@@ -150,6 +150,8 @@ const handleAddParticipant = async () => {
     },
   });
 
+  const isWhitelistFull = whiteListedParticipants.length >= taskData.maxParticipants;
+
   return (
     <Card className="flex flex-col w-[80%] p-6 space-y-6">
 
@@ -167,7 +169,7 @@ const handleAddParticipant = async () => {
         </div>
 
         
-        {hasEntityOwnerRole && (
+        {hasEntityOwnerRole && !isWhitelistFull && taskData.isWhitelisted && (
   <div className="flex flex-row gap-2 items-center">
     <input
       type="text"
