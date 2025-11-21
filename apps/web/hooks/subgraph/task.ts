@@ -11,7 +11,8 @@ import {
   useWriteRewardManagementCloseTask,
   useWriteRewardManagementCreateTask,
   useWriteRewardManagementRemoveFromWhitelist,
-  useWriteRewardManagementResubmitAfterRejection
+  useWriteRewardManagementResubmitAfterRejection,
+  useWriteRewardManagementUpdateTaskDetails
 } from "../wagmi/contracts";
 
 export const useTaskAdd = () => {
@@ -413,5 +414,43 @@ export const useRemoveFromWhitelist = () => {
     removeSuccess: removeMutation.isSuccess,
   };
 };
+
+
+export const useUpdateTaskDetails = () => {
+  const queryClient = useQueryClient();
+  const { writeContractAsync } = useWriteRewardManagementUpdateTaskDetails();
+
+  const mutation = useMutation({
+    mutationFn: async ({
+      entityAddress,
+      taskId,
+      detailsUrl,
+      expiryDate,
+    }: {
+      entityAddress: `0x${string}`;
+      taskId: string;
+      detailsUrl: string;
+      expiryDate: number | bigint;
+    }) => {
+      const txHash = await writeContractAsync({
+        address: entityAddress,
+        args: [taskId as `0x${string}`, detailsUrl, BigInt(expiryDate)],
+      });
+      return txHash;
+    },
+    onSuccess: async (_, { taskId }) => {
+      
+      await queryClient.refetchQueries({ queryKey: ["taskById", taskId] });
+    },
+  });
+
+  return {
+    updateTaskDetails: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    isSuccess: mutation.isSuccess,
+  };
+};
+
+
 
 
