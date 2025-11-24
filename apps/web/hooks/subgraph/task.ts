@@ -12,7 +12,7 @@ import {
   useWriteRewardManagementCreateTask,
   useWriteRewardManagementRemoveFromWhitelist,
   useWriteRewardManagementResubmitAfterRejection,
-  useWriteRewardManagementUpdateTaskDetails
+  useWriteRewardManagementUpdateTaskDetails,
 } from "../wagmi/contracts";
 
 export const useTaskAdd = () => {
@@ -294,11 +294,10 @@ export const useGetRejectedParticipants = (taskId: string) => {
   });
 };
 
-
-
 export const useResubmitTaskMutation = () => {
   const queryClient = useQueryClient();
-  const { writeContractAsync } = useWriteRewardManagementResubmitAfterRejection();
+  const { writeContractAsync } =
+    useWriteRewardManagementResubmitAfterRejection();
   const { address: participant } = useAccount();
 
   const mutation = useMutation({
@@ -311,7 +310,6 @@ export const useResubmitTaskMutation = () => {
       entityId: string;
       completionUrl?: string;
     }) => {
-
       const result = await writeContractAsync({
         address: (entityId as `0x${string}`) || "0x",
         args: [taskId as `0x${string}`, completionUrl || ""],
@@ -337,7 +335,6 @@ export const useResubmitTaskMutation = () => {
   };
 };
 
-
 export const useAddToWhitelist = () => {
   const queryClient = useQueryClient();
 
@@ -361,11 +358,11 @@ export const useAddToWhitelist = () => {
 
     onSuccess: async (_, variables) => {
       await new Promise((r) => setTimeout(r, 5000));
-    
+
       await queryClient.invalidateQueries({
         queryKey: ["whiteListedParticipantByTask", variables.taskId],
       });
-    }    
+    },
   });
 
   return {
@@ -375,12 +372,10 @@ export const useAddToWhitelist = () => {
   };
 };
 
-
 export const useRemoveFromWhitelist = () => {
   const queryClient = useQueryClient();
 
-  const { writeContractAsync } =
-    useWriteRewardManagementRemoveFromWhitelist();
+  const { writeContractAsync } = useWriteRewardManagementRemoveFromWhitelist();
 
   const removeMutation = useMutation({
     mutationFn: async ({
@@ -400,12 +395,11 @@ export const useRemoveFromWhitelist = () => {
 
     onSuccess: async (_, variables) => {
       await new Promise((r) => setTimeout(r, 5000));
-    
+
       await queryClient.invalidateQueries({
         queryKey: ["whiteListedParticipantByTask", variables.taskId],
       });
-    }
-    
+    },
   });
 
   return {
@@ -414,7 +408,6 @@ export const useRemoveFromWhitelist = () => {
     removeSuccess: removeMutation.isSuccess,
   };
 };
-
 
 export const useUpdateTaskDetails = () => {
   const queryClient = useQueryClient();
@@ -439,7 +432,6 @@ export const useUpdateTaskDetails = () => {
       return txHash;
     },
     onSuccess: async (_, { taskId }) => {
-      
       await queryClient.refetchQueries({ queryKey: ["taskById", taskId] });
     },
   });
@@ -450,7 +442,3 @@ export const useUpdateTaskDetails = () => {
     isSuccess: mutation.isSuccess,
   };
 };
-
-
-
-

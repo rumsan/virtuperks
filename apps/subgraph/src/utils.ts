@@ -139,7 +139,7 @@ export function addParticipantToWhitelist(
     // Add participant if not already in the array
     if (!isAlreadyWhitelisted) {
       whitelistedParticipants.push(participant);
-      // taskDetail.whitelistedParticipants = whitelistedParticipants;
+      //taskDetail.whitelistedParticipants = whitelistedParticipants;
       taskDetail.save();
 
       log.info('Added participant {} to whitelist for task {}', [
