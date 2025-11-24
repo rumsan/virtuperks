@@ -2,7 +2,7 @@
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
-import { useGetAllTask, useGetTaskByName } from "@/hooks/subgraph/task";
+import { useGetAllTask, useGetTaskByName, useGetTasksNoApproval } from "@/hooks/subgraph/task";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -17,8 +17,8 @@ import { Tasks } from "@workspace/sdk/type";
 import { Activity, Droplet, Search } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import React from "react";
-import { useColumns } from "../details/details.column";
 import TaskPortalCard from "./list.card";
+import { useColumns } from "./list.column";
 
 interface TaskPortalMainProps {
   router: AppRouterInstance;
@@ -28,7 +28,7 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [taskInput, setTaskInput] = React.useState<string>("");
   const [debouncedTaskName, setDebouncedTaskName] = React.useState<string>("");
-  const [activeTab, setActiveTab] = React.useState<string>("activities"); // default tab
+  const [activeTab, setActiveTab] = React.useState<string>("activities"); 
 
 
   React.useEffect(() => {
@@ -37,22 +37,44 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
   }, [taskInput]);
 
   const getAllTask = useGetAllTask();
+  const { data: tasksNoApproval, isLoading: tasksNoApprovalLoadoing } = useGetTasksNoApproval();
   const getTaskByName = useGetTaskByName(debouncedTaskName);
 
 
-  const tasksToDisplay =
-    debouncedTaskName && getTaskByName.data?.data?.taskCreateds
-      ? getTaskByName.data.data.taskCreateds
-      : getAllTask?.data?.data?.taskCreateds || [];
 
-  // Apply sorting
-  const tasksSortedByStatusAndDate = tasksToDisplay.sort((taskA: any, taskB: any) => {
-    const isTaskAOpen = taskA.taskDetail.isOpen;
-    const isTaskBOpen = taskB.taskDetail.isOpen;
-    if (isTaskAOpen && !isTaskBOpen) return -1;
-    if (!isTaskAOpen && isTaskBOpen) return 1;
-    return Number(taskB.taskDetail.expiryDate) * 1000 - Number(taskA.taskDetail.expiryDate) * 1000;
-  });
+  const tasksToDisplay = React.useMemo(() => {
+    if (activeTab === "blood") {
+
+      if (tasksNoApprovalLoadoing) return [];
+      return tasksNoApproval?.data?.taskCreateds || [];
+    }
+
+
+    if (debouncedTaskName && getTaskByName.data?.data?.taskCreateds) {
+      return getTaskByName.data.data.taskCreateds;
+    }
+
+    return getAllTask?.data?.data?.taskCreateds || [];
+  }, [
+    activeTab,
+    tasksNoApproval,
+    tasksNoApprovalLoadoing,
+    debouncedTaskName,
+    getTaskByName.data,
+    getAllTask.data,
+  ]);
+
+
+  const tasksSortedByStatusAndDate = React.useMemo(() => {
+    return tasksToDisplay.sort((taskA: any, taskB: any) => {
+      const isTaskAOpen = taskA.taskDetail.isOpen;
+      const isTaskBOpen = taskB.taskDetail.isOpen;
+      if (isTaskAOpen && !isTaskBOpen) return -1;
+      if (!isTaskAOpen && isTaskBOpen) return 1;
+      return Number(taskB.taskDetail.expiryDate) * 1000 - Number(taskA.taskDetail.expiryDate) * 1000;
+    });
+  }, [tasksToDisplay]);
+
 
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});

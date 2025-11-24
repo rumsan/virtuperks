@@ -96,3 +96,20 @@ export const useGetWhiteListedParticipantByTask = (
     enabled: !!taskId && !skip,
   });
 };
+
+export const useGetRemovedWhiteListedParticipantByTask = (
+  taskId: string,
+  skip: boolean = false,
+) => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["whiteRemoveListedParticipantByTask", taskId],
+    queryFn: async () => {
+      const taskDetail =
+        await queryService?.getRemovedWhitelistedParticipantsByTaskId(taskId);
+      return taskDetail;
+    },
+    enabled: !!taskId && !skip,
+  });
+}
