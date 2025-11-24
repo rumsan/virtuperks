@@ -6,13 +6,13 @@ interface HasRoleProps {
   address?: `0x${string}`;
 }
 
-export default function hasRole({ role, address }: HasRoleProps) {
+export default function hasRole({ role, address }: HasRoleProps): boolean {
   const { data } = useReadContract({
-    address: process.env.NEXT_PUBLIC_APPREGISTRY as "0x",
+    address: process.env.NEXT_PUBLIC_APPREGISTRY as `0x${string}`,
     abi: AppRegistryABI,
     functionName: "hasRole",
     args: [process.env.NEXT_PUBLIC_APP_ID, role, address],
   });
 
-  return data;
+  return Boolean(data); 
 }

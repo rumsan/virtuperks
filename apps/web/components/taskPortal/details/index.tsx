@@ -29,10 +29,8 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [alertDialog, setAlertDialog] = useState(false);
   const [localStatus, setLocalStatus] = useState<string | null>(null);
-
   const { isConnected, address } = useAccount();
   const { toast } = useToast();
-
   const getTaskDetail = useGetTaskById(cuid.id);
   const taskData = useMemo(
     () => getTaskDetail?.data?.data?.taskCreateds?.[0],
@@ -40,13 +38,10 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   );
   const isTaskOpen = taskData?.taskDetail?.isOpen;
   const participantRole = process.env.NEXT_PUBLIC_PARTICIPANT_ROLE || "";
-  
-
   const hasParticipantRole = hasRole({ role: participantRole, address });
 
   const isWhitelisted = taskData?.taskDetail?.isWhitelisted;
   console.log(isWhitelisted, "isWhitelisted in task portal main");
-
   const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(
     taskData?.internal_id,
   );
@@ -65,7 +60,9 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
   const effectiveStatus =
     localStatus !== null ? localStatus : participantStatus;
-
+   
+  
+  
   const handleApplyTask = async () => {
     if (!isConnected) {
       setAlertDialog(true);
@@ -163,37 +160,38 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
   const { resubmitTask, resubmitPending } = useResubmitTaskMutation();
 
-const handleResubmitTask = async (data: any) => {
-  try {
-    await resubmitTask(
-      {
-        taskId: taskData?.internal_id,
-        entityId: taskData?.rewardManagement?.rewardManagement || "0x",
-        completionUrl: data.completionUrl,
-      },
-      {
-        onSuccess: () => {
-          setIsOpen(false);
-          setLocalStatus("WAITING");
-          toast({
-            title: "Task Resubmitted Successfully!",
-            variant: "success",
-          });
+  const handleResubmitTask = async (data: any) => {
+    try {
+      await resubmitTask(
+        {
+          taskId: taskData?.internal_id,
+          entityId: taskData?.rewardManagement?.rewardManagement || "0x",
+          completionUrl: data.completionUrl,
         },
-        onError: (error) => {
-          console.error("Error resubmitting task:", error);
-          toast({
-            title: "Failed to resubmit task. Please try again.",
-            variant: "destructive",
-          });
+        {
+          onSuccess: () => {
+            setIsOpen(false);
+            setLocalStatus("WAITING");
+            toast({
+              title: "Task Resubmitted Successfully!",
+              variant: "success",
+            });
+          },
+          onError: (error) => {
+            console.error("Error resubmitting task:", error);
+            toast({
+              title: "Failed to resubmit task. Please try again.",
+              variant: "destructive",
+            });
+          },
         },
-      },
-    );
-  } catch (error) {
-    console.error("Error in resubmit:", error);
-  }
-};
+      );
+    } catch (error) {
+      console.error("Error in resubmit:", error);
+    }
+  };
 
+  
 
   useEffect(() => {
     if (localStatus && participantStatus) {
@@ -224,6 +222,42 @@ const handleResubmitTask = async (data: any) => {
         </Button>
       );
     }
+
+
+    if (!taskData?.taskDetail?.requireApproval) {
+      return (
+        <>
+          <Button
+            className="bg-green-500"
+            onClick={() => setIsOpen(true)}
+            disabled={completePending}
+          >
+            {completePending ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Processing...
+              </>
+            ) : (
+              <span className="text-[#F8FAFC]">Mark as complete</span>
+            )}
+          </Button>
+
+          {!completePending && isOpen && (
+            <DialogButton
+              isOpen={isOpen}
+              setIsOpen={setIsOpen}
+              title="Complete Task"
+              subTitle="Please provide the completion URL"
+              buttonName="Submit"
+              submitType="Complete"
+              handleApplyTaskLogic={handleCompleteTask}
+            />
+          )}
+        </>
+      );
+    }
+
+
 
     switch (effectiveStatus) {
       case 0:
@@ -302,35 +336,35 @@ const handleResubmitTask = async (data: any) => {
       case "REJECTED":
       case 5:
         return (
-              <>
-                <Button
-                  className="bg-[#297AD6]"
-                  onClick={() => setIsOpen(true)}
-                  disabled={resubmitPending}
-                >
-                  {resubmitPending ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Processing...
-                    </>
-                  ) : (
-                    <span className="text-[#F8FAFC]">Resubmit Task</span>
-                  )}
-                </Button>
-          
-                {!resubmitPending && isOpen && (
-                  <DialogButton
-                    isOpen={isOpen}
-                    setIsOpen={setIsOpen}
-                    title="Resubmit Task"
-                    subTitle="Please provide the updated completion URL"
-                    buttonName="Submit"
-                    submitType="Resubmit"
-                    handleApplyTaskLogic={handleResubmitTask}
-                  />
-                )}
-              </>
-            );
+          <>
+            <Button
+              className="bg-[#297AD6]"
+              onClick={() => setIsOpen(true)}
+              disabled={resubmitPending}
+            >
+              {resubmitPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Processing...
+                </>
+              ) : (
+                <span className="text-[#F8FAFC]">Resubmit Task</span>
+              )}
+            </Button>
+
+            {!resubmitPending && isOpen && (
+              <DialogButton
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+                title="Resubmit Task"
+                subTitle="Please provide the updated completion URL"
+                buttonName="Submit"
+                submitType="Resubmit"
+                handleApplyTaskLogic={handleResubmitTask}
+              />
+            )}
+          </>
+        );
       default:
         return null;
     }
@@ -386,7 +420,7 @@ const handleResubmitTask = async (data: any) => {
           <TaskPortalDetails taskData={taskData} />
         </div>
         <div className="flex w-full gap-4 flex-nowrap">
-          <TaskPortalParticipant taskId={cuid} />
+          <TaskPortalParticipant taskId={cuid} isWhitelisted={taskData.taskDetail.isWhitelisted} taskData={taskData}/>
         </div>
       </div>
     </main>

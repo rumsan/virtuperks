@@ -6,10 +6,13 @@ import {
   useReadRewardManagementGetTask,
   useReadRewardManagementGetTaskVerifiedParticipants,
   useReadRewardManagementIsTaskExpired,
+  useWriteRewardManagementAddToWhitelist,
   useWriteRewardManagementCloseExpiredTasks,
   useWriteRewardManagementCloseTask,
   useWriteRewardManagementCreateTask,
+  useWriteRewardManagementRemoveFromWhitelist,
   useWriteRewardManagementResubmitAfterRejection,
+  useWriteRewardManagementUpdateTaskDetails,
 } from "../wagmi/contracts";
 
 export const useTaskAdd = () => {
@@ -42,7 +45,6 @@ export const useTaskAdd = () => {
             rejectedParticipants:
               rejectedParticipants as readonly `0x${string}`[],
           },
-
           data.whitelistedParticipants,
         ],
       });
@@ -68,6 +70,19 @@ export const useGetAllTask = () => {
     queryKey: ["taskList"],
     queryFn: async () => {
       const taskDetail = await queryService?.getAllTasks();
+      return taskDetail;
+    },
+    enabled: !!queryService,
+  });
+};
+
+export const useGetTasksNoApproval = () => {
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["tasksNoApproval"],
+    queryFn: async () => {
+      const taskDetail = await queryService?.getTasksNoApproval();
       return taskDetail;
     },
     enabled: !!queryService,
@@ -279,11 +294,10 @@ export const useGetRejectedParticipants = (taskId: string) => {
   });
 };
 
-
-
 export const useResubmitTaskMutation = () => {
   const queryClient = useQueryClient();
-  const { writeContractAsync } = useWriteRewardManagementResubmitAfterRejection();
+  const { writeContractAsync } =
+    useWriteRewardManagementResubmitAfterRejection();
   const { address: participant } = useAccount();
 
   const mutation = useMutation({
@@ -296,7 +310,6 @@ export const useResubmitTaskMutation = () => {
       entityId: string;
       completionUrl?: string;
     }) => {
-
       const result = await writeContractAsync({
         address: (entityId as `0x${string}`) || "0x",
         args: [taskId as `0x${string}`, completionUrl || ""],
@@ -322,5 +335,110 @@ export const useResubmitTaskMutation = () => {
   };
 };
 
+export const useAddToWhitelist = () => {
+  const queryClient = useQueryClient();
 
+  const { writeContractAsync } = useWriteRewardManagementAddToWhitelist();
 
+  const addMutation = useMutation({
+    mutationFn: async ({
+      entityAddress,
+      taskId,
+      participant,
+    }: {
+      entityAddress: `0x${string}`;
+      taskId: string;
+      participant: string;
+    }) => {
+      return await writeContractAsync({
+        address: entityAddress,
+        args: [taskId as `0x${string}`, participant as `0x${string}`, true],
+      });
+    },
+
+    onSuccess: async (_, variables) => {
+      await new Promise((r) => setTimeout(r, 5000));
+
+      await queryClient.invalidateQueries({
+        queryKey: ["whiteListedParticipantByTask", variables.taskId],
+      });
+    },
+  });
+
+  return {
+    addToWhitelist: addMutation.mutateAsync,
+    addPending: addMutation.isPending,
+    addSuccess: addMutation.isSuccess,
+  };
+};
+
+export const useRemoveFromWhitelist = () => {
+  const queryClient = useQueryClient();
+
+  const { writeContractAsync } = useWriteRewardManagementRemoveFromWhitelist();
+
+  const removeMutation = useMutation({
+    mutationFn: async ({
+      entityAddress,
+      taskId,
+      participant,
+    }: {
+      entityAddress: `0x${string}`;
+      taskId: string;
+      participant: string;
+    }) => {
+      return await writeContractAsync({
+        address: entityAddress,
+        args: [taskId as `0x${string}`, participant as `0x${string}`],
+      });
+    },
+
+    onSuccess: async (_, variables) => {
+      await new Promise((r) => setTimeout(r, 5000));
+
+      await queryClient.invalidateQueries({
+        queryKey: ["whiteListedParticipantByTask", variables.taskId],
+      });
+    },
+  });
+
+  return {
+    removeFromWhitelist: removeMutation.mutateAsync,
+    removePending: removeMutation.isPending,
+    removeSuccess: removeMutation.isSuccess,
+  };
+};
+
+export const useUpdateTaskDetails = () => {
+  const queryClient = useQueryClient();
+  const { writeContractAsync } = useWriteRewardManagementUpdateTaskDetails();
+
+  const mutation = useMutation({
+    mutationFn: async ({
+      entityAddress,
+      taskId,
+      detailsUrl,
+      expiryDate,
+    }: {
+      entityAddress: `0x${string}`;
+      taskId: string;
+      detailsUrl: string;
+      expiryDate: number | bigint;
+    }) => {
+      const txHash = await writeContractAsync({
+        address: entityAddress,
+        args: [taskId as `0x${string}`, detailsUrl, BigInt(expiryDate)],
+      });
+      return txHash;
+    },
+    onSuccess: async (_, { taskId }) => {
+      await queryClient.refetchQueries({ queryKey: ["taskById", taskId] });
+    },
+  });
+
+  return {
+    updateTaskDetails: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    isSuccess: mutation.isSuccess,
+  };
+};

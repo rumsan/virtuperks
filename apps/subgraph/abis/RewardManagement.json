@@ -99,6 +99,37 @@
       {
         "indexed": true,
         "internalType": "address",
+        "name": "participant",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "disbursedBy",
+        "type": "address"
+      }
+    ],
+    "name": "DisbursementToParticipant",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "taskId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "disbursedBy",
         "type": "address"
       }
@@ -137,25 +168,6 @@
       {
         "indexed": true,
         "internalType": "bytes32",
-        "name": "id",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "participant",
-        "type": "address"
-      }
-    ],
-    "name": "ParticipantApplied",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "bytes32",
         "name": "taskId",
         "type": "bytes32"
       },
@@ -173,25 +185,6 @@
       }
     ],
     "name": "ParticipantRemovedFromWhitelist",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "taskId",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "participant",
-        "type": "address"
-      }
-    ],
-    "name": "ParticipantResubmitted",
     "type": "event"
   },
   {
@@ -235,7 +228,26 @@
         "type": "address"
       }
     ],
-    "name": "TaskAccepted",
+    "name": "TaskAssignmentAccepted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "id",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "participant",
+        "type": "address"
+      }
+    ],
+    "name": "TaskAssignmentApplied",
     "type": "event"
   },
   {
@@ -254,7 +266,82 @@
         "type": "address"
       }
     ],
-    "name": "TaskApproved",
+    "name": "TaskAssignmentApproved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "id",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "participant",
+        "type": "address"
+      }
+    ],
+    "name": "TaskAssignmentCompleted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "id",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "participant",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "rejectedBy",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
+      }
+    ],
+    "name": "TaskAssignmentRejected",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "id",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "participant",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "verifier",
+        "type": "address"
+      }
+    ],
+    "name": "TaskAssignmentVerified",
     "type": "event"
   },
   {
@@ -274,25 +361,6 @@
       }
     ],
     "name": "TaskClosed",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "id",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "participant",
-        "type": "address"
-      }
-    ],
-    "name": "TaskCompleted",
     "type": "event"
   },
   {
@@ -338,62 +406,6 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "bytes32",
-        "name": "id",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "participant",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "rejectedBy",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "reason",
-        "type": "string"
-      }
-    ],
-    "name": "TaskRejected",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "id",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "participant",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "verifier",
-        "type": "address"
-      }
-    ],
-    "name": "TaskVerified",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
         "internalType": "address",
         "name": "token",
         "type": "address"
@@ -424,6 +436,37 @@
       }
     ],
     "name": "TokenTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "taskId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "allocatedBy",
+        "type": "address"
+      }
+    ],
+    "name": "TokensAllocatedToTask",
     "type": "event"
   },
   { "stateMutability": "payable", "type": "fallback" },
@@ -470,6 +513,22 @@
     "type": "function"
   },
   {
+    "inputs": [
+      { "internalType": "bytes32", "name": "taskId", "type": "bytes32" },
+      { "internalType": "address", "name": "tokenAddress", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "treasuryAddress",
+        "type": "address"
+      },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" }
+    ],
+    "name": "allocateTokensToTask",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "app",
     "outputs": [
@@ -486,8 +545,11 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "closeExpiredTasks",
+    "inputs": [
+      { "internalType": "bytes32", "name": "taskId", "type": "bytes32" },
+      { "internalType": "address", "name": "participant", "type": "address" }
+    ],
+    "name": "approveTaskSubmission",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -554,18 +616,18 @@
           },
           {
             "internalType": "address[]",
-            "name": "verifiedParticipants",
-            "type": "address[]"
-          },
-          {
-            "internalType": "address[]",
-            "name": "rejectedParticipants",
+            "name": "approvedParticipants",
             "type": "address[]"
           }
         ],
-        "internalType": "struct IRewardManagement.Task",
+        "internalType": "struct ITaskManagement.Task",
         "name": "task",
         "type": "tuple"
+      },
+      {
+        "internalType": "address",
+        "name": "treasuryAddress",
+        "type": "address"
       },
       {
         "internalType": "address[]",
@@ -584,7 +646,19 @@
       { "internalType": "uint256", "name": "amount", "type": "uint256" },
       { "internalType": "string", "name": "remarks", "type": "string" }
     ],
-    "name": "disburseAdditionalTokenToTask",
+    "name": "disburseAdditionalTokenToTaskParticipants",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "taskId", "type": "bytes32" },
+      { "internalType": "address", "name": "participant", "type": "address" },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" },
+      { "internalType": "string", "name": "completionUrl", "type": "string" }
+    ],
+    "name": "disburseToSingleParticipant",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -594,34 +668,9 @@
       { "internalType": "bytes32", "name": "taskId", "type": "bytes32" },
       { "internalType": "uint256", "name": "amount", "type": "uint256" }
     ],
-    "name": "disburseTokensToTask",
+    "name": "disburseTokensToTaskParticipants",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getOpenTasks",
-    "outputs": [
-      { "internalType": "bytes32[]", "name": "", "type": "bytes32[]" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "bytes32", "name": "taskId", "type": "bytes32" },
-      { "internalType": "address", "name": "participant", "type": "address" }
-    ],
-    "name": "getParticipantStatus",
-    "outputs": [
-      {
-        "internalType": "enum IRewardManagement.AssignmentStatus",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -639,7 +688,7 @@
             "type": "address"
           },
           {
-            "internalType": "enum IRewardManagement.AssignmentStatus",
+            "internalType": "enum ITaskManagement.AssignmentStatus",
             "name": "status",
             "type": "uint8"
           },
@@ -649,106 +698,10 @@
             "type": "string"
           }
         ],
-        "internalType": "struct IRewardManagement.TaskAssignment",
+        "internalType": "struct ITaskManagement.TaskAssignment",
         "name": "",
         "type": "tuple"
       }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "bytes32", "name": "taskId", "type": "bytes32" }
-    ],
-    "name": "getTask",
-    "outputs": [
-      {
-        "components": [
-          { "internalType": "string", "name": "name", "type": "string" },
-          { "internalType": "string", "name": "detailsUrl", "type": "string" },
-          { "internalType": "address", "name": "owner", "type": "address" },
-          {
-            "internalType": "uint256",
-            "name": "expiryDate",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "rewardToken",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "totalRewardAmount",
-            "type": "uint256"
-          },
-          { "internalType": "bool", "name": "isOpen", "type": "bool" },
-          { "internalType": "bool", "name": "requireApproval", "type": "bool" },
-          { "internalType": "bool", "name": "isWhitelisted", "type": "bool" },
-          {
-            "internalType": "bool",
-            "name": "isTokenDisbursed",
-            "type": "bool"
-          },
-          {
-            "internalType": "uint256",
-            "name": "maxParticipants",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "acceptedParticipantCount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address[]",
-            "name": "verifiedParticipants",
-            "type": "address[]"
-          },
-          {
-            "internalType": "address[]",
-            "name": "rejectedParticipants",
-            "type": "address[]"
-          }
-        ],
-        "internalType": "struct IRewardManagement.Task",
-        "name": "task",
-        "type": "tuple"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "bytes32", "name": "taskId", "type": "bytes32" }
-    ],
-    "name": "getTaskRejectedParticipants",
-    "outputs": [
-      { "internalType": "address[]", "name": "", "type": "address[]" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "bytes32", "name": "taskId", "type": "bytes32" }
-    ],
-    "name": "getTaskVerifiedParticipants",
-    "outputs": [
-      { "internalType": "address[]", "name": "", "type": "address[]" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "owner", "type": "address" }
-    ],
-    "name": "getTasksByOwner",
-    "outputs": [
-      { "internalType": "bytes32[]", "name": "", "type": "bytes32[]" }
     ],
     "stateMutability": "view",
     "type": "function"
@@ -776,6 +729,15 @@
       { "internalType": "bytes32", "name": "taskId", "type": "bytes32" }
     ],
     "name": "isTaskExpired",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "taskId", "type": "bytes32" }
+    ],
+    "name": "isTaskOpen",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
     "type": "function"
@@ -837,7 +799,7 @@
       { "internalType": "address", "name": "participant", "type": "address" },
       { "internalType": "string", "name": "reason", "type": "string" }
     ],
-    "name": "rejectParticipant",
+    "name": "rejectTaskSubmission",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -854,16 +816,6 @@
   },
   {
     "inputs": [
-      { "internalType": "bytes32", "name": "taskId", "type": "bytes32" },
-      { "internalType": "string", "name": "completionUrl", "type": "string" }
-    ],
-    "name": "resubmitAfterRejection",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
       { "internalType": "bytes32", "name": "", "type": "bytes32" },
       { "internalType": "address", "name": "", "type": "address" }
     ],
@@ -871,7 +823,7 @@
     "outputs": [
       { "internalType": "address", "name": "participant", "type": "address" },
       {
-        "internalType": "enum IRewardManagement.AssignmentStatus",
+        "internalType": "enum ITaskManagement.AssignmentStatus",
         "name": "status",
         "type": "uint8"
       },
@@ -945,16 +897,6 @@
       { "internalType": "uint256", "name": "newExpiryDate", "type": "uint256" }
     ],
     "name": "updateTaskDetails",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "bytes32", "name": "taskId", "type": "bytes32" },
-      { "internalType": "address", "name": "participant", "type": "address" }
-    ],
-    "name": "verifyTask",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
