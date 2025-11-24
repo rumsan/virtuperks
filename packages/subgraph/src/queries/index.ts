@@ -176,11 +176,16 @@ export const TokenQueries = {
 
 
 export const getTaskCreation = `
-    query GetTaskCreation {
-      taskCreateds(first: 100, orderBy: blockTimestamp, orderDirection: desc) {
-        id
-        internal_id
-        taskDetail {
+  query GetTaskCreationWithApproval {
+    taskCreateds(
+      first: 100,
+      orderBy: blockTimestamp,
+      orderDirection: desc,
+      where: { taskDetail_: { requireApproval: true } }
+    ) {
+      id
+      internal_id
+      taskDetail {
         acceptedParticipantCount
         detailsUrl
         id
@@ -195,22 +200,78 @@ export const getTaskCreation = `
         requireApproval
         isWhitelisted
         verifiedParticipants
-        
-        }
-        rewardManagement{
+      }
+      rewardManagement {
         appId
         id
         name
         rewardManagement
-        }
-        createdBy
-        blockNumber
-        blockTimestamp
-        transactionHash
       }
-  
+      createdBy
+      blockNumber
+      blockTimestamp
+      transactionHash
     }
-  `;
+  }
+`;
+
+export const getTaskUpdated = `
+  query GetTaskUpdateds($taskId: BigInt!) {
+    taskUpdateds(where: { taskId: $taskId }) {
+      id
+      taskId
+      detailsUrl
+      expiryDate
+      updatedBy
+      blockNumber
+      blockTimestamp
+      transactionHash
+    }
+  }
+`;
+
+
+
+export const getTaskNoApproval = `
+  query GetTaskCreationNoApproval {
+    taskCreateds(
+      first: 100,
+      orderBy: blockTimestamp,
+      orderDirection: desc,
+      where: { taskDetail_: { requireApproval: false } }
+    ) {
+      id
+      internal_id
+      taskDetail {
+        acceptedParticipantCount
+        detailsUrl
+        id
+        expiryDate
+        isOpen
+        isTokenDisbursed
+        maxParticipants
+        name
+        owner
+        rewardToken
+        totalRewardAmount
+        requireApproval
+        isWhitelisted
+        verifiedParticipants
+      }
+      rewardManagement {
+        appId
+        id
+        name
+        rewardManagement
+      }
+      createdBy
+      blockNumber
+      blockTimestamp
+      transactionHash
+    }
+  }
+`;
+
 
 
 
@@ -850,6 +911,20 @@ query GetWhiteListedParticipantByTask($taskId: Bytes!) {
   }
 }
 `;
+
+export const GetRemoveWhiteListedParticipantByTask = `
+query GetRemovedWhiteListedParticipantByTask($taskId: Bytes!) {
+  participantRemovedFromWhitelists(where: { taskId: $taskId }) {
+    id
+    taskId
+    participant
+    by
+    blockNumber
+    blockTimestamp
+  }
+}
+`;
+
 
 export const GetEntityOwner = `
 query GetEntityOwner($userAddress: Bytes!) {
