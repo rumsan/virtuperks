@@ -23,6 +23,7 @@ const defaultValues = {
   owner: "",
   entityAddress: "",
   expiryDate: new Date(),
+  treasurerAddress: "",
   rewardToken: process.env.NEXT_PUBLIC_RAHAT_TOKEN || "",
   totalRewardAmount: 0,
   isOpen: true,
@@ -112,6 +113,7 @@ export default function TaskAdd({ router }: TaskAddProps) {
         owner,
         entityAddress: data.entityAddress,
         expiryDate,
+        treasurerAddress: data.treasurerAddress,
         rewardToken,
         totalRewardAmount: totalRewardAmount.toString(),
         isOpen,
@@ -119,9 +121,9 @@ export default function TaskAdd({ router }: TaskAddProps) {
         requireApproval: data.requireApproval,
         isWhitelisted: data.isWhitelisted,
         maxParticipants: maxParticipants.toString(),
-        acceptedParticipantCount: 0, // Default to 0
+        acceptedParticipantCount: 0, 
         whitelistedParticipants: whitelistedParticipants || [],
-        verfiedParticipants: [], // Default to empty array
+        verfiedParticipants: [], 
       });
 
       toast({

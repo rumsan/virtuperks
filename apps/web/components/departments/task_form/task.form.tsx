@@ -206,33 +206,52 @@ export default function TaskBaseForm({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="maxParticipants"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Max Number of Participants</FormLabel>
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    {...field}
-                    value={
-                      field.value !== undefined && field.value !== null
-                        ? field.value.toString()
-                        : ""
-                    }
-                    onChange={(e) => {
-                      const value = e.target.value;
 
-                      field.onChange(
-                        value === "" ? undefined : parseInt(value, 10),
-                      );
-                    }}
-                  />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
+
+          
+<div className="grid grid-cols-2 gap-4 mb-5">
+  <FormField
+    control={form.control}
+    name="maxParticipants"
+    render={({ field }) => (
+      <FormItem>
+        <FormLabel>Max Number of Participants</FormLabel>
+        <Input
+          type="number"
+          placeholder="0"
+          {...field}
+          value={field.value !== undefined && field.value !== null ? field.value.toString() : ""}
+          onChange={(e) => {
+            const value = e.target.value;
+            field.onChange(value === "" ? undefined : parseInt(value, 10));
+          }}
+        />
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+
+  <FormField
+    control={form.control}
+    name="treasurerAddress"
+    render={({ field }) => (
+      <FormItem>
+        <FormLabel>Treasurer Address</FormLabel>
+        <Input
+          type="text"
+          placeholder="Enter treasurer wallet address"
+          {...field}
+          value={field.value ?? ""}
+          onChange={(e) => field.onChange(e.target.value)}
+        />
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+</div>
+
+            
           </div>
 
           <div className="grid grid-cols-2 gap-4 mb-5">
