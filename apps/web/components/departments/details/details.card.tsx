@@ -347,12 +347,12 @@ export default function DepartmentDetailsCard({
               </div>
               <div className="flex flex-col leading-tight">
                 <span className="font-semibold text-red-600 text-xs">
-                  No Available Tokens
+                 Tokens Not Approved
                 </span>
                 <span className="text-[10px] text-red-500">
                   Please contact a{" "}
                   <span className="font-medium text-red-600">Minter</span> to
-                  allocate more.
+                  approve tokens.
                 </span>
               </div>
             </div>
