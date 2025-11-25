@@ -248,7 +248,7 @@ export default function DepartmentDetailsCard({
                 }
               >
                 <Plus size={22} strokeWidth={2.75} />
-                <span className="ml-2">Mint Token</span>
+                <span className="">Approve Token</span>
               </Button>
             )}
 

@@ -5,6 +5,7 @@ import {
   useReadRewardTokenBalanceOf,
   useWriteRewardManagementDisburseTokensToTaskParticipants,
   useWriteRewardManagementTransferToken,
+  useWriteRewardTokenApprove,
   useWriteRewardTokenTransfer,
 } from "../wagmi/contracts";
 
@@ -165,6 +166,42 @@ export const useTokenTranfer = () => {
     transferError: mutation.isError,
   };
 };
+
+// Mint tokens
+export const useRewardTokenApprove = () => {
+  const { writeContractAsync } = useWriteRewardTokenApprove();
+
+  const tokenAddress = process.env
+    .NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
+
+  const mutation = useMutation({
+    mutationFn: async ({
+      address,
+      amount,
+    }: {
+      address: string;
+      amount: number;
+    }) => {
+      const result = await writeContractAsync({
+        address: tokenAddress,
+        args: [
+          address as `0x${string}`, 
+          BigInt(amount),           
+        ],
+      });
+
+      return result;
+    },
+  });
+
+  return {
+    tokenApprove: mutation.mutateAsync,
+    approvePending: mutation.isPending,
+    approveSuccess: mutation.isSuccess,
+    approveError: mutation.isError,
+  };
+};
+
 
 export const useCheckParticipantBalance = (participantAddress: string) => {
   const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN;

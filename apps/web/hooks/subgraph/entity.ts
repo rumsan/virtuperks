@@ -8,8 +8,7 @@ import {
   useReadRewardManagementGetTotalUnallocatedTokens,
   useReadRewardManagementOwner,
   useReadRewardManagementTotalAllocatedTokens,
-  useWriteRewardManagementFactoryCreateRewardManagement,
-  useWriteRewardTokenMint,
+  useWriteRewardManagementFactoryCreateRewardManagement
 } from "../wagmi/contracts";
 
 export const useGetAllEntity = () => {
@@ -91,36 +90,6 @@ export const useGetEntityById = (rewardManagement: string) => {
       return entity;
     },
   });
-};
-
-// Mint tokens
-export const useRewardTokenMint = () => {
-  const { writeContractAsync } = useWriteRewardTokenMint();
-
-  const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
-
-  const mutation = useMutation({
-    mutationFn: async ({
-      address,
-      amount,
-    }: {
-      address: string;
-      amount: number;
-    }) => {
-      const result = await writeContractAsync({
-        address: tokenAddress,
-        args: [address as `0x${string}`, BigInt(amount)],
-      });
-      return result;
-    },
-  });
-
-  return {
-    tokenMint: mutation.mutateAsync,
-    mintPending: mutation.isPending,
-    mintSuccess: mutation.isSuccess,
-    mintError: mutation.isError,
-  };
 };
 
 export const useCheckTotalUnallocatedTokens = (entityId: string) => {
