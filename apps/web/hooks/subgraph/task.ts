@@ -1,17 +1,11 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAccount } from "wagmi";
 import {
-  useReadRewardManagementGetOpenTasks,
-  useReadRewardManagementGetTask,
-  useReadRewardManagementGetTaskVerifiedParticipants,
   useReadRewardManagementIsTaskExpired,
   useWriteRewardManagementAddToWhitelist,
-  useWriteRewardManagementCloseExpiredTasks,
   useWriteRewardManagementCloseTask,
   useWriteRewardManagementCreateTask,
   useWriteRewardManagementRemoveFromWhitelist,
-  useWriteRewardManagementResubmitAfterRejection,
   useWriteRewardManagementUpdateTaskDetails,
 } from "../wagmi/contracts";
 
@@ -40,11 +34,10 @@ export const useTaskAdd = () => {
             isTokenDisbursed: Boolean(data.isTokenDisbursed),
             maxParticipants: BigInt(data.maxParticipants),
             acceptedParticipantCount: BigInt(data.acceptedParticipantCount),
-            verifiedParticipants:
+            approvedParticipants:
               verifiedParticipants as readonly `0x${string}`[],
-            rejectedParticipants:
-              rejectedParticipants as readonly `0x${string}`[],
           },
+          data.treasuryAddress as `0x${string}`,
           data.whitelistedParticipants,
         ],
       });
@@ -131,14 +124,15 @@ export const useGetTaskByName = (taskName: string) => {
 
 export const useCloseExpiredTask = () => {
   const queryClient = useQueryClient();
-  const { writeContractAsync } = useWriteRewardManagementCloseExpiredTasks();
+  //get from the subgraph
+  // const { writeContractAsync } = useWriteRewardManagementCloseExpiredTasks();
 
   const mutation = useMutation({
     mutationFn: async (data: { entityAddress: `0x${string}` }) => {
-      return await writeContractAsync({
-        address: data.entityAddress,
-        args: [],
-      });
+      // return await writeContractAsync({
+      //   address: data.entityAddress,
+      //   args: [],
+      // });
     },
     onSuccess: async () => {
       // wait a bit to ensure tx is mined & indexers (like TheGraph) update
@@ -203,30 +197,30 @@ export const useCheckTaskVerifiedParticipant = (
   taskId: string,
   entityId: string,
 ) => {
-  const { data, isError, isLoading } =
-    useReadRewardManagementGetTaskVerifiedParticipants({
-      address: entityId as `0x${string}`,
-      args: [taskId as `0x${string}`],
-    });
+  //get form the subgraph
+  // const { data, isError, isLoading } =
+  //   useReadRewardManagementGetTaskVerifiedParticipants({
+  //     address: entityId as `0x${string}`,
+  //     args: [taskId as `0x${string}`],
+  //   });
   return {
-    verifiedTaskParticipant: data,
-    isError,
-    statusLoading: isLoading,
+    verifiedTaskParticipant: [],
+    // isError,
+    //statusLoading: isLoading,
   };
 };
 
 export const useCheckTaskStatus = (taskId: string, entityId: string) => {
-  const { data, isError, isLoading } = useReadRewardManagementGetTask({
-    address: entityId as `0x${string}`,
-    args: [taskId as `0x${string}`],
-  });
-
-  return {
-    taskDetail: data,
-    status: data?.isTokenDisbursed,
-    isError,
-    statusLoading: isLoading,
-  };
+  // const { data, isError, isLoading } = useReadRewardManagementGetTask({
+  //   address: entityId as `0x${string}`,
+  //   args: [taskId as `0x${string}`],
+  // });
+  // return {
+  //   taskDetail: data,
+  //   status: data?.isTokenDisbursed,
+  //   isError,
+  //   statusLoading: isLoading,
+  // };
 };
 
 export const useIsTaskExpired = (taskId: string, entityId: string) => {
@@ -247,15 +241,16 @@ export const useIsTaskExpired = (taskId: string, entityId: string) => {
 };
 
 export const useGetOpentask = (entityId: string) => {
-  const { data, isError, isLoading } = useReadRewardManagementGetOpenTasks({
-    address: entityId as `0x${string}`,
-    args: [],
-  });
+  //get from subgraph
+  // const { data, isError, isLoading } = useReadRewardManagementGetOpenTasks({
+  //   address: entityId as `0x${string}`,
+  //   args: [],
+  // });
 
   return {
-    openTasks: data,
-    isError,
-    statusLoading: isLoading,
+    openTasks: [],
+    // isError,
+    // statusLoading: isLoading,
   };
 };
 
@@ -294,46 +289,46 @@ export const useGetRejectedParticipants = (taskId: string) => {
   });
 };
 
-export const useResubmitTaskMutation = () => {
-  const queryClient = useQueryClient();
-  const { writeContractAsync } =
-    useWriteRewardManagementResubmitAfterRejection();
-  const { address: participant } = useAccount();
+// export const useResubmitTaskMutation = () => {
+//   const queryClient = useQueryClient();
+//   const { writeContractAsync } =
+//     useWriteRewardManagementResubmitAfterRejection();
+//   const { address: participant } = useAccount();
 
-  const mutation = useMutation({
-    mutationFn: async ({
-      taskId,
-      entityId,
-      completionUrl,
-    }: {
-      taskId: string;
-      entityId: string;
-      completionUrl?: string;
-    }) => {
-      const result = await writeContractAsync({
-        address: (entityId as `0x${string}`) || "0x",
-        args: [taskId as `0x${string}`, completionUrl || ""],
-      });
-      return result;
-    },
+//   const mutation = useMutation({
+//     mutationFn: async ({
+//       taskId,
+//       entityId,
+//       completionUrl,
+//     }: {
+//       taskId: string;
+//       entityId: string;
+//       completionUrl?: string;
+//     }) => {
+//       const result = await writeContractAsync({
+//         address: (entityId as `0x${string}`) || "0x",
+//         args: [taskId as `0x${string}`, completionUrl || ""],
+//       });
+//       return result;
+//     },
 
-    onSuccess: (result, variable) => {
-      if (participant) {
-        setTimeout(() => {
-          queryClient.invalidateQueries({
-            queryKey: ["participantTaskStatus", participant, variable.taskId],
-          });
-        }, 5000);
-      }
-    },
-  });
+//     onSuccess: (result, variable) => {
+//       if (participant) {
+//         setTimeout(() => {
+//           queryClient.invalidateQueries({
+//             queryKey: ["participantTaskStatus", participant, variable.taskId],
+//           });
+//         }, 5000);
+//       }
+//     },
+//   });
 
-  return {
-    resubmitTask: mutation.mutateAsync,
-    resubmitPending: mutation.isPending,
-    resubmitSuccess: mutation.isSuccess,
-  };
-};
+//   return {
+//     resubmitTask: mutation.mutateAsync,
+//     resubmitPending: mutation.isPending,
+//     resubmitSuccess: mutation.isSuccess,
+//   };
+// };
 
 export const useAddToWhitelist = () => {
   const queryClient = useQueryClient();

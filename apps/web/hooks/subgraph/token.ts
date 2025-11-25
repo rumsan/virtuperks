@@ -3,13 +3,14 @@ import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   useReadRewardTokenBalanceOf,
-  useWriteRewardManagementDisburseTokensToTask,
+  useWriteRewardManagementDisburseTokensToTaskParticipants,
   useWriteRewardManagementTransferToken,
   useWriteRewardTokenTransfer,
 } from "../wagmi/contracts";
 
 export const useDisburseTokenToTask = () => {
-  const { writeContractAsync } = useWriteRewardManagementDisburseTokensToTask();
+  const { writeContractAsync } =
+    useWriteRewardManagementDisburseTokensToTaskParticipants();
 
   const mutation = useMutation({
     mutationFn: async ({
