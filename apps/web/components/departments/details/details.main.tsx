@@ -3,12 +3,12 @@
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import {
   useCheckTotalAllocatedTokens,
-  useCheckTotalUnallocatedTokens,
   useGetEntityById,
-  useGetEntityOwners,
+  useGetEntityOwners
 } from "@/hooks/subgraph/entity";
 import { useCloseExpiredTask } from "@/hooks/subgraph/task";
 import {
+  useGetApprovedTokens,
   useGetDisbursements,
   useGetTokenTransfers,
 } from "@/hooks/subgraph/token";
@@ -41,8 +41,10 @@ export default function DepartmentDetails({
 
   const { totalAllocatedTokens, statusLoading: allocatedLoading } =
     useCheckTotalAllocatedTokens(entity?.rewardManagement);
-  const { unallocatedTokens, statusLoading: unallocatedLoading } =
-    useCheckTotalUnallocatedTokens(entity?.rewardManagement);
+  // const { unallocatedTokens, statusLoading: unallocatedLoading } =
+  //   useCheckTotalUnallocatedTokens(entity?.rewardManagement);
+  const { totalApproved, isLoading: unallocatedLoading } = useGetApprovedTokens(entity?.rewardManagement);
+  const unallocatedTokens = Number(totalApproved);
   const { getEntityOwners, statusLoading: ownersLoading } = useGetEntityOwners(
     entity?.entityId,
   );

@@ -351,6 +351,25 @@ export const getCloseTasks = `
     }
   `;
 
+  export const getApprovedTokensBySpender = `
+  query GetApprovedTokensBySpender($spender: Bytes!) {
+    approvals(
+      first: 100
+      orderBy: blockTimestamp
+      orderDirection: desc
+      where: { spender: $spender }
+    ) {
+      id
+      owner
+      spender
+      value
+      blockNumber
+      blockTimestamp
+      transactionHash
+    }
+  }
+`;
+
 
 
 export const getTaskCreatedById = `
