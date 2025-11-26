@@ -1,6 +1,7 @@
 import { Client, fetchExchange } from '@urql/core';
 import {
   AppRegistryQueries,
+  getApprovedTokensBySpender,
   getCloseTasks,
   GetCombineParticipantsByTask,
   GetEntityOwner,
@@ -82,6 +83,13 @@ export class SubgraphService {
 
   }
 
+  async getApprovedTokens(spender: string) {
+    const { data, error } = await this.subgraphQuery.query(
+      getApprovedTokensBySpender,
+      { spender }
+    );
+    return { data, error };
+  }
 
   async getCloseTasks() {
 

@@ -1,10 +1,10 @@
 "use client";
 
 import {
-  useCheckTotalUnallocatedTokens,
   useGetAllEntity,
-  useGetEntityById,
+  useGetEntityById
 } from "@/hooks/subgraph/entity";
+import { useGetApprovedTokens } from "@/hooks/subgraph/token";
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
 import {
@@ -82,9 +82,11 @@ export default function TaskBaseForm({
   const entityAddress = watch("entityAddress");
   const totalRewardAmount = watch("totalRewardAmount");
 
-  const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
-    entityAddress ?? "",
-  );
+  // const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
+  //   entityAddress ?? "",
+  // );
+  
+  const { totalApproved: unallocatedTokens } = useGetApprovedTokens(entityAddress ?? "");
 
   useEffect(() => {
     if (entity?.rewardManagement) {
@@ -96,7 +98,7 @@ export default function TaskBaseForm({
     if (!entityAddress) return;
     if (unallocatedTokens === undefined) return;
 
-    if (unallocatedTokens === BigInt(0)) {
+    if (unallocatedTokens === "0") {
       setError("entityAddress", {
         type: "manual",
         message:
@@ -206,33 +208,52 @@ export default function TaskBaseForm({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="maxParticipants"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Max Number of Participants</FormLabel>
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    {...field}
-                    value={
-                      field.value !== undefined && field.value !== null
-                        ? field.value.toString()
-                        : ""
-                    }
-                    onChange={(e) => {
-                      const value = e.target.value;
 
-                      field.onChange(
-                        value === "" ? undefined : parseInt(value, 10),
-                      );
-                    }}
-                  />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
+
+          
+<div className="grid grid-cols-2 gap-4 mb-5">
+  <FormField
+    control={form.control}
+    name="maxParticipants"
+    render={({ field }) => (
+      <FormItem>
+        <FormLabel>Max Number of Participants</FormLabel>
+        <Input
+          type="number"
+          placeholder="0"
+          {...field}
+          value={field.value !== undefined && field.value !== null ? field.value.toString() : ""}
+          onChange={(e) => {
+            const value = e.target.value;
+            field.onChange(value === "" ? undefined : parseInt(value, 10));
+          }}
+        />
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+
+  <FormField
+    control={form.control}
+    name="treasurerAddress"
+    render={({ field }) => (
+      <FormItem>
+        <FormLabel>Treasurer Address</FormLabel>
+        <Input
+          type="text"
+          placeholder="Enter treasurer wallet address"
+          {...field}
+          value={field.value ?? ""}
+          onChange={(e) => field.onChange(e.target.value)}
+        />
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+</div>
+
+            
           </div>
 
           <div className="grid grid-cols-2 gap-4 mb-5">
