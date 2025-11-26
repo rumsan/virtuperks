@@ -16,7 +16,7 @@ export const useTaskAdd = () => {
   const mutation = useMutation({
     mutationFn: async (data: any) => {
       const verifiedParticipants = data.verifiedParticipants || [];
-      const rejectedParticipants = data.rejectedParticipants || [];
+
       const result = await writeContractAsync({
         address: data.entityAddress as `0x${string}`,
         args: [
@@ -37,7 +37,7 @@ export const useTaskAdd = () => {
             approvedParticipants:
               verifiedParticipants as readonly `0x${string}`[],
           },
-          data.treasuryAddress as `0x${string}`,
+          data.treasurerAddress as `0x${string}`,
           data.whitelistedParticipants,
         ],
       });

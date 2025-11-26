@@ -316,7 +316,7 @@ export default function DepartmentDetailsCard({
         <Card className="font-normal text-base h-50 flex flex-col">
           <CardHeader className="flex-grow">
             <CardTitle className="flex p-0 mb-4 text-[#0F172A]">
-              Total Tokens Allocated
+              Total Approved Tokens Allocated
             </CardTitle>
           </CardHeader>
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
@@ -327,7 +327,7 @@ export default function DepartmentDetailsCard({
         <Card className="font-normal text-base flex flex-col justify-between p-5 space-y-4 h-50 shadow-sm border border-slate-200 relative overflow-hidden">
           <CardHeader className="p-0">
             <CardTitle className="text-[#0F172A] text-lg font-semibold">
-              Total Tokens Available
+              Total Approved Tokens Available
             </CardTitle>
           </CardHeader>
 
@@ -347,7 +347,7 @@ export default function DepartmentDetailsCard({
               </div>
               <div className="flex flex-col leading-tight">
                 <span className="font-semibold text-red-600 text-xs">
-                 Tokens Not Approved
+                  Tokens Not Approved
                 </span>
                 <span className="text-[10px] text-red-500">
                   Please contact a{" "}

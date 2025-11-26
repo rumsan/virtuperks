@@ -8,7 +8,7 @@ import {
   useCompleteTaskMutation,
   useParticipateTaskMutation,
 } from "@/hooks/subgraph/querycall";
-import { useGetTaskById, useResubmitTaskMutation } from "@/hooks/subgraph/task";
+import { useGetTaskById } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
 import hasRole from "@/utils/role";
 import { Button } from "@workspace/ui/components/button";
@@ -60,9 +60,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
   const effectiveStatus =
     localStatus !== null ? localStatus : participantStatus;
-   
-  
-  
+
   const handleApplyTask = async () => {
     if (!isConnected) {
       setAlertDialog(true);
@@ -158,40 +156,37 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
     }
   };
 
-  const { resubmitTask, resubmitPending } = useResubmitTaskMutation();
-
   const handleResubmitTask = async (data: any) => {
     try {
-      await resubmitTask(
-        {
-          taskId: taskData?.internal_id,
-          entityId: taskData?.rewardManagement?.rewardManagement || "0x",
-          completionUrl: data.completionUrl,
-        },
-        {
-          onSuccess: () => {
-            setIsOpen(false);
-            setLocalStatus("WAITING");
-            toast({
-              title: "Task Resubmitted Successfully!",
-              variant: "success",
-            });
-          },
-          onError: (error) => {
-            console.error("Error resubmitting task:", error);
-            toast({
-              title: "Failed to resubmit task. Please try again.",
-              variant: "destructive",
-            });
-          },
-        },
-      );
+      //call hook of completetask
+      // await resubmitTask(
+      //   {
+      //     taskId: taskData?.internal_id,
+      //     entityId: taskData?.rewardManagement?.rewardManagement || "0x",
+      //     completionUrl: data.completionUrl,
+      //   },
+      //   {
+      //     onSuccess: () => {
+      //       setIsOpen(false);
+      //       setLocalStatus("WAITING");
+      //       toast({
+      //         title: "Task Resubmitted Successfully!",
+      //         variant: "success",
+      //       });
+      //     },
+      //     onError: (error) => {
+      //       console.error("Error resubmitting task:", error);
+      //       toast({
+      //         title: "Failed to resubmit task. Please try again.",
+      //         variant: "destructive",
+      //       });
+      //     },
+      //   },
+      // );
     } catch (error) {
       console.error("Error in resubmit:", error);
     }
   };
-
-  
 
   useEffect(() => {
     if (localStatus && participantStatus) {
@@ -222,7 +217,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
         </Button>
       );
     }
-
 
     if (!taskData?.taskDetail?.requireApproval) {
       return (
@@ -256,8 +250,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
         </>
       );
     }
-
-
 
     switch (effectiveStatus) {
       case 0:
@@ -420,7 +412,11 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
           <TaskPortalDetails taskData={taskData} />
         </div>
         <div className="flex w-full gap-4 flex-nowrap">
-          <TaskPortalParticipant taskId={cuid} isWhitelisted={taskData.taskDetail.isWhitelisted} taskData={taskData}/>
+          <TaskPortalParticipant
+            taskId={cuid}
+            isWhitelisted={taskData.taskDetail.isWhitelisted}
+            taskData={taskData}
+          />
         </div>
       </div>
     </main>

@@ -113,7 +113,6 @@ query GetRoleRevokedById($id: ID!) {
     }
   }
 `,
-
 };
 
 // RewardToken Queries
@@ -174,7 +173,6 @@ export const TokenQueries = {
 `,
 };
 
-
 export const getTaskCreation = `
   query GetTaskCreationWithApproval {
     taskCreateds(
@@ -199,7 +197,6 @@ export const getTaskCreation = `
         totalRewardAmount
         requireApproval
         isWhitelisted
-        verifiedParticipants
       }
       rewardManagement {
         appId
@@ -230,8 +227,6 @@ export const getTaskUpdated = `
   }
 `;
 
-
-
 export const getTaskNoApproval = `
   query GetTaskCreationNoApproval {
     taskCreateds(
@@ -256,7 +251,6 @@ export const getTaskNoApproval = `
         totalRewardAmount
         requireApproval
         isWhitelisted
-        verifiedParticipants
       }
       rewardManagement {
         appId
@@ -271,9 +265,6 @@ export const getTaskNoApproval = `
     }
   }
 `;
-
-
-
 
 export const getOpenTasks = `
     query GetOpenTasks {
@@ -295,7 +286,6 @@ export const getOpenTasks = `
         totalRewardAmount
         requireApproval
         isWhitelisted
-        verifiedParticipants
         
         }
         rewardManagement{
@@ -312,8 +302,6 @@ export const getOpenTasks = `
   
     }
   `;
-
-
 
 export const getCloseTasks = `
     query GetCloseTasks {
@@ -334,7 +322,6 @@ export const getCloseTasks = `
         totalRewardAmount
         requireApproval
         isWhitelisted
-        verifiedParticipants
         
         }
         rewardManagement{
@@ -351,7 +338,7 @@ export const getCloseTasks = `
     }
   `;
 
-  export const getApprovedTokensBySpender = `
+export const getApprovedTokensBySpender = `
   query GetApprovedTokensBySpender($spender: Bytes!) {
     approvals(
       first: 100
@@ -369,8 +356,6 @@ export const getCloseTasks = `
     }
   }
 `;
-
-
 
 export const getTaskCreatedById = `
   query GetTaskCreatedById($internal_id: Bytes!) {
@@ -569,7 +554,6 @@ export const GetCombineParticipantsByTask = `
   
 `;
 
-
 // Factory Queries
 export const GetRewardManagement = `
     query GetDeployments {
@@ -618,7 +602,6 @@ export const GetRewardManagementCreatedByAddress = `
       }
   }
 `;
-
 
 //query to get the participant task statistic
 
@@ -680,8 +663,6 @@ export const getParticipantTaskStatistics = `
   }
 `;
 
-
-
 export const getParticipantTasks = `
    query GetParticipantTasks($participant: Bytes!) {
     participantTaskStatuses(where: { participant: $participant }) {
@@ -716,8 +697,7 @@ export const getParticipantTasks = `
         }
     }
 }
-  `
-
+  `;
 
 export const GetTaskOwnedByIndividual = `
 query GetParticipantTasks($createdBy: Bytes!) {
@@ -748,7 +728,7 @@ query GetParticipantTasks($createdBy: Bytes!) {
         }
     }
 }
-`
+`;
 
 export const GetTaskByName = `
   query GetTaskByName($taskName: String!) {
@@ -783,7 +763,6 @@ export const GetTaskByName = `
     }
   }
 `;
-
 
 export const GetRewardManagementTokenTransfers = `
   query GetRewardManagementTokenTransfers($rewardManagement: Bytes!) {
@@ -825,8 +804,6 @@ export const GetRewardManagementDisbursements = `
   }
 `;
 
-
-
 //for the reward Redemption
 export const GetRewards = `
     query GetRewards {
@@ -844,7 +821,6 @@ export const GetRewards = `
     }
   `;
 
-
 export const getRewardById = `
   query GetRewardById($rewardRedemption: Bytes!) {
     rewardRedemptionCreateds(where: { rewardRedemption: $rewardRedemption }) {
@@ -860,7 +836,6 @@ export const getRewardById = `
     }
   }
 `;
-
 
 export const GetRedeemedReward = `
 query GetRedemptionStatuses($rewardRedemption: Bytes!) {
@@ -917,7 +892,7 @@ query GetRedeemedRewardsByParticipant($participant: Bytes!) {
     }
   }
 }
-`
+`;
 export const GetWhiteListedParticipantByTask = `
 query GetWhiteListedParticipantByTask($taskId: Bytes!) {
   participantWhitelisteds(where: { taskId: $taskId }) {
@@ -944,7 +919,6 @@ query GetRemovedWhiteListedParticipantByTask($taskId: Bytes!) {
 }
 `;
 
-
 export const GetEntityOwner = `
 query GetEntityOwner($userAddress: Bytes!) {
   ownerAddeds(where: { entityOwner: $userAddress }) {
@@ -954,9 +928,7 @@ query GetEntityOwner($userAddress: Bytes!) {
     entityOwner
   }
 }
-`
-
-
+`;
 
 export const GetRejectedParticipant = `
 query GetRejected($taskId: Bytes!) {
@@ -981,5 +953,4 @@ query GetTaskOwner($userAddress: Bytes!) {
   }
 }
 
-`
-
+`;
