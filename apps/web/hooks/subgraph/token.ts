@@ -1,6 +1,7 @@
 "use client";
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import type { Approval } from '../../../../packages/sdk/src/types/token.type';
 import {
   useReadRewardTokenBalanceOf,
   useWriteRewardManagementDisburseTokensToTaskParticipants,
@@ -216,3 +217,38 @@ export const useCheckParticipantBalance = (participantAddress: string) => {
     isLoading,
   };
 };
+
+
+export const useGetApprovedTokens = (spender: string) => {
+  const { queryService } = useGraphService();
+
+  const query = useQuery({
+    queryKey: ["approvedTokens", spender],
+    queryFn: async () => {
+      if (!spender) return "0";
+
+      const response = await queryService?.getApprovedTokens(spender);
+
+      const approvals: Approval[] = response?.data?.approvals ?? [];
+
+      // Sum all values (convert from string to BigInt for safety)
+      const total = approvals.reduce((acc, approval) => {
+        return acc + BigInt(approval.value);
+      }, BigInt(0));
+
+      return total.toString(); // Return as string to match existing value format
+    },
+    enabled: !!queryService && !!spender,
+  });
+
+  // Return both the total value and loading state
+  return {
+    totalApproved: query.data ?? "0",
+    isLoading: query.isLoading,
+    isError: query.isError,
+    error: query.error,
+  };
+};
+
+
+

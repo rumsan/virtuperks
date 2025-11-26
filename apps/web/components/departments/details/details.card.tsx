@@ -31,7 +31,7 @@ import { useAccount } from "wagmi";
 type DepartmentDetailsCardProps = {
   entity: any;
   totalAllocatedTokens?: bigint;
-  unallocatedTokens?: bigint;
+  unallocatedTokens?: number;
   getEntityOwners?: readonly `0x${string}`[];
   router: AppRouterInstance;
   closePending?: boolean;

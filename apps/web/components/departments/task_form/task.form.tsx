@@ -1,10 +1,10 @@
 "use client";
 
 import {
-  useCheckTotalUnallocatedTokens,
   useGetAllEntity,
-  useGetEntityById,
+  useGetEntityById
 } from "@/hooks/subgraph/entity";
+import { useGetApprovedTokens } from "@/hooks/subgraph/token";
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
 import {
@@ -82,9 +82,11 @@ export default function TaskBaseForm({
   const entityAddress = watch("entityAddress");
   const totalRewardAmount = watch("totalRewardAmount");
 
-  const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
-    entityAddress ?? "",
-  );
+  // const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
+  //   entityAddress ?? "",
+  // );
+  
+  const { totalApproved: unallocatedTokens } = useGetApprovedTokens(entityAddress ?? "");
 
   useEffect(() => {
     if (entity?.rewardManagement) {
@@ -96,7 +98,7 @@ export default function TaskBaseForm({
     if (!entityAddress) return;
     if (unallocatedTokens === undefined) return;
 
-    if (unallocatedTokens === BigInt(0)) {
+    if (unallocatedTokens === "0") {
       setError("entityAddress", {
         type: "manual",
         message:

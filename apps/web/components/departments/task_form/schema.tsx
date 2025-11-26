@@ -7,10 +7,7 @@ export const taskSchema = () => {
       detailsUrl: z.string().min(1, "Task details URL is required"),
       owner: z.string().min(1, "Task owner is required"),
       entityAddress: z.string().min(1, "Entity address is required"),
-      treasurerAddress: z
-      .string()
-      .regex(/^0x[a-fA-F0-9]{40}$/, "Treasurer address must be a valid Ethereum address")
-      .optional(),
+      treasurerAddress: z.string().min(1, "Treasurer address is required"),
       // Expiry date
       expiryDate: z.coerce
         .date({
