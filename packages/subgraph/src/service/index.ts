@@ -24,9 +24,8 @@ import {
   getTaskNoApproval,
   GetTaskOwnedByIndividual,
   GetWhiteListedParticipantByTask,
-  TokenQueries
+  TokenQueries,
 } from '../queries';
-
 
 const SUBGRAPH_URL = process.env.NEXT_PUBLIC_SUBGRAPH_URL!;
 
@@ -43,9 +42,18 @@ export class SubgraphService {
   // AppRegistry Related Services
   async getAppRegistryData() {
     try {
-      const appCreated = await this.subgraphQuery.query(AppRegistryQueries.getAppCreated, {});
-      const roleManagement = await this.subgraphQuery.query(AppRegistryQueries.getRoleManagement, {});
-      return { appCreated: appCreated.data, roleManagement: roleManagement.data };
+      const appCreated = await this.subgraphQuery.query(
+        AppRegistryQueries.getAppCreated,
+        {},
+      );
+      const roleManagement = await this.subgraphQuery.query(
+        AppRegistryQueries.getRoleManagement,
+        {},
+      );
+      return {
+        appCreated: appCreated.data,
+        roleManagement: roleManagement.data,
+      };
     } catch (error) {
       console.error('Error fetching AppRegistry data:', error);
       return { error };
@@ -55,8 +63,14 @@ export class SubgraphService {
   // Token Related Services
   async getTokenData() {
     try {
-      const transfers = await this.subgraphQuery.query(TokenQueries.getTransfers, {});
-      const approvals = await this.subgraphQuery.query(TokenQueries.getApprovals, {});
+      const transfers = await this.subgraphQuery.query(
+        TokenQueries.getTransfers,
+        {},
+      );
+      const approvals = await this.subgraphQuery.query(
+        TokenQueries.getApprovals,
+        {},
+      );
       return { transfers: transfers.data, approvals: approvals.data };
     } catch (error) {
       console.error('Error fetching token data:', error);
@@ -71,50 +85,45 @@ export class SubgraphService {
   }
 
   async getTasksNoApproval() {
-    const { data, error } = await this.subgraphQuery.query(getTaskNoApproval, {});
+    const { data, error } = await this.subgraphQuery.query(
+      getTaskNoApproval,
+      {},
+    );
     return { data, error };
   }
 
-
   async getOpenTasks() {
-
-    const { data, error } = await this.subgraphQuery.query(getOpenTasks, {})
+    const { data, error } = await this.subgraphQuery.query(getOpenTasks, {});
     return { data, error };
-
   }
 
   async getApprovedTokens(spender: string) {
     const { data, error } = await this.subgraphQuery.query(
       getApprovedTokensBySpender,
-      { spender }
+      { spender },
     );
     return { data, error };
   }
 
   async getCloseTasks() {
-
-    const { data, error } = await this.subgraphQuery.query(getCloseTasks, {})
+    const { data, error } = await this.subgraphQuery.query(getCloseTasks, {});
     return { data, error };
   }
 
-
-
-
   async getTaskById(id: string) {
-    const { data, error } = await this.subgraphQuery.query(getTaskCreatedById, { internal_id: id })
-    return { data, error }
+    const { data, error } = await this.subgraphQuery.query(getTaskCreatedById, {
+      internal_id: id,
+    });
+    return { data, error };
   }
 
-
-
   async getTaskByName(taskName: string) {
-    if (!taskName) throw new Error("Task name is required");
+    if (!taskName) throw new Error('Task name is required');
 
     try {
-      const { data, error } = await this.subgraphQuery.query(
-        GetTaskByName,
-        { taskName }
-      );
+      const { data, error } = await this.subgraphQuery.query(GetTaskByName, {
+        taskName,
+      });
 
       return { data, error };
     } catch (error) {
@@ -123,15 +132,11 @@ export class SubgraphService {
     }
   }
 
-
-
-
-
   async getCombineParticipantsByTask(taskId: string) {
     try {
       const { data, error } = await this.subgraphQuery.query(
         GetCombineParticipantsByTask,
-        { taskId }
+        { taskId },
       );
       return { data, error };
     } catch (error) {
@@ -139,7 +144,6 @@ export class SubgraphService {
       return { error };
     }
   }
-
 
   // async getTaskOwnedByIndividual(){
   //   try {
@@ -149,11 +153,13 @@ export class SubgraphService {
   //   }
   // }
 
-
   // Factory Related Services
   async getDeployments() {
     try {
-      const { data, error } = await this.subgraphQuery.query(GetRewardManagement, {});
+      const { data, error } = await this.subgraphQuery.query(
+        GetRewardManagement,
+        {},
+      );
       return { data, error };
     } catch (error) {
       console.error('Error fetching deployments:', error);
@@ -165,7 +171,7 @@ export class SubgraphService {
     try {
       const { data, error } = await this.subgraphQuery.query(
         GetRewardManagementCreatedByAddress,
-        { entityId }
+        { entityId },
       );
 
       if (error) {
@@ -173,7 +179,10 @@ export class SubgraphService {
       }
       return { data, error: null };
     } catch (error) {
-      console.error('Error fetching rewardManagementCreated by address:', error);
+      console.error(
+        'Error fetching rewardManagementCreated by address:',
+        error,
+      );
       return { data: null, error };
     }
   }
@@ -182,33 +191,33 @@ export class SubgraphService {
     try {
       const { data, error } = await this.subgraphQuery.query(
         getParticipantTasks,
-        { participant: participantAddress }
-      )
-      return { data, error }
+        { participant: participantAddress },
+      );
+      return { data, error };
     } catch (error) {
-
-      console.error('Error fetching rewardManagementCreated by address:', error);
+      console.error(
+        'Error fetching rewardManagementCreated by address:',
+        error,
+      );
       return { data: null, error };
     }
   }
 
   async getTasksOwnedByIndividual(createdBy: string) {
-    if (!createdBy) throw new Error("Creator address is required");
+    if (!createdBy) throw new Error('Creator address is required');
 
     try {
       const { data, error } = await this.subgraphQuery.query(
         GetTaskOwnedByIndividual,
-        { createdBy: createdBy.toLowerCase() } // match GraphQL variable
+        { createdBy: createdBy.toLowerCase() }, // match GraphQL variable
       );
 
       return { data, error };
     } catch (error) {
-      console.error("Error fetching tasks owned by individual:", error);
+      console.error('Error fetching tasks owned by individual:', error);
       return { data: null, error };
     }
   }
-
-
 
   // service function to get participant task statistics
 
@@ -216,7 +225,7 @@ export class SubgraphService {
     try {
       const { data, error } = await this.subgraphQuery.query(
         getParticipantTaskStatistics,
-        { participant: participantAddress }
+        { participant: participantAddress },
       );
       return { data, error };
     } catch (error) {
@@ -225,19 +234,17 @@ export class SubgraphService {
     }
   }
 
-
-
   async getRewardManagementTokenTransfers(rewardManagementAddress: string) {
     try {
       const { data, error } = await this.subgraphQuery.query(
         GetRewardManagementTokenTransfers,
-        { rewardManagement: rewardManagementAddress }
+        { rewardManagement: rewardManagementAddress },
       );
       return { data, error };
     } catch (error) {
       console.error(
         `Error fetching token transfers for reward management address: ${rewardManagementAddress}`,
-        error
+        error,
       );
       return { data: null, error };
     }
@@ -247,13 +254,13 @@ export class SubgraphService {
     try {
       const { data, error } = await this.subgraphQuery.query(
         GetRewardManagementDisbursements,
-        { rewardManagement: rewardManagementAddress }
+        { rewardManagement: rewardManagementAddress },
       );
       return { data, error };
     } catch (error) {
       console.error(
         `Error fetching disbursements for reward management address: ${rewardManagementAddress}`,
-        error
+        error,
       );
       return { data: null, error };
     }
@@ -270,10 +277,11 @@ export class SubgraphService {
     }
   }
 
-
   async getRewardById(rewardRedemption: string) {
     try {
-      const { data, error } = await this.subgraphQuery.query(getRewardById, { rewardRedemption });
+      const { data, error } = await this.subgraphQuery.query(getRewardById, {
+        rewardRedemption,
+      });
       return { data, error };
     } catch (error) {
       console.error('Error fetching reward by ID:', error);
@@ -283,9 +291,11 @@ export class SubgraphService {
 
   // service to get redeemed rewards
   async getRedeemedReward(rewardRedemption: string) {
-
     try {
-      const { data, error } = await this.subgraphQuery.query(GetRedeemedReward, { rewardRedemption });
+      const { data, error } = await this.subgraphQuery.query(
+        GetRedeemedReward,
+        { rewardRedemption },
+      );
       return { data, error };
     } catch (error) {
       console.error('Error fetching rewards:', error);
@@ -298,7 +308,7 @@ export class SubgraphService {
     try {
       const { data, error } = await this.subgraphQuery.query(
         GetRedeemedRewardsByParticipant,
-        { participant: participantAddress }
+        { participant: participantAddress },
       );
       return { data, error };
     } catch (error) {
@@ -312,26 +322,31 @@ export class SubgraphService {
     try {
       const { data, error } = await this.subgraphQuery.query(
         GetWhiteListedParticipantByTask,
-        { taskId }
+        { taskId },
       );
       return { data, error };
     } catch (error) {
-      console.error('Error fetching whitelisted participants by task ID:', error);
+      console.error(
+        'Error fetching whitelisted participants by task ID:',
+        error,
+      );
       return { data: null, error };
     }
   }
-
 
   //servie to remove whitelisted participants by task Id
   async getRemovedWhitelistedParticipantsByTaskId(taskId: string) {
     try {
       const { data, error } = await this.subgraphQuery.query(
         GetRemoveWhiteListedParticipantByTask,
-        { taskId }
+        { taskId },
       );
       return { data, error };
     } catch (error) {
-      console.error('Error fetching removed whitelisted participants by task ID:', error);
+      console.error(
+        'Error fetching removed whitelisted participants by task ID:',
+        error,
+      );
       return { data: null, error };
     }
   }
@@ -341,7 +356,7 @@ export class SubgraphService {
     try {
       const { data, error } = await this.subgraphQuery.query(
         GetRejectedParticipant,
-        { taskId }
+        { taskId },
       );
 
       return { data, error };
@@ -354,16 +369,14 @@ export class SubgraphService {
   //service funtion to get entity owner by user address
   async getEntityOwnerByUserAddress(userAddress: string): Promise<boolean> {
     try {
-      const { data, error } = await this.subgraphQuery.query(
-        GetEntityOwner,
-        { userAddress }
-      );
+      const { data, error } = await this.subgraphQuery.query(GetEntityOwner, {
+        userAddress,
+      });
 
       if (error) {
         console.error('Error fetching entity owner by user address:', error);
         return false;
       }
-
 
       // Return true if ownerAddeds array exists and has at least one entry
       return !!(data?.ownerAddeds && data.ownerAddeds.length > 0);
@@ -395,10 +408,4 @@ export class SubgraphService {
   //     return false;
   //   }
   // }
-
 }
-
-
-
-
-

@@ -127,6 +127,19 @@ export function handleDisbursementToTask(event: DisbursementToTaskEvent): void {
   }
 
   entity.save();
+  //update TaskDetail
+  let mapping = TaskIdMapping.load(event.params.taskId);
+
+  if (mapping) {
+    let taskCreated = TaskCreated.load(mapping.taskCreated);
+    if (taskCreated && taskCreated.taskDetail) {
+      let taskDetail = TaskDetail.load(taskCreated.taskDetail as Bytes);
+      if (taskDetail) {
+        taskDetail.isTokenDisbursed = true;
+        taskDetail.save();
+      }
+    }
+  }
 }
 
 export function handleEtherWithdrawn(event: EtherWithdrawnEvent): void {
@@ -468,6 +481,20 @@ export function handleTaskDetailsUpdated(event: TaskDetailsUpdatedEvent): void {
   entity.transactionHash = event.transaction.hash;
 
   entity.save();
+  let contract = RewardManagement.bind(event.address);
+  let taskResult = contract.tasks(event.params.id);
+  let mapping = TaskIdMapping.load(event.params.id);
+  if (mapping) {
+    let taskCreated = TaskCreated.load(mapping.taskCreated);
+    if (taskCreated && taskCreated.taskDetail) {
+      let taskDetail = TaskDetail.load(taskCreated.taskDetail as Bytes);
+      if (taskDetail) {
+        taskDetail.detailsUrl = taskResult.getDetailsUrl();
+        taskDetail.expiryDate = taskResult.getExpiryDate();
+        taskDetail.save();
+      }
+    }
+  }
 }
 
 export function handleTokenTransferred(event: TokenTransferredEvent): void {

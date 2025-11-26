@@ -376,7 +376,6 @@ export const getTaskCreatedById = `
         totalRewardAmount
         requireApproval
         isWhitelisted
-        verifiedParticipants
         
         }
         rewardManagement{
@@ -417,7 +416,6 @@ export const GetCombineParticipantsByTask = `
         totalRewardAmount
         requireApproval
         isWhitelisted
-        verifiedParticipants
       }
       rewardManagement {
         appId
@@ -447,7 +445,7 @@ export const GetCombineParticipantsByTask = `
         totalRewardAmount
         requireApproval
         isWhitelisted
-        verifiedParticipants
+        
       }
       rewardManagement {
         appId
@@ -478,7 +476,6 @@ export const GetCombineParticipantsByTask = `
         totalRewardAmount
         requireApproval
         isWhitelisted
-        verifiedParticipants
       }
       rewardManagement {
         appId
@@ -509,7 +506,7 @@ export const GetCombineParticipantsByTask = `
         totalRewardAmount
         requireApproval
         isWhitelisted
-        verifiedParticipants
+       
       }
       rewardManagement {
         appId
@@ -540,7 +537,7 @@ export const GetCombineParticipantsByTask = `
         totalRewardAmount
         requireApproval
         isWhitelisted
-        verifiedParticipants
+
       }
       rewardManagement {
         appId

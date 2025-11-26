@@ -37,7 +37,7 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDisbursed, setIsDisbursed] = useState(false);
   const { address } = useAccount();
-
+  //use  taskData in isTaskExpired and other places
   const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
 
   const { entityRole, roleLoading } = useGetEntityRole(
@@ -61,6 +61,8 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
       taskData?.rewardManagement?.rewardManagement,
     );
   const hasVerifiedParticipants = (verifiedParticipants?.length ?? 0) > 0;
+
+  //remove this useCheckTaskStatus
   const {
     taskDetail,
     status: isTokenDisbursedFromContract,

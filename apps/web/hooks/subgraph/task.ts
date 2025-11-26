@@ -211,16 +211,19 @@ export const useCheckTaskVerifiedParticipant = (
 };
 
 export const useCheckTaskStatus = (taskId: string, entityId: string) => {
-  // const { data, isError, isLoading } = useReadRewardManagementGetTask({
-  //   address: entityId as `0x${string}`,
-  //   args: [taskId as `0x${string}`],
-  // });
-  // return {
-  //   taskDetail: data,
-  //   status: data?.isTokenDisbursed,
-  //   isError,
-  //   statusLoading: isLoading,
-  // };
+  const { queryService } = useGraphService();
+
+  return useQuery({
+    queryKey: ["taskDetailById", taskId],
+    queryFn: async () => {
+      if (!queryService) {
+        throw new Error("Subgraph query service is not initialized.");
+      }
+      const taskDetail = await queryService?.getTaskDetailByTaskId(taskId);
+      return taskDetail;
+    },
+    enabled: !!taskId && !!queryService,
+  });
 };
 
 export const useIsTaskExpired = (taskId: string, entityId: string) => {
