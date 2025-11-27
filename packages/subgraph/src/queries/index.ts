@@ -892,11 +892,13 @@ query GetRedeemedRewardsByParticipant($participant: Bytes!) {
 `;
 export const GetWhiteListedParticipantByTask = `
 query GetWhiteListedParticipantByTask($taskId: Bytes!) {
-  participantWhitelisteds(where: { taskId: $taskId }) {
+  participantWhitelisteds(where: { taskId: $taskId, isActive: true }) {
     id
     taskId
     participant
     by
+    isActive
+    removedAt
     blockNumber
     blockTimestamp
   }

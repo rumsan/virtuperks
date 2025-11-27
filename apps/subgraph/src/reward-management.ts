@@ -189,9 +189,11 @@ export function handleParticipantRemovedFromWhitelist(
 export function handleParticipantWhitelisted(
   event: ParticipantWhitelistedEvent,
 ): void {
-  let entity = new ParticipantWhitelisted(
-    event.transaction.hash.concatI32(event.logIndex.toI32()),
-  );
+  let whitelistId = event.params.taskId
+    .toHexString()
+    .concat('-')
+    .concat(event.params.participant.toHexString());
+  let entity = new ParticipantWhitelisted(Bytes.fromUTF8(whitelistId));
   entity.taskId = event.params.taskId;
   entity.participant = event.params.participant;
   entity.by = event.params.by;
@@ -199,6 +201,7 @@ export function handleParticipantWhitelisted(
   entity.blockNumber = event.block.number;
   entity.blockTimestamp = event.block.timestamp;
   entity.transactionHash = event.transaction.hash;
+  entity.isActive = true; // New field to indicate active status
 
   entity.save();
 }
