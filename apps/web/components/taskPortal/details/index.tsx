@@ -41,7 +41,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const hasParticipantRole = hasRole({ role: participantRole, address });
 
   const isWhitelisted = taskData?.taskDetail?.isWhitelisted;
-  console.log(isWhitelisted, "isWhitelisted in task portal main");
+  // console.log(isWhitelisted, "isWhitelisted in task portal main");
   const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(
     taskData?.internal_id,
   );
@@ -52,15 +52,15 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
   const { participateTask, participatePending } = useParticipateTaskMutation();
   const { completeTask, completePending } = useCompleteTaskMutation();
-  const { status: participantStatus, isLoading: statusLoading } =
+  const { status, isLoading: statusLoading } =
     useCheckParticipantStatus(
       taskData?.internal_id,
       taskData?.rewardManagement?.rewardManagement,
     );
-
+  const participantStatus = status?.status;
   const effectiveStatus =
     localStatus !== null ? localStatus : participantStatus;
-
+  // console.log("Participant Status: ", participantStatus)
   const handleApplyTask = async () => {
     if (!isConnected) {
       setAlertDialog(true);
@@ -311,20 +311,27 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             )}
           </>
         );
-      case "COMPLETED":
-      case 3:
-        return (
-          <Button className="bg-green-500 disabled:bg-green-500" disabled>
-            <span className="text-[#F8FAFC]">Completed</span>
-          </Button>
-        );
-      case "VERIFIED":
-      case 4:
-        return (
-          <Button className="bg-[#22C55E]" disabled>
-            <span className="text-[#F8FAFC]">Verified</span>
-          </Button>
-        );
+        case "COMPLETED":
+          case 3:
+            return (
+              <Button
+                className="bg-green-500 disabled:bg-green-500 cursor-not-allowed hover:cursor-not-allowed"
+                disabled
+              >
+                <span className="text-[#F8FAFC]">Completed</span>
+              </Button>
+            );
+          
+          case "VERIFIED":
+          case 4:
+            return (
+              <Button
+                className="bg-[#22C55E] cursor-not-allowed hover:cursor-not-allowed"
+                disabled
+              >
+                <span className="text-[#F8FAFC]">Verified</span>
+              </Button>
+            );          
       case "REJECTED":
       case 5:
         return (
