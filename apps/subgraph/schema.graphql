@@ -201,10 +201,12 @@ type ParticipantRemovedFromWhitelist @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type ParticipantWhitelisted @entity(immutable: true) {
+type ParticipantWhitelisted @entity(immutable: false) {
   id: Bytes!
   taskId: Bytes! # bytes32
   participant: Bytes! # address
+  isActive: Boolean
+  removedAt: BigInt
   by: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!

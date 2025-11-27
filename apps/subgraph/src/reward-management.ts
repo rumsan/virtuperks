@@ -172,6 +172,18 @@ export function handleParticipantRemovedFromWhitelist(
   entity.transactionHash = event.transaction.hash;
 
   entity.save();
+  // Update ParticipantWhitelisted entity
+  let whitelistId = event.params.taskId
+    .toHexString()
+    .concat('-')
+    .concat(event.params.participant.toHexString());
+  let whitelisted = ParticipantWhitelisted.load(Bytes.fromUTF8(whitelistId));
+  if (whitelisted) {
+    whitelisted.isActive = false; // or set a status, removedAt, etc.
+    whitelisted.removedAt = event.block.timestamp; // optional
+    whitelisted.by = event.params.by;
+    whitelisted.save();
+  }
 }
 
 export function handleParticipantWhitelisted(
