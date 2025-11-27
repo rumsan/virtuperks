@@ -2,6 +2,7 @@ import { formatDate } from "@/utils/formatDate";
 import { TaskCreated } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import {
+  Building2,
   Coins,
   ExternalLink,
   Timer,
@@ -87,6 +88,11 @@ const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
               </span>
             </span>
           </span>
+
+          <span className="flex items-center gap-3">
+                      <Building2 color="#64748B" size={22} strokeWidth={2.5} />
+                      Department: <span className="font-semibold">{taskData?.rewardManagement?.name || "N/A"}</span>
+                    </span>
 
           {/* Eligibility Description */}
           <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
