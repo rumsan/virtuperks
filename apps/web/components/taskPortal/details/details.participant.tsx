@@ -150,7 +150,10 @@ const handleAddParticipant = async () => {
     },
   });
 
-  const isWhitelistFull = whiteListedParticipants.length >= taskData?.taskDetail?.maxParticipants;
+  const isWhitelistFull =
+  Number(taskData?.taskDetail?.acceptedParticipantCount ?? 0) >=
+  Number(taskData?.taskDetail?.maxParticipants ?? 0);
+
  
 
   return (
@@ -209,8 +212,25 @@ const handleAddParticipant = async () => {
       </div>
     </>
   ) : isWhitelisted ? (
+<div>
+    <div className="flex flex-row gap-2 items-center">
+    <input
+      type="text"
+      value={newParticipant}
+      onChange={(e) => setNewParticipant(e.target.value)}
+      placeholder="Enter wallet address (0x...)"
+      className="border border-gray-300 rounded-xl px-4 py-2 w-80 shadow-sm 
+                 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+    />
 
-   
+    <Button
+      className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl"
+      onClick={handleAddParticipant}
+      disabled={addPending}
+    >
+      {addPending ? "Adding..." : "Add Participant"}
+    </Button>
+  </div>
     <div className="flex flex-col items-center text-center py-10">
       <div className="text-5xl mb-4">📝</div>
       <h3 className="text-lg font-semibold text-gray-800 mb-1">
@@ -219,7 +239,8 @@ const handleAddParticipant = async () => {
       <p className="text-gray-600 text-sm max-w-sm">
         This task has whitelist enabled, but no participants have been added.
       </p>
-    </div>
+            </div>
+            </div>
 
   ) : (
 
