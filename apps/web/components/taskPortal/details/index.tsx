@@ -156,37 +156,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
     }
   };
 
-  const handleResubmitTask = async (data: any) => {
-    try {
-      //call hook of completetask
-      // await resubmitTask(
-      //   {
-      //     taskId: taskData?.internal_id,
-      //     entityId: taskData?.rewardManagement?.rewardManagement || "0x",
-      //     completionUrl: data.completionUrl,
-      //   },
-      //   {
-      //     onSuccess: () => {
-      //       setIsOpen(false);
-      //       setLocalStatus("WAITING");
-      //       toast({
-      //         title: "Task Resubmitted Successfully!",
-      //         variant: "success",
-      //       });
-      //     },
-      //     onError: (error) => {
-      //       console.error("Error resubmitting task:", error);
-      //       toast({
-      //         title: "Failed to resubmit task. Please try again.",
-      //         variant: "destructive",
-      //       });
-      //     },
-      //   },
-      // );
-    } catch (error) {
-      console.error("Error in resubmit:", error);
-    }
-  };
+  
 
   useEffect(() => {
     if (localStatus && participantStatus) {
@@ -339,9 +309,9 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             <Button
               className="bg-[#297AD6]"
               onClick={() => setIsOpen(true)}
-              disabled={resubmitPending}
+              disabled={completePending}
             >
-              {resubmitPending ? (
+              {completePending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   Processing...
@@ -351,7 +321,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
               )}
             </Button>
 
-            {!resubmitPending && isOpen && (
+            {!completePending && isOpen && (
               <DialogButton
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
@@ -359,7 +329,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
                 subTitle="Please provide the updated completion URL"
                 buttonName="Submit"
                 submitType="Resubmit"
-                handleApplyTaskLogic={handleResubmitTask}
+                handleApplyTaskLogic={handleCompleteTask}
               />
             )}
           </>
