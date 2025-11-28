@@ -4,15 +4,13 @@ import { DisperseButton } from "@/components/common/ui/disperse-button";
 import { Cuid } from "@/components/departments/details/details.main";
 import { useGetEntityRole } from "@/hooks/subgraph/entity";
 import {
-  useCheckParticipantStatus,
-  useGetCombineStausByTask,
+  useGetCombineStausByTask
 } from "@/hooks/subgraph/querycall";
 import {
   useCheckTaskStatus,
   useCheckTaskVerifiedParticipant,
   useCloseTaskMutation,
-  useGetRejectedParticipants,
-  useGetTaskById,
+  useGetTaskById
 } from "@/hooks/subgraph/task";
 import { useDisburseTokenToTask } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
@@ -32,14 +30,20 @@ type TaskMainProps = {
 };
 
 const TaskMain = ({ cuid, router }: TaskMainProps) => {
-  const getTaskDetail = useGetTaskById(cuid.id);
+  console.log("Main CUID: ", cuid.id)
+  // const  = useGetTaskById(cuid.id);
+  const {
+    task: getTaskDetail,
+    isLoading: taskDetailLoading,
+    isError
+  } = useGetTaskById(cuid.id);
+  
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [isDisbursed, setIsDisbursed] = useState(false);
   const { address } = useAccount();
   //use  taskData in isTaskExpired and other places
-  const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
-
+  const taskData = getTaskDetail?.data?.taskCreateds?.[0];
   const { entityRole, roleLoading } = useGetEntityRole(
     taskData?.rewardManagement?.rewardManagement || "",
   );
@@ -47,14 +51,6 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     role: entityRole || "",
     address,
   });
-
-  const { status: participantStatus, isLoading: statusLoading } =
-    useCheckParticipantStatus(
-      taskData?.internal_id,
-      taskData?.rewardManagement?.rewardManagement,
-    );
-  const fetchRejectedParticipant = useGetRejectedParticipants(cuid.id);
-
   const { verifiedTaskParticipant: verifiedParticipants } =
     useCheckTaskVerifiedParticipant(
       taskData?.internal_id,
@@ -64,15 +60,13 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
 
   //remove this useCheckTaskStatus
   const {
-    taskDetail,
     status: isTokenDisbursedFromContract,
-    statusLoading: taskDetailLoading,
   } = useCheckTaskStatus(
     taskData?.internal_id ?? "",
     taskData?.rewardManagement.rewardManagement ?? "",
   );
 
-  const isTaskExpired = !taskDetail?.isOpen;
+  const isTaskExpired = !taskData?.isOpen;
   const { disburseTokenToTask, disbursePending } = useDisburseTokenToTask();
   const closeTaskMutation = useCloseTaskMutation();
 
@@ -139,7 +133,6 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     !taskReady || !hasVerifiedParticipants || !hasEntityOwnerRole;
 
   const isLoading =
-    getTaskDetail.isLoading ||
     taskDetailLoading ||
     disbursePending ||
     participantsLoading;
