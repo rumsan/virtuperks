@@ -94,6 +94,8 @@ export const useGetWhiteListedParticipantByTask = (
       return taskDetail;
     },
     enabled: !!taskId && !skip,
+    refetchInterval: 3000,     
+    refetchIntervalInBackground: false,
   });
 };
 

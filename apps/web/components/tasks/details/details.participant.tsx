@@ -87,7 +87,7 @@ const TaskParticipant = ({
 
   return (
     <>
-      <Card className="w-[80%] h-full p-4">
+      <Card className="w-[70%] h-full p-4">
         <CardTitle className="flex flex-col gap-2 w-full">
           <span>Requests</span>
           <span className="text-sm text-gray-500 font-normal">
@@ -106,7 +106,7 @@ const TaskParticipant = ({
         </div>
       </Card>
 
-      <Card className="w-[20%] ml-auto p-4">
+      <Card className="w-[30%] ml-auto p-4">
         <CardTitle className="flex flex-col gap-2 w-full">
           <span>Participants</span>
           <span className="text-sm text-gray-500 font-normal">

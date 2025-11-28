@@ -1,8 +1,13 @@
-import { useUpdateTaskDetails } from "@/hooks/subgraph/task";
+import { useGetEntityRole } from "@/hooks/subgraph/entity";
+import { useGetWhiteListedParticipantByTask } from "@/hooks/subgraph/participant";
+import { useAddToWhitelist, useRemoveFromWhitelist, useUpdateTaskDetails } from "@/hooks/subgraph/task";
 import { formatDate } from "@/utils/formatDate";
+import hasRole from "@/utils/role";
 import { Card, CardTitle } from "@workspace/ui/components/card";
-import { Building2, Pencil, Timer, Trophy, UserRoundCog, Users } from "lucide-react";
+import { toast } from "@workspace/ui/hooks/use-toast";
+import { Building2, Pencil, Timer, Trophy, UserRoundCog, Users, XCircle } from "lucide-react";
 import { useState } from "react";
+import { useAccount } from "wagmi";
 
 type TaskDetailsProps = {
   taskData: any;
@@ -12,6 +17,75 @@ const TaskDetails = ({ taskData }: TaskDetailsProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [detailsUrl, setDetailsUrl] = useState(taskData?.taskDetail?.detailsUrl || "");
   const [expiryDate, setExpiryDate] = useState(taskData?.taskDetail?.expiryDate || "");
+  const [newParticipant, setNewParticipant] = useState("");
+  const [removing, setRemoving] = useState<string | null>(null);
+  const { address } = useAccount();
+  const { addToWhitelist, addPending } = useAddToWhitelist();
+  const { removeFromWhitelist, removePending } = useRemoveFromWhitelist();
+  const { entityRole, roleLoading } = useGetEntityRole(
+      taskData?.rewardManagement?.rewardManagement || "",
+      );
+  const hasEntityOwnerRole = hasRole({
+        role: entityRole || "",
+        address,
+      });
+
+const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(taskData?.taskDetail?.id);
+const whiteListedParticipants = getWhiteListedParticipants?.data?.data?.participantWhitelisteds || [];
+
+const handleAddParticipant = async () => {
+  if (!newParticipant) return;
+
+  try {
+    await addToWhitelist({
+      entityAddress: taskData.rewardManagement.rewardManagement,
+      taskId: taskData.taskDetail.id,
+      participant: newParticipant,
+    });
+
+    toast({
+      title: "Success",
+      description: `Participant ${newParticipant} added to whitelist!`,
+      variant: "success",
+    });
+
+    setNewParticipant("");
+  } catch (err: any) {
+    toast({
+      title: "Error",
+      description: err?.message || "Failed to add participant",
+      variant: "destructive",
+    });
+  }
+};
+
+const handleRemoveFromWhitelist = async (participant: string) => {
+  try {
+    setRemoving(participant);
+
+    await removeFromWhitelist({
+      entityAddress: taskData.rewardManagement.rewardManagement,
+      taskId: taskData.taskDetail.id,
+      participant,
+    });
+
+    toast({
+      title: "Removed",
+      description: `Participant ${participant} removed`,
+      variant: "success",
+    });
+  } catch (err: any) {
+    toast({
+      title: "Error",
+      description: err?.message || "Failed to remove participant",
+      variant: "destructive",
+    });
+  } finally {
+    setRemoving(null);
+  }
+};
+
+
 
   const { updateTaskDetails, isPending } = useUpdateTaskDetails();
 
@@ -44,7 +118,7 @@ const TaskDetails = ({ taskData }: TaskDetailsProps) => {
 
   return (
     <>
-      <Card className="w-[80%] h-full p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
+      <Card className="w-[70%] h-full p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
         <CardTitle className="flex flex-col gap-4 w-full">
           {/* Title and Status */}
           <div className="flex items-center gap-3 justify-between">
@@ -110,6 +184,13 @@ const TaskDetails = ({ taskData }: TaskDetailsProps) => {
             Department: <span className="font-semibold">{taskData?.rewardManagement?.name || "N/A"}</span>
           </span>
 
+          <span className="flex items-center gap-3 mt-3">
+          <Trophy color="#64748B" size={22} strokeWidth={2.5} />
+           Tokens:
+          <span className="font-semibold">
+    {taskData?.taskDetail?.totalRewardAmount || "N/A"}
+  </span>
+          </span>
           <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
             <p className="text-sm text-gray-700">
               <span className="font-semibold text-blue-700">Eligibility: </span>
@@ -127,13 +208,76 @@ const TaskDetails = ({ taskData }: TaskDetailsProps) => {
         </div>
       </Card>
 
-      {/* Reward Card */}
-      <Card className="w-[20%] flex flex-col items-center justify-center ml-auto p-4 gap-3">
-        <div className="flex items-center justify-center rounded-full h-10 w-10 bg-blue-50">
-          <Trophy color="#297AD6" size={20} />
+      
+  <Card className="w-[30%] p-4 ml-auto flex flex-col gap-6 bg-white rounded-xl shadow-sm h-[382px]">
+  {/* Section Title */}
+  <div className="flex flex-col">
+    <span className="text-xl font-semibold text-[#1E293B]">Whitelisted Participants</span>
+    <span className="text-gray-500 text-sm">
+      Add or manage participants allowed to join this task
+    </span>
+  </div>
+
+  {/* Input Field */}
+  {taskData?.taskDetail?.isWhitelisted && hasEntityOwnerRole && (
+    <div className="flex gap-2">
+      <input
+        type="text"
+        value={newParticipant}
+        onChange={(e) => setNewParticipant(e.target.value)}
+        placeholder="Enter wallet address (0x...)"
+        className="border border-gray-300 rounded-xl px-3 py-2 w-full text-sm 
+                   focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <button
+        className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 text-sm"
+        onClick={handleAddParticipant}
+        disabled={addPending}
+      >
+        {addPending ? "Adding..." : "Add"}
+      </button>
+    </div>
+  )}
+
+  {/* Scrollable Whitelist Container */}
+  <div className="flex-1 overflow-y-auto flex flex-col gap-3 mt-2 pr-1">
+
+    {whiteListedParticipants.length > 0 ? (
+      whiteListedParticipants.map((p: any) => (
+        <div
+          key={p.participant}
+          className="flex items-center justify-between p-2 border border-gray-200 rounded-lg"
+        >
+          <span className="text-sm text-gray-700">
+            {`${p.participant.slice(0, 20)}...${p.participant.slice(-8)}`}
+          </span>
+
+          {hasEntityOwnerRole && (
+            <button
+              onClick={() => handleRemoveFromWhitelist(p.participant)}
+              disabled={removing === p.participant}
+              className="text-red-500 hover:text-red-700 flex items-center"
+            >
+              {removing === p.participant ? (
+                <span className="text-xs animate-pulse">Removing...</span>
+              ) : (
+                <XCircle size={18} strokeWidth={2.5} />
+              )}
+            </button>
+          )}
         </div>
-        <span className="text-2xl text-[#297AD6] font-bold">{taskData?.taskDetail?.totalRewardAmount} Tokens</span>
-      </Card>
+      ))
+    ) : (
+      <p className="text-sm text-gray-400 text-center py-4">
+        No whitelisted participants yet
+      </p>
+    )}
+  </div>
+
+</Card>
+
+
+
 
       {/* Modal */}
       {isEditing && (
