@@ -46,7 +46,6 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
     remarks?: string,
   ) => {
     try {
-
       setPendingTaskIds((prev) => new Set(prev).add(task.id));
       setOpenTaskId(null);
 
@@ -95,7 +94,6 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
       console.error("Error handling mutation:", error);
       toast({ title: "Action failed", variant: "destructive", duration: 2000 });
     } finally {
-
       setPendingTaskIds((prev) => {
         const newSet = new Set(prev);
         newSet.delete(task.id);
@@ -118,7 +116,10 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
       setActionType("accept");
     }
 
-    if ((action === "verify" || action === "reject") && status === "COMPLETED") {
+    if (
+      (action === "verify" || action === "reject") &&
+      status === "COMPLETED"
+    ) {
       setSelectedTask({
         id: row.original.taskId,
         participant: row.getValue("participant") as string,
@@ -186,22 +187,32 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
         const status = row.getValue("status") as string;
         if (status === "REJECTED") return null;
 
-        const completionUrl = row.getValue("completionUrl") as string | undefined;
+        const completionUrl = row.getValue("completionUrl") as
+          | string
+          | undefined;
         if (!completionUrl) return null;
 
-        const absoluteUrl =
-          completionUrl.startsWith("http://") || completionUrl.startsWith("https://")
-            ? completionUrl
-            : `https://${completionUrl}`;
+        const isValidUrl =
+          completionUrl.startsWith("http://") ||
+          completionUrl.startsWith("https://");
 
+        if (!isValidUrl) {
+          return (
+            <span className="text-sm text-gray-700 truncate max-w-[200px]">
+              {completionUrl}
+            </span>
+          );
+        }
         let displayUrl = completionUrl;
         try {
-          displayUrl = new URL(absoluteUrl).hostname;
-        } catch { }
+          displayUrl = new URL(completionUrl).hostname;
+        } catch {
+          displayUrl = completionUrl;
+        }
 
         return (
           <a
-            href={absoluteUrl}
+            href={completionUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-blue-600 hover:text-blue-700 hover:underline decoration-2"
@@ -265,7 +276,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
         const isAcceptAction = status === "PENDING";
         const isVerifyRejectAction = status === "COMPLETED";
         const isDisabled =
-          (pendingTaskIds.has(row.original.taskId)) ||
+          pendingTaskIds.has(row.original.taskId) ||
           (isAcceptAction && !hasEntityOwnerRole) ||
           (isVerifyRejectAction && !isTaskOwner);
 
@@ -339,7 +350,6 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
                 )}
               </>
             )}
-
 
             {selectedTask &&
               openTaskId === row.original.taskId &&
