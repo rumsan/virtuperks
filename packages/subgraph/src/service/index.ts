@@ -23,6 +23,7 @@ import {
   getTaskCreation,
   getTaskNoApproval,
   GetTaskOwnedByIndividual,
+  GetTaskOwner,
   GetWhiteListedParticipantByTask,
   TokenQueries,
 } from '../queries';
@@ -387,25 +388,16 @@ export class SubgraphService {
   }
 
   // service to check task owner by address
-  // async getTaskOwnerUserAddress(userAddress: string): Promise<boolean> {
-  //   try {
-  //     const { data, error } = await this.subgraphQuery.query(
-  //       GetTaskOwner,
-  //       { userAddress }
-  //     );
+  async getTaskOwnerUserAddress(userAddress: string): Promise<boolean> {
+    try {
+      const { data, error } = await this.subgraphQuery.query(GetTaskOwner, {
+        userAddress,
+      });
 
-  //     if (error) {
-  //       console.error('Error fetching task owner by user address:', error);
-  //       return false;
-  //     }
-
-  //     console.log('Task owner data:', data);
-
-  //     // Return true if taskDetails array exists and has at least one entry
-  //     return !!(data?.taskDetails && Array.isArray(data.taskDetails) && data.taskDetails.length > 0);
-  //   } catch (error) {
-  //     console.error('Error fetching task owner by user address:', error);
-  //     return false;
-  //   }
-  // }
+      return !!(data?.taskDetails && data.taskDetails.length > 0);
+    } catch (error) {
+      console.error('Error fetching task owner by user address:', error);
+      return false;
+    }
+  }
 }
