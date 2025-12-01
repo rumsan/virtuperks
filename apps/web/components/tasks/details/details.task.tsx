@@ -8,6 +8,7 @@ import { toast } from "@workspace/ui/hooks/use-toast";
 import { Building2, Pencil, Timer, Trophy, UserRoundCog, Users, XCircle } from "lucide-react";
 import { useState } from "react";
 import { useAccount } from "wagmi";
+import { updateSchema } from "./schema";
 
 type TaskDetailsProps = {
   taskData: any;
@@ -94,23 +95,71 @@ const handleRemoveFromWhitelist = async (participant: string) => {
 
   const openEditModal = () => {
     setDetailsUrl(taskData?.taskDetail?.detailsUrl || "");
-    setExpiryDate(taskData?.taskDetail?.expiryDate || "");
+  
+    const timestamp = taskData?.taskDetail?.expiryDate;
+    const formatted = timestamp
+      ? new Date(Number(timestamp) * 1000).toISOString().split("T")[0]
+      : "";
+  
+    setExpiryDate(formatted);
+  
     setIsEditing(true);
   };
+  
 
   const handleSave = async () => {
     try {
+      // Validate raw inputs (both optional)
+      const parsed = updateSchema.safeParse({
+        detailsUrl,
+        expiryDate,
+      });
+  
+      if (!parsed.success) {
+        const zError = parsed.error; 
+      
+        toast({
+          title: "Validation Error",
+          description: zError.errors[0]?.message || "Invalid input",
+          variant: "destructive",
+        });
+        return;
+      }      
+  
+      const urlChanged = detailsUrl !== (taskData?.taskDetail?.detailsUrl || "");
+      const dateChanged =
+        expiryDate !== (taskData?.taskDetail?.expiryDate?.split("T")?.[0] || "");
+  
+        if ((detailsUrl === undefined || detailsUrl === "") &&
+        (expiryDate === undefined || expiryDate === "")) {
+      throw new Error("At least one field (detailsUrl or expiryDate) must be provided");
+    }
+    
       await updateTaskDetails({
         entityAddress: taskData?.rewardManagement?.rewardManagement,
         taskId: taskData?.taskDetail?.id,
-        detailsUrl,
-        expiryDate: Number(new Date(expiryDate).getTime() / 1000),
+        ...(urlChanged ? { detailsUrl } : {}),
+        ...(dateChanged && expiryDate
+          ? { expiryDate: Number(new Date(expiryDate).getTime() / 1000) }
+          : {}),      
       });
+  
+      toast({
+        title: "Success",
+        description: "Task updated successfully!",
+        variant: "success",
+      });
+  
       setIsEditing(false);
-    } catch (err) {
-      console.error("Failed to update task details:", err);
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err?.message || "Failed to update task",
+        variant: "destructive",
+      });
     }
   };
+  
 
   const handleCancel = () => {
     setIsEditing(false);
@@ -295,11 +344,11 @@ const handleRemoveFromWhitelist = async (participant: string) => {
 
             <label className="block mb-2 font-medium">Deadline</label>
             <input
-              type="date"
-              className="border border-gray-300 rounded w-full px-2 py-1 mb-4"
-              value={expiryDate?.split("T")[0]}
-              onChange={(e) => setExpiryDate(e.target.value)}
-            />
+  type="date"
+  className="border border-gray-300 rounded w-full px-2 py-1 mb-4"
+  value={expiryDate || ""}
+  onChange={(e) => setExpiryDate(e.target.value || "")}
+/>
 
             <div className="flex justify-end gap-2 mt-4">
               <button
