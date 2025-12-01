@@ -420,8 +420,8 @@ export const useUpdateTaskDetails = () => {
     }: {
       entityAddress: `0x${string}`;
       taskId: string;
-      detailsUrl: string;       
-      expiryDate: number | bigint; 
+      detailsUrl?: string;       
+      expiryDate?: number | bigint; 
     }) => {
       if (!detailsUrl && !expiryDate) {
         throw new Error("At least one field (detailsUrl or expiryDate) must be provided");
@@ -432,9 +432,9 @@ export const useUpdateTaskDetails = () => {
         address: entityAddress,
         args: [
           taskId as `0x${string}`,
-          detailsUrl,
-          BigInt(expiryDate),
-        ],
+          detailsUrl ?? "",               
+          BigInt(expiryDate ?? 0),        
+        ],        
       });
 
       return txHash;
