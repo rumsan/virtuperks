@@ -66,6 +66,7 @@ export const useGetAllTask = () => {
       return taskDetail;
     },
     enabled: !!queryService,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -79,6 +80,7 @@ export const useGetTasksNoApproval = () => {
       return taskDetail;
     },
     enabled: !!queryService,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -385,32 +387,18 @@ export const useUpdateTaskDetails = () => {
     }: {
       entityAddress: `0x${string}`;
       taskId: string;
-      detailsUrl?: string;
-      expiryDate?: number | bigint;
+      detailsUrl: string;
+      expiryDate: number | bigint;
     }) => {
-      if (detailsUrl === undefined && expiryDate === undefined) {
+      if (!detailsUrl && !expiryDate) {
         throw new Error(
           "At least one field (detailsUrl or expiryDate) must be provided",
         );
       }
 
-      // Pull the existing task info from the cache
-      const cachedTask = queryClient.getQueryData<any>(["taskById", taskId]);
-
-      const oldUrl = cachedTask?.taskDetail?.detailsUrl ?? "";
-      const oldExpiry = cachedTask?.taskDetail?.expiryDate ?? 0;
-
-      // Preserve unchanged values
-      const finalDetailsUrl = detailsUrl !== undefined ? detailsUrl : oldUrl;
-      const finalExpiryDate = expiryDate !== undefined ? expiryDate : oldExpiry;
-
       const txHash = await writeContractAsync({
         address: entityAddress,
-        args: [
-          taskId as `0x${string}`,
-          finalDetailsUrl,
-          BigInt(finalExpiryDate),
-        ],
+        args: [taskId as `0x${string}`, detailsUrl, BigInt(expiryDate)],
       });
 
       return txHash;
@@ -418,7 +406,6 @@ export const useUpdateTaskDetails = () => {
 
     onSuccess: async (_, variables) => {
       await new Promise((r) => setTimeout(r, 4000));
-
       await queryClient.invalidateQueries({
         queryKey: ["taskById", variables.taskId],
       });
