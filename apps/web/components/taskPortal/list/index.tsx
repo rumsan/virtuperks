@@ -2,7 +2,11 @@
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
-import { useGetAllTask, useGetTaskByName, useGetTasksNoApproval } from "@/hooks/subgraph/task";
+import {
+  useGetAllTask,
+  useGetTaskByName,
+  useGetTasksNoApproval,
+} from "@/hooks/subgraph/task";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -28,8 +32,7 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [taskInput, setTaskInput] = React.useState<string>("");
   const [debouncedTaskName, setDebouncedTaskName] = React.useState<string>("");
-  const [activeTab, setActiveTab] = React.useState<string>("activities"); 
-
+  const [activeTab, setActiveTab] = React.useState<string>("activities");
 
   React.useEffect(() => {
     const handler = setTimeout(() => setDebouncedTaskName(taskInput), 500);
@@ -37,18 +40,15 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
   }, [taskInput]);
 
   const getAllTask = useGetAllTask();
-  const { data: tasksNoApproval, isLoading: tasksNoApprovalLoadoing } = useGetTasksNoApproval();
+  const { data: tasksNoApproval, isLoading: tasksNoApprovalLoadoing } =
+    useGetTasksNoApproval();
   const getTaskByName = useGetTaskByName(debouncedTaskName);
-
-
 
   const tasksToDisplay = React.useMemo(() => {
     if (activeTab === "blood") {
-
       if (tasksNoApprovalLoadoing) return [];
       return tasksNoApproval?.data?.taskCreateds || [];
     }
-
 
     if (debouncedTaskName && getTaskByName.data?.data?.taskCreateds) {
       return getTaskByName.data.data.taskCreateds;
@@ -64,24 +64,34 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
     getAllTask.data,
   ]);
 
-
   const tasksSortedByStatusAndDate = React.useMemo(() => {
     return tasksToDisplay.sort((taskA: any, taskB: any) => {
       const isTaskAOpen = taskA.taskDetail.isOpen;
       const isTaskBOpen = taskB.taskDetail.isOpen;
       if (isTaskAOpen && !isTaskBOpen) return -1;
       if (!isTaskAOpen && isTaskBOpen) return 1;
-      return Number(taskB.taskDetail.expiryDate) * 1000 - Number(taskA.taskDetail.expiryDate) * 1000;
+      return (
+        Number(taskB.taskDetail.expiryDate) * 1000 -
+        Number(taskA.taskDetail.expiryDate) * 1000
+      );
     });
   }, [tasksToDisplay]);
 
-
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    [],
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
-  const columns = useColumns() as import("@tanstack/react-table").ColumnDef<Tasks, any>[];
+  const columns = useColumns() as import("@tanstack/react-table").ColumnDef<
+    Tasks,
+    any
+  >[];
 
   const table = useReactTable<Tasks>({
     data: tasksSortedByStatusAndDate,
@@ -95,7 +105,13 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    state: { sorting, columnFilters, columnVisibility, rowSelection, pagination },
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+      pagination,
+    },
   });
 
   if (getAllTask.isLoading || (debouncedTaskName && getTaskByName.isLoading)) {
@@ -117,7 +133,9 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
         <h1 className="font-bold text-4xl flex items-center gap-2">
           Task Portal
         </h1>
-        <p className="text-gray-500 text-sm">Manage and explore all your tasks effortlessly.</p>
+        <p className="text-gray-500 text-sm">
+          Manage and explore all your tasks effortlessly.
+        </p>
       </div>
 
       {/* Search and Tabs */}
@@ -136,10 +154,11 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
         <div className="flex gap-2 mt-2 md:mt-0">
           <button
             onClick={() => setActiveTab("activities")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full border transition ${activeTab === "activities"
-              ? "bg-green-600 text-white border-green-600"
-              : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-              }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full border transition ${
+              activeTab === "activities"
+                ? "bg-green-600 text-white border-green-600"
+                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+            }`}
           >
             <Activity className="w-4 h-4" />
             Activities
@@ -147,10 +166,11 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
 
           <button
             onClick={() => setActiveTab("blood")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full border transition ${activeTab === "blood"
-              ? "bg-red-600 text-white border-red-600"
-              : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-              }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full border transition ${
+              activeTab === "blood"
+                ? "bg-red-600 text-white border-red-600"
+                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+            }`}
           >
             <Droplet className="w-4 h-4" />
             Blood Donation

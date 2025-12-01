@@ -1,5 +1,5 @@
 import { useGraphService } from "@/providers/subgraph-provider";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useReadRewardManagementGetParticipantTaskAssignment } from "../wagmi/contracts";
 
 //praticipatig task
@@ -56,7 +56,9 @@ export const useGetParticipantStatistic = (participantAddress: string) => {
   };
 };
 
-export const useGetParticipantTaskBasedOnStatus = (participantAddress: string) => {
+export const useGetParticipantTaskBasedOnStatus = (
+  participantAddress: string,
+) => {
   const { queryService } = useGraphService();
 
   const response = useQuery({
@@ -85,8 +87,13 @@ export const useGetWhiteListedParticipantByTask = (
   skip: boolean = false,
 ) => {
   const { queryService } = useGraphService();
+  const queryClient = useQueryClient();
+  const cachedTaskDetail = queryClient.getQueryData<any>([
+    "whiteListedParticipantByTask",
+    taskId,
+  ]);
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ["whiteListedParticipantByTask", taskId],
     queryFn: async () => {
       const taskDetail =
@@ -94,7 +101,10 @@ export const useGetWhiteListedParticipantByTask = (
       return taskDetail;
     },
     enabled: !!taskId && !skip,
+    initialData: cachedTaskDetail,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
+  return query;
 };
 
 export const useGetRemovedWhiteListedParticipantByTask = (
@@ -112,4 +122,4 @@ export const useGetRemovedWhiteListedParticipantByTask = (
     },
     enabled: !!taskId && !skip,
   });
-}
+};

@@ -105,6 +105,7 @@ export const useClosedTask = () => {
       return taskDetail;
     },
     enabled: !!queryService,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -154,8 +155,10 @@ export const useCloseExpiredTask = () => {
 
 export const useGetTaskById = (id: string) => {
   const { queryService } = useGraphService();
+  const queryClient = useQueryClient();
+  const cachedTaskDetail = queryClient.getQueryData<any>(["taskById", id]);
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ["taskById", id],
     queryFn: async () => {
       if (!queryService) {
@@ -165,7 +168,11 @@ export const useGetTaskById = (id: string) => {
       return taskDetail;
     },
     enabled: !!id && !!queryService,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    initialData: cachedTaskDetail,
   });
+
+  return query;
 };
 
 export const useCloseTaskMutation = () => {
@@ -210,21 +217,21 @@ export const useCheckTaskVerifiedParticipant = (
   };
 };
 
-export const useCheckTaskStatus = (taskId: string, entityId: string) => {
-  const { queryService } = useGraphService();
+// export const useCheckTaskStatus = (taskId: string, entityId: string) => {
+//   const { queryService } = useGraphService();
 
-  return useQuery({
-    queryKey: ["taskDetailById", taskId],
-    queryFn: async () => {
-      if (!queryService) {
-        throw new Error("Subgraph query service is not initialized.");
-      }
-      const taskDetail = await queryService?.getTaskDetailByTaskId(taskId);
-      return taskDetail;
-    },
-    enabled: !!taskId && !!queryService,
-  });
-};
+//   return useQuery({
+//     queryKey: ["taskDetailById", taskId],
+//     queryFn: async () => {
+//       if (!queryService) {
+//         throw new Error("Subgraph query service is not initialized.");
+//       }
+//       const taskDetail = await queryService?.getTaskDetailByTaskId(taskId);
+//       return taskDetail;
+//     },
+//     enabled: !!taskId && !!queryService,
+//   });
+// };
 
 export const useIsTaskExpired = (taskId: string, entityId: string) => {
   const {
@@ -291,47 +298,6 @@ export const useGetRejectedParticipants = (taskId: string) => {
     enabled: !!taskId && !!queryService,
   });
 };
-
-// export const useResubmitTaskMutation = () => {
-//   const queryClient = useQueryClient();
-//   const { writeContractAsync } =
-//     useWriteRewardManagementResubmitAfterRejection();
-//   const { address: participant } = useAccount();
-
-//   const mutation = useMutation({
-//     mutationFn: async ({
-//       taskId,
-//       entityId,
-//       completionUrl,
-//     }: {
-//       taskId: string;
-//       entityId: string;
-//       completionUrl?: string;
-//     }) => {
-//       const result = await writeContractAsync({
-//         address: (entityId as `0x${string}`) || "0x",
-//         args: [taskId as `0x${string}`, completionUrl || ""],
-//       });
-//       return result;
-//     },
-
-//     onSuccess: (result, variable) => {
-//       if (participant) {
-//         setTimeout(() => {
-//           queryClient.invalidateQueries({
-//             queryKey: ["participantTaskStatus", participant, variable.taskId],
-//           });
-//         }, 5000);
-//       }
-//     },
-//   });
-
-//   return {
-//     resubmitTask: mutation.mutateAsync,
-//     resubmitPending: mutation.isPending,
-//     resubmitSuccess: mutation.isSuccess,
-//   };
-// };
 
 export const useAddToWhitelist = () => {
   const queryClient = useQueryClient();
@@ -406,7 +372,6 @@ export const useRemoveFromWhitelist = () => {
   };
 };
 
-
 export const useUpdateTaskDetails = () => {
   const queryClient = useQueryClient();
   const { writeContractAsync } = useWriteRewardManagementUpdateTaskDetails();
@@ -423,16 +388,14 @@ export const useUpdateTaskDetails = () => {
       detailsUrl?: string;
       expiryDate?: number | bigint;
     }) => {
-
       if (detailsUrl === undefined && expiryDate === undefined) {
-        throw new Error("At least one field (detailsUrl or expiryDate) must be provided");
+        throw new Error(
+          "At least one field (detailsUrl or expiryDate) must be provided",
+        );
       }
 
       // Pull the existing task info from the cache
-      const cachedTask = queryClient.getQueryData<any>([
-        "taskById",
-        taskId,
-      ]);
+      const cachedTask = queryClient.getQueryData<any>(["taskById", taskId]);
 
       const oldUrl = cachedTask?.taskDetail?.detailsUrl ?? "";
       const oldExpiry = cachedTask?.taskDetail?.expiryDate ?? 0;
@@ -453,15 +416,14 @@ export const useUpdateTaskDetails = () => {
       return txHash;
     },
 
-    onSuccess: async (_, variables) => { 
+    onSuccess: async (_, variables) => {
       await new Promise((r) => setTimeout(r, 4000));
 
       await queryClient.invalidateQueries({
         queryKey: ["taskById", variables.taskId],
       });
     },
-  });  
-  
+  });
 
   return {
     updateTaskDetails: mutation.mutateAsync,
@@ -470,3 +432,31 @@ export const useUpdateTaskDetails = () => {
   };
 };
 
+export const useFindTaskOwner = (ownerAddress: string) => {
+  const { queryService } = useGraphService();
+  const queryClient = useQueryClient();
+  const cachedTaskOwner = queryClient.getQueryData<any>([
+    "entityTaskCheck",
+    ownerAddress,
+  ]);
+
+  const query = useQuery({
+    queryKey: ["entityTaskCheck", ownerAddress],
+    queryFn: async () => {
+      if (!queryService) {
+        throw new Error("Subgraph query service is not initialized.");
+      }
+
+      const result = await queryService.getTaskOwnerUserAddress(
+        ownerAddress as `0x${string}`,
+      );
+
+      return result;
+    },
+
+    enabled: !!ownerAddress && !!queryService,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    initialData: cachedTaskOwner,
+  });
+  return query;
+};
