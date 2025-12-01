@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  useGetAllEntity,
   useGetEntityById
 } from "@/hooks/subgraph/entity";
 import { useGetApprovedTokens } from "@/hooks/subgraph/token";
@@ -66,8 +65,6 @@ export default function TaskBaseForm({
   const [currentWallet, setCurrentWallet] = useState("");
   const [walletAddresses, setWalletAddresses] = useState<string[]>([]);
   const [showAddParticipants, setShowAddParticipants] = useState(false);
-  const getAllEntity = useGetAllEntity();
-  const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
   const params = useParams();
   const cuid = params?.id as string;
   const { data: entity, isLoading: entityLoading } = useGetEntityById(cuid);
@@ -109,22 +106,39 @@ export default function TaskBaseForm({
     }
   }, [entityAddress, unallocatedTokens, setError, clearErrors]);
 
-  const handleAddWallet = () => {
+  const handleAddWallet = async () => {
     if (currentWallet && isAddress(currentWallet)) {
-      setWalletAddresses((prev) => [...prev, currentWallet]);
-      form.setValue("whitelistedParticipants", [
-        ...walletAddresses,
-        currentWallet,
-      ]);
+      const updated = [...walletAddresses, currentWallet];
+  
+      setWalletAddresses(updated);
+  
+      form.setValue("whitelistedParticipants", updated, {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
+  
+      await form.trigger("whitelistedParticipants");
+  
       setCurrentWallet("");
     }
   };
+  
 
-  const removeWallet = (addressToRemove: string) => {
-    const filtered = walletAddresses.filter((addr) => addr !== addressToRemove);
-    setWalletAddresses(filtered);
-    form.setValue("whitelistedParticipants", filtered);
+  const removeWallet = async (addressToRemove: string) => {
+    const updated = walletAddresses.filter((addr) => addr !== addressToRemove);
+  
+    setWalletAddresses(updated);
+  
+    form.setValue("whitelistedParticipants", updated, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  
+    await form.trigger("whitelistedParticipants"); 
   };
+  
 
   useEffect(() => {
     if (!entityAddress || unallocatedTokens === undefined) return;

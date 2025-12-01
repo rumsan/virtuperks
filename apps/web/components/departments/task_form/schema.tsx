@@ -75,12 +75,15 @@ export const taskSchema = () => {
 
       whitelistedParticipants: z
         .array(
-          z
-            .string()
-            .regex(/^0x[a-fA-F0-9]{40}$/, "Must be a valid Ethereum address"),
+          z.string().regex(/^0x[a-fA-F0-9]{40}$/, "Must be a valid Ethereum address")
+        )
+        .refine(
+          (arr) =>
+            new Set(arr.map((a) => a.toLowerCase())).size === arr.length,
+          "Duplicate address is not allowed"
         )
         .optional()
-        .default([]),
+        .default([]),          
     })
 };
 
