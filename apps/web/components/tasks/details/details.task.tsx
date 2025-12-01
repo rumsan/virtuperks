@@ -19,6 +19,9 @@ const TaskDetails = ({ taskData }: TaskDetailsProps) => {
   const [detailsUrl, setDetailsUrl] = useState(taskData?.taskDetail?.detailsUrl || "");
   const [expiryDate, setExpiryDate] = useState(taskData?.taskDetail?.expiryDate || "");
   const [newParticipant, setNewParticipant] = useState("");
+  const [detailsUrlError, setDetailsUrlError] = useState("");
+const [expiryDateError, setExpiryDateError] = useState("");
+
   const [removing, setRemoving] = useState<string | null>(null);
   const { address } = useAccount();
   const { addToWhitelist, addPending } = useAddToWhitelist();
@@ -114,17 +117,24 @@ const handleRemoveFromWhitelist = async (participant: string) => {
         detailsUrl,
         expiryDate,
       });
-  
-      if (!parsed.success) {
-        const zError = parsed.error; 
       
-        toast({
-          title: "Validation Error",
-          description: zError.errors[0]?.message || "Invalid input",
-          variant: "destructive",
+      if (!parsed.success) {
+        // Clear old errors
+        setDetailsUrlError("");
+        setExpiryDateError("");
+      
+        parsed.error.errors.forEach((err) => {
+          if (err.path[0] === "detailsUrl") {
+            setDetailsUrlError(err.message);
+          }
+          if (err.path[0] === "expiryDate") {
+            setExpiryDateError(err.message);
+          }
         });
-        return;
-      }      
+      
+        return; // Stop submit
+      }
+      
   
       const urlChanged = detailsUrl !== (taskData?.taskDetail?.detailsUrl || "");
       const dateChanged =
@@ -335,20 +345,61 @@ const handleRemoveFromWhitelist = async (participant: string) => {
             <h2 className="text-xl font-bold mb-4">Edit Task</h2>
 
             <label className="block mb-2 font-medium">Details URL</label>
-            <input
-              type="text"
-              className="border border-gray-300 rounded w-full px-2 py-1 mb-4"
-              value={detailsUrl}
-              onChange={(e) => setDetailsUrl(e.target.value)}
-            />
+<input
+  type="text"
+  className="border border-gray-300 rounded w-full px-2 py-1"
+  value={detailsUrl}
+  onChange={(e) => {
+    const value = e.target.value;
+    setDetailsUrl(value);
 
-            <label className="block mb-2 font-medium">Deadline</label>
-            <input
-  type="date"
-  className="border border-gray-300 rounded w-full px-2 py-1 mb-4"
-  value={expiryDate || ""}
-  onChange={(e) => setExpiryDate(e.target.value || "")}
+    // Clear error if the URL is valid or empty
+    if (!value) {
+      setDetailsUrlError(""); // empty field is allowed
+      return;
+    }
+
+    // Simple validation for http/https
+    const isValidUrl = value.startsWith("http://") || value.startsWith("https://");
+    try {
+      new URL(value);
+      if (isValidUrl) setDetailsUrlError("");
+    } catch {
+      // keep the error if invalid
+    }
+  }}
 />
+{detailsUrlError && (
+  <p className="text-red-500 text-sm mt-1">{detailsUrlError}</p>
+)}
+
+
+
+<label className="block mb-2 font-medium">Deadline</label>
+<input
+  type="date"
+  className="border border-gray-300 rounded w-full px-2 py-1"
+  value={expiryDate || ""}
+  onChange={(e) => {
+    const value = e.target.value || "";
+    setExpiryDate(value);
+
+    // Clear error if the new date is valid (after today)
+    if (value) {
+      const selectedDate = new Date(value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // compare only date part
+      if (selectedDate > today) {
+        setExpiryDateError("");
+      }
+    } else {
+      setExpiryDateError(""); // clear if field is empty
+    }
+  }}
+/>
+{expiryDateError && (
+  <p className="text-red-500 text-sm mt-1">{expiryDateError}</p>
+)}
 
             <div className="flex justify-end gap-2 mt-4">
               <button

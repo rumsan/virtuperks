@@ -4,7 +4,8 @@ export const taskSchema = () => {
   return z
     .object({
       name: z.string().min(1, "Task name is required"),
-      detailsUrl: z.string().min(1, "Task details URL is required"),
+      detailsUrl: z.string()
+    .url("URL must be a valid URL starting with http:// or https://"),
       owner: z.string().min(1, "Task owner is required"),
       entityAddress: z.string().min(1, "Entity address is required"),
       treasurerAddress: z.string().min(1, "Treasurer address is required"),
