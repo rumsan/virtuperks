@@ -745,7 +745,6 @@ export const GetTaskByName = `
         totalRewardAmount
         requireApproval
         isWhitelisted
-        verifiedParticipants
       }
       rewardManagement {
         appId
