@@ -33,23 +33,39 @@ export default function DepartmentBaseForm({
   const [walletAddresses, setWalletAddresses] = useState<string[]>([]);
   const handleAddWallet = () => {
     if (currentWallet && isAddress(currentWallet)) {
-      setWalletAddresses((prev) => [...prev, currentWallet]);
-      form.setValue("entityOwners", [...walletAddresses, currentWallet]);
+      const updated = [...(form.getValues("entityOwners") || []), currentWallet];
+  
+      form.setValue("entityOwners", updated, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+  
       setCurrentWallet("");
     }
   };
-
+  
   const removeWallet = (addressToRemove: string) => {
-    const filtered = walletAddresses.filter((addr) => addr !== addressToRemove);
-    setWalletAddresses(filtered);
-    form.setValue("entityOwners", filtered);
+    const current = form.getValues("entityOwners") || [];
+    const updated = current.filter((addr) => addr !== addressToRemove);
+  
+    form.setValue("entityOwners", updated, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  
+    form.trigger("entityOwners");
   };
+  
+  
+
+
   const handleSubmit = form.handleSubmit(
     (data) => {
       saveForm(data);
     },
     (errors) => {},
   );
+  
   return (
     <>
       {" "}
@@ -120,21 +136,13 @@ export default function DepartmentBaseForm({
 
                       {/* Display added addresses */}
                       <div className="flex flex-wrap gap-2">
-                        {walletAddresses.map((address) => (
-                          <div
-                            key={address}
-                            className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full"
-                          >
-                            <span className="text-sm">{address}</span>
-                            <button
-                              type="button"
-                              onClick={() => removeWallet(address)}
-                              className="text-gray-500 hover:text-red-500"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        ))}
+                      {(field.value || []).map((address) => (
+  <div key={address} className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full">
+    <span className="text-sm">{address}</span>
+    <button type="button" onClick={() => removeWallet(address)}>×</button>
+  </div>
+))}
+
                       </div>
                     </div>
                     <FormMessage />

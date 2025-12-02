@@ -387,8 +387,8 @@ export const useUpdateTaskDetails = () => {
     }: {
       entityAddress: `0x${string}`;
       taskId: string;
-      detailsUrl: string;
-      expiryDate: number | bigint;
+      detailsUrl?: string;       
+      expiryDate?: number | bigint; 
     }) => {
       if (!detailsUrl && !expiryDate) {
         throw new Error(
@@ -398,7 +398,11 @@ export const useUpdateTaskDetails = () => {
 
       const txHash = await writeContractAsync({
         address: entityAddress,
-        args: [taskId as `0x${string}`, detailsUrl, BigInt(expiryDate)],
+        args: [
+          taskId as `0x${string}`,
+          detailsUrl ?? "",               
+          BigInt(expiryDate ?? 0),        
+        ],        
       });
 
       return txHash;
