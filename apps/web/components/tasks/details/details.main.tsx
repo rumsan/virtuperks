@@ -30,6 +30,11 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const { address } = useAccount();
   const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
 
+  // Wrap setIsOpen to track state changes
+  const handleSetIsOpen = (value: boolean) => {
+    setIsOpen(value);
+  };
+
   const { entityRole } = useGetEntityRole(
     taskData?.rewardManagement?.rewardManagement || "",
   );
@@ -84,31 +89,30 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   };
 
   const handleDialogAction = async (data: any) => {
+    setIsOpen(false);
     try {
       await disburseTokenToTask({
         taskId: taskData.internal_id,
         amount: data.amount,
         entityId: taskData.rewardManagement.rewardManagement,
       });
-      setIsOpen(false);
       setIsDisbursed(true);
       toast({
-        title: "Disperse Token Successfully!",
+        title: "Disburse Token Successfully!",
         variant: "success",
         duration: 2000,
       });
     } catch (error) {
-      console.error("Error approving task:", error);
+      console.error("❌ Disbursement failed:", error);
       toast({
-        title: "Failed To Approve Task. Please Try Again.",
+        title: "Failed To Disburse Tokens. Please Try Again.",
         variant: "destructive",
         duration: 2000,
       });
     }
   };
 
-  const isLoading =
-    getTaskDetail.isLoading || disbursePending || participantsLoading;
+  const isLoading = getTaskDetail.isLoading || participantsLoading;
 
   if (isLoading) {
     return (
@@ -151,8 +155,9 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
               isDisabled={isDisburseButtonDisabled}
               hasVerifiedParticipants={hasVerifiedParticipants}
               hasEntityOwnerRole={hasEntityOwnerRole}
-              onClick={() => setIsOpen(true)}
+              onClick={() => handleSetIsOpen(true)}
               isDisbursed={isDisbursed}
+              isLoading={disbursePending}
             />
             <div className="relative group">
               {/* Wrapper hides cursor */}
@@ -187,8 +192,8 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
 
             <DialogButton
               isOpen={isOpen}
-              setIsOpen={setIsOpen}
-              title="Are you sure you want to disperse the amount?"
+              setIsOpen={handleSetIsOpen}
+              title="Are you sure you want to disburse the amount?"
               subTitle="This action cannot be undone"
               buttonName="Disperse"
               submitType="Disperse"
