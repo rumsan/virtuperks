@@ -10,7 +10,7 @@ import {
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { useToast } from "@workspace/ui/hooks/use-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type DialogButtonProps = {
   isOpen: boolean;
@@ -21,7 +21,7 @@ type DialogButtonProps = {
   submitType?:
     | "Apply"
     | "Complete"
-    | "Resubmit" 
+    | "Resubmit"
     | "Disperse"
     | "directdisburse"
     | "CreateReward"
@@ -76,6 +76,16 @@ export const DialogButton = ({
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
+  useEffect(() => {
+    if (isOpen && submitType === "Disperse" && availableTokens !== undefined) {
+      setFormData((prev) => ({
+        ...prev,
+        amount: String(availableTokens),
+      }));
+      setError(null);
+    }
+  }, [isOpen, submitType, availableTokens]);
+
   const handleInputChange =
     (field: keyof typeof formData) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,6 +104,13 @@ export const DialogButton = ({
       !formData.amount.trim()
     ) {
       return "Amount is required";
+    }
+    if (submitType === "Disperse") {
+      const amountNum = Number(formData.amount);
+      if (isNaN(amountNum) || amountNum <= 0)
+        return "Amount must be greater than 0";
+      if (availableTokens !== undefined && amountNum !== availableTokens)
+        return `Amount must be exactly ${availableTokens}`;
     }
     if (submitType === "directdisburse") {
       if (!formData.amount.trim()) return "Amount is required";
@@ -120,10 +137,11 @@ export const DialogButton = ({
       });
       return;
     }
-  
+
     try {
-      let submitData: Parameters<NonNullable<typeof handleApplyTaskLogic>>[0] = {};
-  
+      let submitData: Parameters<NonNullable<typeof handleApplyTaskLogic>>[0] =
+        {};
+
       if (submitType === "Complete" || submitType === "Resubmit") {
         submitData = { completionUrl: formData.completionUrl.trim() };
       } else if (submitType === "Disperse") {
@@ -137,7 +155,7 @@ export const DialogButton = ({
       } else if (submitType === "Reject") {
         submitData = { remarks: formData.remarks.trim() };
       }
-  
+
       await handleApplyTaskLogic?.(submitData);
       setFormData({
         completionUrl: "",
@@ -151,13 +169,19 @@ export const DialogButton = ({
       setIsOpen(false);
     } catch (error) {
       let errorMessage = "Failed to apply for task";
-      if (submitType === "Complete") errorMessage = "Failed to submit completion URL";
-      else if (submitType === "Resubmit") errorMessage = "Failed to resubmit task";
-      else if (submitType === "Verify") errorMessage = "Failed to verify participant";
-      else if (submitType === "Disperse") errorMessage = "Failed to disperse amount";
-      else if (submitType === "directdisburse") errorMessage = "Failed to process direct disbursement";
-      else if (submitType === "Reject") errorMessage = "Failed to reject participant";
-  
+      if (submitType === "Complete")
+        errorMessage = "Failed to submit completion URL";
+      else if (submitType === "Resubmit")
+        errorMessage = "Failed to resubmit task";
+      else if (submitType === "Verify")
+        errorMessage = "Failed to verify participant";
+      else if (submitType === "Disperse")
+        errorMessage = "Failed to disburse amount";
+      else if (submitType === "directdisburse")
+        errorMessage = "Failed to process direct disbursement";
+      else if (submitType === "Reject")
+        errorMessage = "Failed to reject participant";
+
       setError(errorMessage);
       toast({
         title: "Error",
@@ -165,7 +189,7 @@ export const DialogButton = ({
         variant: "destructive",
       });
     }
-  };  
+  };
 
   const renderInputFields = () => {
     if (submitType === "Complete" || submitType === "Resubmit") {
@@ -205,18 +229,20 @@ export const DialogButton = ({
             type="number"
             value={formData.amount}
             onChange={handleInputChange("amount")}
-            placeholder="Enter amount to disperse"
+            placeholder="Enter amount to disburse"
             className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-gray-900 ${
               error ? "border-red-600" : ""
             }`}
           />
 
-          {/* Show warning if amount exceeds availableTokens */}
-          {availableTokens !== undefined && amountNum > availableTokens && (
-            <p className="text-red-500 text-sm mt-1">
-              Amount exceeds the task reward {availableTokens}
-            </p>
-          )}
+          {/* Show warning if amount doesn't match availableTokens exactly */}
+          {availableTokens !== undefined &&
+            amountNum !== availableTokens &&
+            amountNum > 0 && (
+              <p className="text-red-500 text-sm mt-1">
+                Amount must be exactly {availableTokens}
+              </p>
+            )}
         </div>
       );
     }

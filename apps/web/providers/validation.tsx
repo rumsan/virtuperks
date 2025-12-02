@@ -56,7 +56,9 @@ const Validation = ({ children }: ValidationProps) => {
       address,
     ],
   });
-
+  console.log(hasDefaultAdminRole, "hasDefaultAdminRole in validation");
+  console.log(hasTreasurerRole, "hasTreasurerRole in validation");
+  console.log(hasParticipantRole, "hasParticipantRole in validation");
   // Check for privileged roles first
   const hasBasicPrivilegedRole = hasDefaultAdminRole || hasTreasurerRole;
 
