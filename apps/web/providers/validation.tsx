@@ -3,6 +3,7 @@
 import TaskPortalNav from "@/components/layout/nav/task_portal.nav";
 import UnifiedNav from "@/components/layout/nav/unified.nav";
 import { useFindEntityOwner } from "@/hooks/subgraph/entity";
+import { useFindTaskOwner } from "@/hooks/subgraph/task";
 import { AppRegistryABI } from "@workspace/contracts/abis";
 import { ConnectKitButton } from "connectkit";
 import { AlertTriangle, Wallet } from "lucide-react";
@@ -55,6 +56,9 @@ const Validation = ({ children }: ValidationProps) => {
       address,
     ],
   });
+  console.log(hasDefaultAdminRole, "hasDefaultAdminRole in validation");
+  console.log(hasTreasurerRole, "hasTreasurerRole in validation");
+  console.log(hasParticipantRole, "hasParticipantRole in validation");
   // Check for privileged roles first
   const hasBasicPrivilegedRole = hasDefaultAdminRole || hasTreasurerRole;
 
@@ -65,12 +69,10 @@ const Validation = ({ children }: ValidationProps) => {
   const { data: hasEntityOwnerRole } = useFindEntityOwner(
     shouldCheckEntityOwner ? (address as string) : "",
   );
+
   // will implement later
-  // const { data: hasTaskOwnerRole } = useFindTaskOwner(
-  //   !hasBasicPrivilegedRole && !hasEntityOwnerRole && isConnected
-  //     ? (address ?? "0x")
-  //     : "0x",
-  // );
+  const { data: hasTaskOwnerRole } = useFindTaskOwner(address as string);
+  console.log("hasTaskOwnerRole", hasTaskOwnerRole);
 
   useEffect(() => {
     if (isConnecting) return;
@@ -85,7 +87,8 @@ const Validation = ({ children }: ValidationProps) => {
     const rolesAreLoading =
       hasDefaultAdminRole === undefined ||
       hasTreasurerRole === undefined ||
-      hasParticipantRole === undefined;
+      hasParticipantRole === undefined ||
+      hasTaskOwnerRole === undefined;
 
     // For entity owner, only wait if we're actually checking it
     const shouldCheckEntityOwner = !hasBasicPrivilegedRole && isConnected;
@@ -98,7 +101,10 @@ const Validation = ({ children }: ValidationProps) => {
 
     //check privileged role
     const hasPrivilegedRole =
-      hasDefaultAdminRole || hasTreasurerRole || hasEntityOwnerRole;
+      hasDefaultAdminRole ||
+      hasTreasurerRole ||
+      hasEntityOwnerRole ||
+      hasTaskOwnerRole;
 
     let newRole: Role;
 
@@ -121,6 +127,7 @@ const Validation = ({ children }: ValidationProps) => {
     hasDefaultAdminRole,
     hasTreasurerRole,
     hasEntityOwnerRole,
+    hasTaskOwnerRole,
     hasParticipantRole,
     hasBasicPrivilegedRole,
   ]);

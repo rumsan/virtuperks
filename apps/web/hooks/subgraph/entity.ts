@@ -8,7 +8,7 @@ import {
   useReadRewardManagementGetTotalUnallocatedTokens,
   useReadRewardManagementOwner,
   useReadRewardManagementTotalAllocatedTokens,
-  useWriteRewardManagementFactoryCreateRewardManagement
+  useWriteRewardManagementFactoryCreateRewardManagement,
 } from "../wagmi/contracts";
 
 export const useGetAllEntity = () => {
@@ -182,8 +182,13 @@ export const useGetEntityRole = (entityId: string) => {
 
 export const useFindEntityOwner = (ownerAddress: string) => {
   const { queryService } = useGraphService();
+  const queryClient = useQueryClient();
+  const cachedEntityOwner = queryClient.getQueryData<any>([
+    "entityOwnerCheck",
+    ownerAddress,
+  ]);
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ["entityOwnerCheck", ownerAddress],
     enabled:
       !!ownerAddress &&
@@ -201,33 +206,9 @@ export const useFindEntityOwner = (ownerAddress: string) => {
 
       return result;
     },
-    retry: 1,
+    initialData: cachedEntityOwner,
+
     staleTime: 5 * 60 * 1000, // 5 minutes cache
   });
-};
-
-export const useFindTaskOwner = (ownerAddress: string) => {
-  const { queryService } = useGraphService();
-
-  return useQuery({
-    queryKey: ["entityTaskCheck", ownerAddress],
-    enabled:
-      !!ownerAddress &&
-      ownerAddress !== "0x" &&
-      ownerAddress !== "" &&
-      !!queryService,
-    queryFn: async () => {
-      if (!queryService) {
-        throw new Error("Subgraph query service is not initialized.");
-      }
-
-      // const result = await queryService.getTaskOwnerUserAddress(
-      //   ownerAddress as `0x${string}`,
-      // );
-
-      // return result;
-    },
-    retry: 1,
-    staleTime: 5 * 60 * 1000, // 5 minutes cache
-  });
+  return query;
 };
