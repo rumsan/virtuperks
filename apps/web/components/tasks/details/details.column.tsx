@@ -5,6 +5,7 @@ import {
   useRejectParticipantMutation,
   useVerifyParticipantMutation,
 } from "@/hooks/subgraph/querycall";
+import { useDisburseToSingleParticipant } from "@/hooks/subgraph/token";
 import { getDialogContent } from "@/utils/dialog";
 import hasRole from "@/utils/role";
 import { ColumnDef } from "@tanstack/react-table";
@@ -20,6 +21,7 @@ interface SelectedTask {
   completionUrl?: string;
   status: "PENDING" | "COMPLETED" | "VERIFIED";
   entityId?: string;
+  totalRewardAmount?: bigint;
 }
 interface TaskCreatedWithRejectReason extends TaskCreated {
   rejectedReason?: string;
@@ -36,6 +38,8 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
   const acceptParticipantMutation = useAcceptParticipantMutation();
   const verifyParticipantMutation = useVerifyParticipantMutation();
   const rejectParticipantMutation = useRejectParticipantMutation();
+  const disburseMutation = useDisburseToSingleParticipant();
+
 
   const { toast } = useToast();
   const { address: userAddress } = useAccount();
@@ -131,6 +135,39 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
       setActionType(action);
     }
   };
+
+  const handleDisburse = async (task: SelectedTask) => {
+    try {
+      setPendingTaskIds(prev => new Set(prev).add(task.id));
+  
+      await disburseMutation.disburseToSingleParticipant({
+        taskId: task.id, 
+        participant: task.participant,
+        amount: task.totalRewardAmount!,
+        completionUrl: task.completionUrl ?? "Individual disbursement",
+        contractAddress: task.entityId ?? "0x", 
+      });      
+  
+      toast({
+        title: "Participant disbursed successfully!",
+        variant: "success",
+      });
+    } catch (err) {
+      console.error(err);
+      toast({
+        title: "Failed to disburse tokens",
+        variant: "destructive",
+      });
+    } finally {
+      setPendingTaskIds(prev => {
+        const s = new Set(prev);
+        s.delete(task.id);
+        return s;
+      });
+    }
+  };
+  
+
 
   return [
     // Participant
@@ -251,7 +288,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
       enableHiding: false,
       cell: ({ row }) => {
         const status = row.getValue("status") as string;
-
+      
         if (status === "REJECTED") {
           return (
             <span className="text-sm text-red-600">
@@ -259,12 +296,12 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
             </span>
           );
         }
-
+      
         const dialogContent = getDialogContent(status);
         const taskOwnerAddress = row.original.taskDetail.owner;
         const entityContractAddress =
           row.original.rewardManagement?.rewardManagement ?? "";
-
+      
         const { entityRole } = useGetEntityRole(entityContractAddress);
         const hasEntityOwnerRole = hasRole({
           role: entityRole ?? "",
@@ -272,41 +309,38 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
         });
         const isTaskOwner =
           userAddress?.toLowerCase() === taskOwnerAddress?.toLowerCase();
-
+      
         const isAcceptAction = status === "PENDING";
         const isVerifyRejectAction = status === "COMPLETED";
+        const isVerified = status === "VERIFIED";
+      
         const isDisabled =
           pendingTaskIds.has(row.original.taskId) ||
           (isAcceptAction && !hasEntityOwnerRole) ||
           (isVerifyRejectAction && !isTaskOwner);
-
-        if (!(status === "PENDING" || status === "COMPLETED")) {
-          return (
-            <span className="text-sm text-gray-500">No action available</span>
-          );
-        }
-
+      
         return (
           <div className="flex items-center gap-2 relative">
-            {pendingTaskIds.has(row.original.taskId) ? (
+            {/* Loader */}
+            {pendingTaskIds.has(row.original.taskId) && (
               <div className="flex items-center gap-2 ml-1 text-sm text-gray-700">
                 <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-
+      
                 <span>
                   {(() => {
                     const rowStatus = row.getValue("status") as string;
-
-                    // If this row is still PENDING, it's an Accept action
                     if (rowStatus === "PENDING") return "Accepting...";
-
-                    // If COMPLETED, determine if reject or verify
                     if (actionType === "reject") return "Rejecting...";
                     return "Verifying...";
                   })()}
                 </span>
               </div>
-            ) : (
+            )}
+      
+            {/* Action buttons */}
+            {!pendingTaskIds.has(row.original.taskId) && (
               <>
+                {/* Accept Action */}
                 {isAcceptAction && (
                   <button
                     onClick={() => handleAction(row, "accept")}
@@ -320,7 +354,8 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
                     />
                   </button>
                 )}
-
+      
+                {/* Verify / Reject */}
                 {isVerifyRejectAction && (
                   <>
                     <button
@@ -334,7 +369,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
                         size={28}
                       />
                     </button>
-
+      
                     <button
                       onClick={() => handleAction(row, "reject")}
                       disabled={isDisabled}
@@ -348,9 +383,30 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
                     </button>
                   </>
                 )}
+      
+                {/* VERIFIED → DISBURSE */}
+                {isVerified && (
+  <button
+    onClick={() =>
+      handleDisburse({
+        id: row.original.taskId,
+        participant: row.getValue("participant") as string,
+        status: "VERIFIED",
+        entityId: row.original.rewardManagement?.rewardManagement ?? "0x",
+        totalRewardAmount: BigInt(row.original.taskDetail.totalRewardAmount ?? 0),
+        completionUrl: row.getValue("completionUrl") ?? "Individual disbursement",
+      })
+    }
+    disabled={pendingTaskIds.has(row.original.taskId)}
+    title="Disburse tokens to this participant"
+  >
+    <CircleCheck color="#0D6EFD" strokeWidth={1.5} size={28} />
+  </button>
+)}
               </>
             )}
-
+      
+            {/* Dialog */}
             {selectedTask &&
               openTaskId === row.original.taskId &&
               actionType && (
@@ -385,7 +441,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
               )}
           </div>
         );
-      },
+      },      
     },
   ];
 }

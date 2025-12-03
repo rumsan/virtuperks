@@ -5,9 +5,10 @@ import type { Approval } from '../../../../packages/sdk/src/types/token.type';
 import {
   useReadRewardTokenBalanceOf,
   useWriteRewardManagementDisburseTokensToTaskParticipants,
+  useWriteRewardManagementDisburseToSingleParticipant,
   useWriteRewardManagementTransferToken,
   useWriteRewardTokenApprove,
-  useWriteRewardTokenTransfer,
+  useWriteRewardTokenTransfer
 } from "../wagmi/contracts";
 
 export const useDisburseTokenToTask = () => {
@@ -247,6 +248,57 @@ export const useGetApprovedTokens = (spender: string) => {
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,
+  };
+};
+
+
+
+export const useDisburseToSingleParticipant = () => {
+  const { writeContractAsync } = useWriteRewardManagementDisburseToSingleParticipant();
+
+  const mutation = useMutation({
+    mutationFn: async ({
+      taskId,
+      participant,
+      amount,
+      completionUrl,
+      contractAddress, // <-- add contract address
+    }: {
+      taskId: string; // hex string like '0x...'
+      participant: string; // Ethereum address
+      amount: bigint; // token amount
+      completionUrl: string; // URL string
+      contractAddress: string; // address of reward management contract
+      }) => {
+      
+        console.log("Disburse args:", {
+          address: contractAddress,
+          args: [
+            taskId as `0x${string}`,
+            participant as `0x${string}`,
+            BigInt(amount),
+            completionUrl,
+          ],
+        });
+      
+      const result = await writeContractAsync({
+        address: contractAddress as `0x${string}`, // must pass address
+        args: [
+          taskId as `0x${string}`,
+          participant as `0x${string}`,
+          BigInt(amount),
+          completionUrl,
+        ],
+      });
+      return result;
+    },
+  });
+
+  return {
+    disburseToSingleParticipant: mutation.mutateAsync,
+    disbursePending: mutation.isPending,
+    disburseSuccess: mutation.isSuccess,
+    disburseError: mutation.isError,
   };
 };
 
