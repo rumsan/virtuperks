@@ -605,7 +605,7 @@ export const GetRewardManagementCreatedByAddress = `
 export const getParticipantTaskStatistics = `
   query GetParticipantTaskStatistics($participant: Bytes!) {
     
-    applied: participantApplieds(
+    applied:  taskAssignmentApplieds (
       where: { participant: $participant}
     ) {
       id
@@ -618,7 +618,7 @@ export const getParticipantTaskStatistics = `
       }
     }
     
-    accepted:taskAccepteds (
+    accepted:taskAssignmentAccepteds (
       where: { participant: $participant }
     ) {
       id
@@ -631,7 +631,7 @@ export const getParticipantTaskStatistics = `
       }
     }
     
-    completed: taskCompleteds(
+    completed: taskAssignmentCompleteds(
       where: { participant: $participant}
     ) {
       id
@@ -644,7 +644,7 @@ export const getParticipantTaskStatistics = `
       }
     }
     
-    verified: taskVerifieds(
+    verified: taskAssignmentVerifieds(
       where: { participant: $participant }
     ) {
       id
