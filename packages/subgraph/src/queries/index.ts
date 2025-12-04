@@ -585,12 +585,17 @@ export const getParticipantTaskStatistics = `
       where: { participant: $participant}
     ) {
       id
+      internal_id
       taskDetail{
-      name
-      detailsUrl
-      expiryDate
-      totalRewardAmount
-      isOpen
+        name
+        detailsUrl
+        expiryDate
+        totalRewardAmount
+        isOpen
+        owner
+        maxParticipants
+        acceptedParticipantCount
+        isTokenDisbursed
       }
     }
     
@@ -598,12 +603,17 @@ export const getParticipantTaskStatistics = `
       where: { participant: $participant }
     ) {
       id
+      internal_id
       taskDetail{
-      name
-      detailsUrl
-      expiryDate
-      totalRewardAmount
-      isOpen
+        name
+        detailsUrl
+        expiryDate
+        totalRewardAmount
+        isOpen
+        owner
+        maxParticipants
+        acceptedParticipantCount
+        isTokenDisbursed
       }
     }
     
@@ -611,12 +621,17 @@ export const getParticipantTaskStatistics = `
       where: { participant: $participant}
     ) {
       id
+      internal_id
       taskDetail{
-      name
-      detailsUrl
-      expiryDate
-      totalRewardAmount
-      isOpen
+        name
+        detailsUrl
+        expiryDate
+        totalRewardAmount
+        isOpen
+        owner
+        maxParticipants
+        acceptedParticipantCount
+        isTokenDisbursed
       }
     }
     
@@ -624,12 +639,17 @@ export const getParticipantTaskStatistics = `
       where: { participant: $participant }
     ) {
       id
+      internal_id
       taskDetail{
-      name
-      detailsUrl
-      expiryDate
-      totalRewardAmount
-       isOpen
+        name
+        detailsUrl
+        expiryDate
+        totalRewardAmount
+        isOpen
+        owner
+        maxParticipants
+        acceptedParticipantCount
+        isTokenDisbursed
       }
     }
     
