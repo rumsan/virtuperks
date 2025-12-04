@@ -61,9 +61,8 @@ export interface TaskCreateParams {
 
 
 export interface Tasks {
-  id: string;
-  internal_id: string;
-  taskDetail: {
+  
+    id: string;
     name: string;
     isOpen: boolean;
     detailsUrl: string;
@@ -72,5 +71,5 @@ export interface Tasks {
     expiryDate: number;
     totalRewardAmount: number;
     acceptedParticipantCount: number;
-  };
+  
 }
