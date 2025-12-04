@@ -175,42 +175,30 @@ export const TokenQueries = {
 
 export const getTaskCreation = `
   query GetTaskCreationWithApproval {
-    taskCreateds(
+    taskDetails(
       first: 100,
-      orderBy: blockTimestamp,
+      orderBy: expiryDate,
       orderDirection: desc,
-      where: { taskDetail_: { requireApproval: true } }
+      where: { requireApproval: true }
     ) {
       id
-      internal_id
-      taskDetail {
-        acceptedParticipantCount
-        detailsUrl
-        id
-        expiryDate
-        isOpen
-        isTokenDisbursed
-        maxParticipants
-        name
-        owner
-        rewardToken
-        totalRewardAmount
-        requireApproval
-        isWhitelisted
-      }
-      rewardManagement {
-        appId
-        id
-        name
-        rewardManagement
-      }
-      createdBy
-      blockNumber
-      blockTimestamp
-      transactionHash
+      name
+      detailsUrl
+      owner
+      expiryDate
+      rewardToken
+      totalRewardAmount
+      isOpen
+      requireApproval
+      isWhitelisted
+      isTokenDisbursed
+      maxParticipants
+      acceptedParticipantCount
     }
   }
 `;
+
+
 
 export const getTaskUpdated = `
   query GetTaskUpdateds($taskId: BigInt!) {
@@ -227,44 +215,32 @@ export const getTaskUpdated = `
   }
 `;
 
+
 export const getTaskNoApproval = `
-  query GetTaskCreationNoApproval {
-    taskCreateds(
-      first: 100,
-      orderBy: blockTimestamp,
-      orderDirection: desc,
-      where: { taskDetail_: { requireApproval: false } }
-    ) {
-      id
-      internal_id
-      taskDetail {
-        acceptedParticipantCount
-        detailsUrl
-        id
-        expiryDate
-        isOpen
-        isTokenDisbursed
-        maxParticipants
-        name
-        owner
-        rewardToken
-        totalRewardAmount
-        requireApproval
-        isWhitelisted
-      }
-      rewardManagement {
-        appId
-        id
-        name
-        rewardManagement
-      }
-      createdBy
-      blockNumber
-      blockTimestamp
-      transactionHash
-    }
+query GetTaskCreationWithApproval {
+  taskDetails(
+    first: 100,
+    orderBy: expiryDate,
+    orderDirection: desc,
+    where: { requireApproval: false }
+  ) {
+    id
+    name
+    detailsUrl
+    owner
+    expiryDate
+    rewardToken
+    totalRewardAmount
+    isOpen
+    requireApproval
+    isWhitelisted
+    isTokenDisbursed
+    maxParticipants
+    acceptedParticipantCount
   }
+}
 `;
+
 
 export const getOpenTasks = `
     query GetOpenTasks {
@@ -729,36 +705,26 @@ query GetParticipantTasks($createdBy: Bytes!) {
 
 export const GetTaskByName = `
   query GetTaskByName($taskName: String!) {
-     taskCreateds(where: { taskDetail_: { name_contains_nocase: $taskName } }) {
+    taskDetails(
+      where: { name_contains_nocase: $taskName }
+    ) {
       id
-      internal_id
-      taskDetail {
-        id
-        name
-        detailsUrl
-        expiryDate
-        isOpen
-        isTokenDisbursed
-        maxParticipants
-        owner
-        rewardToken
-        totalRewardAmount
-        requireApproval
-        isWhitelisted
-      }
-      rewardManagement {
-        appId
-        id
-        name
-        rewardManagement
-      }
-      createdBy
-      blockNumber
-      blockTimestamp
-      transactionHash
+      name
+      detailsUrl
+      expiryDate
+      isOpen
+      isTokenDisbursed
+      maxParticipants
+      owner
+      rewardToken
+      totalRewardAmount
+      requireApproval
+      isWhitelisted
     }
   }
 `;
+
+
 
 export const GetRewardManagementTokenTransfers = `
   query GetRewardManagementTokenTransfers($rewardManagement: Bytes!) {
