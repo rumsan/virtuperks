@@ -30,9 +30,11 @@ interface TaskPortalMainProps {
 
 export default function TaskPortalMain({ router }: TaskPortalMainProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [taskInput, setTaskInput] = React.useState<string>("");
-  const [debouncedTaskName, setDebouncedTaskName] = React.useState<string>("");
-  const [activeTab, setActiveTab] = React.useState<string>("activities");
+  const [taskInput, setTaskInput] = React.useState("");
+  const [debouncedTaskName, setDebouncedTaskName] = React.useState("");
+  const [activeTab, setActiveTab] = React.useState<"activities" | "blood">(
+    "activities"
+  );
 
   React.useEffect(() => {
     const handler = setTimeout(() => setDebouncedTaskName(taskInput), 500);
@@ -40,61 +42,38 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
   }, [taskInput]);
 
   const getAllTask = useGetAllTask();
-  const { data: tasksNoApproval, isLoading: tasksNoApprovalLoadoing } =
+  const { data: tasksNoApproval, isLoading: tasksNoApprovalLoading } =
     useGetTasksNoApproval();
   const getTaskByName = useGetTaskByName(debouncedTaskName);
+  console.log("data: ", getTaskByName)
+ 
 
-  const tasksToDisplay = React.useMemo(() => {
+  const tasksToDisplay = React.useMemo<Tasks[]>(() => {
     if (activeTab === "blood") {
-      if (tasksNoApprovalLoadoing) return [];
-      return tasksNoApproval?.data?.taskCreateds || [];
+      return tasksNoApprovalLoading ? [] : tasksNoApproval?.data?.taskDetails     || [];
     }
-
-    if (debouncedTaskName && getTaskByName.data?.data?.taskCreateds) {
-      return getTaskByName.data.data.taskCreateds;
-    }
-
-    return getAllTask?.data?.data?.taskCreateds || [];
+    if (debouncedTaskName && getTaskByName.data?.data?.taskDetails) {
+      return getTaskByName.data.data.taskDetails;
+    }    
+    return getAllTask?.data?.data?.taskDetails || [];
   }, [
     activeTab,
     tasksNoApproval,
-    tasksNoApprovalLoadoing,
+    tasksNoApprovalLoading,
     debouncedTaskName,
     getTaskByName.data,
     getAllTask.data,
   ]);
 
-  const tasksSortedByStatusAndDate = React.useMemo(() => {
-    return tasksToDisplay.sort((taskA: any, taskB: any) => {
-      const isTaskAOpen = taskA.taskDetail.isOpen;
-      const isTaskBOpen = taskB.taskDetail.isOpen;
-      if (isTaskAOpen && !isTaskBOpen) return -1;
-      if (!isTaskAOpen && isTaskBOpen) return 1;
-      return (
-        Number(taskB.taskDetail.expiryDate) * 1000 -
-        Number(taskA.taskDetail.expiryDate) * 1000
-      );
-    });
-  }, [tasksToDisplay]);
+  const columns = useColumns() as import("@tanstack/react-table").ColumnDef<Tasks, any>[];
 
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [pagination, setPagination] = React.useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-
-  const columns = useColumns() as import("@tanstack/react-table").ColumnDef<
-    Tasks,
-    any
-  >[];
+  const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
 
   const table = useReactTable<Tasks>({
-    data: tasksSortedByStatusAndDate,
+    data: tasksToDisplay,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -105,13 +84,7 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-      pagination,
-    },
+    state: { sorting, columnFilters, columnVisibility, rowSelection, pagination },
   });
 
   if (getAllTask.isLoading || (debouncedTaskName && getTaskByName.isLoading)) {
@@ -129,10 +102,9 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
 
   return (
     <main className="gap-4 p-4 sm:px-6 md:gap-4 w-full flex flex-col">
+      {/* Header */}
       <div className="flex flex-col gap-2">
-        <h1 className="font-bold text-4xl flex items-center gap-2">
-          Task Portal
-        </h1>
+        <h1 className="font-bold text-4xl flex items-center gap-2">Task Portal</h1>
         <p className="text-gray-500 text-sm">
           Manage and explore all your tasks effortlessly.
         </p>
@@ -152,45 +124,42 @@ export default function TaskPortalMain({ router }: TaskPortalMainProps) {
         </div>
 
         <div className="flex gap-2 mt-2 md:mt-0">
-          <button
-            onClick={() => setActiveTab("activities")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full border transition ${
-              activeTab === "activities"
-                ? "bg-green-600 text-white border-green-600"
-                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-            }`}
-          >
-            <Activity className="w-4 h-4" />
-            Activities
-          </button>
+  {[
+    { label: "Activities", value: "activities", icon: Activity },
+    { label: "Blood Donation", value: "blood", icon: Droplet },
+  ].map((tab) => {
+    const Icon = tab.icon;
+    const isActive = activeTab === tab.value;
 
-          <button
-            onClick={() => setActiveTab("blood")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full border transition ${
-              activeTab === "blood"
-                ? "bg-red-600 text-white border-red-600"
-                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-            }`}
-          >
-            <Droplet className="w-4 h-4" />
-            Blood Donation
-          </button>
-        </div>
+    const activeStyles = {
+      activities: "bg-green-600 text-white border-green-600",
+      blood: "bg-red-600 text-white border-red-600",
+    }[tab.value];
+
+    return (
+      <button
+        key={tab.value}
+        onClick={() => setActiveTab(tab.value as any)}
+        className={`flex items-center gap-2 px-4 py-2 rounded-full border transition ${
+          isActive
+            ? activeStyles
+            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+        }`}
+      >
+        <Icon className="w-4 h-4" />
+        {tab.label}
+      </button>
+    );
+  })}
+</div>
       </div>
 
       {/* Task Cards */}
-      <TaskPortalCard
-        data={table.getRowModel().rows.map((row) => row.original)}
-        router={router}
-      />
+      <TaskPortalCard data={table.getRowModel().rows.map((row) => row.original)} router={router} />
 
       {/* Pagination */}
       <div className="mt-5 mb-5">
-        <DataTablePagination
-          table={table}
-          setPagination={setPagination}
-          pagination={pagination}
-        />
+        <DataTablePagination table={table} setPagination={setPagination} pagination={pagination} />
       </div>
     </main>
   );
