@@ -1,13 +1,12 @@
 import axios from "axios";
 
-const URL = process.env.NEXT_Participant_LOOKUP_URL;
-const ParticipantLookupApiKey = process.env.ParticipantLookupApiKey;
+const URL = process.env.NEXT_PUBLIC_PARTICIPANT_LOOKUP_URL;
+const ParticipantLookupApiKey = process.env.NEXT_PUBLIC_PARTICIPANT_LOOKUP_API_KEY;
 
-// Create reusable axios instance
 export const participantLookupClient = axios.create({
   baseURL: URL,
   headers: {
-    "Content-Type": "application/json",
-    "x-api-key": ParticipantLookupApiKey,
+    "rs-api-key": ParticipantLookupApiKey,
   },
 });
+
