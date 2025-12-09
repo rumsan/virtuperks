@@ -1171,7 +1171,6 @@ export const rewardManagementAbi = [
       { name: 'taskId', internalType: 'bytes32', type: 'bytes32' },
       { name: 'participant', internalType: 'address', type: 'address' },
       { name: 'amount', internalType: 'uint256', type: 'uint256' },
-      { name: 'completionUrl', internalType: 'string', type: 'string' },
     ],
     name: 'disburseToSingleParticipant',
     outputs: [],

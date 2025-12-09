@@ -655,8 +655,7 @@
     "inputs": [
       { "internalType": "bytes32", "name": "taskId", "type": "bytes32" },
       { "internalType": "address", "name": "participant", "type": "address" },
-      { "internalType": "uint256", "name": "amount", "type": "uint256" },
-      { "internalType": "string", "name": "completionUrl", "type": "string" }
+      { "internalType": "uint256", "name": "amount", "type": "uint256" }
     ],
     "name": "disburseToSingleParticipant",
     "outputs": [],

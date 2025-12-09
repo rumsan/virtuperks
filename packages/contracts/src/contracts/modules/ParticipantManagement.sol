@@ -102,7 +102,8 @@ abstract contract ParticipantManagement is TaskManagement, IParticipantManagemen
 
         if (tasks[taskId].requireApproval) {
             require(
-                taskAssignment.status == AssignmentStatus.ACCEPTED,
+                taskAssignment.status == AssignmentStatus.ACCEPTED ||
+                    taskAssignment.status == AssignmentStatus.REJECTED,
                 "This task requires user to be accepted to complete task"
             );
         }
