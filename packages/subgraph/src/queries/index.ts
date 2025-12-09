@@ -918,3 +918,16 @@ query GetTaskOwner($userAddress: Bytes!) {
 }
 
 `;
+
+
+
+export const GetTreasurerOrMinterWalletsUnique = `
+  query GetTreasurerOrMinterWalletsUnique($roles: [Bytes!]!) {
+    roleAdminGranteds(
+      where: { role_in: $roles }
+    ) {
+      account
+    }
+  }
+`;
+
