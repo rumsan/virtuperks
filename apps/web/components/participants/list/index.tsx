@@ -16,7 +16,7 @@ import {
 } from "@tanstack/react-table";
 import { Button } from "@workspace/ui/components/button";
 import { Card } from "@workspace/ui/components/card";
-import { Plus } from "lucide-react";
+import { UserPlus, UserX } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import React from "react";
 import { useColumns } from "./list.columns";
@@ -76,12 +76,6 @@ const ParticipantList = ({ router }: ParticipantListProps) => {
   });
   
 
-  const handleRowClick = (row: any) => {
-    if (row.original.cuid) {
-      router.push(PATHS.PARTICIPANT.DETAILS(row.original.cuid));
-    }
-  };
-
   return (
     <main className="gap-2 p-4 sm:px-8 sm:py-10 md:gap-8 w-full">
   <div className="flex space-y-4">
@@ -92,11 +86,18 @@ const ParticipantList = ({ router }: ParticipantListProps) => {
       </h3>
     </div>
 
-    <div className="flex justify-end ml-auto mt-0">
-      <Button onClick={() => router.push(PATHS.PARTICIPANT.ADD)}>
-        <Plus size={20} strokeWidth={2.5} /> <span>Add Participant</span>
-      </Button>
-    </div>
+    <div className="flex justify-end ml-auto mt-0 gap-2">
+  <Button onClick={() => router.push(`${PATHS.PARTICIPANT.ADD}?action=assign`)}>
+    <UserPlus size={25} strokeWidth={2} /> <span>Assign Role</span>
+  </Button>
+
+  <Button
+    variant="destructive"
+    onClick={() => router.push(`${PATHS.PARTICIPANT.ADD}?action=revoke`)}
+  >
+    <UserX size={25} strokeWidth={2} /> <span>Revoke Role</span>
+  </Button>
+</div>
   </div>
 
   {/* Centered wrapper */}
