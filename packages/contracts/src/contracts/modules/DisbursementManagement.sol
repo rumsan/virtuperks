@@ -40,8 +40,7 @@ abstract contract DisbursementManagement is
     function disburseToSingleParticipant(
         bytes32 taskId,
         address participant,
-        uint256 amount,
-        string memory completionUrl
+        uint256 amount
     ) public onlyOwner nonReentrant whenNotPaused {
         Task storage task = tasks[taskId];
         if (amount == 0) {
@@ -56,7 +55,6 @@ abstract contract DisbursementManagement is
             "Participant has already been disbursed."
         );
         require(task.isTokenDisbursed == false, "Tokens already disbursed");
-        taskAssignment.completionUrl = completionUrl;
 
         _disburseToParticipant(taskId, participant, amount);
     }

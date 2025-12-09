@@ -24,6 +24,7 @@ import {
   getTaskNoApproval,
   GetTaskOwnedByIndividual,
   GetTaskOwner,
+  GetTreasurerOrMinterWalletsUnique,
   GetWhiteListedParticipantByTask,
   TokenQueries,
 } from '../queries';
@@ -400,4 +401,17 @@ export class SubgraphService {
       return false;
     }
   }
+
+
+
+  async getWalletsByRole(role: string) {
+    const roles = [role];
+    const { data, error } = await this.subgraphQuery.query(
+      GetTreasurerOrMinterWalletsUnique,
+      { roles }
+    );
+  
+    return { data, error };
+  }
+  
 }
