@@ -760,7 +760,6 @@ describe('RewardManagement Contract', function () {
             taskId,
             participant1.address,
             BigInt(100),
-            'https://completion.com',
           ),
       )
         .to.emit(rewardManagement, 'DisbursementToParticipant')

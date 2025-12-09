@@ -19,8 +19,7 @@ interface IDisbursementManagement {
     function disburseToSingleParticipant(
         bytes32 taskId,
         address participant,
-        uint256 amount,
-        string memory completionUrl
+        uint256 amount
     ) external;
 
     function disburseTokensToTaskParticipants(bytes32 taskId, uint256 amount) external;
