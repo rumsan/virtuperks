@@ -1,11 +1,8 @@
 "use client";
 
-import { useParticipantLookup } from "@/hooks/client/participant.lookup";
-import {
-  useGetEntityById
-} from "@/hooks/subgraph/entity";
+import { useSelectParticipantLookUp } from "@/hooks/client/participant.lookup";
+import { useGetEntityById } from "@/hooks/subgraph/entity";
 import { useGetApprovedTokens } from "@/hooks/subgraph/token";
-import { useGetTreasurerWallets } from "@/hooks/subgraph/treasurer.role.check";
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
 import {
@@ -14,7 +11,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
 import {
@@ -43,17 +40,6 @@ interface TaskFormProps {
   form: UseFormReturn<any>;
   isPending: boolean;
 }
-type EntityType = {
-  aclAddress: string;
-  blockNumber: string;
-  blockTimeStamp: string;
-  rewardManagement: string;
-  id: string;
-  transactionHash: string;
-  __typename: string;
-  _appId: string;
-  name: string;
-};
 
 export default function TaskBaseForm({
   mode,
@@ -75,26 +61,14 @@ export default function TaskBaseForm({
     setError,
     clearErrors,
   } = form;
+  const { name, mappedTreasurers, isLoading } = useSelectParticipantLookUp();
 
   const entityAddress = watch("entityAddress");
   const totalRewardAmount = watch("totalRewardAmount");
 
-  const { data: participantsResponse = {}, isLoading } = useParticipantLookup();
-  const participants = participantsResponse.data || [];
-
-  const participantOptions = participants.map((p: any) => ({
-    label: p.name,
-    value: p.address,
-  }));
-  
-
-  const { 
-    data: treasurerWallets, 
-    isLoading: treasurerWalletsLoading
-  } = useGetTreasurerWallets(process.env.NEXT_PUBLIC_MINTER_ROLE!);
-
-  const { totalApproved: unallocatedTokens } =
-    useGetApprovedTokens(entityAddress ?? "");
+  const { totalApproved: unallocatedTokens } = useGetApprovedTokens(
+    entityAddress ?? "",
+  );
 
   useEffect(() => {
     if (entity?.rewardManagement) {
@@ -175,23 +149,6 @@ export default function TaskBaseForm({
 
   const handleSubmitForm = form.handleSubmit(saveForm);
 
-  
-  const participantMap: Record<string, string> = {};
-  participants.forEach((p: any) => {
-    participantMap[p.address.toLowerCase()] = p.name;
-  });
-
-  const treasurerOptions =
-    treasurerWallets?.map((wallet: string) => {
-      const lower = wallet.toLowerCase();
-      const name = participantMap[lower];
-
-      return {
-        wallet,
-        label: name ? name : wallet, 
-      };
-    }) ?? [];
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmitForm)}>
@@ -247,7 +204,6 @@ export default function TaskBaseForm({
 
             {/* Max participants + Treasurer */}
             <div className="grid grid-cols-2 gap-4 mb-5">
-              
               {/* Max participants */}
               <FormField
                 control={form.control}
@@ -266,7 +222,9 @@ export default function TaskBaseForm({
                       }
                       onChange={(e) => {
                         const value = e.target.value;
-                        field.onChange(value === "" ? undefined : parseInt(value, 10));
+                        field.onChange(
+                          value === "" ? undefined : parseInt(value, 10),
+                        );
                       }}
                     />
                     <FormMessage />
@@ -286,14 +244,14 @@ export default function TaskBaseForm({
                       <Select
                         value={field.value}
                         onValueChange={field.onChange}
-                        disabled={treasurerWalletsLoading}
+                        disabled={isLoading}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select Treasurer" />
                         </SelectTrigger>
 
                         <SelectContent>
-                          {treasurerOptions.map((t) => (
+                          {mappedTreasurers.map((t) => (
                             <SelectItem key={t.wallet} value={t.wallet}>
                               {t.label}
                             </SelectItem>
@@ -306,7 +264,6 @@ export default function TaskBaseForm({
                   </FormItem>
                 )}
               />
-
             </div>
           </div>
 
@@ -323,7 +280,7 @@ export default function TaskBaseForm({
                       type="number"
                       placeholder="0"
                       {...field}
-                      value={field.value === 0 ? "" : field.value ?? ""}
+                      value={field.value === 0 ? "" : (field.value ?? "")}
                       onChange={(e) => {
                         const val = e.target.value;
                         field.onChange(val === "" ? undefined : Number(val));
@@ -479,9 +436,9 @@ export default function TaskBaseForm({
                       </SelectTrigger>
 
                       <SelectContent>
-                        {participantOptions.map((p: any) => (
-                          <SelectItem key={p.value} value={p.value}>
-                            {p.label}
+                        {name.map((p: any) => (
+                          <SelectItem key={p.address} value={p.address}>
+                            {p.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -535,7 +492,8 @@ export default function TaskBaseForm({
           {watch("isWhitelisted") && !showAddParticipants && (
             <div className="mt-2 p-2 border border-blue-300 bg-blue-50 rounded-lg mb-5">
               <p className="text-sm text-gray-700 mb-2">
-                Whitelisting is enabled for this task. You can add participants or continue without adding any.
+                Whitelisting is enabled for this task. You can add participants
+                or continue without adding any.
               </p>
 
               <Button
@@ -568,9 +526,9 @@ export default function TaskBaseForm({
                         </SelectTrigger>
 
                         <SelectContent>
-                          {participantOptions.map((p: any) => (
-                            <SelectItem key={p.value} value={p.value}>
-                              {p.label}
+                          {name.map((p: any) => (
+                            <SelectItem key={p.address} value={p.address}>
+                              {p.name}
                             </SelectItem>
                           ))}
                         </SelectContent>
