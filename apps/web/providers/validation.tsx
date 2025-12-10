@@ -56,9 +56,7 @@ const Validation = ({ children }: ValidationProps) => {
       address,
     ],
   });
-  console.log(hasDefaultAdminRole, "hasDefaultAdminRole in validation");
-  console.log(hasTreasurerRole, "hasTreasurerRole in validation");
-  console.log(hasParticipantRole, "hasParticipantRole in validation");
+
   // Check for privileged roles first
   const hasBasicPrivilegedRole = hasDefaultAdminRole || hasTreasurerRole;
 
@@ -72,7 +70,6 @@ const Validation = ({ children }: ValidationProps) => {
 
   // will implement later
   const { data: hasTaskOwnerRole } = useFindTaskOwner(address as string);
-  console.log("hasTaskOwnerRole", hasTaskOwnerRole);
 
   useEffect(() => {
     if (isConnecting) return;
