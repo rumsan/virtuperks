@@ -1,6 +1,6 @@
 "use client";
 import { useGraphService } from "@/providers/subgraph-provider";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Approval } from '../../../../packages/sdk/src/types/token.type';
 import {
   useReadRewardTokenBalanceOf,
@@ -254,52 +254,49 @@ export const useGetApprovedTokens = (spender: string) => {
 
 
 export const useDisburseToSingleParticipant = () => {
-  const { writeContractAsync } = useWriteRewardManagementDisburseToSingleParticipant();
+  const queryClient = useQueryClient();
 
-  const mutation = useMutation({
+  const { writeContractAsync, isPending, isSuccess } =
+    useWriteRewardManagementDisburseToSingleParticipant();
+
+  return useMutation({
     mutationFn: async ({
       taskId,
       participant,
       amount,
-      completionUrl,
-      contractAddress, // <-- add contract address
+      contractAddress,
     }: {
-      taskId: string; // hex string like '0x...'
-      participant: string; // Ethereum address
-      amount: bigint; // token amount
-      completionUrl: string; // URL string
-      contractAddress: string; // address of reward management contract
-      }) => {
-      
-        console.log("Disburse args:", {
-          address: contractAddress,
-          args: [
-            taskId as `0x${string}`,
-            participant as `0x${string}`,
-            BigInt(amount),
-            completionUrl,
-          ],
-        });
-      
-      const result = await writeContractAsync({
-        address: contractAddress as `0x${string}`, // must pass address
+      taskId: string;
+      participant: string;
+      amount: string;
+      contractAddress: string;
+    }) => {
+      console.log("Disburse args:", {
+        address: contractAddress,
         args: [
           taskId as `0x${string}`,
           participant as `0x${string}`,
           BigInt(amount),
-          completionUrl,
         ],
       });
-      return result;
+
+      return await writeContractAsync({
+        address: contractAddress as `0x${string}`,
+        args: [
+          taskId as `0x${string}`,
+          participant as `0x${string}`,
+          BigInt(amount),
+        ],
+      });
+    },
+
+    onSuccess: async (result, variables) => {
+      await new Promise((resolve) => setTimeout(resolve, 9000));
+      await queryClient.invalidateQueries({
+        queryKey: ["AllParticipantsStatus", variables.taskId],
+      });
     },
   });
-
-  return {
-    disburseToSingleParticipant: mutation.mutateAsync,
-    disbursePending: mutation.isPending,
-    disburseSuccess: mutation.isSuccess,
-    disburseError: mutation.isError,
-  };
 };
 
 

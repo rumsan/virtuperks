@@ -11,7 +11,7 @@ import hasRole from "@/utils/role";
 import { ColumnDef } from "@tanstack/react-table";
 import { TaskCreated } from "@workspace/sdk/types/task.type";
 import { useToast } from "@workspace/ui/hooks/use-toast";
-import { Check, CircleCheck, Copy, ExternalLink, XCircle } from "lucide-react";
+import { Check, CircleCheck, Coins, Copy, ExternalLink, XCircle } from "lucide-react";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 
@@ -19,15 +19,15 @@ interface SelectedTask {
   id: string;
   participant: string;
   completionUrl?: string;
-  status: "PENDING" | "COMPLETED" | "VERIFIED";
+  status: "PENDING" | "COMPLETED" | "VERIFIED" | "INDIVIDUALDISBURSE";
   entityId?: string;
-  totalRewardAmount?: bigint;
+  totalRewardAmount?: string;
 }
 interface TaskCreatedWithRejectReason extends TaskCreated {
   rejectedReason?: string;
 }
 
-type ActionType = "accept" | "verify" | "reject";
+type ActionType = "accept" | "verify" | "reject" | "individualDisburse";
 
 export function useColumns(): ColumnDef<TaskCreated>[] {
   const [selectedTask, setSelectedTask] = useState<SelectedTask | null>(null);
@@ -49,6 +49,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
     action: ActionType,
     remarks?: string,
   ) => {
+    console.log("HandleMUta: ", task);
     try {
       setPendingTaskIds((prev) => new Set(prev).add(task.id));
       setOpenTaskId(null);
@@ -66,6 +67,7 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
       }
 
       if (action === "verify" && task.status === "COMPLETED") {
+        console.log("Verify Amount: ", task)
         await verifyParticipantMutation.mutateAsync({
           taskId: task.id,
           participant: task.participant,
@@ -89,6 +91,23 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
         toast({
           title: "Participant rejected successfully!",
           variant: "destructive",
+          duration: 2000,
+        });
+      }
+
+      if (action === "individualDisburse" && task.status === "COMPLETED") {
+        console.log("TASK: --", task);
+        console.log("➡️ Amount (raw):", task.totalRewardAmount);
+        await disburseMutation.mutateAsync({
+          taskId: task.id as `0x${string}`,
+          participant: task.participant as `0x${string}`,
+          amount: task.totalRewardAmount ?? "0",
+          contractAddress: task.entityId as `0x${string}`,
+        });
+        
+        toast({
+          title: "Token disbursed successfully!",
+          variant: "success",
           duration: 2000,
         });
       }
@@ -134,40 +153,22 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
       setOpenTaskId(row.original.taskId);
       setActionType(action);
     }
-  };
 
-  const handleDisburse = async (task: SelectedTask) => {
-    try {
-      setPendingTaskIds(prev => new Set(prev).add(task.id));
+    if (action === "individualDisburse" && status === "COMPLETED") {
+      console.log("ROwDAta: ", row.original
+      )
+      setSelectedTask({
+        id: row.original.taskId,
+        participant: row.getValue("participant"),
+        status: "COMPLETED",
+        entityId: row.original.rewardManagement?.rewardManagement ?? "0x",
+        totalRewardAmount: row.original.taskDetail?.totalRewardAmount,
+      });
   
-      await disburseMutation.disburseToSingleParticipant({
-        taskId: task.id, 
-        participant: task.participant,
-        amount: task.totalRewardAmount!,
-        completionUrl: task.completionUrl ?? "Individual disbursement",
-        contractAddress: task.entityId ?? "0x", 
-      });      
-  
-      toast({
-        title: "Participant disbursed successfully!",
-        variant: "success",
-      });
-    } catch (err) {
-      console.error(err);
-      toast({
-        title: "Failed to disburse tokens",
-        variant: "destructive",
-      });
-    } finally {
-      setPendingTaskIds(prev => {
-        const s = new Set(prev);
-        s.delete(task.id);
-        return s;
-      });
+      setOpenTaskId(row.original.taskId);
+      setActionType("individualDisburse");
     }
   };
-  
-
 
   return [
     // Participant
@@ -286,9 +287,12 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
         <div className="text-left text-gray-600 font-bold">Action / Remark</div>
       ),
       enableHiding: false,
+    
       cell: ({ row }) => {
         const status = row.getValue("status") as string;
-      
+        const taskId = row.original.taskId;
+    
+        // Early return for rejected tasks
         if (status === "REJECTED") {
           return (
             <span className="text-sm text-red-600">
@@ -296,152 +300,138 @@ export function useColumns(): ColumnDef<TaskCreated>[] {
             </span>
           );
         }
-      
-        const dialogContent = getDialogContent(status);
-        const taskOwnerAddress = row.original.taskDetail.owner;
-        const entityContractAddress =
+    
+        const taskOwner = row.original.taskDetail.owner;
+        const entityAddress =
           row.original.rewardManagement?.rewardManagement ?? "";
-      
-        const { entityRole } = useGetEntityRole(entityContractAddress);
+    
+        const { entityRole } = useGetEntityRole(entityAddress);
         const hasEntityOwnerRole = hasRole({
           role: entityRole ?? "",
           address: userAddress,
         });
         const isTaskOwner =
-          userAddress?.toLowerCase() === taskOwnerAddress?.toLowerCase();
-      
-        const isAcceptAction = status === "PENDING";
-        const isVerifyRejectAction = status === "COMPLETED";
-        const isVerified = status === "VERIFIED";
-      
+          userAddress?.toLowerCase() === taskOwner?.toLowerCase();
+    
+        const isPending = pendingTaskIds.has(taskId);
+    
         const isDisabled =
-          pendingTaskIds.has(row.original.taskId) ||
-          (isAcceptAction && !hasEntityOwnerRole) ||
-          (isVerifyRejectAction && !isTaskOwner);
-      
+          isPending ||
+          (status === "PENDING" && !hasEntityOwnerRole) ||
+          (status === "COMPLETED" && !isTaskOwner);
+    
         return (
-          <div className="flex items-center gap-2 relative">
+          <div className="flex items-center gap-3 relative">
+    
             {/* Loader */}
-            {pendingTaskIds.has(row.original.taskId) && (
+            {isPending && (
               <div className="flex items-center gap-2 ml-1 text-sm text-gray-700">
                 <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-      
-                <span>
-                  {(() => {
-                    const rowStatus = row.getValue("status") as string;
-                    if (rowStatus === "PENDING") return "Accepting...";
-                    if (actionType === "reject") return "Rejecting...";
-                    return "Verifying...";
-                  })()}
-                </span>
+                <span>Processing...</span>
               </div>
             )}
-      
-            {/* Action buttons */}
-            {!pendingTaskIds.has(row.original.taskId) && (
+    
+            {!isPending && (
               <>
-                {/* Accept Action */}
-                {isAcceptAction && (
+                {/* PENDING → ACCEPT */}
+                {status === "PENDING" && (
                   <button
-                    onClick={() => handleAction(row, "accept")}
                     disabled={isDisabled}
+                    onClick={() => handleAction(row, "accept")}
                     title="Accept participant"
                   >
                     <CircleCheck
                       color={isDisabled ? "#A1A1AA" : "#03AB65"}
-                      strokeWidth={1.5}
-                      size={28}
+                      size={26}
                     />
                   </button>
                 )}
-      
-                {/* Verify / Reject */}
-                {isVerifyRejectAction && (
+    
+                {/* COMPLETED → VERIFY / REJECT / DISBURSE NOW */}
+                {status === "COMPLETED" && (
                   <>
                     <button
-                      onClick={() => handleAction(row, "verify")}
                       disabled={isDisabled}
+                      onClick={() => handleAction(row, "verify")}
                       title="Verify Task Completion"
                     >
                       <CircleCheck
                         color={isDisabled ? "#A1A1AA" : "#03AB65"}
-                        strokeWidth={1.5}
-                        size={28}
+                        size={26}
                       />
                     </button>
-      
+    
                     <button
-                      onClick={() => handleAction(row, "reject")}
                       disabled={isDisabled}
+                      onClick={() => handleAction(row, "reject")}
                       title="Reject Task Completion"
                     >
                       <XCircle
                         color={isDisabled ? "#A1A1AA" : "#FF0000"}
-                        strokeWidth={1.5}
-                        size={28}
+                        size={26}
                       />
+                    </button>
+    
+                    {/* ⭐ NEW — Disburse at COMPLETED stage */}
+                    <button
+                      disabled={isDisabled}
+                      onClick={() => handleAction(row, "individualDisburse")}
+                      title="disburse token Directly"
+                    >
+  <Coins
+  color={isDisabled ? "#A1A1AA" : "#FFD700"} 
+  size={28}
+/>
                     </button>
                   </>
                 )}
-      
-                {/* VERIFIED → DISBURSE */}
-                {isVerified && (
-  <button
-    onClick={() =>
-      handleDisburse({
-        id: row.original.taskId,
-        participant: row.getValue("participant") as string,
-        status: "VERIFIED",
-        entityId: row.original.rewardManagement?.rewardManagement ?? "0x",
-        totalRewardAmount: BigInt(row.original.taskDetail.totalRewardAmount ?? 0),
-        completionUrl: row.getValue("completionUrl") ?? "Individual disbursement",
-      })
-    }
-    disabled={pendingTaskIds.has(row.original.taskId)}
-    title="Disburse tokens to this participant"
-  >
-    <CircleCheck color="#0D6EFD" strokeWidth={1.5} size={28} />
-  </button>
-)}
               </>
             )}
-      
-            {/* Dialog */}
-            {selectedTask &&
-              openTaskId === row.original.taskId &&
-              actionType && (
-                <DialogButton
-                  isOpen={!!openTaskId}
-                  setIsOpen={() => setOpenTaskId(null)}
-                  title={
-                    actionType === "accept"
-                      ? "Accept this participant?"
-                      : actionType === "verify"
-                        ? "Verify this participant?"
-                        : "Reject this participant?"
-                  }
-                  subTitle={
-                    actionType === "reject"
-                      ? "Please provide a reason (optional)."
-                      : dialogContent.subTitle
-                  }
-                  buttonName={
-                    pendingTaskIds.has(row.original.taskId)
-                      ? "Processing..."
-                      : actionType === "reject"
-                        ? "Reject"
-                        : dialogContent.buttonName
-                  }
-                  submitType={actionType === "reject" ? "Reject" : undefined}
-                  handleApplyTaskLogic={(data) =>
-                    handleMutation(selectedTask, actionType, data?.remarks)
-                  }
-                  isDisabled={pendingTaskIds.has(row.original.taskId)}
-                />
-              )}
+    
+          {/* Dialog */}
+{selectedTask && openTaskId === taskId && actionType && (
+  <DialogButton
+    isOpen={!!openTaskId}
+    setIsOpen={() => setOpenTaskId(null)}
+    title={
+      actionType === "accept"
+        ? "Accept participant?"
+        : actionType === "verify"
+        ? "Verify participant?"
+        : actionType === "reject"
+        ? "Reject participant?"
+        : actionType === "individualDisburse"
+        ? "Disburse tokens?"
+        : ""
+    }
+    subTitle={
+      actionType === "reject"
+        ? "Provide a reason (optional)."
+        : getDialogContent(selectedTask.status, actionType).subTitle
+    }
+    buttonName={
+      isPending
+        ? "Processing..."
+        : actionType === "reject"
+        ? "Reject"
+        : getDialogContent(selectedTask.status, actionType).buttonName
+    }
+    submitType={
+      actionType === "reject"
+        ? "Reject"
+        : actionType === "individualDisburse"
+        ? "IndividualDisburse"
+        : undefined
+    }
+    handleApplyTaskLogic={(data) =>
+      handleMutation(selectedTask, actionType, data?.remarks)
+    }
+    isDisabled={isPending}
+  />
+)}          
           </div>
         );
-      },      
+      },
     },
   ];
 }
