@@ -189,25 +189,25 @@ export default function TaskListMain({ router }: TaskListMainProps) {
   className="w-full"
 >
   <div className="w-full flex justify-center mt-10">
-    <TabsList className="h-12 bg-white border shadow-sm rounded-full px-4 py-2 flex gap-10">
-      {["applied", "accepted", "completed", "verified"].map((t) => (
-        <TabsTrigger
-          key={t}
-          value={t}
-          className="
-            px-8 py-3 min-w-[120px] rounded-full
-            data-[state=active]:bg-blue-600
-            data-[state=active]:text-white
-            text-gray-600
-            hover:bg-blue-100
-            transition-colors
-            text-lg
-          "
-        >
-          {t.charAt(0).toUpperCase() + t.slice(1)}
-        </TabsTrigger>
-      ))}
-    </TabsList>
+  <TabsList className="h-12 bg-white border shadow-sm rounded-lg px-4 py-2 flex gap-10">
+  {["applied", "accepted", "completed", "verified"].map((t) => (
+    <TabsTrigger
+      key={t}
+      value={t}
+      className="
+        px-8 py-3 min-w-[120px] rounded-lg
+        data-[state=active]:bg-blue-600
+        data-[state=active]:text-white
+        text-gray-600
+        hover:bg-blue-100
+        transition-colors
+        text-lg
+      "
+    >
+      {t.charAt(0).toUpperCase() + t.slice(1)}
+    </TabsTrigger>
+  ))}
+</TabsList>
   </div>
 
   <div
