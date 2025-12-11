@@ -83,6 +83,11 @@ export const useSelectParticipantLookUp = (entityId?: string) => {
     isLoading: treasurerWalletsLoading || participantLoading,
     hasParticipantError: isError,
     lookupByCuid: (address: string) =>
-      data ? data?.data?.find((item: any) => item.address === address) : null,
+      data
+        ? data?.data?.find(
+            (item: any) =>
+              item.address?.toLowerCase() === address?.toLowerCase()
+          )
+        : null,    
   };
 };

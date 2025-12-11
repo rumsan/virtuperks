@@ -1,3 +1,4 @@
+import { useSelectParticipantLookUp } from "@/hooks/client/participant.lookup";
 import { formatDate } from "@/utils/formatDate";
 import { TaskCreated } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
@@ -20,7 +21,8 @@ const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
     e.stopPropagation();
     window.open(url, "_blank", "noopener,noreferrer");
   };
-
+  const { lookupByCuid } = useSelectParticipantLookUp();
+  const ownerData = lookupByCuid(taskData?.taskDetail?.owner);
   return (
     <>
       <Card className="w-[80%] h-full p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
@@ -66,8 +68,8 @@ const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
             <span>
               Task Owner:{" "}
               <span className="font-semibold">
-                {taskData?.taskDetail?.owner}
-              </span>
+  {ownerData?.name || taskData?.taskDetail?.owner}
+</span>
             </span>
           </span>
           <span className="flex items-center gap-3">
