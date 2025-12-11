@@ -1,10 +1,10 @@
 "use client";
 
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
+import { useSelectParticipantLookUp } from "@/hooks/client/participant.lookup";
 import {
   useCheckTotalAllocatedTokens,
-  useGetEntityById,
-  useGetEntityOwners,
+  useGetEntityById
 } from "@/hooks/subgraph/entity";
 import { useCloseExpiredTask } from "@/hooks/subgraph/task";
 import {
@@ -47,12 +47,9 @@ export default function DepartmentDetails({
     entity?.rewardManagement,
   );
   const unallocatedTokens = Number(totalApproved);
-  // remove useGetEntityOwners and use the one below
-  const { getEntityOwners, statusLoading: ownersLoading } = useGetEntityOwners(
-    entity?.entityId,
-  );
+  
   // use the mappedEntityOwners from the hook
-  // const { mappedEntityOwners } = useSelectParticipantLookUp(entity?.entityId);
+  const { mappedEntityOwners: getEntityOwners, isLoading: ownersLoading } = useSelectParticipantLookUp(entity?.entityId);
 
   const { data: disbursementData } = useGetDisbursements(
     entity?.rewardManagement,

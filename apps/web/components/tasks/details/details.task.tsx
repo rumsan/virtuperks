@@ -1,3 +1,4 @@
+import { useSelectParticipantLookUp } from "@/hooks/client/participant.lookup";
 import { useGetEntityRole } from "@/hooks/subgraph/entity";
 import { useGetWhiteListedParticipantByTask } from "@/hooks/subgraph/participant";
 import { useAddToWhitelist, useRemoveFromWhitelist, useUpdateTaskDetails } from "@/hooks/subgraph/task";
@@ -88,7 +89,8 @@ const handleRemoveFromWhitelist = async (participant: string) => {
     setRemoving(null);
   }
 };
-
+const { lookupByCuid } = useSelectParticipantLookUp();
+  const ownerData = lookupByCuid(taskData?.taskDetail?.owner);
 
 
   const { updateTaskDetails, isPending } = useUpdateTaskDetails();
@@ -225,7 +227,7 @@ const handleRemoveFromWhitelist = async (participant: string) => {
         <div className="flex flex-col text-gray-600 font-medium gap-2 mt-4 text-base">
           <span className="flex items-center gap-3">
             <UserRoundCog color="#64748B" size={22} strokeWidth={2.5} />
-            Task Owner: <span className="font-semibold">{taskData?.taskDetail?.owner}</span>
+            Task Owner: <span className="font-semibold">{ownerData?.name || taskData?.taskDetail?.owner}</span>
           </span>
 
           <span className="flex items-center gap-3">

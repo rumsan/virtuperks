@@ -32,7 +32,7 @@ type DepartmentDetailsCardProps = {
   entity: any;
   totalAllocatedTokens?: bigint;
   unallocatedTokens?: number;
-  getEntityOwners?: readonly `0x${string}`[];
+  getEntityOwners?: { wallet: `0x${string}`; label: string }[];
   router: AppRouterInstance;
   closePending?: boolean;
   handleCloseExpiredTasks?: () => Promise<void>;
@@ -268,46 +268,37 @@ export default function DepartmentDetailsCard({
                 <div className="flex flex-start text-[#334155] text-xl justify-start">
                   {entity.name}
                 </div>
-
                 {getEntityOwners && getEntityOwners.length > 0 && (
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[#475569] font-medium text-sm">
-                      {getEntityOwners.length === 1
-                        ? "Department Owner"
-                        : "Department Owners"}
-                    </span>
-                    <div className="flex flex-col gap-1 text-sm">
-                      {getEntityOwners.map((owner: string, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center gap-2 cursor-pointer group"
-                          onClick={() => {
-                            navigator.clipboard.writeText(owner);
-                            setCopiedOwner(owner);
-                            setTimeout(() => setCopiedOwner(null), 2000);
-                          }}
-                        >
-                          <span className="truncate max-w-[200px] transition-colors text-[#475569]">
-                            {owner}
-                          </span>
-                          <div className="flex items-center transition-colors">
-                            {copiedOwner === owner ? (
-                              <span className="text-green-600 font-bold">
-                                ✔
-                              </span>
-                            ) : (
-                              <Copy
-                                className="group-hover:text-blue-800"
-                                size={16}
-                                strokeWidth={2}
-                              />
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+  <div className="flex flex-col gap-2">
+    <span className="text-[#475569] font-medium text-sm">
+      {getEntityOwners.length === 1 ? "Department Owner" : "Department Owners"}
+    </span>
+
+    <div className="flex flex-col gap-1 text-sm">
+      {getEntityOwners.map((owner, idx) => (
+        <div
+          key={idx}
+          className="flex items-center gap-2 cursor-pointer group"
+          onClick={() => {
+            navigator.clipboard.writeText(owner.wallet);
+            setCopiedOwner(owner.wallet);
+            setTimeout(() => setCopiedOwner(null), 2000);
+          }}
+        >
+          <span className="truncate max-w-[200px] text-[#475569]">
+            {owner.label} ({owner.wallet})
+          </span>
+
+          {copiedOwner === owner.wallet ? (
+            <span className="text-green-600 font-bold">✔</span>
+          ) : (
+            <Copy className="group-hover:text-blue-800" size={16} />
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+)}
               </div>
             </CardDescription>
           </CardTitle>
