@@ -28,7 +28,7 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select";
 import { format } from "date-fns";
-import { CalendarIcon, Info } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -205,44 +205,8 @@ export default function TaskBaseForm({
 
             {/* Max participants + Treasurer */}
             <div className="grid grid-cols-2 gap-4 mb-5">
-           
+              {/* Max participants */}
               <FormField
-  control={form.control}
-  name="totalRewardAmount"
-  render={({ field }) => (
-    <FormItem>
-      <FormLabel>Reward Amount</FormLabel>
-      <FormControl>
-        <Input
-          type="number"
-          placeholder="0"
-          {...field}
-          value={field.value === 0 ? "" : (field.value ?? "")}
-          onChange={(e) => {
-            const val = e.target.value;
-            field.onChange(val === "" ? undefined : Number(val));
-          }}
-        />
-      </FormControl>
-
-      {/* Professional disclaimer */}
-      <div className="flex items-start gap-2 mt-2 bg-blue-50 border border-blue-200 rounded-md p-2">
-        <Info className="text-blue-500 mt-0.5" size={18} />
-        <p className="text-sm text-blue-700">
-          <span className="font-semibold">Note:</span> This amount will be 
-          <span className="font-semibold"> equally distributed </span> among the verified participants.
-        </p>
-      </div>
-      <FormMessage />
-    </FormItem>
-  )}
-/>
-            </div>
-          </div>
-
-          {/* Reward + Token + Entity */}
-          <div className="grid grid-cols-2 gap-4 mb-5">
-         <FormField
                 control={form.control}
                 name="maxParticipants"
                 render={({ field }) => (
@@ -268,6 +232,66 @@ export default function TaskBaseForm({
                   </FormItem>
                 )}
               />
+
+              {/* NEW TREASURER FIELD */}
+              <FormField
+                control={form.control}
+                name="treasurerAddress"
+                render={({ field, fieldState }) => (
+                  <FormItem>
+                    <FormLabel>Treasurer</FormLabel>
+
+                    <FormControl>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        disabled={isLoading}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Treasurer" />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                          {mappedTreasurers.map((t) => (
+                            <SelectItem key={t.wallet} value={t.wallet}>
+                              {t.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+
+                    {fieldState.error && <FormMessage />}
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
+          {/* Reward + Token + Entity */}
+          <div className="grid grid-cols-2 gap-4 mb-5">
+            <FormField
+              control={form.control}
+              name="totalRewardAmount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Reward Amount</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="0"
+                      {...field}
+                      value={field.value === 0 ? "" : (field.value ?? "")}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        field.onChange(val === "" ? undefined : Number(val));
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Token */}
             <FormField
