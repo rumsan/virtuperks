@@ -1,13 +1,14 @@
 "use client";
 import { useGraphService } from "@/providers/subgraph-provider";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Approval } from '../../../../packages/sdk/src/types/token.type';
 import {
   useReadRewardTokenBalanceOf,
   useWriteRewardManagementDisburseTokensToTaskParticipants,
+  useWriteRewardManagementDisburseToSingleParticipant,
   useWriteRewardManagementTransferToken,
   useWriteRewardTokenApprove,
-  useWriteRewardTokenTransfer,
+  useWriteRewardTokenTransfer
 } from "../wagmi/contracts";
 
 export const useDisburseTokenToTask = () => {
@@ -248,6 +249,54 @@ export const useGetApprovedTokens = (spender: string) => {
     isError: query.isError,
     error: query.error,
   };
+};
+
+
+
+export const useDisburseToSingleParticipant = () => {
+  const queryClient = useQueryClient();
+
+  const { writeContractAsync, isPending, isSuccess } =
+    useWriteRewardManagementDisburseToSingleParticipant();
+
+  return useMutation({
+    mutationFn: async ({
+      taskId,
+      participant,
+      amount,
+      contractAddress,
+    }: {
+      taskId: string;
+      participant: string;
+      amount: string;
+      contractAddress: string;
+    }) => {
+      console.log("Disburse args:", {
+        address: contractAddress,
+        args: [
+          taskId as `0x${string}`,
+          participant as `0x${string}`,
+          BigInt(amount),
+        ],
+      });
+
+      return await writeContractAsync({
+        address: contractAddress as `0x${string}`,
+        args: [
+          taskId as `0x${string}`,
+          participant as `0x${string}`,
+          BigInt(amount),
+        ],
+      });
+    },
+
+    onSuccess: async (result, variables) => {
+      await new Promise((resolve) => setTimeout(resolve, 9000));
+      await queryClient.invalidateQueries({
+        queryKey: ["AllParticipantsStatus", variables.taskId],
+      });
+    },
+  });
 };
 
 

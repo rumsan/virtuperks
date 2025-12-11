@@ -8,6 +8,7 @@ import { Calendar } from "@workspace/ui/components/calendar";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -446,6 +447,30 @@ export default function TaskBaseForm({
                   </FormControl>
 
                   {fieldState.error && <FormMessage />}
+                </FormItem>
+              )}
+            />
+
+<FormField
+              control={form.control}
+              name="requireApproval"
+              render={({ field }) => (
+                <FormItem className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="space-y-1">
+                    <FormLabel>Approval Required</FormLabel>
+                    <FormDescription>
+                      Enable if tasks require owner approval.
+                    </FormDescription>
+                  </div>
+
+                  <FormControl>
+                    <input
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      className="h-5 w-5 accent-blue-600 cursor-pointer"
+                    />
+                  </FormControl>
                 </FormItem>
               )}
             />
