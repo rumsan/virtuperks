@@ -26,7 +26,8 @@ type DialogButtonProps = {
     | "directdisburse"
     | "CreateReward"
     | "Reject"
-    | "Verify";
+    | "Verify"
+    | "IndividualDisburse";
   inputLabel?: string;
   inputPlaceholder?: string;
   availableTokens?: number;

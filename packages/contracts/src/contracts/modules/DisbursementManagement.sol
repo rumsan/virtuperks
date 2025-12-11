@@ -39,9 +39,9 @@ abstract contract DisbursementManagement is
 
     function disburseToSingleParticipant(
         bytes32 taskId,
-        address participant,
+        address parcipant,
         uint256 amount
-    ) public onlyOwner nonReentrant whenNotPaused {
+    ) public onlyOtiwner nonReentrant whenNotPaused {
         Task storage task = tasks[taskId];
         if (amount == 0) {
             amount = task.totalRewardAmount / task.maxParticipants;

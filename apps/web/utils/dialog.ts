@@ -1,5 +1,11 @@
-export const getDialogContent = (status: string) => {
-  
+export const getDialogContent = (status: string, actionType?: string) => {
+  if (actionType === "individualDisburse") {
+    return {
+      title: "Disburse tokens to this participant?",
+      subTitle: "You are about to send tokens directly to this participant. This action cannot be undone.",
+      buttonName: "Disburse",
+    };
+  }
  
     return {
       title: status === "PENDING" 
