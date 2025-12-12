@@ -2,7 +2,10 @@
 
 import { DialogButton } from "@/components/common/ui/dialog";
 import { useGetEntityRole } from "@/hooks/subgraph/entity";
-import { useDirectTokenTransfer } from "@/hooks/subgraph/token";
+import {
+  useAcceptTokenTransfer,
+  useDirectTokenTransfer,
+} from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
 import hasRole from "@/utils/role";
 import { Button } from "@workspace/ui/components/button";
@@ -17,6 +20,7 @@ import { toast } from "@workspace/ui/hooks/use-toast";
 import {
   AlertTriangle,
   Building,
+  CheckCircle2,
   Clock,
   Copy,
   Gift,
@@ -32,6 +36,7 @@ type DepartmentDetailsCardProps = {
   entity: any;
   totalAllocatedTokens?: bigint;
   unallocatedTokens?: number;
+  treasurerAddress?: string;
   getEntityOwners?: { wallet: `0x${string}`; label: string }[];
   router: AppRouterInstance;
   closePending?: boolean;
@@ -42,6 +47,7 @@ export default function DepartmentDetailsCard({
   entity,
   totalAllocatedTokens,
   unallocatedTokens,
+  treasurerAddress,
   getEntityOwners,
   router,
   closePending,
@@ -52,6 +58,7 @@ export default function DepartmentDetailsCard({
     role: process.env.NEXT_PUBLIC_MINTER_ROLE!,
     address,
   });
+
   const canAllocateToken = Boolean(roleData);
 
   const { entityRole, roleLoading } = useGetEntityRole(
@@ -65,18 +72,47 @@ export default function DepartmentDetailsCard({
 
   const canTransferToken = Boolean(hasEntityOwnerRole);
 
-  const {
-    directTransfer,
-    directTransferPending,
-    directTransferSuccess,
-    directTransferError,
-  } = useDirectTokenTransfer();
+  const { directTransfer, directTransferPending } = useDirectTokenTransfer();
+
+  const acceptTokenMutation = useAcceptTokenTransfer();
 
   const [isOpen, setIsOpen] = useState(false);
   const [copiedOwner, setCopiedOwner] = React.useState<string | null>(null);
 
   const params = useParams();
   const cuid = params?.id as string;
+
+  const handleAcceptTokens = async () => {
+    if (!unallocatedTokens || unallocatedTokens <= 0) {
+      toast({
+        title: "No approved tokens to accept",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await acceptTokenMutation.mutateAsync({
+        treasuryAddress: treasurerAddress || "",
+        tokenAddress: process.env.NEXT_PUBLIC_RAHAT_TOKEN || "",
+        amount: unallocatedTokens.toString(),
+        rewardManagementAddress: entity.rewardManagement,
+      });
+
+      toast({
+        title: "Tokens accepted successfully!",
+        description: `${unallocatedTokens} tokens have been transferred to your department.`,
+        variant: "success",
+      });
+    } catch (error) {
+      console.error("Error accepting tokens:", error);
+      toast({
+        title: "Failed to accept tokens",
+        description: "Please try again or contact support.",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (!entity) {
     return (
@@ -257,6 +293,50 @@ export default function DepartmentDetailsCard({
         </div>
       </div>
 
+      {/* Token Acceptance Notification Banner */}
+      {canTransferToken && unallocatedTokens && unallocatedTokens > 0 && (
+        <div className="mt-4 mb-2">
+          <div className="flex items-center justify-between gap-4 rounded-lg border-2 border-green-500 bg-green-50 p-4 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center rounded-full bg-green-100 p-2">
+                <CheckCircle2
+                  className="h-6 w-6 text-green-600"
+                  strokeWidth={2.5}
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-semibold text-green-800 text-base">
+                  Treasury has Approved {unallocatedTokens} Tokens
+                </span>
+                <span className="text-sm text-green-700">
+                  Click the button to accept and transfer these tokens to your
+                  department.
+                </span>
+              </div>
+            </div>
+
+            <Button
+              variant="default"
+              className="h-12 w-56 bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2"
+              disabled={acceptTokenMutation.isPending}
+              onClick={handleAcceptTokens}
+            >
+              {acceptTokenMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Accepting...</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 size={20} strokeWidth={2.5} />
+                  <span>Accept Tokens</span>
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-4 mt-4 gap-4 w-full">
         <Card className="font-normal text-base h-50 flex flex-col p-4">
           <CardTitle className="flex items-center gap-3">
@@ -269,36 +349,41 @@ export default function DepartmentDetailsCard({
                   {entity.name}
                 </div>
                 {getEntityOwners && getEntityOwners.length > 0 && (
-  <div className="flex flex-col gap-2">
-    <span className="text-[#475569] font-medium text-sm">
-      {getEntityOwners.length === 1 ? "Department Owner" : "Department Owners"}
-    </span>
+                  <div className="flex flex-col gap-2">
+                    <span className="text-[#475569] font-medium text-sm">
+                      {getEntityOwners.length === 1
+                        ? "Department Owner"
+                        : "Department Owners"}
+                    </span>
 
-    <div className="flex flex-col gap-1 text-sm">
-      {getEntityOwners.map((owner, idx) => (
-        <div
-          key={idx}
-          className="flex items-center gap-2 cursor-pointer group"
-          onClick={() => {
-            navigator.clipboard.writeText(owner.wallet);
-            setCopiedOwner(owner.wallet);
-            setTimeout(() => setCopiedOwner(null), 2000);
-          }}
-        >
-          <span className="truncate max-w-[200px] text-[#475569]">
-            {owner.label} ({owner.wallet})
-          </span>
+                    <div className="flex flex-col gap-1 text-sm">
+                      {getEntityOwners.map((owner, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center gap-2 cursor-pointer group"
+                          onClick={() => {
+                            navigator.clipboard.writeText(owner.wallet);
+                            setCopiedOwner(owner.wallet);
+                            setTimeout(() => setCopiedOwner(null), 2000);
+                          }}
+                        >
+                          <span className="truncate max-w-[200px] text-[#475569]">
+                            {owner.label} ({owner.wallet})
+                          </span>
 
-          {copiedOwner === owner.wallet ? (
-            <span className="text-green-600 font-bold">✔</span>
-          ) : (
-            <Copy className="group-hover:text-blue-800" size={16} />
-          )}
-        </div>
-      ))}
-    </div>
-  </div>
-)}
+                          {copiedOwner === owner.wallet ? (
+                            <span className="text-green-600 font-bold">✔</span>
+                          ) : (
+                            <Copy
+                              className="group-hover:text-blue-800"
+                              size={16}
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </CardDescription>
           </CardTitle>

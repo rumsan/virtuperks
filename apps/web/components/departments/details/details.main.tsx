@@ -4,7 +4,7 @@ import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { useSelectParticipantLookUp } from "@/hooks/client/participant.lookup";
 import {
   useCheckTotalAllocatedTokens,
-  useGetEntityById
+  useGetEntityById,
 } from "@/hooks/subgraph/entity";
 import { useCloseExpiredTask } from "@/hooks/subgraph/task";
 import {
@@ -43,13 +43,19 @@ export default function DepartmentDetails({
     useCheckTotalAllocatedTokens(entity?.rewardManagement);
   // const { unallocatedTokens, statusLoading: unallocatedLoading } =
   //   useCheckTotalUnallocatedTokens(entity?.rewardManagement);
+  //fetch treasurer wallets
+  const treasurerRole = process.env.NEXT_PUBLIC_MINTER_ROLE!;
+  const { mappedTreasurers } = useSelectParticipantLookUp();
+  const getTreasurer = mappedTreasurers[0];
+
   const { totalApproved, isLoading: unallocatedLoading } = useGetApprovedTokens(
     entity?.rewardManagement,
   );
   const unallocatedTokens = Number(totalApproved);
-  
+
   // use the mappedEntityOwners from the hook
-  const { mappedEntityOwners: getEntityOwners, isLoading: ownersLoading } = useSelectParticipantLookUp(entity?.entityId);
+  const { mappedEntityOwners: getEntityOwners, isLoading: ownersLoading } =
+    useSelectParticipantLookUp(entity?.entityId);
 
   const { data: disbursementData } = useGetDisbursements(
     entity?.rewardManagement,
@@ -127,6 +133,7 @@ export default function DepartmentDetails({
       {/* Pass entity data to child */}
       <DepartmentDetailsCard
         entity={entity}
+        treasurerAddress={getTreasurer?.wallet as `0x${string}`}
         totalAllocatedTokens={totalAllocatedTokens}
         unallocatedTokens={unallocatedTokens}
         getEntityOwners={getEntityOwners}
