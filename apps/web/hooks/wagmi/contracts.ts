@@ -1044,6 +1044,17 @@ export const rewardManagementAbi = [
   {
     type: 'function',
     inputs: [
+      { name: 'treasuryAddress', internalType: 'address', type: 'address' },
+      { name: 'tokenAddress', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'acceptTokenTransfer',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
       { name: 'taskId', internalType: 'bytes32', type: 'bytes32' },
       { name: 'participant', internalType: 'address', type: 'address' },
       { name: 'throwError', internalType: 'bool', type: 'bool' },
@@ -1057,7 +1068,6 @@ export const rewardManagementAbi = [
     inputs: [
       { name: 'taskId', internalType: 'bytes32', type: 'bytes32' },
       { name: 'tokenAddress', internalType: 'address', type: 'address' },
-      { name: 'treasuryAddress', internalType: 'address', type: 'address' },
       { name: 'amount', internalType: 'uint256', type: 'uint256' },
     ],
     name: 'allocateTokensToTask',
@@ -1143,7 +1153,6 @@ export const rewardManagementAbi = [
           },
         ],
       },
-      { name: 'treasuryAddress', internalType: 'address', type: 'address' },
       {
         name: '_whitelistParticipants',
         internalType: 'address[]',
@@ -2232,6 +2241,15 @@ export const useWriteRewardManagementAcceptParticipant =
   })
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"acceptTokenTransfer"`
+ */
+export const useWriteRewardManagementAcceptTokenTransfer =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: rewardManagementAbi,
+    functionName: 'acceptTokenTransfer',
+  })
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"addToWhitelist"`
  */
 export const useWriteRewardManagementAddToWhitelist =
@@ -2406,6 +2424,15 @@ export const useSimulateRewardManagementAcceptParticipant =
   /*#__PURE__*/ createUseSimulateContract({
     abi: rewardManagementAbi,
     functionName: 'acceptParticipant',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"acceptTokenTransfer"`
+ */
+export const useSimulateRewardManagementAcceptTokenTransfer =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: rewardManagementAbi,
+    functionName: 'acceptTokenTransfer',
   })
 
 /**
