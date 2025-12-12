@@ -1,8 +1,15 @@
-import { useUpdateTaskDetails } from "@/hooks/subgraph/task";
+import { useParticipantLookup, useSelectParticipantLookUp } from "@/hooks/client/participant.lookup";
+import { useGetEntityRole } from "@/hooks/subgraph/entity";
+import { useGetWhiteListedParticipantByTask } from "@/hooks/subgraph/participant";
+import { useAddToWhitelist, useRemoveFromWhitelist, useUpdateTaskDetails } from "@/hooks/subgraph/task";
 import { formatDate } from "@/utils/formatDate";
+import hasRole from "@/utils/role";
 import { Card, CardTitle } from "@workspace/ui/components/card";
-import { Building2, Pencil, Timer, Trophy, UserRoundCog, Users } from "lucide-react";
-import { useState } from "react";
+import { toast } from "@workspace/ui/hooks/use-toast";
+import { Building2, Pencil, Timer, Trophy, UserRoundCog, Users, XCircle } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { useAccount } from "wagmi";
+import { updateSchema } from "./schema";
 
 type TaskDetailsProps = {
   taskData: any;
@@ -12,31 +19,205 @@ const TaskDetails = ({ taskData }: TaskDetailsProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [detailsUrl, setDetailsUrl] = useState(taskData?.taskDetail?.detailsUrl || "");
   const [expiryDate, setExpiryDate] = useState(taskData?.taskDetail?.expiryDate || "");
+  const [newParticipant, setNewParticipant] = useState("");
+  const [detailsUrlError, setDetailsUrlError] = useState("");
+  const [expiryDateError, setExpiryDateError] = useState("");
+  
+  const [inputValue, setInputValue] = useState("");
+const [showSuggestions, setShowSuggestions] = useState(false);
+const [highlightedIndex, setHighlightedIndex] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [removing, setRemoving] = useState<string | null>(null);
+  const { address } = useAccount();
+  const { addToWhitelist, addPending } = useAddToWhitelist();
+  const { removeFromWhitelist, removePending } = useRemoveFromWhitelist();
+  const { entityRole, roleLoading } = useGetEntityRole(
+      taskData?.rewardManagement?.rewardManagement || "",
+      );
+  const hasEntityOwnerRole = hasRole({
+        role: entityRole || "",
+        address,
+      });
+
+const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(taskData?.taskDetail?.id);
+const whiteListedParticipants = getWhiteListedParticipants?.data?.data?.participantWhitelisteds || [];
+
+const handleAddParticipant = async () => {
+  if (!newParticipant) return;
+
+  try {
+    await addToWhitelist({
+      entityAddress: taskData.rewardManagement.rewardManagement,
+      taskId: taskData.taskDetail.id,
+      participant: newParticipant,
+    });
+
+    toast({
+      title: "Success",
+      description: `Participant ${newParticipant} added to whitelist!`,
+      variant: "success",
+    });
+
+    setNewParticipant("");
+  } catch (err: any) {
+    toast({
+      title: "Error",
+      description: err?.message || "Failed to add participant",
+      variant: "destructive",
+    });
+  }
+};
+
+const handleRemoveFromWhitelist = async (participant: string) => {
+  try {
+    setRemoving(participant);
+
+    await removeFromWhitelist({
+      entityAddress: taskData.rewardManagement.rewardManagement,
+      taskId: taskData.taskDetail.id,
+      participant,
+    });
+
+    toast({
+      title: "Removed",
+      description: `Participant ${participant} removed`,
+      variant: "success",
+    });
+  } catch (err: any) {
+    toast({
+      title: "Error",
+      description: err?.message || "Failed to remove participant",
+      variant: "destructive",
+    });
+  } finally {
+    setRemoving(null);
+  }
+};
+const { lookupByCuid } = useSelectParticipantLookUp();
+  const ownerData = lookupByCuid(taskData?.taskDetail?.owner);
+
 
   const { updateTaskDetails, isPending } = useUpdateTaskDetails();
 
   const formattedDate = formatDate(taskData?.taskDetail?.expiryDate);
   const isWhiteListed = taskData?.taskDetail?.isWhitelisted;
 
+
+  const { data: participantData = {}, isLoading: participantLoading } = useParticipantLookup();
+  const participants = participantData?.data || [];
+  
+  
+  const filteredParticipants = useMemo(() => {
+    const lower = inputValue.toLowerCase();
+    return participants.filter(
+      (p: any) =>
+        (p.name?.toLowerCase().includes(lower) ||
+          p.address?.toLowerCase().includes(lower)) &&
+        !whiteListedParticipants.find((w: any) => w.participant === p.address)
+    );
+  }, [inputValue, participants, whiteListedParticipants]);
+  
+    
+   
+  const handleSelectParticipant = (p: any) => {
+    setNewParticipant(p.address); 
+    setInputValue(p.name);        
+    setShowSuggestions(false);
+    setHighlightedIndex(0);
+  };
+  
+ 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showSuggestions) return;
+  
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightedIndex((prev) => Math.min(prev + 1, filteredParticipants.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightedIndex((prev) => Math.max(prev - 1, 0));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (filteredParticipants[highlightedIndex]) {
+        handleSelectParticipant(filteredParticipants[highlightedIndex]);
+      }
+    }
+  };
+
   const openEditModal = () => {
     setDetailsUrl(taskData?.taskDetail?.detailsUrl || "");
-    setExpiryDate(taskData?.taskDetail?.expiryDate || "");
+  
+    const timestamp = taskData?.taskDetail?.expiryDate;
+    const formatted = timestamp
+      ? new Date(Number(timestamp) * 1000).toISOString().split("T")[0]
+      : "";
+  
+    setExpiryDate(formatted);
+  
     setIsEditing(true);
   };
+  
 
   const handleSave = async () => {
     try {
+      
+      const parsed = updateSchema.safeParse({
+        detailsUrl,
+        expiryDate,
+      });
+      
+      if (!parsed.success) {
+        
+        setDetailsUrlError("");
+        setExpiryDateError("");
+      
+        parsed.error.errors.forEach((err) => {
+          if (err.path[0] === "detailsUrl") {
+            setDetailsUrlError(err.message);
+          }
+          if (err.path[0] === "expiryDate") {
+            setExpiryDateError(err.message);
+          }
+        });
+      
+        return; 
+      }
+      
+  
+      const urlChanged = detailsUrl !== (taskData?.taskDetail?.detailsUrl || "");
+      const dateChanged =
+        expiryDate !== (taskData?.taskDetail?.expiryDate?.split("T")?.[0] || "");
+  
+        if ((detailsUrl === undefined || detailsUrl === "") &&
+        (expiryDate === undefined || expiryDate === "")) {
+      throw new Error("At least one field (detailsUrl or expiryDate) must be provided");
+    }
+    
       await updateTaskDetails({
         entityAddress: taskData?.rewardManagement?.rewardManagement,
         taskId: taskData?.taskDetail?.id,
-        detailsUrl,
-        expiryDate: Number(new Date(expiryDate).getTime() / 1000),
+        ...(urlChanged ? { detailsUrl } : {}),
+        ...(dateChanged && expiryDate
+          ? { expiryDate: Number(new Date(expiryDate).getTime() / 1000) }
+          : {}),      
       });
+  
+      toast({
+        title: "Success",
+        description: "Task updated successfully!",
+        variant: "success",
+      });
+  
       setIsEditing(false);
-    } catch (err) {
-      console.error("Failed to update task details:", err);
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err?.message || "Failed to update task",
+        variant: "destructive",
+      });
     }
   };
+  
 
   const handleCancel = () => {
     setIsEditing(false);
@@ -44,7 +225,7 @@ const TaskDetails = ({ taskData }: TaskDetailsProps) => {
 
   return (
     <>
-      <Card className="w-[80%] h-full p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
+      <Card className="w-[70%] h-full p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
         <CardTitle className="flex flex-col gap-4 w-full">
           {/* Title and Status */}
           <div className="flex items-center gap-3 justify-between">
@@ -92,7 +273,7 @@ const TaskDetails = ({ taskData }: TaskDetailsProps) => {
         <div className="flex flex-col text-gray-600 font-medium gap-2 mt-4 text-base">
           <span className="flex items-center gap-3">
             <UserRoundCog color="#64748B" size={22} strokeWidth={2.5} />
-            Task Owner: <span className="font-semibold">{taskData?.taskDetail?.owner}</span>
+            Task Owner: <span className="font-semibold">{ownerData?.name || taskData?.taskDetail?.owner}</span>
           </span>
 
           <span className="flex items-center gap-3">
@@ -110,6 +291,13 @@ const TaskDetails = ({ taskData }: TaskDetailsProps) => {
             Department: <span className="font-semibold">{taskData?.rewardManagement?.name || "N/A"}</span>
           </span>
 
+          <span className="flex items-center gap-3 mt-3">
+          <Trophy color="#64748B" size={22} strokeWidth={2.5} />
+           Tokens:
+          <span className="font-semibold">
+    {taskData?.taskDetail?.totalRewardAmount || "N/A"}
+  </span>
+          </span>
           <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
             <p className="text-sm text-gray-700">
               <span className="font-semibold text-blue-700">Eligibility: </span>
@@ -127,13 +315,105 @@ const TaskDetails = ({ taskData }: TaskDetailsProps) => {
         </div>
       </Card>
 
-      {/* Reward Card */}
-      <Card className="w-[20%] flex flex-col items-center justify-center ml-auto p-4 gap-3">
-        <div className="flex items-center justify-center rounded-full h-10 w-10 bg-blue-50">
-          <Trophy color="#297AD6" size={20} />
+      
+  <Card className="w-[30%] p-4 ml-auto flex flex-col gap-6 bg-white rounded-xl shadow-sm h-[382px]">
+  {/* Section Title */}
+  <div className="flex flex-col">
+    <span className="text-xl font-semibold text-[#1E293B]">Whitelisted Participants</span>
+    <span className="text-gray-500 text-sm">
+      Add or manage participants allowed to join this task
+    </span>
+  </div>
+
+  {/* Input Field */}
+  {taskData?.taskDetail?.isWhitelisted && hasEntityOwnerRole && (
+    <div className="flex gap-2 relative w-full">
+    <input
+      ref={inputRef}
+      type="text"
+      value={inputValue}
+      onChange={(e) => {
+        setInputValue(e.target.value);
+        setShowSuggestions(true);
+      }}
+      onKeyDown={handleKeyDown}
+      onFocus={() => setShowSuggestions(true)}
+      onBlur={() => setTimeout(() => setShowSuggestions(false), 120)}
+      placeholder="Search participant by name or address"
+      className="border border-gray-300 rounded-xl px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  
+    {showSuggestions && filteredParticipants.length > 0 && (
+      <ul className="absolute top-11 left-0 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto z-20">
+        {filteredParticipants.map((p: any, index: number) => (
+          <li
+            key={p.address}
+            onMouseDown={() => handleSelectParticipant(p)}
+            onMouseEnter={() => setHighlightedIndex(index)}
+            className={`px-3 py-2 cursor-pointer text-sm ${
+              highlightedIndex === index
+                ? "bg-blue-100"
+                : "hover:bg-blue-50"
+            }`}
+          >
+            <div className="font-medium">{p.name}</div>
+            <div className="text-gray-500 text-xs">
+              {p.address.slice(0, 10)}...{p.address.slice(-6)}
+            </div>
+          </li>
+        ))}
+      </ul>
+    )}
+  
+    <button
+      className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 text-sm"
+      onClick={handleAddParticipant}
+      disabled={addPending || !newParticipant}
+    >
+      {addPending ? "Adding..." : "Add"}
+    </button>
+  </div>  
+  )}
+
+  {/* Scrollable Whitelist Container */}
+  <div className="flex-1 overflow-y-auto flex flex-col gap-3 mt-2 pr-1">
+
+    {whiteListedParticipants.length > 0 ? (
+      whiteListedParticipants.map((p: any) => (
+        <div
+          key={p.participant}
+          className="flex items-center justify-between p-2 border border-gray-200 rounded-lg"
+        >
+          <span className="text-sm text-gray-700">
+            {`${p.participant.slice(0, 20)}...${p.participant.slice(-8)}`}
+          </span>
+
+          {hasEntityOwnerRole && (
+            <button
+              onClick={() => handleRemoveFromWhitelist(p.participant)}
+              disabled={removing === p.participant}
+              className="text-red-500 hover:text-red-700 flex items-center"
+            >
+              {removing === p.participant ? (
+                <span className="text-xs animate-pulse">Removing...</span>
+              ) : (
+                <XCircle size={18} strokeWidth={2.5} />
+              )}
+            </button>
+          )}
         </div>
-        <span className="text-2xl text-[#297AD6] font-bold">{taskData?.taskDetail?.totalRewardAmount} Tokens</span>
-      </Card>
+      ))
+    ) : (
+      <p className="text-sm text-gray-400 text-center py-4">
+        No whitelisted participants yet
+      </p>
+    )}
+  </div>
+
+</Card>
+
+
+
 
       {/* Modal */}
       {isEditing && (
@@ -142,20 +422,61 @@ const TaskDetails = ({ taskData }: TaskDetailsProps) => {
             <h2 className="text-xl font-bold mb-4">Edit Task</h2>
 
             <label className="block mb-2 font-medium">Details URL</label>
-            <input
-              type="text"
-              className="border border-gray-300 rounded w-full px-2 py-1 mb-4"
-              value={detailsUrl}
-              onChange={(e) => setDetailsUrl(e.target.value)}
-            />
+<input
+  type="text"
+  className="border border-gray-300 rounded w-full px-2 py-1"
+  value={detailsUrl}
+  onChange={(e) => {
+    const value = e.target.value;
+    setDetailsUrl(value);
 
-            <label className="block mb-2 font-medium">Deadline</label>
-            <input
-              type="date"
-              className="border border-gray-300 rounded w-full px-2 py-1 mb-4"
-              value={expiryDate?.split("T")[0]}
-              onChange={(e) => setExpiryDate(e.target.value)}
-            />
+    // Clear error if the URL is valid or empty
+    if (!value) {
+      setDetailsUrlError(""); // empty field is allowed
+      return;
+    }
+
+    // Simple validation for http/https
+    const isValidUrl = value.startsWith("http://") || value.startsWith("https://");
+    try {
+      new URL(value);
+      if (isValidUrl) setDetailsUrlError("");
+    } catch {
+      // keep the error if invalid
+    }
+  }}
+/>
+{detailsUrlError && (
+  <p className="text-red-500 text-sm mt-1">{detailsUrlError}</p>
+)}
+
+
+
+<label className="block mb-2 font-medium">Deadline</label>
+<input
+  type="date"
+  className="border border-gray-300 rounded w-full px-2 py-1"
+  value={expiryDate || ""}
+  onChange={(e) => {
+    const value = e.target.value || "";
+    setExpiryDate(value);
+
+    // Clear error if the new date is valid (after today)
+    if (value) {
+      const selectedDate = new Date(value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // compare only date part
+      if (selectedDate > today) {
+        setExpiryDateError("");
+      }
+    } else {
+      setExpiryDateError(""); // clear if field is empty
+    }
+  }}
+/>
+{expiryDateError && (
+  <p className="text-red-500 text-sm mt-1">{expiryDateError}</p>
+)}
 
             <div className="flex justify-end gap-2 mt-4">
               <button

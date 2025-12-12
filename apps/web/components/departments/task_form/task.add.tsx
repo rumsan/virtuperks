@@ -119,9 +119,9 @@ export default function TaskAdd({ router }: TaskAddProps) {
         requireApproval: data.requireApproval,
         isWhitelisted: data.isWhitelisted,
         maxParticipants: maxParticipants.toString(),
-        acceptedParticipantCount: 0, // Default to 0
+        acceptedParticipantCount: 0, 
         whitelistedParticipants: whitelistedParticipants || [],
-        verfiedParticipants: [], // Default to empty array
+        verfiedParticipants: [], 
       });
 
       toast({

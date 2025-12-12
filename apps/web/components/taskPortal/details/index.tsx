@@ -8,7 +8,7 @@ import {
   useCompleteTaskMutation,
   useParticipateTaskMutation,
 } from "@/hooks/subgraph/querycall";
-import { useGetTaskById, useResubmitTaskMutation } from "@/hooks/subgraph/task";
+import { useGetTaskById } from "@/hooks/subgraph/task";
 import { PATHS } from "@/routes/paths";
 import hasRole from "@/utils/role";
 import { Button } from "@workspace/ui/components/button";
@@ -41,7 +41,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
   const hasParticipantRole = hasRole({ role: participantRole, address });
 
   const isWhitelisted = taskData?.taskDetail?.isWhitelisted;
-  console.log(isWhitelisted, "isWhitelisted in task portal main");
+  // console.log(isWhitelisted, "isWhitelisted in task portal main");
   const getWhiteListedParticipants = useGetWhiteListedParticipantByTask(
     taskData?.internal_id,
   );
@@ -52,17 +52,15 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
 
   const { participateTask, participatePending } = useParticipateTaskMutation();
   const { completeTask, completePending } = useCompleteTaskMutation();
-  const { status: participantStatus, isLoading: statusLoading } =
+  const { status, isLoading: statusLoading } =
     useCheckParticipantStatus(
       taskData?.internal_id,
       taskData?.rewardManagement?.rewardManagement,
     );
-
+  const participantStatus = status?.status;
   const effectiveStatus =
     localStatus !== null ? localStatus : participantStatus;
-   
-  
-  
+  // console.log("Participant Status: ", participantStatus)
   const handleApplyTask = async () => {
     if (!isConnected) {
       setAlertDialog(true);
@@ -158,39 +156,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
     }
   };
 
-  const { resubmitTask, resubmitPending } = useResubmitTaskMutation();
-
-  const handleResubmitTask = async (data: any) => {
-    try {
-      await resubmitTask(
-        {
-          taskId: taskData?.internal_id,
-          entityId: taskData?.rewardManagement?.rewardManagement || "0x",
-          completionUrl: data.completionUrl,
-        },
-        {
-          onSuccess: () => {
-            setIsOpen(false);
-            setLocalStatus("WAITING");
-            toast({
-              title: "Task Resubmitted Successfully!",
-              variant: "success",
-            });
-          },
-          onError: (error) => {
-            console.error("Error resubmitting task:", error);
-            toast({
-              title: "Failed to resubmit task. Please try again.",
-              variant: "destructive",
-            });
-          },
-        },
-      );
-    } catch (error) {
-      console.error("Error in resubmit:", error);
-    }
-  };
-
   
 
   useEffect(() => {
@@ -222,7 +187,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
         </Button>
       );
     }
-
 
     if (!taskData?.taskDetail?.requireApproval) {
       return (
@@ -256,8 +220,6 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
         </>
       );
     }
-
-
 
     switch (effectiveStatus) {
       case 0:
@@ -319,20 +281,27 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             )}
           </>
         );
-      case "COMPLETED":
-      case 3:
-        return (
-          <Button className="bg-green-500 disabled:bg-green-500" disabled>
-            <span className="text-[#F8FAFC]">Completed</span>
-          </Button>
-        );
-      case "VERIFIED":
-      case 4:
-        return (
-          <Button className="bg-[#22C55E]" disabled>
-            <span className="text-[#F8FAFC]">Verified</span>
-          </Button>
-        );
+        case "COMPLETED":
+          case 3:
+            return (
+              <Button
+                className="bg-green-500 disabled:bg-green-500 cursor-not-allowed hover:cursor-not-allowed"
+                disabled
+              >
+                <span className="text-[#F8FAFC]">Completed</span>
+              </Button>
+            );
+          
+          case "VERIFIED":
+          case 4:
+            return (
+              <Button
+                className="bg-[#22C55E] cursor-not-allowed hover:cursor-not-allowed"
+                disabled
+              >
+                <span className="text-[#F8FAFC]">Verified</span>
+              </Button>
+            );          
       case "REJECTED":
       case 5:
         return (
@@ -340,9 +309,9 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
             <Button
               className="bg-[#297AD6]"
               onClick={() => setIsOpen(true)}
-              disabled={resubmitPending}
+              disabled={completePending}
             >
-              {resubmitPending ? (
+              {completePending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   Processing...
@@ -352,7 +321,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
               )}
             </Button>
 
-            {!resubmitPending && isOpen && (
+            {!completePending && isOpen && (
               <DialogButton
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
@@ -360,7 +329,7 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
                 subTitle="Please provide the updated completion URL"
                 buttonName="Submit"
                 submitType="Resubmit"
-                handleApplyTaskLogic={handleResubmitTask}
+                handleApplyTaskLogic={handleCompleteTask}
               />
             )}
           </>
@@ -420,7 +389,11 @@ const TaskPortalMain = ({ cuid, router }: TaskPortalMainProps) => {
           <TaskPortalDetails taskData={taskData} />
         </div>
         <div className="flex w-full gap-4 flex-nowrap">
-          <TaskPortalParticipant taskId={cuid} isWhitelisted={taskData.taskDetail.isWhitelisted} taskData={taskData}/>
+          <TaskPortalParticipant
+            taskId={cuid}
+            isWhitelisted={taskData.taskDetail.isWhitelisted}
+            taskData={taskData}
+          />
         </div>
       </div>
     </main>

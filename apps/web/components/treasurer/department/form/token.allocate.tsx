@@ -1,6 +1,6 @@
 "use client";
 
-import { useRewardTokenMint } from "@/hooks/subgraph/entity";
+import { useRewardTokenApprove } from "@/hooks/subgraph/token";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
@@ -32,20 +32,23 @@ const TokenAllocateForm = ({ id, entityData }: TokenAllocateFormProps) => {
     resolver: zodResolver(tokenSchema()),
   });
 
-  const { tokenMint, mintPending, mintSuccess, mintError } =
-    useRewardTokenMint();
+  const { tokenApprove,
+    approvePending,
+    approveSuccess,
+    approveError, } =
+  useRewardTokenApprove();
 
   useEffect(() => {
-    if (mintSuccess) {
+    if (approveSuccess) {
       history.back();
-    } else if (mintError) {
-      console.error("Token minting failed:", mintError);
+    } else if (approveError) {
+      console.error("Token minting failed:", approveError);
     }
-  }, [mintSuccess, mintError]);
+  }, [approveSuccess, approveError]);
 
   const handleSubmit = async (data: Token) => {
     try {
-      await tokenMint({
+      await tokenApprove({
         address: entityData.rewardManagement,
         amount: data.amount!,
       });
@@ -104,9 +107,9 @@ const TokenAllocateForm = ({ id, entityData }: TokenAllocateFormProps) => {
                     type="submit"
                     variant="default"
                     className="w-[170px] flex justify-center items-center gap-2"
-                    disabled={mintPending}
+                    disabled={approvePending}
                   >
-                    {mintPending ? "Minting..." : "Create"}
+                    {approvePending ? "Approving..." : "Create"}
                   </Button>
                 </div>
               </div>

@@ -43,6 +43,13 @@ contract RewardToken is ERC20, ERC20Burnable, IRewardToken, ERC2771Context {
         return _amount;
     }
 
+    // function mintAndApprove(address _spender, uint256 _amount) public returns (uint256) {
+    //     require(appRegistry.hasRole(appId, MINTER_ROLE, _msgSender()), "Not a minter");
+    //     _mint(address(this), _amount);
+    //     _approve(address(this), _spender, _amount);
+    //     return _amount;
+    // }
+
     /// @dev overriding the method to ERC2771Context
     function _msgSender() internal view override(Context, ERC2771Context) returns (address sender) {
         sender = ERC2771Context._msgSender();

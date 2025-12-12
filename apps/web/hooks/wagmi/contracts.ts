@@ -708,6 +708,37 @@ export const rewardManagementAbi = [
         indexed: false,
       },
       {
+        name: 'participant',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'disbursedBy',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'DisbursementToParticipant',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'taskId',
+        internalType: 'bytes32',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
         name: 'disbursedBy',
         internalType: 'address',
         type: 'address',
@@ -730,20 +761,6 @@ export const rewardManagementAbi = [
       { name: 'by', internalType: 'address', type: 'address', indexed: true },
     ],
     name: 'EtherWithdrawn',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'id', internalType: 'bytes32', type: 'bytes32', indexed: true },
-      {
-        name: 'participant',
-        internalType: 'address',
-        type: 'address',
-        indexed: true,
-      },
-    ],
-    name: 'ParticipantApplied',
   },
   {
     type: 'event',
@@ -781,25 +798,6 @@ export const rewardManagementAbi = [
         type: 'address',
         indexed: true,
       },
-    ],
-    name: 'ParticipantResubmitted',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'taskId',
-        internalType: 'bytes32',
-        type: 'bytes32',
-        indexed: true,
-      },
-      {
-        name: 'participant',
-        internalType: 'address',
-        type: 'address',
-        indexed: true,
-      },
       { name: 'by', internalType: 'address', type: 'address', indexed: true },
     ],
     name: 'ParticipantWhitelisted',
@@ -816,7 +814,21 @@ export const rewardManagementAbi = [
         indexed: true,
       },
     ],
-    name: 'TaskAccepted',
+    name: 'TaskAssignmentAccepted',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'id', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      {
+        name: 'participant',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'TaskAssignmentApplied',
   },
   {
     type: 'event',
@@ -830,7 +842,67 @@ export const rewardManagementAbi = [
         indexed: true,
       },
     ],
-    name: 'TaskApproved',
+    name: 'TaskAssignmentApproved',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'id', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      {
+        name: 'participant',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'TaskAssignmentCompleted',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'id', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      {
+        name: 'participant',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'rejectedBy',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'reason',
+        internalType: 'string',
+        type: 'string',
+        indexed: false,
+      },
+    ],
+    name: 'TaskAssignmentRejected',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'id', internalType: 'bytes32', type: 'bytes32', indexed: true },
+      {
+        name: 'participant',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'verifier',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'TaskAssignmentVerified',
   },
   {
     type: 'event',
@@ -845,20 +917,6 @@ export const rewardManagementAbi = [
       },
     ],
     name: 'TaskClosed',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'id', internalType: 'bytes32', type: 'bytes32', indexed: true },
-      {
-        name: 'participant',
-        internalType: 'address',
-        type: 'address',
-        indexed: true,
-      },
-    ],
-    name: 'TaskCompleted',
   },
   {
     type: 'event',
@@ -892,52 +950,6 @@ export const rewardManagementAbi = [
     type: 'event',
     anonymous: false,
     inputs: [
-      { name: 'id', internalType: 'bytes32', type: 'bytes32', indexed: true },
-      {
-        name: 'participant',
-        internalType: 'address',
-        type: 'address',
-        indexed: true,
-      },
-      {
-        name: 'rejectedBy',
-        internalType: 'address',
-        type: 'address',
-        indexed: true,
-      },
-      {
-        name: 'reason',
-        internalType: 'string',
-        type: 'string',
-        indexed: false,
-      },
-    ],
-    name: 'TaskRejected',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'id', internalType: 'bytes32', type: 'bytes32', indexed: true },
-      {
-        name: 'participant',
-        internalType: 'address',
-        type: 'address',
-        indexed: true,
-      },
-      {
-        name: 'verifier',
-        internalType: 'address',
-        type: 'address',
-        indexed: true,
-      },
-    ],
-    name: 'TaskVerified',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
       {
         name: 'token',
         internalType: 'address',
@@ -965,6 +977,37 @@ export const rewardManagementAbi = [
       },
     ],
     name: 'TokenTransferred',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'taskId',
+        internalType: 'bytes32',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'token',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'amount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'allocatedBy',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'TokensAllocatedToTask',
   },
   { type: 'fallback', stateMutability: 'payable' },
   {
@@ -1001,11 +1044,33 @@ export const rewardManagementAbi = [
   {
     type: 'function',
     inputs: [
+      { name: 'treasuryAddress', internalType: 'address', type: 'address' },
+      { name: 'tokenAddress', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'acceptTokenTransfer',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
       { name: 'taskId', internalType: 'bytes32', type: 'bytes32' },
       { name: 'participant', internalType: 'address', type: 'address' },
       { name: 'throwError', internalType: 'bool', type: 'bool' },
     ],
     name: 'addToWhitelist',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'taskId', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'tokenAddress', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'allocateTokensToTask',
     outputs: [],
     stateMutability: 'nonpayable',
   },
@@ -1027,8 +1092,11 @@ export const rewardManagementAbi = [
   },
   {
     type: 'function',
-    inputs: [],
-    name: 'closeExpiredTasks',
+    inputs: [
+      { name: 'taskId', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'participant', internalType: 'address', type: 'address' },
+    ],
+    name: 'approveTaskSubmission',
     outputs: [],
     stateMutability: 'nonpayable',
   },
@@ -1055,7 +1123,7 @@ export const rewardManagementAbi = [
       { name: 'taskId', internalType: 'bytes32', type: 'bytes32' },
       {
         name: 'task',
-        internalType: 'struct IRewardManagement.Task',
+        internalType: 'struct ITaskManagement.Task',
         type: 'tuple',
         components: [
           { name: 'name', internalType: 'string', type: 'string' },
@@ -1079,12 +1147,7 @@ export const rewardManagementAbi = [
             type: 'uint256',
           },
           {
-            name: 'verifiedParticipants',
-            internalType: 'address[]',
-            type: 'address[]',
-          },
-          {
-            name: 'rejectedParticipants',
+            name: 'approvedParticipants',
             internalType: 'address[]',
             type: 'address[]',
           },
@@ -1107,7 +1170,18 @@ export const rewardManagementAbi = [
       { name: 'amount', internalType: 'uint256', type: 'uint256' },
       { name: 'remarks', internalType: 'string', type: 'string' },
     ],
-    name: 'disburseAdditionalTokenToTask',
+    name: 'disburseAdditionalTokenToTaskParticipants',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'taskId', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'participant', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'disburseToSingleParticipant',
     outputs: [],
     stateMutability: 'nonpayable',
   },
@@ -1117,32 +1191,9 @@ export const rewardManagementAbi = [
       { name: 'taskId', internalType: 'bytes32', type: 'bytes32' },
       { name: 'amount', internalType: 'uint256', type: 'uint256' },
     ],
-    name: 'disburseTokensToTask',
+    name: 'disburseTokensToTaskParticipants',
     outputs: [],
     stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'getOpenTasks',
-    outputs: [{ name: '', internalType: 'bytes32[]', type: 'bytes32[]' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'taskId', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'participant', internalType: 'address', type: 'address' },
-    ],
-    name: 'getParticipantStatus',
-    outputs: [
-      {
-        name: '',
-        internalType: 'enum IRewardManagement.AssignmentStatus',
-        type: 'uint8',
-      },
-    ],
-    stateMutability: 'view',
   },
   {
     type: 'function',
@@ -1154,85 +1205,19 @@ export const rewardManagementAbi = [
     outputs: [
       {
         name: '',
-        internalType: 'struct IRewardManagement.TaskAssignment',
+        internalType: 'struct ITaskManagement.TaskAssignment',
         type: 'tuple',
         components: [
           { name: 'participant', internalType: 'address', type: 'address' },
           {
             name: 'status',
-            internalType: 'enum IRewardManagement.AssignmentStatus',
+            internalType: 'enum ITaskManagement.AssignmentStatus',
             type: 'uint8',
           },
           { name: 'completionUrl', internalType: 'string', type: 'string' },
         ],
       },
     ],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'taskId', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'getTask',
-    outputs: [
-      {
-        name: 'task',
-        internalType: 'struct IRewardManagement.Task',
-        type: 'tuple',
-        components: [
-          { name: 'name', internalType: 'string', type: 'string' },
-          { name: 'detailsUrl', internalType: 'string', type: 'string' },
-          { name: 'owner', internalType: 'address', type: 'address' },
-          { name: 'expiryDate', internalType: 'uint256', type: 'uint256' },
-          { name: 'rewardToken', internalType: 'address', type: 'address' },
-          {
-            name: 'totalRewardAmount',
-            internalType: 'uint256',
-            type: 'uint256',
-          },
-          { name: 'isOpen', internalType: 'bool', type: 'bool' },
-          { name: 'requireApproval', internalType: 'bool', type: 'bool' },
-          { name: 'isWhitelisted', internalType: 'bool', type: 'bool' },
-          { name: 'isTokenDisbursed', internalType: 'bool', type: 'bool' },
-          { name: 'maxParticipants', internalType: 'uint256', type: 'uint256' },
-          {
-            name: 'acceptedParticipantCount',
-            internalType: 'uint256',
-            type: 'uint256',
-          },
-          {
-            name: 'verifiedParticipants',
-            internalType: 'address[]',
-            type: 'address[]',
-          },
-          {
-            name: 'rejectedParticipants',
-            internalType: 'address[]',
-            type: 'address[]',
-          },
-        ],
-      },
-    ],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'taskId', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'getTaskRejectedParticipants',
-    outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'taskId', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'getTaskVerifiedParticipants',
-    outputs: [{ name: '', internalType: 'address[]', type: 'address[]' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
-    name: 'getTasksByOwner',
-    outputs: [{ name: '', internalType: 'bytes32[]', type: 'bytes32[]' }],
     stateMutability: 'view',
   },
   {
@@ -1255,6 +1240,13 @@ export const rewardManagementAbi = [
     type: 'function',
     inputs: [{ name: 'taskId', internalType: 'bytes32', type: 'bytes32' }],
     name: 'isTaskExpired',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'taskId', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'isTaskOpen',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
     stateMutability: 'view',
   },
@@ -1310,7 +1302,7 @@ export const rewardManagementAbi = [
       { name: 'participant', internalType: 'address', type: 'address' },
       { name: 'reason', internalType: 'string', type: 'string' },
     ],
-    name: 'rejectParticipant',
+    name: 'rejectTaskSubmission',
     outputs: [],
     stateMutability: 'nonpayable',
   },
@@ -1327,16 +1319,6 @@ export const rewardManagementAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'taskId', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'completionUrl', internalType: 'string', type: 'string' },
-    ],
-    name: 'resubmitAfterRejection',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
       { name: '', internalType: 'bytes32', type: 'bytes32' },
       { name: '', internalType: 'address', type: 'address' },
     ],
@@ -1345,7 +1327,7 @@ export const rewardManagementAbi = [
       { name: 'participant', internalType: 'address', type: 'address' },
       {
         name: 'status',
-        internalType: 'enum IRewardManagement.AssignmentStatus',
+        internalType: 'enum ITaskManagement.AssignmentStatus',
         type: 'uint8',
       },
       { name: 'completionUrl', internalType: 'string', type: 'string' },
@@ -1410,16 +1392,6 @@ export const rewardManagementAbi = [
       { name: 'newExpiryDate', internalType: 'uint256', type: 'uint256' },
     ],
     name: 'updateTaskDetails',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'taskId', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'participant', internalType: 'address', type: 'address' },
-    ],
-    name: 'verifyTask',
     outputs: [],
     stateMutability: 'nonpayable',
   },
@@ -2157,66 +2129,12 @@ export const useReadRewardManagementAppId = /*#__PURE__*/ createUseReadContract(
 )
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"getOpenTasks"`
- */
-export const useReadRewardManagementGetOpenTasks =
-  /*#__PURE__*/ createUseReadContract({
-    abi: rewardManagementAbi,
-    functionName: 'getOpenTasks',
-  })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"getParticipantStatus"`
- */
-export const useReadRewardManagementGetParticipantStatus =
-  /*#__PURE__*/ createUseReadContract({
-    abi: rewardManagementAbi,
-    functionName: 'getParticipantStatus',
-  })
-
-/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"getParticipantTaskAssignment"`
  */
 export const useReadRewardManagementGetParticipantTaskAssignment =
   /*#__PURE__*/ createUseReadContract({
     abi: rewardManagementAbi,
     functionName: 'getParticipantTaskAssignment',
-  })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"getTask"`
- */
-export const useReadRewardManagementGetTask =
-  /*#__PURE__*/ createUseReadContract({
-    abi: rewardManagementAbi,
-    functionName: 'getTask',
-  })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"getTaskRejectedParticipants"`
- */
-export const useReadRewardManagementGetTaskRejectedParticipants =
-  /*#__PURE__*/ createUseReadContract({
-    abi: rewardManagementAbi,
-    functionName: 'getTaskRejectedParticipants',
-  })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"getTaskVerifiedParticipants"`
- */
-export const useReadRewardManagementGetTaskVerifiedParticipants =
-  /*#__PURE__*/ createUseReadContract({
-    abi: rewardManagementAbi,
-    functionName: 'getTaskVerifiedParticipants',
-  })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"getTasksByOwner"`
- */
-export const useReadRewardManagementGetTasksByOwner =
-  /*#__PURE__*/ createUseReadContract({
-    abi: rewardManagementAbi,
-    functionName: 'getTasksByOwner',
   })
 
 /**
@@ -2244,6 +2162,15 @@ export const useReadRewardManagementIsTaskExpired =
   /*#__PURE__*/ createUseReadContract({
     abi: rewardManagementAbi,
     functionName: 'isTaskExpired',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"isTaskOpen"`
+ */
+export const useReadRewardManagementIsTaskOpen =
+  /*#__PURE__*/ createUseReadContract({
+    abi: rewardManagementAbi,
+    functionName: 'isTaskOpen',
   })
 
 /**
@@ -2314,6 +2241,15 @@ export const useWriteRewardManagementAcceptParticipant =
   })
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"acceptTokenTransfer"`
+ */
+export const useWriteRewardManagementAcceptTokenTransfer =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: rewardManagementAbi,
+    functionName: 'acceptTokenTransfer',
+  })
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"addToWhitelist"`
  */
 export const useWriteRewardManagementAddToWhitelist =
@@ -2323,12 +2259,21 @@ export const useWriteRewardManagementAddToWhitelist =
   })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"closeExpiredTasks"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"allocateTokensToTask"`
  */
-export const useWriteRewardManagementCloseExpiredTasks =
+export const useWriteRewardManagementAllocateTokensToTask =
   /*#__PURE__*/ createUseWriteContract({
     abi: rewardManagementAbi,
-    functionName: 'closeExpiredTasks',
+    functionName: 'allocateTokensToTask',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"approveTaskSubmission"`
+ */
+export const useWriteRewardManagementApproveTaskSubmission =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: rewardManagementAbi,
+    functionName: 'approveTaskSubmission',
   })
 
 /**
@@ -2359,21 +2304,30 @@ export const useWriteRewardManagementCreateTask =
   })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"disburseAdditionalTokenToTask"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"disburseAdditionalTokenToTaskParticipants"`
  */
-export const useWriteRewardManagementDisburseAdditionalTokenToTask =
+export const useWriteRewardManagementDisburseAdditionalTokenToTaskParticipants =
   /*#__PURE__*/ createUseWriteContract({
     abi: rewardManagementAbi,
-    functionName: 'disburseAdditionalTokenToTask',
+    functionName: 'disburseAdditionalTokenToTaskParticipants',
   })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"disburseTokensToTask"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"disburseToSingleParticipant"`
  */
-export const useWriteRewardManagementDisburseTokensToTask =
+export const useWriteRewardManagementDisburseToSingleParticipant =
   /*#__PURE__*/ createUseWriteContract({
     abi: rewardManagementAbi,
-    functionName: 'disburseTokensToTask',
+    functionName: 'disburseToSingleParticipant',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"disburseTokensToTaskParticipants"`
+ */
+export const useWriteRewardManagementDisburseTokensToTaskParticipants =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: rewardManagementAbi,
+    functionName: 'disburseTokensToTaskParticipants',
   })
 
 /**
@@ -2404,12 +2358,12 @@ export const useWriteRewardManagementPause =
   })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"rejectParticipant"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"rejectTaskSubmission"`
  */
-export const useWriteRewardManagementRejectParticipant =
+export const useWriteRewardManagementRejectTaskSubmission =
   /*#__PURE__*/ createUseWriteContract({
     abi: rewardManagementAbi,
-    functionName: 'rejectParticipant',
+    functionName: 'rejectTaskSubmission',
   })
 
 /**
@@ -2419,15 +2373,6 @@ export const useWriteRewardManagementRemoveFromWhitelist =
   /*#__PURE__*/ createUseWriteContract({
     abi: rewardManagementAbi,
     functionName: 'removeFromWhitelist',
-  })
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"resubmitAfterRejection"`
- */
-export const useWriteRewardManagementResubmitAfterRejection =
-  /*#__PURE__*/ createUseWriteContract({
-    abi: rewardManagementAbi,
-    functionName: 'resubmitAfterRejection',
   })
 
 /**
@@ -2458,15 +2403,6 @@ export const useWriteRewardManagementUpdateTaskDetails =
   })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"verifyTask"`
- */
-export const useWriteRewardManagementVerifyTask =
-  /*#__PURE__*/ createUseWriteContract({
-    abi: rewardManagementAbi,
-    functionName: 'verifyTask',
-  })
-
-/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"withdrawEther"`
  */
 export const useWriteRewardManagementWithdrawEther =
@@ -2491,6 +2427,15 @@ export const useSimulateRewardManagementAcceptParticipant =
   })
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"acceptTokenTransfer"`
+ */
+export const useSimulateRewardManagementAcceptTokenTransfer =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: rewardManagementAbi,
+    functionName: 'acceptTokenTransfer',
+  })
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"addToWhitelist"`
  */
 export const useSimulateRewardManagementAddToWhitelist =
@@ -2500,12 +2445,21 @@ export const useSimulateRewardManagementAddToWhitelist =
   })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"closeExpiredTasks"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"allocateTokensToTask"`
  */
-export const useSimulateRewardManagementCloseExpiredTasks =
+export const useSimulateRewardManagementAllocateTokensToTask =
   /*#__PURE__*/ createUseSimulateContract({
     abi: rewardManagementAbi,
-    functionName: 'closeExpiredTasks',
+    functionName: 'allocateTokensToTask',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"approveTaskSubmission"`
+ */
+export const useSimulateRewardManagementApproveTaskSubmission =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: rewardManagementAbi,
+    functionName: 'approveTaskSubmission',
   })
 
 /**
@@ -2536,21 +2490,30 @@ export const useSimulateRewardManagementCreateTask =
   })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"disburseAdditionalTokenToTask"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"disburseAdditionalTokenToTaskParticipants"`
  */
-export const useSimulateRewardManagementDisburseAdditionalTokenToTask =
+export const useSimulateRewardManagementDisburseAdditionalTokenToTaskParticipants =
   /*#__PURE__*/ createUseSimulateContract({
     abi: rewardManagementAbi,
-    functionName: 'disburseAdditionalTokenToTask',
+    functionName: 'disburseAdditionalTokenToTaskParticipants',
   })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"disburseTokensToTask"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"disburseToSingleParticipant"`
  */
-export const useSimulateRewardManagementDisburseTokensToTask =
+export const useSimulateRewardManagementDisburseToSingleParticipant =
   /*#__PURE__*/ createUseSimulateContract({
     abi: rewardManagementAbi,
-    functionName: 'disburseTokensToTask',
+    functionName: 'disburseToSingleParticipant',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"disburseTokensToTaskParticipants"`
+ */
+export const useSimulateRewardManagementDisburseTokensToTaskParticipants =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: rewardManagementAbi,
+    functionName: 'disburseTokensToTaskParticipants',
   })
 
 /**
@@ -2581,12 +2544,12 @@ export const useSimulateRewardManagementPause =
   })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"rejectParticipant"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"rejectTaskSubmission"`
  */
-export const useSimulateRewardManagementRejectParticipant =
+export const useSimulateRewardManagementRejectTaskSubmission =
   /*#__PURE__*/ createUseSimulateContract({
     abi: rewardManagementAbi,
-    functionName: 'rejectParticipant',
+    functionName: 'rejectTaskSubmission',
   })
 
 /**
@@ -2596,15 +2559,6 @@ export const useSimulateRewardManagementRemoveFromWhitelist =
   /*#__PURE__*/ createUseSimulateContract({
     abi: rewardManagementAbi,
     functionName: 'removeFromWhitelist',
-  })
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"resubmitAfterRejection"`
- */
-export const useSimulateRewardManagementResubmitAfterRejection =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: rewardManagementAbi,
-    functionName: 'resubmitAfterRejection',
   })
 
 /**
@@ -2632,15 +2586,6 @@ export const useSimulateRewardManagementUpdateTaskDetails =
   /*#__PURE__*/ createUseSimulateContract({
     abi: rewardManagementAbi,
     functionName: 'updateTaskDetails',
-  })
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link rewardManagementAbi}__ and `functionName` set to `"verifyTask"`
- */
-export const useSimulateRewardManagementVerifyTask =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: rewardManagementAbi,
-    functionName: 'verifyTask',
   })
 
 /**
@@ -2686,6 +2631,15 @@ export const useWatchRewardManagementContractUnpausedEvent =
   })
 
 /**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementAbi}__ and `eventName` set to `"DisbursementToParticipant"`
+ */
+export const useWatchRewardManagementDisbursementToParticipantEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: rewardManagementAbi,
+    eventName: 'DisbursementToParticipant',
+  })
+
+/**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementAbi}__ and `eventName` set to `"DisbursementToTask"`
  */
 export const useWatchRewardManagementDisbursementToTaskEvent =
@@ -2704,30 +2658,12 @@ export const useWatchRewardManagementEtherWithdrawnEvent =
   })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementAbi}__ and `eventName` set to `"ParticipantApplied"`
- */
-export const useWatchRewardManagementParticipantAppliedEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: rewardManagementAbi,
-    eventName: 'ParticipantApplied',
-  })
-
-/**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementAbi}__ and `eventName` set to `"ParticipantRemovedFromWhitelist"`
  */
 export const useWatchRewardManagementParticipantRemovedFromWhitelistEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: rewardManagementAbi,
     eventName: 'ParticipantRemovedFromWhitelist',
-  })
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementAbi}__ and `eventName` set to `"ParticipantResubmitted"`
- */
-export const useWatchRewardManagementParticipantResubmittedEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: rewardManagementAbi,
-    eventName: 'ParticipantResubmitted',
   })
 
 /**
@@ -2740,21 +2676,57 @@ export const useWatchRewardManagementParticipantWhitelistedEvent =
   })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementAbi}__ and `eventName` set to `"TaskAccepted"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementAbi}__ and `eventName` set to `"TaskAssignmentAccepted"`
  */
-export const useWatchRewardManagementTaskAcceptedEvent =
+export const useWatchRewardManagementTaskAssignmentAcceptedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: rewardManagementAbi,
-    eventName: 'TaskAccepted',
+    eventName: 'TaskAssignmentAccepted',
   })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementAbi}__ and `eventName` set to `"TaskApproved"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementAbi}__ and `eventName` set to `"TaskAssignmentApplied"`
  */
-export const useWatchRewardManagementTaskApprovedEvent =
+export const useWatchRewardManagementTaskAssignmentAppliedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: rewardManagementAbi,
-    eventName: 'TaskApproved',
+    eventName: 'TaskAssignmentApplied',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementAbi}__ and `eventName` set to `"TaskAssignmentApproved"`
+ */
+export const useWatchRewardManagementTaskAssignmentApprovedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: rewardManagementAbi,
+    eventName: 'TaskAssignmentApproved',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementAbi}__ and `eventName` set to `"TaskAssignmentCompleted"`
+ */
+export const useWatchRewardManagementTaskAssignmentCompletedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: rewardManagementAbi,
+    eventName: 'TaskAssignmentCompleted',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementAbi}__ and `eventName` set to `"TaskAssignmentRejected"`
+ */
+export const useWatchRewardManagementTaskAssignmentRejectedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: rewardManagementAbi,
+    eventName: 'TaskAssignmentRejected',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementAbi}__ and `eventName` set to `"TaskAssignmentVerified"`
+ */
+export const useWatchRewardManagementTaskAssignmentVerifiedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: rewardManagementAbi,
+    eventName: 'TaskAssignmentVerified',
   })
 
 /**
@@ -2764,15 +2736,6 @@ export const useWatchRewardManagementTaskClosedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: rewardManagementAbi,
     eventName: 'TaskClosed',
-  })
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementAbi}__ and `eventName` set to `"TaskCompleted"`
- */
-export const useWatchRewardManagementTaskCompletedEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: rewardManagementAbi,
-    eventName: 'TaskCompleted',
   })
 
 /**
@@ -2794,30 +2757,21 @@ export const useWatchRewardManagementTaskDetailsUpdatedEvent =
   })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementAbi}__ and `eventName` set to `"TaskRejected"`
- */
-export const useWatchRewardManagementTaskRejectedEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: rewardManagementAbi,
-    eventName: 'TaskRejected',
-  })
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementAbi}__ and `eventName` set to `"TaskVerified"`
- */
-export const useWatchRewardManagementTaskVerifiedEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: rewardManagementAbi,
-    eventName: 'TaskVerified',
-  })
-
-/**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementAbi}__ and `eventName` set to `"TokenTransferred"`
  */
 export const useWatchRewardManagementTokenTransferredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: rewardManagementAbi,
     eventName: 'TokenTransferred',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link rewardManagementAbi}__ and `eventName` set to `"TokensAllocatedToTask"`
+ */
+export const useWatchRewardManagementTokensAllocatedToTaskEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: rewardManagementAbi,
+    eventName: 'TokensAllocatedToTask',
   })
 
 /**

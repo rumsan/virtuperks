@@ -3,17 +3,8 @@ import { DialogButton } from "@/components/common/ui/dialog";
 import { DisperseButton } from "@/components/common/ui/disperse-button";
 import { Cuid } from "@/components/departments/details/details.main";
 import { useGetEntityRole } from "@/hooks/subgraph/entity";
-import {
-  useCheckParticipantStatus,
-  useGetCombineStausByTask,
-} from "@/hooks/subgraph/querycall";
-import {
-  useCheckTaskStatus,
-  useCheckTaskVerifiedParticipant,
-  useCloseTaskMutation,
-  useGetRejectedParticipants,
-  useGetTaskById,
-} from "@/hooks/subgraph/task";
+import { useGetCombineStausByTask } from "@/hooks/subgraph/querycall";
+import { useCloseTaskMutation, useGetTaskById } from "@/hooks/subgraph/task";
 import { useDisburseTokenToTask } from "@/hooks/subgraph/token";
 import { PATHS } from "@/routes/paths";
 import hasRole from "@/utils/role";
@@ -37,50 +28,20 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDisbursed, setIsDisbursed] = useState(false);
   const { address } = useAccount();
-
   const taskData = getTaskDetail?.data?.data?.taskCreateds[0];
 
-  const { entityRole, roleLoading } = useGetEntityRole(
+  // Wrap setIsOpen to track state changes
+  const handleSetIsOpen = (value: boolean) => {
+    setIsOpen(value);
+  };
+
+  const { entityRole } = useGetEntityRole(
     taskData?.rewardManagement?.rewardManagement || "",
   );
   const hasEntityOwnerRole = !!hasRole({
     role: entityRole || "",
     address,
   });
-
-  const { status: participantStatus, isLoading: statusLoading } =
-    useCheckParticipantStatus(
-      taskData?.internal_id,
-      taskData?.rewardManagement?.rewardManagement,
-    );
-  const fetchRejectedParticipant = useGetRejectedParticipants(cuid.id);
-
-  const { verifiedTaskParticipant: verifiedParticipants } =
-    useCheckTaskVerifiedParticipant(
-      taskData?.internal_id,
-      taskData?.rewardManagement?.rewardManagement,
-    );
-  const hasVerifiedParticipants = (verifiedParticipants?.length ?? 0) > 0;
-  const {
-    taskDetail,
-    status: isTokenDisbursedFromContract,
-    statusLoading: taskDetailLoading,
-  } = useCheckTaskStatus(
-    taskData?.internal_id ?? "",
-    taskData?.rewardManagement.rewardManagement ?? "",
-  );
-
-  const isTaskExpired = !taskDetail?.isOpen;
-  const { disburseTokenToTask, disbursePending } = useDisburseTokenToTask();
-  const closeTaskMutation = useCloseTaskMutation();
-
-  const taskReady = !taskDetailLoading;
-  // const isDisburseButtonDisabled =
-  //   !taskReady ||
-  //   isTokenDisbursedFromContract ||
-  //   hasVerifiedParticipants == false;
-  const isCloseButtonDisabled =
-    !taskReady || isTaskExpired || !hasEntityOwnerRole;
 
   const {
     pendingParticipants,
@@ -90,6 +51,25 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
     rejectedParticipants,
     combineParticipantsLoading: participantsLoading,
   } = useGetCombineStausByTask(taskData?.internal_id);
+
+  const hasVerifiedParticipants = (verifiedPartcipants?.length ?? 0) > 0;
+  const isTokenDisbursedFromContract =
+    taskData?.taskDetail?.isTokenDisbursed ?? false;
+  const isTaskExpired = !taskData?.taskDetail?.isOpen;
+
+  const { disburseTokenToTask, disbursePending } = useDisburseTokenToTask();
+  const closeTaskMutation = useCloseTaskMutation();
+
+  const taskReady = !!taskData;
+
+  const isDisburseButtonDisabled =
+    !hasVerifiedParticipants ||
+    !hasEntityOwnerRole ||
+    isTokenDisbursedFromContract ||
+    isDisbursed;
+
+  const isCloseButtonDisabled =
+    !taskReady || isTaskExpired || !hasEntityOwnerRole;
 
   const handleCloseTask = async () => {
     try {
@@ -109,38 +89,30 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
   };
 
   const handleDialogAction = async (data: any) => {
+    setIsOpen(false);
     try {
       await disburseTokenToTask({
         taskId: taskData.internal_id,
         amount: data.amount,
         entityId: taskData.rewardManagement.rewardManagement,
       });
-      setIsOpen(false);
       setIsDisbursed(true);
       toast({
-        title: "Disperse Token Successfully!",
+        title: "Disburse Token Successfully!",
         variant: "success",
         duration: 2000,
       });
     } catch (error) {
-      console.error("Error approving task:", error);
+      console.error("❌ Disbursement failed:", error);
       toast({
-        title: "Failed To Approve Task. Please Try Again.",
+        title: "Failed To Disburse Tokens. Please Try Again.",
         variant: "destructive",
         duration: 2000,
       });
     }
   };
 
-  // Calculate if button should be disabled
-  const isDisburseButtonDisabled =
-    !taskReady || !hasVerifiedParticipants || !hasEntityOwnerRole;
-
-  const isLoading =
-    getTaskDetail.isLoading ||
-    taskDetailLoading ||
-    disbursePending ||
-    participantsLoading;
+  const isLoading = getTaskDetail.isLoading || participantsLoading;
 
   if (isLoading) {
     return (
@@ -183,8 +155,9 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
               isDisabled={isDisburseButtonDisabled}
               hasVerifiedParticipants={hasVerifiedParticipants}
               hasEntityOwnerRole={hasEntityOwnerRole}
-              onClick={() => setIsOpen(true)}
+              onClick={() => handleSetIsOpen(true)}
               isDisbursed={isDisbursed}
+              isLoading={disbursePending}
             />
             <div className="relative group">
               {/* Wrapper hides cursor */}
@@ -219,8 +192,8 @@ const TaskMain = ({ cuid, router }: TaskMainProps) => {
 
             <DialogButton
               isOpen={isOpen}
-              setIsOpen={setIsOpen}
-              title="Are you sure you want to disperse the amount?"
+              setIsOpen={handleSetIsOpen}
+              title="Are you sure you want to disburse the amount?"
               subTitle="This action cannot be undone"
               buttonName="Disperse"
               submitType="Disperse"

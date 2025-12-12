@@ -1,10 +1,8 @@
 "use client";
 
-import {
-  useCheckTotalUnallocatedTokens,
-  useGetAllEntity,
-  useGetEntityById,
-} from "@/hooks/subgraph/entity";
+import { useSelectParticipantLookUp } from "@/hooks/client/participant.lookup";
+import { useGetEntityById } from "@/hooks/subgraph/entity";
+import { useGetApprovedTokens } from "@/hooks/subgraph/token";
 import { Button } from "@workspace/ui/components/button";
 import { Calendar } from "@workspace/ui/components/calendar";
 import {
@@ -30,7 +28,7 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Info } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -43,17 +41,6 @@ interface TaskFormProps {
   form: UseFormReturn<any>;
   isPending: boolean;
 }
-type EntityType = {
-  aclAddress: string;
-  blockNumber: string;
-  blockTimeStamp: string;
-  rewardManagement: string;
-  id: string;
-  transactionHash: string;
-  __typename: string;
-  _appId: string;
-  name: string;
-};
 
 export default function TaskBaseForm({
   mode,
@@ -66,23 +53,21 @@ export default function TaskBaseForm({
   const [currentWallet, setCurrentWallet] = useState("");
   const [walletAddresses, setWalletAddresses] = useState<string[]>([]);
   const [showAddParticipants, setShowAddParticipants] = useState(false);
-  const getAllEntity = useGetAllEntity();
-  const entityList = getAllEntity?.data?.data?.rewardManagementCreateds;
   const params = useParams();
   const cuid = params?.id as string;
   const { data: entity, isLoading: entityLoading } = useGetEntityById(cuid);
-
   const {
     watch,
     formState: { errors },
     setError,
     clearErrors,
   } = form;
+  const { name, mappedTreasurers, isLoading } = useSelectParticipantLookUp();
 
   const entityAddress = watch("entityAddress");
   const totalRewardAmount = watch("totalRewardAmount");
 
-  const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
+  const { totalApproved: unallocatedTokens } = useGetApprovedTokens(
     entityAddress ?? "",
   );
 
@@ -96,7 +81,7 @@ export default function TaskBaseForm({
     if (!entityAddress) return;
     if (unallocatedTokens === undefined) return;
 
-    if (unallocatedTokens === BigInt(0)) {
+    if (unallocatedTokens === "0") {
       setError("entityAddress", {
         type: "manual",
         message:
@@ -107,21 +92,33 @@ export default function TaskBaseForm({
     }
   }, [entityAddress, unallocatedTokens, setError, clearErrors]);
 
-  const handleAddWallet = () => {
+  const handleAddWallet = async () => {
     if (currentWallet && isAddress(currentWallet)) {
-      setWalletAddresses((prev) => [...prev, currentWallet]);
-      form.setValue("whitelistedParticipants", [
-        ...walletAddresses,
-        currentWallet,
-      ]);
+      const updated = [...walletAddresses, currentWallet];
+
+      setWalletAddresses(updated);
+
+      form.setValue("whitelistedParticipants", updated, {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
+
+      await form.trigger("whitelistedParticipants");
+
       setCurrentWallet("");
     }
   };
 
-  const removeWallet = (addressToRemove: string) => {
-    const filtered = walletAddresses.filter((addr) => addr !== addressToRemove);
-    setWalletAddresses(filtered);
-    form.setValue("whitelistedParticipants", filtered);
+  const removeWallet = async (addressToRemove: string) => {
+    const updated = walletAddresses.filter((addr) => addr !== addressToRemove);
+    setWalletAddresses(updated);
+    form.setValue("whitelistedParticipants", updated, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+    await form.trigger("whitelistedParticipants");
   };
 
   useEffect(() => {
@@ -158,6 +155,7 @@ export default function TaskBaseForm({
       <form onSubmit={form.handleSubmit(handleSubmitForm)}>
         <div className="p-6">
           <div className="flex flex-col w-full gap-4 mb-5">
+            {/* Task Title */}
             <FormField
               control={form.control}
               name="name"
@@ -171,7 +169,6 @@ export default function TaskBaseForm({
                       value={field.value ?? ""}
                       onChange={(e) => {
                         const value = e.target.value;
-                        // Prevent space as the first character
                         if (value.length === 1 && value[0] === " ") return;
                         field.onChange(value);
                       }}
@@ -182,6 +179,7 @@ export default function TaskBaseForm({
               )}
             />
 
+            {/* Task URL */}
             <FormField
               control={form.control}
               name="detailsUrl"
@@ -189,69 +187,14 @@ export default function TaskBaseForm({
                 <FormItem>
                   <FormLabel>Task URL</FormLabel>
                   <FormControl>
-                    <div className="relative flex items-center bg-white rounded-md">
-                      <Input
-                        placeholder="Write title Url"
-                        {...field}
-                        value={field.value ?? ""}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          if (value.length === 1 && value[0] === " ") return;
-                          field.onChange(value);
-                        }}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="maxParticipants"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Max Number of Participants</FormLabel>
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    {...field}
-                    value={
-                      field.value !== undefined && field.value !== null
-                        ? field.value.toString()
-                        : ""
-                    }
-                    onChange={(e) => {
-                      const value = e.target.value;
-
-                      field.onChange(
-                        value === "" ? undefined : parseInt(value, 10),
-                      );
-                    }}
-                  />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-5">
-            <FormField
-              control={form.control}
-              name="totalRewardAmount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Reward Amount</FormLabel>
-                  <FormControl>
                     <Input
-                      type="number"
-                      placeholder="0"
+                      placeholder="Write title Url"
                       {...field}
-                      value={field.value === 0 ? "" : (field.value ?? "")}
+                      value={field.value ?? ""}
                       onChange={(e) => {
-                        const val = e.target.value;
-
-                        field.onChange(val === "" ? undefined : Number(val));
+                        const value = e.target.value;
+                        if (value.length === 1 && value[0] === " ") return;
+                        field.onChange(value);
                       }}
                     />
                   </FormControl>
@@ -260,6 +203,73 @@ export default function TaskBaseForm({
               )}
             />
 
+            {/* Max participants + Treasurer */}
+            <div className="grid grid-cols-2 gap-4 mb-5">
+           
+              <FormField
+  control={form.control}
+  name="totalRewardAmount"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Reward Amount</FormLabel>
+      <FormControl>
+        <Input
+          type="number"
+          placeholder="0"
+          {...field}
+          value={field.value === 0 ? "" : (field.value ?? "")}
+          onChange={(e) => {
+            const val = e.target.value;
+            field.onChange(val === "" ? undefined : Number(val));
+          }}
+        />
+      </FormControl>
+
+      {/* Professional disclaimer */}
+      <div className="flex items-start gap-2 mt-2 bg-blue-50 border border-blue-200 rounded-md p-2">
+        <Info className="text-blue-500 mt-0.5" size={18} />
+        <p className="text-sm text-blue-700">
+          <span className="font-semibold">Note:</span> This amount will be 
+          <span className="font-semibold"> equally distributed </span> among the verified participants.
+        </p>
+      </div>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+            </div>
+          </div>
+
+          {/* Reward + Token + Entity */}
+          <div className="grid grid-cols-2 gap-4 mb-5">
+         <FormField
+                control={form.control}
+                name="maxParticipants"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Max Number of Participants</FormLabel>
+                    <Input
+                      type="number"
+                      placeholder="0"
+                      {...field}
+                      value={
+                        field.value !== undefined && field.value !== null
+                          ? field.value.toString()
+                          : ""
+                      }
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        field.onChange(
+                          value === "" ? undefined : parseInt(value, 10),
+                        );
+                      }}
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+            {/* Token */}
             <FormField
               control={form.control}
               name="rewardToken"
@@ -270,7 +280,7 @@ export default function TaskBaseForm({
                     <Select
                       onValueChange={(value) => field.onChange(value)}
                       value={process.env.NEXT_PUBLIC_RAHAT_TOKEN || ""}
-                      disabled // Make it read-only
+                      disabled
                     >
                       <SelectTrigger>
                         <SelectValue>Rahat Token</SelectValue>
@@ -289,6 +299,7 @@ export default function TaskBaseForm({
               )}
             />
 
+            {/* Entity */}
             <FormField
               control={form.control}
               name="entityAddress"
@@ -303,14 +314,11 @@ export default function TaskBaseForm({
                         disabled
                         className="bg-gray-100 cursor-not-allowed"
                       />
-                      {/* keep only the rewardManagement address in form submission */}
                       <input
                         type="hidden"
                         {...field}
                         value={entity?.rewardManagement || ""}
                       />
-
-                      {/* 👇 Display available tokens here */}
                       {unallocatedTokens !== undefined && (
                         <span className="text-sm text-gray-500">
                           Available Tokens: {unallocatedTokens.toString()}
@@ -323,33 +331,7 @@ export default function TaskBaseForm({
               )}
             />
 
-            {/* <FormField
-              control={form.control}
-              name="isOpen"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Event status </FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={(value) =>
-                        field.onChange(value === "true")
-                      }
-                      value={field.value ? "true" : "false"}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select event status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="true">True</SelectItem>
-                        <SelectItem value="false">False</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
-
+            {/* Expiry Date */}
             <FormField
               control={form.control}
               name="expiryDate"
@@ -374,8 +356,9 @@ export default function TaskBaseForm({
                             <Button
                               type="button"
                               variant="outline"
-                              className={`w-full font-normal ${!field.value && "text-muted-foreground"
-                                }`}
+                              className={`w-full font-normal ${
+                                !field.value && "text-muted-foreground"
+                              }`}
                             >
                               {field.value ? (
                                 format(new Date(field.value), "MM/dd/yyyy")
@@ -411,29 +394,40 @@ export default function TaskBaseForm({
               }}
             />
 
+            {/* Owner */}
             <FormField
               control={form.control}
               name="owner"
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <FormItem>
                   <FormLabel>Set Task Owner</FormLabel>
-                  <Input
-                    type="string"
-                    placeholder="Add owner Address"
-                    {...field}
-                    value={field.value ?? ""}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (value.length === 1 && value[0] === " ") return;
-                      field.onChange(value);
-                    }}
-                  />
-                  <FormMessage />
+
+                  <FormControl>
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={isLoading}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Owner" />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        {name.map((p: any) => (
+                          <SelectItem key={p.address} value={p.address}>
+                            {p.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+
+                  {fieldState.error && <FormMessage />}
                 </FormItem>
               )}
             />
 
-            <FormField
+<FormField
               control={form.control}
               name="requireApproval"
               render={({ field }) => (
@@ -456,11 +450,9 @@ export default function TaskBaseForm({
                 </FormItem>
               )}
             />
-
-
           </div>
 
-          {/* isWhitelisted Toggle */}
+          {/* Whitelist Toggle */}
           <div className="mb-5">
             <FormField
               control={form.control}
@@ -472,7 +464,7 @@ export default function TaskBaseForm({
                       Whitelist Participants
                     </FormLabel>
                     <p className="text-sm text-gray-500">
-                      Enable this to restrict task to specific wallet addresses
+                      Restrict task to specific wallet addresses
                     </p>
                   </div>
                   <FormControl>
@@ -483,7 +475,6 @@ export default function TaskBaseForm({
                         checked={field.value}
                         onChange={(e) => {
                           field.onChange(e.target.checked);
-                          // Clear whitelisted participants when disabling
                           if (!e.target.checked) {
                             setWalletAddresses([]);
                             form.setValue("whitelistedParticipants", []);
@@ -498,95 +489,96 @@ export default function TaskBaseForm({
             />
           </div>
 
-          {/* When task is whitelisted, show button to add participants */}
+          {/* Add Participants */}
           {watch("isWhitelisted") && !showAddParticipants && (
-  <div className="mt-2 p-2 border border-blue-300 bg-blue-50 rounded-lg mb-5">
-    <p className="text-sm text-gray-700 mb-2">
-      Whitelisting is enabled for this task. You can add participants or continue without adding any.
-    </p>
+            <div className="mt-2 p-2 border border-blue-300 bg-blue-50 rounded-lg mb-5">
+              <p className="text-sm text-gray-700 mb-2">
+                Whitelisting is enabled for this task. You can add participants
+                or continue without adding any.
+              </p>
 
-    <Button
-      type="button"
-      className="mt-1"
-      onClick={() => setShowAddParticipants(true)}
-    >
-      Add Participants
-    </Button>
-  </div>
-)}
-
-
-
-
-          {/* Conditionally render whitelisted participants field */}
-          {watch("isWhitelisted") && showAddParticipants && (
-  <FormField
-    control={form.control}
-    name="whitelistedParticipants"
-    render={({ field }) => (
-      <FormItem>
-        <FormLabel>Add Participant Addresses</FormLabel>
-
-        <div className="space-y-4">
-          <div className="flex gap-2">
-            <Input
-              type="text"
-              placeholder="Paste wallet address"
-              value={currentWallet}
-              onChange={(e) => setCurrentWallet(e.target.value)}
-            />
-            <Button
-              type="button"
-              onClick={handleAddWallet}
-              disabled={!isAddress(currentWallet)}
-            >
-              Add
-            </Button>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {walletAddresses.map((address) => (
-              <div
-                key={address}
-                className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full"
+              <Button
+                type="button"
+                className="mt-1"
+                onClick={() => setShowAddParticipants(true)}
               >
-                <span className="text-sm">{address}</span>
-                <button
-                  type="button"
-                  onClick={() => removeWallet(address)}
-                  className="text-gray-500 hover:text-red-500"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
+                Add Participants
+              </Button>
+            </div>
+          )}
 
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-)}
+          {/* Participant Selector */}
+          {watch("isWhitelisted") && showAddParticipants && (
+            <FormField
+              control={form.control}
+              name="whitelistedParticipants"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Add Participant Addresses</FormLabel>
+                  <div className="space-y-4">
+                    {/* Dropdown */}
+                    <div className="flex gap-2">
+                      <Select
+                        onValueChange={(val) => setCurrentWallet(val)}
+                        disabled={isLoading}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select participant" />
+                        </SelectTrigger>
 
+                        <SelectContent>
+                          {name.map((p: any) => (
+                            <SelectItem key={p.address} value={p.address}>
+                              {p.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
 
+                      <Button
+                        type="button"
+                        onClick={handleAddWallet}
+                        disabled={!currentWallet}
+                      >
+                        Add
+                      </Button>
+                    </div>
+
+                    {/* Display Added Wallets */}
+                    <div className="flex flex-wrap gap-2">
+                      {walletAddresses.map((address) => (
+                        <div
+                          key={address}
+                          className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full"
+                        >
+                          <span className="text-sm">{address}</span>
+                          <button
+                            type="button"
+                            onClick={() => removeWallet(address)}
+                            className="text-gray-500 hover:text-red-500"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+
+          {/* Submit + Cancel */}
           <div className="w-full flex justify-end gap-4">
             <Button
               variant="outline"
               type="button"
-              className={`w-[170px] flex justify-center items-center gap-2 ${isPending
-                ? "cursor-not-allowed opacity-70"
-                : "hover:bg-gray-100"
-                }`}
-              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+              className={`w-[170px] ${isPending ? "opacity-70" : ""}`}
+              onClick={(e) => {
                 e.preventDefault();
                 if (!isPending) history.back();
               }}
-              title={
-                isPending
-                  ? "Cannot cancel while task is being created"
-                  : "Cancel"
-              }
             >
               Cancel
             </Button>
@@ -594,39 +586,10 @@ export default function TaskBaseForm({
             <Button
               type="submit"
               variant="default"
-              className="w-[170px] flex justify-center items-center gap-2"
+              className="w-[170px]"
               disabled={isPending}
             >
-              {isPending ? (
-                <>
-                  {/* Spinner */}
-                  <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  {/* Optional disabled icon */}
-                  <span className="mr-1">🚫</span>
-                  Processing...
-                </>
-              ) : (
-                "Create"
-              )}
+              {isPending ? "Processing..." : "Create"}
             </Button>
           </div>
         </div>

@@ -1,18 +1,12 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { toast } from "@workspace/ui/hooks/use-toast";
-import { Check, Copy, Loader2, User, UserMinus } from "lucide-react";
+import { Check, Copy, User } from "lucide-react";
 import { useState } from "react";
 
 export function useColumns<
   T extends { participant: string }
->(p0: {
-  addToWhitelist: (participant: string) => Promise<void>;
-  removeFromWhitelist: (participant: string) => Promise<void>;
-  removePending: boolean;
-  canRemove: boolean;
-}): ColumnDef<T>[] {
+>(): ColumnDef<T>[] {
 
   return [
     {
@@ -26,7 +20,6 @@ export function useColumns<
       cell: ({ row }) => {
         const wallet = row.original.participant;
         const [copied, setCopied] = useState(false);
-        const [isRemoving, setIsRemoving] = useState(false);
 
         const handleCopy = async () => {
           try {
@@ -35,30 +28,6 @@ export function useColumns<
             setTimeout(() => setCopied(false), 1500);
           } catch (err) {
             console.error("Failed to copy address:", err);
-          }
-        };
-
-        const handleRemove = async () => {
-          try {
-            setIsRemoving(true);
-
-            await p0.removeFromWhitelist(wallet);
-
-            toast({
-              title: "Removed",
-              description: `Participant ${wallet} removed from whitelist`,
-              variant: "success",
-              duration: 5000,
-            });
-          } catch (err: any) {
-            toast({
-              title: "Error",
-              description: err?.message || "Failed to remove participant",
-              variant: "destructive",
-              duration: 5000,
-            });
-          } finally {
-            setIsRemoving(false);
           }
         };
 
@@ -87,26 +56,6 @@ export function useColumns<
                 )}
               </button>
             </div>
-
-            {/* Remove Button (only for entity owner) */}
-            {p0.canRemove && (
-              <button
-                onClick={handleRemove}
-                disabled={isRemoving || p0.removePending}
-                className={`flex items-center transition-all ${
-                  isRemoving
-                    ? "text-red-300 opacity-70 cursor-not-allowed"
-                    : "text-red-500 hover:text-red-700"
-                }`}
-                title="Remove from whitelist"
-              >
-                {isRemoving ? (
-                  <Loader2 size={20} className="animate-spin" />
-                ) : (
-                  <UserMinus size={22} />
-                )}
-              </button>
-            )}
           </div>
         );
       },

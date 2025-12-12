@@ -5,11 +5,8 @@ import { toUtf8Bytes } from "ethers";
 import { keccak256 } from "viem";
 import {
   useReadRewardManagementFactoryGetEntityOwners,
-  useReadRewardManagementGetTotalUnallocatedTokens,
   useReadRewardManagementOwner,
-  useReadRewardManagementTotalAllocatedTokens,
   useWriteRewardManagementFactoryCreateRewardManagement,
-  useWriteRewardTokenMint,
 } from "../wagmi/contracts";
 
 export const useGetAllEntity = () => {
@@ -93,68 +90,6 @@ export const useGetEntityById = (rewardManagement: string) => {
   });
 };
 
-// Mint tokens
-export const useRewardTokenMint = () => {
-  const { writeContractAsync } = useWriteRewardTokenMint();
-
-  const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
-
-  const mutation = useMutation({
-    mutationFn: async ({
-      address,
-      amount,
-    }: {
-      address: string;
-      amount: number;
-    }) => {
-      const result = await writeContractAsync({
-        address: tokenAddress,
-        args: [address as `0x${string}`, BigInt(amount)],
-      });
-      return result;
-    },
-  });
-
-  return {
-    tokenMint: mutation.mutateAsync,
-    mintPending: mutation.isPending,
-    mintSuccess: mutation.isSuccess,
-    mintError: mutation.isError,
-  };
-};
-
-export const useCheckTotalUnallocatedTokens = (entityId: string) => {
-  const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
-
-  const { data, isError, isLoading } =
-    useReadRewardManagementGetTotalUnallocatedTokens({
-      address: entityId as `0x${string}`,
-      args: [tokenAddress],
-    });
-
-  return {
-    unallocatedTokens: data,
-    isError,
-    statusLoading: isLoading,
-  };
-};
-
-export const useCheckTotalAllocatedTokens = (entityId: string) => {
-  const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
-
-  const { data, isError, isLoading } =
-    useReadRewardManagementTotalAllocatedTokens({
-      address: entityId as `0x${string}`,
-      args: [tokenAddress],
-    });
-
-  return {
-    totalAllocatedTokens: data,
-    isError,
-    statusLoading: isLoading,
-  };
-};
-
 export const useGetEntityOwners = (entityId: string) => {
   const factoryAddress = process.env
     .NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}`;
@@ -213,8 +148,13 @@ export const useGetEntityRole = (entityId: string) => {
 
 export const useFindEntityOwner = (ownerAddress: string) => {
   const { queryService } = useGraphService();
+  const queryClient = useQueryClient();
+  const cachedEntityOwner = queryClient.getQueryData<any>([
+    "entityOwnerCheck",
+    ownerAddress,
+  ]);
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ["entityOwnerCheck", ownerAddress],
     enabled:
       !!ownerAddress &&
@@ -232,33 +172,9 @@ export const useFindEntityOwner = (ownerAddress: string) => {
 
       return result;
     },
-    retry: 1,
+    initialData: cachedEntityOwner,
+
     staleTime: 5 * 60 * 1000, // 5 minutes cache
   });
-};
-
-export const useFindTaskOwner = (ownerAddress: string) => {
-  const { queryService } = useGraphService();
-
-  return useQuery({
-    queryKey: ["entityTaskCheck", ownerAddress],
-    enabled:
-      !!ownerAddress &&
-      ownerAddress !== "0x" &&
-      ownerAddress !== "" &&
-      !!queryService,
-    queryFn: async () => {
-      if (!queryService) {
-        throw new Error("Subgraph query service is not initialized.");
-      }
-
-      // const result = await queryService.getTaskOwnerUserAddress(
-      //   ownerAddress as `0x${string}`,
-      // );
-
-      // return result;
-    },
-    retry: 1,
-    staleTime: 5 * 60 * 1000, // 5 minutes cache
-  });
+  return query;
 };

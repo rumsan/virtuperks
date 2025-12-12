@@ -178,82 +178,91 @@ export default function TaskListMain({ router }: TaskListMainProps) {
           </Card>
         </div>
 
+        
         {/* Tabs */}
         <Tabs
-          value={tab}
-          onValueChange={(v) => {
-            setTab(v as "applied" | "accepted" | "completed" | "verified");
-            setPagination((p) => ({ ...p, pageIndex: 0 }));
-          }}
-        >
-          <div className="flex items-center mt-10 mb-10">
-            <div className="w-[800px]">
-              <TabsList className="flex bg-blue-50 h-10">
-                <TabsTrigger value="applied" className="w-full h-8">
-                  Applied
-                </TabsTrigger>
-                <TabsTrigger value="accepted" className="w-full h-8">
-                  Accepted
-                </TabsTrigger>
-                <TabsTrigger value="completed" className="w-full h-8">
-                  Completed
-                </TabsTrigger>
-                <TabsTrigger value="verified" className="w-full h-8">
-                  Verified
-                </TabsTrigger>
-              </TabsList>
-            </div>
-          </div>
+  value={tab}
+  onValueChange={(v) => {
+    setTab(v as any);
+    setPagination((p) => ({ ...p, pageIndex: 0 }));
+  }}
+  className="w-full"
+>
+  <div className="w-full flex justify-center mt-10">
+  <TabsList className="h-12 bg-white border shadow-sm rounded-lg px-4 py-2 flex gap-10">
+  {["applied", "accepted", "completed", "verified"].map((t) => (
+    <TabsTrigger
+      key={t}
+      value={t}
+      className="
+        px-8 py-3 min-w-[120px] rounded-lg
+        data-[state=active]:bg-blue-600
+        data-[state=active]:text-white
+        text-gray-600
+        hover:bg-blue-100
+        transition-colors
+        text-lg
+      "
+    >
+      {t.charAt(0).toUpperCase() + t.slice(1)}
+    </TabsTrigger>
+  ))}
+</TabsList>
+  </div>
 
-          
-          <TabsContent value="applied">
-            <TaskTable
-              table={tableApplied}
-              data={taskApplied}
-              label="applied"
-              router={router}
-              TABLE_MIN_HEIGHT={TABLE_MIN_HEIGHT}
-              pagination={pagination}
-              setPagination={setPagination}
-            />
-          </TabsContent>
+  <div
+    className="mt-6 border border-gray-300 rounded-lg p-4 mb-5"
+    style={{ minHeight: TABLE_MIN_HEIGHT }}
+  >
+    <TabsContent value="applied">
+      <TaskTable
+        table={tableApplied}
+        data={taskApplied}
+        label="applied"
+        router={router}
+        TABLE_MIN_HEIGHT={TABLE_MIN_HEIGHT}
+        pagination={pagination}
+        setPagination={setPagination}
+      />
+    </TabsContent>
 
-          <TabsContent value="accepted">
-            <TaskTable
-              table={tableAccepted}
-              data={taskAccepted}
-              label="accepted"
-              router={router}
-              TABLE_MIN_HEIGHT={TABLE_MIN_HEIGHT}
-              pagination={pagination}
-              setPagination={setPagination}
-            />
-          </TabsContent>
+    <TabsContent value="accepted">
+      <TaskTable
+        table={tableAccepted}
+        data={taskAccepted}
+        label="accepted"
+        router={router}
+        TABLE_MIN_HEIGHT={TABLE_MIN_HEIGHT}
+        pagination={pagination}
+        setPagination={setPagination}
+      />
+    </TabsContent>
 
-          <TabsContent value="completed">
-            <TaskTable
-              table={tableCompleted}
-              data={taskCompleted}
-              label="completed"
-              router={router}
-              TABLE_MIN_HEIGHT={TABLE_MIN_HEIGHT}
-              pagination={pagination}
-              setPagination={setPagination}
-            />
-          </TabsContent>
+    <TabsContent value="completed">
+      <TaskTable
+        table={tableCompleted}
+        data={taskCompleted}
+        label="completed"
+        router={router}
+        TABLE_MIN_HEIGHT={TABLE_MIN_HEIGHT}
+        pagination={pagination}
+        setPagination={setPagination}
+      />
+    </TabsContent>
 
-          <TabsContent value="verified">
-            <TaskTable
-              table={tableVerified}
-              data={taskVerified}
-              label="verified"
-              router={router}
-              TABLE_MIN_HEIGHT={TABLE_MIN_HEIGHT}
-              pagination={pagination}
-              setPagination={setPagination}
-            />
-          </TabsContent>
-        </Tabs>
+    <TabsContent value="verified">
+      <TaskTable
+        table={tableVerified}
+        data={taskVerified}
+        label="verified"
+        router={router}
+        TABLE_MIN_HEIGHT={TABLE_MIN_HEIGHT}
+        pagination={pagination}
+        setPagination={setPagination}
+      />
+    </TabsContent>
+  </div>
+</Tabs>
       </div>
     </main>
   );
@@ -278,9 +287,12 @@ function TaskTable({
   
   if (!data || data.length === 0) {
     return (
-      <div className="text-gray-500 text-center py-6 flex flex-col items-center gap-2">
-        <AlertCircle className="text-gray-400" size={32} />
-        <p>No {label} tasks found.</p>
+      <div
+        className="text-gray-500 text-center flex flex-col items-center justify-center gap-2"
+        style={{ minHeight: TABLE_MIN_HEIGHT }}
+      >
+        <AlertCircle className="text-gray-400" size={40} />
+        <p className="font-lg">No {label} tasks found.</p>
       </div>
     );
   }

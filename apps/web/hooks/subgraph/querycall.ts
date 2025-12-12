@@ -3,12 +3,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useAccount } from "wagmi";
 import {
-  useReadRewardManagementGetParticipantStatus,
+  useReadRewardManagementGetParticipantTaskAssignment,
   useWriteRewardManagementAcceptParticipant,
+  useWriteRewardManagementApproveTaskSubmission,
   useWriteRewardManagementCompleteTask,
   useWriteRewardManagementParticipate,
-  useWriteRewardManagementRejectParticipant,
-  useWriteRewardManagementVerifyTask,
+  useWriteRewardManagementRejectTaskSubmission,
 } from "../wagmi/contracts";
 
 export const useCheckParticipantStatus = (taskId: string, entityId: string) => {
@@ -17,7 +17,7 @@ export const useCheckParticipantStatus = (taskId: string, entityId: string) => {
     data: status,
     isError,
     isLoading,
-  } = useReadRewardManagementGetParticipantStatus({
+  } = useReadRewardManagementGetParticipantTaskAssignment({
     address: entityId as `0x${string}`,
     args: [taskId as `0x${string}`, address as `0x${string}`],
   });
@@ -163,7 +163,7 @@ export const useGetCombineStausByTask = (taskId: any) => {
 export const useVerifyParticipantMutation = () => {
   const queryClient = useQueryClient();
   const { writeContractAsync, isPending, isSuccess } =
-    useWriteRewardManagementVerifyTask();
+    useWriteRewardManagementApproveTaskSubmission();
 
   return useMutation({
     mutationFn: async ({
@@ -195,7 +195,7 @@ export const useVerifyParticipantMutation = () => {
 export const useRejectParticipantMutation = () => {
   const queryClient = useQueryClient();
   const { writeContractAsync, isPending, isSuccess } =
-    useWriteRewardManagementRejectParticipant();
+    useWriteRewardManagementRejectTaskSubmission();
 
   return useMutation({
     mutationFn: async ({

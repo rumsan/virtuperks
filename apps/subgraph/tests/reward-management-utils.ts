@@ -4,21 +4,22 @@ import {
   AdditionalDisbursementToTask,
   ContractPaused,
   ContractUnpaused,
+  DisbursementToParticipant,
   DisbursementToTask,
   EtherWithdrawn,
-  ParticipantApplied,
   ParticipantRemovedFromWhitelist,
-  ParticipantResubmitted,
   ParticipantWhitelisted,
-  TaskAccepted,
-  TaskApproved,
+  TaskAssignmentAccepted,
+  TaskAssignmentApplied,
+  TaskAssignmentApproved,
+  TaskAssignmentCompleted,
+  TaskAssignmentRejected,
+  TaskAssignmentVerified,
   TaskClosed,
-  TaskCompleted,
   TaskCreated,
   TaskDetailsUpdated,
-  TaskRejected,
-  TaskVerified,
-  TokenTransferred
+  TokenTransferred,
+  TokensAllocatedToTask
 } from "../generated/RewardManagement/RewardManagement"
 
 export function createAdditionalDisbursementToTaskEvent(
@@ -75,6 +76,39 @@ export function createContractUnpausedEvent(by: Address): ContractUnpaused {
   return contractUnpausedEvent
 }
 
+export function createDisbursementToParticipantEvent(
+  taskId: Bytes,
+  amount: BigInt,
+  participant: Address,
+  disbursedBy: Address
+): DisbursementToParticipant {
+  let disbursementToParticipantEvent =
+    changetype<DisbursementToParticipant>(newMockEvent())
+
+  disbursementToParticipantEvent.parameters = new Array()
+
+  disbursementToParticipantEvent.parameters.push(
+    new ethereum.EventParam("taskId", ethereum.Value.fromFixedBytes(taskId))
+  )
+  disbursementToParticipantEvent.parameters.push(
+    new ethereum.EventParam("amount", ethereum.Value.fromUnsignedBigInt(amount))
+  )
+  disbursementToParticipantEvent.parameters.push(
+    new ethereum.EventParam(
+      "participant",
+      ethereum.Value.fromAddress(participant)
+    )
+  )
+  disbursementToParticipantEvent.parameters.push(
+    new ethereum.EventParam(
+      "disbursedBy",
+      ethereum.Value.fromAddress(disbursedBy)
+    )
+  )
+
+  return disbursementToParticipantEvent
+}
+
 export function createDisbursementToTaskEvent(
   taskId: Bytes,
   amount: BigInt,
@@ -122,27 +156,6 @@ export function createEtherWithdrawnEvent(
   return etherWithdrawnEvent
 }
 
-export function createParticipantAppliedEvent(
-  id: Bytes,
-  participant: Address
-): ParticipantApplied {
-  let participantAppliedEvent = changetype<ParticipantApplied>(newMockEvent())
-
-  participantAppliedEvent.parameters = new Array()
-
-  participantAppliedEvent.parameters.push(
-    new ethereum.EventParam("id", ethereum.Value.fromFixedBytes(id))
-  )
-  participantAppliedEvent.parameters.push(
-    new ethereum.EventParam(
-      "participant",
-      ethereum.Value.fromAddress(participant)
-    )
-  )
-
-  return participantAppliedEvent
-}
-
 export function createParticipantRemovedFromWhitelistEvent(
   taskId: Bytes,
   participant: Address,
@@ -167,28 +180,6 @@ export function createParticipantRemovedFromWhitelistEvent(
   )
 
   return participantRemovedFromWhitelistEvent
-}
-
-export function createParticipantResubmittedEvent(
-  taskId: Bytes,
-  participant: Address
-): ParticipantResubmitted {
-  let participantResubmittedEvent =
-    changetype<ParticipantResubmitted>(newMockEvent())
-
-  participantResubmittedEvent.parameters = new Array()
-
-  participantResubmittedEvent.parameters.push(
-    new ethereum.EventParam("taskId", ethereum.Value.fromFixedBytes(taskId))
-  )
-  participantResubmittedEvent.parameters.push(
-    new ethereum.EventParam(
-      "participant",
-      ethereum.Value.fromAddress(participant)
-    )
-  )
-
-  return participantResubmittedEvent
 }
 
 export function createParticipantWhitelistedEvent(
@@ -217,43 +208,148 @@ export function createParticipantWhitelistedEvent(
   return participantWhitelistedEvent
 }
 
-export function createTaskAcceptedEvent(
+export function createTaskAssignmentAcceptedEvent(
   id: Bytes,
   participant: Address
-): TaskAccepted {
-  let taskAcceptedEvent = changetype<TaskAccepted>(newMockEvent())
+): TaskAssignmentAccepted {
+  let taskAssignmentAcceptedEvent =
+    changetype<TaskAssignmentAccepted>(newMockEvent())
 
-  taskAcceptedEvent.parameters = new Array()
+  taskAssignmentAcceptedEvent.parameters = new Array()
 
-  taskAcceptedEvent.parameters.push(
+  taskAssignmentAcceptedEvent.parameters.push(
     new ethereum.EventParam("id", ethereum.Value.fromFixedBytes(id))
   )
-  taskAcceptedEvent.parameters.push(
+  taskAssignmentAcceptedEvent.parameters.push(
     new ethereum.EventParam(
       "participant",
       ethereum.Value.fromAddress(participant)
     )
   )
 
-  return taskAcceptedEvent
+  return taskAssignmentAcceptedEvent
 }
 
-export function createTaskApprovedEvent(
+export function createTaskAssignmentAppliedEvent(
   id: Bytes,
-  approver: Address
-): TaskApproved {
-  let taskApprovedEvent = changetype<TaskApproved>(newMockEvent())
+  participant: Address
+): TaskAssignmentApplied {
+  let taskAssignmentAppliedEvent =
+    changetype<TaskAssignmentApplied>(newMockEvent())
 
-  taskApprovedEvent.parameters = new Array()
+  taskAssignmentAppliedEvent.parameters = new Array()
 
-  taskApprovedEvent.parameters.push(
+  taskAssignmentAppliedEvent.parameters.push(
     new ethereum.EventParam("id", ethereum.Value.fromFixedBytes(id))
   )
-  taskApprovedEvent.parameters.push(
+  taskAssignmentAppliedEvent.parameters.push(
+    new ethereum.EventParam(
+      "participant",
+      ethereum.Value.fromAddress(participant)
+    )
+  )
+
+  return taskAssignmentAppliedEvent
+}
+
+export function createTaskAssignmentApprovedEvent(
+  id: Bytes,
+  approver: Address
+): TaskAssignmentApproved {
+  let taskAssignmentApprovedEvent =
+    changetype<TaskAssignmentApproved>(newMockEvent())
+
+  taskAssignmentApprovedEvent.parameters = new Array()
+
+  taskAssignmentApprovedEvent.parameters.push(
+    new ethereum.EventParam("id", ethereum.Value.fromFixedBytes(id))
+  )
+  taskAssignmentApprovedEvent.parameters.push(
     new ethereum.EventParam("approver", ethereum.Value.fromAddress(approver))
   )
 
-  return taskApprovedEvent
+  return taskAssignmentApprovedEvent
+}
+
+export function createTaskAssignmentCompletedEvent(
+  id: Bytes,
+  participant: Address
+): TaskAssignmentCompleted {
+  let taskAssignmentCompletedEvent =
+    changetype<TaskAssignmentCompleted>(newMockEvent())
+
+  taskAssignmentCompletedEvent.parameters = new Array()
+
+  taskAssignmentCompletedEvent.parameters.push(
+    new ethereum.EventParam("id", ethereum.Value.fromFixedBytes(id))
+  )
+  taskAssignmentCompletedEvent.parameters.push(
+    new ethereum.EventParam(
+      "participant",
+      ethereum.Value.fromAddress(participant)
+    )
+  )
+
+  return taskAssignmentCompletedEvent
+}
+
+export function createTaskAssignmentRejectedEvent(
+  id: Bytes,
+  participant: Address,
+  rejectedBy: Address,
+  reason: string
+): TaskAssignmentRejected {
+  let taskAssignmentRejectedEvent =
+    changetype<TaskAssignmentRejected>(newMockEvent())
+
+  taskAssignmentRejectedEvent.parameters = new Array()
+
+  taskAssignmentRejectedEvent.parameters.push(
+    new ethereum.EventParam("id", ethereum.Value.fromFixedBytes(id))
+  )
+  taskAssignmentRejectedEvent.parameters.push(
+    new ethereum.EventParam(
+      "participant",
+      ethereum.Value.fromAddress(participant)
+    )
+  )
+  taskAssignmentRejectedEvent.parameters.push(
+    new ethereum.EventParam(
+      "rejectedBy",
+      ethereum.Value.fromAddress(rejectedBy)
+    )
+  )
+  taskAssignmentRejectedEvent.parameters.push(
+    new ethereum.EventParam("reason", ethereum.Value.fromString(reason))
+  )
+
+  return taskAssignmentRejectedEvent
+}
+
+export function createTaskAssignmentVerifiedEvent(
+  id: Bytes,
+  participant: Address,
+  verifier: Address
+): TaskAssignmentVerified {
+  let taskAssignmentVerifiedEvent =
+    changetype<TaskAssignmentVerified>(newMockEvent())
+
+  taskAssignmentVerifiedEvent.parameters = new Array()
+
+  taskAssignmentVerifiedEvent.parameters.push(
+    new ethereum.EventParam("id", ethereum.Value.fromFixedBytes(id))
+  )
+  taskAssignmentVerifiedEvent.parameters.push(
+    new ethereum.EventParam(
+      "participant",
+      ethereum.Value.fromAddress(participant)
+    )
+  )
+  taskAssignmentVerifiedEvent.parameters.push(
+    new ethereum.EventParam("verifier", ethereum.Value.fromAddress(verifier))
+  )
+
+  return taskAssignmentVerifiedEvent
 }
 
 export function createTaskClosedEvent(
@@ -272,27 +368,6 @@ export function createTaskClosedEvent(
   )
 
   return taskClosedEvent
-}
-
-export function createTaskCompletedEvent(
-  id: Bytes,
-  participant: Address
-): TaskCompleted {
-  let taskCompletedEvent = changetype<TaskCompleted>(newMockEvent())
-
-  taskCompletedEvent.parameters = new Array()
-
-  taskCompletedEvent.parameters.push(
-    new ethereum.EventParam("id", ethereum.Value.fromFixedBytes(id))
-  )
-  taskCompletedEvent.parameters.push(
-    new ethereum.EventParam(
-      "participant",
-      ethereum.Value.fromAddress(participant)
-    )
-  )
-
-  return taskCompletedEvent
 }
 
 export function createTaskCreatedEvent(
@@ -331,63 +406,6 @@ export function createTaskDetailsUpdatedEvent(
   return taskDetailsUpdatedEvent
 }
 
-export function createTaskRejectedEvent(
-  id: Bytes,
-  participant: Address,
-  rejectedBy: Address,
-  reason: string
-): TaskRejected {
-  let taskRejectedEvent = changetype<TaskRejected>(newMockEvent())
-
-  taskRejectedEvent.parameters = new Array()
-
-  taskRejectedEvent.parameters.push(
-    new ethereum.EventParam("id", ethereum.Value.fromFixedBytes(id))
-  )
-  taskRejectedEvent.parameters.push(
-    new ethereum.EventParam(
-      "participant",
-      ethereum.Value.fromAddress(participant)
-    )
-  )
-  taskRejectedEvent.parameters.push(
-    new ethereum.EventParam(
-      "rejectedBy",
-      ethereum.Value.fromAddress(rejectedBy)
-    )
-  )
-  taskRejectedEvent.parameters.push(
-    new ethereum.EventParam("reason", ethereum.Value.fromString(reason))
-  )
-
-  return taskRejectedEvent
-}
-
-export function createTaskVerifiedEvent(
-  id: Bytes,
-  participant: Address,
-  verifier: Address
-): TaskVerified {
-  let taskVerifiedEvent = changetype<TaskVerified>(newMockEvent())
-
-  taskVerifiedEvent.parameters = new Array()
-
-  taskVerifiedEvent.parameters.push(
-    new ethereum.EventParam("id", ethereum.Value.fromFixedBytes(id))
-  )
-  taskVerifiedEvent.parameters.push(
-    new ethereum.EventParam(
-      "participant",
-      ethereum.Value.fromAddress(participant)
-    )
-  )
-  taskVerifiedEvent.parameters.push(
-    new ethereum.EventParam("verifier", ethereum.Value.fromAddress(verifier))
-  )
-
-  return taskVerifiedEvent
-}
-
 export function createTokenTransferredEvent(
   token: Address,
   to: Address,
@@ -419,4 +437,34 @@ export function createTokenTransferredEvent(
   )
 
   return tokenTransferredEvent
+}
+
+export function createTokensAllocatedToTaskEvent(
+  taskId: Bytes,
+  token: Address,
+  amount: BigInt,
+  allocatedBy: Address
+): TokensAllocatedToTask {
+  let tokensAllocatedToTaskEvent =
+    changetype<TokensAllocatedToTask>(newMockEvent())
+
+  tokensAllocatedToTaskEvent.parameters = new Array()
+
+  tokensAllocatedToTaskEvent.parameters.push(
+    new ethereum.EventParam("taskId", ethereum.Value.fromFixedBytes(taskId))
+  )
+  tokensAllocatedToTaskEvent.parameters.push(
+    new ethereum.EventParam("token", ethereum.Value.fromAddress(token))
+  )
+  tokensAllocatedToTaskEvent.parameters.push(
+    new ethereum.EventParam("amount", ethereum.Value.fromUnsignedBigInt(amount))
+  )
+  tokensAllocatedToTaskEvent.parameters.push(
+    new ethereum.EventParam(
+      "allocatedBy",
+      ethereum.Value.fromAddress(allocatedBy)
+    )
+  )
+
+  return tokensAllocatedToTaskEvent
 }

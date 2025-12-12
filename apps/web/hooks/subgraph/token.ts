@@ -1,15 +1,22 @@
 "use client";
 import { useGraphService } from "@/providers/subgraph-provider";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { Approval } from "../../../../packages/sdk/src/types/token.type";
 import {
+  useReadRewardManagementGetTotalUnallocatedTokens,
+  useReadRewardManagementTotalAllocatedTokens,
   useReadRewardTokenBalanceOf,
-  useWriteRewardManagementDisburseTokensToTask,
+  useWriteRewardManagementAcceptTokenTransfer,
+  useWriteRewardManagementDisburseTokensToTaskParticipants,
+  useWriteRewardManagementDisburseToSingleParticipant,
   useWriteRewardManagementTransferToken,
+  useWriteRewardTokenApprove,
   useWriteRewardTokenTransfer,
 } from "../wagmi/contracts";
 
 export const useDisburseTokenToTask = () => {
-  const { writeContractAsync } = useWriteRewardManagementDisburseTokensToTask();
+  const { writeContractAsync } =
+    useWriteRewardManagementDisburseTokensToTaskParticipants();
 
   const mutation = useMutation({
     mutationFn: async ({
@@ -165,6 +172,37 @@ export const useTokenTranfer = () => {
   };
 };
 
+// Mint tokens
+export const useRewardTokenApprove = () => {
+  const { writeContractAsync } = useWriteRewardTokenApprove();
+
+  const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
+
+  const mutation = useMutation({
+    mutationFn: async ({
+      address,
+      amount,
+    }: {
+      address: string;
+      amount: number;
+    }) => {
+      const result = await writeContractAsync({
+        address: tokenAddress,
+        args: [address as `0x${string}`, BigInt(amount)],
+      });
+
+      return result;
+    },
+  });
+
+  return {
+    tokenApprove: mutation.mutateAsync,
+    approvePending: mutation.isPending,
+    approveSuccess: mutation.isSuccess,
+    approveError: mutation.isError,
+  };
+};
+
 export const useCheckParticipantBalance = (participantAddress: string) => {
   const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN;
 
@@ -176,5 +214,160 @@ export const useCheckParticipantBalance = (participantAddress: string) => {
     participantTotalToken: data,
     isError,
     isLoading,
+  };
+};
+
+export const useGetApprovedTokens = (spender: string) => {
+  const { queryService } = useGraphService();
+
+  const query = useQuery({
+    queryKey: ["approvedTokens", spender],
+    queryFn: async () => {
+      if (!spender) return "0";
+
+      const response = await queryService?.getApprovedTokens(spender);
+
+      const approvals: Approval[] = response?.data?.approvals ?? [];
+
+      // Sum all values (convert from string to BigInt for safety)
+      const total = approvals.reduce((acc, approval) => {
+        return acc + BigInt(approval.value);
+      }, BigInt(0));
+
+      return total.toString(); // Return as string to match existing value format
+    },
+    enabled: !!queryService && !!spender,
+  });
+
+  // Return both the total value and loading state
+  return {
+    totalApproved: query.data ?? "0",
+    isLoading: query.isLoading,
+    isError: query.isError,
+    error: query.error,
+  };
+};
+
+export const useDisburseToSingleParticipant = () => {
+  const queryClient = useQueryClient();
+
+  const { writeContractAsync } =
+    useWriteRewardManagementDisburseToSingleParticipant();
+
+  return useMutation({
+    mutationFn: async ({
+      taskId,
+      participant,
+      amount,
+      contractAddress,
+    }: {
+      taskId: string;
+      participant: string;
+      amount: string;
+      contractAddress: string;
+    }) => {
+      console.log("Disburse args:", {
+        address: contractAddress,
+        args: [
+          taskId as `0x${string}`,
+          participant as `0x${string}`,
+          BigInt(amount),
+        ],
+      });
+
+      return await writeContractAsync({
+        address: contractAddress as `0x${string}`,
+        args: [
+          taskId as `0x${string}`,
+          participant as `0x${string}`,
+          BigInt(amount),
+        ],
+      });
+    },
+
+    onSuccess: async (result, variables) => {
+      await new Promise((resolve) => setTimeout(resolve, 9000));
+      await queryClient.invalidateQueries({
+        queryKey: ["AllParticipantsStatus", variables.taskId],
+      });
+    },
+  });
+};
+
+// Hook to accept token transfer from treasury
+export const useAcceptTokenTransfer = () => {
+  const queryClient = useQueryClient();
+  const { writeContractAsync } = useWriteRewardManagementAcceptTokenTransfer();
+
+  return useMutation({
+    mutationFn: async ({
+      treasuryAddress,
+      tokenAddress,
+      amount,
+      rewardManagementAddress,
+    }: {
+      treasuryAddress: string;
+      tokenAddress: string;
+      amount: string;
+      rewardManagementAddress: string;
+    }) => {
+      console.log(
+        treasuryAddress,
+        tokenAddress,
+        amount,
+        rewardManagementAddress,
+        "Accepting token transfer",
+      );
+      return await writeContractAsync({
+        address: rewardManagementAddress as `0x${string}`,
+        args: [
+          treasuryAddress as `0x${string}`,
+          tokenAddress as `0x${string}`,
+          BigInt(amount),
+        ],
+      });
+    },
+    onSuccess: async (result, variables) => {
+      // Wait for transaction to be mined
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+
+      // Invalidate queries to refresh the data
+      await queryClient.invalidateQueries({
+        queryKey: ["approvedTokens", variables.rewardManagementAddress],
+      });
+    },
+  });
+};
+
+export const useCheckTotalUnAllocatedTokens = (entityId: string) => {
+  const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
+  console.log("Entity ID in useCheckTotalUnallocatedTokens:", entityId);
+
+  const { data, isError, isLoading } =
+    useReadRewardManagementGetTotalUnallocatedTokens({
+      address: entityId as `0x${string}`,
+      args: [tokenAddress],
+    });
+
+  return {
+    totalUnallocatedTokens: data,
+    isError,
+    statusLoading: isLoading,
+  };
+};
+
+export const useCheckTotalAllocatedTokens = (entityId: string) => {
+  const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
+
+  const { data, isError, isLoading } =
+    useReadRewardManagementTotalAllocatedTokens({
+      address: entityId as `0x${string}`,
+      args: [tokenAddress],
+    });
+
+  return {
+    totalAllocatedTokens: data,
+    isError,
+    statusLoading: isLoading,
   };
 };

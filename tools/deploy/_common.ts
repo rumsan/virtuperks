@@ -31,9 +31,8 @@ export class commonLib {
   public async getContractArtifacts(
     contractName: string,
   ): Promise<ContractArtifacts> {
-    
     const contract = require(`../artifacts/${contractName}.json`);
-   
+
     return contract;
   }
 
@@ -44,14 +43,12 @@ export class commonLib {
     const factory = new ethers.ContractFactory(abi, bytecode, signer);
     const contract = await factory.deploy(...args);
 
-  
     await contract.waitForDeployment();
 
-    const tx = contract.deploymentTransaction()
-    const receipt = await this.provider.waitForTransaction(tx!.hash)
+    const tx = contract.deploymentTransaction();
+    const receipt = await this.provider.waitForTransaction(tx!.hash);
     const address = await contract.getAddress();
     const blockNumber = receipt?.blockNumber || 1;
-    
 
     console.log(blockNumber);
 
@@ -122,7 +119,7 @@ export class commonLib {
     appId: string,
     name: string,
     address: string,
-    _isPrivate: boolean = false,
+    _isPrivate: boolean = true,
   ) {
     const signer = this.getDeployerWallet();
     const { abi } = await this.getContractArtifacts('AppRegistry');
@@ -165,9 +162,9 @@ export class commonLib {
     );
 
     if (role === 'MINTER') {
-      if (accessManager.grantRole) {
+      if (accessManager.grantRoleAdmin) {
         const roleHash = ethers.id(role);
-        const tx = await accessManager.grantRole(appId, roleHash, account);
+        const tx = await accessManager.grantRoleAdmin(appId, roleHash, account);
         await tx.wait();
         console.log(`Role "${role}" assigned to account "${account}"`);
       }

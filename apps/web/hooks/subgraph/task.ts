@@ -1,18 +1,12 @@
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAccount } from "wagmi";
 import {
-  useReadRewardManagementGetOpenTasks,
-  useReadRewardManagementGetTask,
-  useReadRewardManagementGetTaskVerifiedParticipants,
   useReadRewardManagementIsTaskExpired,
   useWriteRewardManagementAddToWhitelist,
-  useWriteRewardManagementCloseExpiredTasks,
   useWriteRewardManagementCloseTask,
   useWriteRewardManagementCreateTask,
   useWriteRewardManagementRemoveFromWhitelist,
-  useWriteRewardManagementResubmitAfterRejection,
-  useWriteRewardManagementUpdateTaskDetails
+  useWriteRewardManagementUpdateTaskDetails,
 } from "../wagmi/contracts";
 
 export const useTaskAdd = () => {
@@ -22,7 +16,7 @@ export const useTaskAdd = () => {
   const mutation = useMutation({
     mutationFn: async (data: any) => {
       const verifiedParticipants = data.verifiedParticipants || [];
-      const rejectedParticipants = data.rejectedParticipants || [];
+
       const result = await writeContractAsync({
         address: data.entityAddress as `0x${string}`,
         args: [
@@ -40,10 +34,8 @@ export const useTaskAdd = () => {
             isTokenDisbursed: Boolean(data.isTokenDisbursed),
             maxParticipants: BigInt(data.maxParticipants),
             acceptedParticipantCount: BigInt(data.acceptedParticipantCount),
-            verifiedParticipants:
+            approvedParticipants:
               verifiedParticipants as readonly `0x${string}`[],
-            rejectedParticipants:
-              rejectedParticipants as readonly `0x${string}`[],
           },
           data.whitelistedParticipants,
         ],
@@ -73,6 +65,7 @@ export const useGetAllTask = () => {
       return taskDetail;
     },
     enabled: !!queryService,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -86,6 +79,7 @@ export const useGetTasksNoApproval = () => {
       return taskDetail;
     },
     enabled: !!queryService,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -112,6 +106,7 @@ export const useClosedTask = () => {
       return taskDetail;
     },
     enabled: !!queryService,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -131,14 +126,15 @@ export const useGetTaskByName = (taskName: string) => {
 
 export const useCloseExpiredTask = () => {
   const queryClient = useQueryClient();
-  const { writeContractAsync } = useWriteRewardManagementCloseExpiredTasks();
+  //get from the subgraph
+  // const { writeContractAsync } = useWriteRewardManagementCloseExpiredTasks();
 
   const mutation = useMutation({
     mutationFn: async (data: { entityAddress: `0x${string}` }) => {
-      return await writeContractAsync({
-        address: data.entityAddress,
-        args: [],
-      });
+      // return await writeContractAsync({
+      //   address: data.entityAddress,
+      //   args: [],
+      // });
     },
     onSuccess: async () => {
       // wait a bit to ensure tx is mined & indexers (like TheGraph) update
@@ -160,8 +156,10 @@ export const useCloseExpiredTask = () => {
 
 export const useGetTaskById = (id: string) => {
   const { queryService } = useGraphService();
+  const queryClient = useQueryClient();
+  const cachedTaskDetail = queryClient.getQueryData<any>(["taskById", id]);
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ["taskById", id],
     queryFn: async () => {
       if (!queryService) {
@@ -171,7 +169,11 @@ export const useGetTaskById = (id: string) => {
       return taskDetail;
     },
     enabled: !!id && !!queryService,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    initialData: cachedTaskDetail,
   });
+
+  return query;
 };
 
 export const useCloseTaskMutation = () => {
@@ -203,31 +205,34 @@ export const useCheckTaskVerifiedParticipant = (
   taskId: string,
   entityId: string,
 ) => {
-  const { data, isError, isLoading } =
-    useReadRewardManagementGetTaskVerifiedParticipants({
-      address: entityId as `0x${string}`,
-      args: [taskId as `0x${string}`],
-    });
+  //get form the subgraph
+  // const { data, isError, isLoading } =
+  //   useReadRewardManagementGetTaskVerifiedParticipants({
+  //     address: entityId as `0x${string}`,
+  //     args: [taskId as `0x${string}`],
+  //   });
   return {
-    verifiedTaskParticipant: data,
-    isError,
-    statusLoading: isLoading,
+    verifiedTaskParticipant: [],
+    // isError,
+    //statusLoading: isLoading,
   };
 };
 
-export const useCheckTaskStatus = (taskId: string, entityId: string) => {
-  const { data, isError, isLoading } = useReadRewardManagementGetTask({
-    address: entityId as `0x${string}`,
-    args: [taskId as `0x${string}`],
-  });
+// export const useCheckTaskStatus = (taskId: string, entityId: string) => {
+//   const { queryService } = useGraphService();
 
-  return {
-    taskDetail: data,
-    status: data?.isTokenDisbursed,
-    isError,
-    statusLoading: isLoading,
-  };
-};
+//   return useQuery({
+//     queryKey: ["taskDetailById", taskId],
+//     queryFn: async () => {
+//       if (!queryService) {
+//         throw new Error("Subgraph query service is not initialized.");
+//       }
+//       const taskDetail = await queryService?.getTaskDetailByTaskId(taskId);
+//       return taskDetail;
+//     },
+//     enabled: !!taskId && !!queryService,
+//   });
+// };
 
 export const useIsTaskExpired = (taskId: string, entityId: string) => {
   const {
@@ -247,15 +252,16 @@ export const useIsTaskExpired = (taskId: string, entityId: string) => {
 };
 
 export const useGetOpentask = (entityId: string) => {
-  const { data, isError, isLoading } = useReadRewardManagementGetOpenTasks({
-    address: entityId as `0x${string}`,
-    args: [],
-  });
+  //get from subgraph
+  // const { data, isError, isLoading } = useReadRewardManagementGetOpenTasks({
+  //   address: entityId as `0x${string}`,
+  //   args: [],
+  // });
 
   return {
-    openTasks: data,
-    isError,
-    statusLoading: isLoading,
+    openTasks: [],
+    // isError,
+    // statusLoading: isLoading,
   };
 };
 
@@ -294,50 +300,6 @@ export const useGetRejectedParticipants = (taskId: string) => {
   });
 };
 
-
-
-export const useResubmitTaskMutation = () => {
-  const queryClient = useQueryClient();
-  const { writeContractAsync } = useWriteRewardManagementResubmitAfterRejection();
-  const { address: participant } = useAccount();
-
-  const mutation = useMutation({
-    mutationFn: async ({
-      taskId,
-      entityId,
-      completionUrl,
-    }: {
-      taskId: string;
-      entityId: string;
-      completionUrl?: string;
-    }) => {
-
-      const result = await writeContractAsync({
-        address: (entityId as `0x${string}`) || "0x",
-        args: [taskId as `0x${string}`, completionUrl || ""],
-      });
-      return result;
-    },
-
-    onSuccess: (result, variable) => {
-      if (participant) {
-        setTimeout(() => {
-          queryClient.invalidateQueries({
-            queryKey: ["participantTaskStatus", participant, variable.taskId],
-          });
-        }, 5000);
-      }
-    },
-  });
-
-  return {
-    resubmitTask: mutation.mutateAsync,
-    resubmitPending: mutation.isPending,
-    resubmitSuccess: mutation.isSuccess,
-  };
-};
-
-
 export const useAddToWhitelist = () => {
   const queryClient = useQueryClient();
 
@@ -361,11 +323,11 @@ export const useAddToWhitelist = () => {
 
     onSuccess: async (_, variables) => {
       await new Promise((r) => setTimeout(r, 5000));
-    
+
       await queryClient.invalidateQueries({
         queryKey: ["whiteListedParticipantByTask", variables.taskId],
       });
-    }    
+    },
   });
 
   return {
@@ -375,12 +337,10 @@ export const useAddToWhitelist = () => {
   };
 };
 
-
 export const useRemoveFromWhitelist = () => {
   const queryClient = useQueryClient();
 
-  const { writeContractAsync } =
-    useWriteRewardManagementRemoveFromWhitelist();
+  const { writeContractAsync } = useWriteRewardManagementRemoveFromWhitelist();
 
   const removeMutation = useMutation({
     mutationFn: async ({
@@ -400,12 +360,10 @@ export const useRemoveFromWhitelist = () => {
 
     onSuccess: async (_, variables) => {
       await new Promise((r) => setTimeout(r, 5000));
-    
       await queryClient.invalidateQueries({
-        queryKey: ["whiteListedParticipantByTask", variables.taskId],
+        queryKey: ["taskById", variables.taskId],
       });
-    }
-    
+    },
   });
 
   return {
@@ -414,7 +372,6 @@ export const useRemoveFromWhitelist = () => {
     removeSuccess: removeMutation.isSuccess,
   };
 };
-
 
 export const useUpdateTaskDetails = () => {
   const queryClient = useQueryClient();
@@ -429,18 +386,32 @@ export const useUpdateTaskDetails = () => {
     }: {
       entityAddress: `0x${string}`;
       taskId: string;
-      detailsUrl: string;
-      expiryDate: number | bigint;
+      detailsUrl?: string;       
+      expiryDate?: number | bigint; 
     }) => {
+      if (!detailsUrl && !expiryDate) {
+        throw new Error(
+          "At least one field (detailsUrl or expiryDate) must be provided",
+        );
+      }
+
       const txHash = await writeContractAsync({
         address: entityAddress,
-        args: [taskId as `0x${string}`, detailsUrl, BigInt(expiryDate)],
+        args: [
+          taskId as `0x${string}`,
+          detailsUrl ?? "",               
+          BigInt(expiryDate ?? 0),        
+        ],        
       });
+
       return txHash;
     },
-    onSuccess: async (_, { taskId }) => {
-      
-      await queryClient.refetchQueries({ queryKey: ["taskById", taskId] });
+
+    onSuccess: async (_, variables) => {
+      await new Promise((r) => setTimeout(r, 4000));
+      await queryClient.invalidateQueries({
+        queryKey: ["taskById", variables.taskId],
+      });
     },
   });
 
@@ -451,6 +422,31 @@ export const useUpdateTaskDetails = () => {
   };
 };
 
+export const useFindTaskOwner = (ownerAddress: string) => {
+  const { queryService } = useGraphService();
+  const queryClient = useQueryClient();
+  const cachedTaskOwner = queryClient.getQueryData<any>([
+    "entityTaskCheck",
+    ownerAddress,
+  ]);
 
+  const query = useQuery({
+    queryKey: ["entityTaskCheck", ownerAddress],
+    queryFn: async () => {
+      if (!queryService) {
+        throw new Error("Subgraph query service is not initialized.");
+      }
 
+      const result = await queryService.getTaskOwnerUserAddress(
+        ownerAddress as `0x${string}`,
+      );
 
+      return result;
+    },
+
+    enabled: !!ownerAddress && !!queryService,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    initialData: cachedTaskOwner,
+  });
+  return query;
+};

@@ -11,7 +11,7 @@ import {
 } from "@workspace/ui/components/card";
 import { ArrowLeft, Coins, Folders, User } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import TokenCreate from "../form/token.create";
+// import TokenCreate from "../form/token.create";
 
 interface TokenCreateMainProps {
   router: AppRouterInstance;
@@ -75,7 +75,7 @@ export default function TokenCreateMain({ router, id }: TokenCreateMainProps) {
             <CardDescription />
           </CardHeader>
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {'0'}
+            {"0"}
           </CardFooter>
         </Card>
 
@@ -90,7 +90,7 @@ export default function TokenCreateMain({ router, id }: TokenCreateMainProps) {
             <CardDescription />
           </CardHeader>
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {'0'}
+            {"0"}
           </CardFooter>
         </Card>
 
@@ -108,7 +108,7 @@ export default function TokenCreateMain({ router, id }: TokenCreateMainProps) {
         </Card>
       </div>
 
-      <TokenCreate router={router} id={id} />
+      {/* <TokenCreate router={router} id={id} /> */}
     </main>
   );
 }

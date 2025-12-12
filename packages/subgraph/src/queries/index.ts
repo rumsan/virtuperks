@@ -113,7 +113,6 @@ query GetRoleRevokedById($id: ID!) {
     }
   }
 `,
-
 };
 
 // RewardToken Queries
@@ -174,46 +173,32 @@ export const TokenQueries = {
 `,
 };
 
-
 export const getTaskCreation = `
   query GetTaskCreationWithApproval {
-    taskCreateds(
+    taskDetails(
       first: 100,
-      orderBy: blockTimestamp,
+      orderBy: expiryDate,
       orderDirection: desc,
-      where: { taskDetail_: { requireApproval: true } }
+      where: { requireApproval: true }
     ) {
       id
-      internal_id
-      taskDetail {
-        acceptedParticipantCount
-        detailsUrl
-        id
-        expiryDate
-        isOpen
-        isTokenDisbursed
-        maxParticipants
-        name
-        owner
-        rewardToken
-        totalRewardAmount
-        requireApproval
-        isWhitelisted
-        verifiedParticipants
-      }
-      rewardManagement {
-        appId
-        id
-        name
-        rewardManagement
-      }
-      createdBy
-      blockNumber
-      blockTimestamp
-      transactionHash
+      name
+      detailsUrl
+      owner
+      expiryDate
+      rewardToken
+      totalRewardAmount
+      isOpen
+      requireApproval
+      isWhitelisted
+      isTokenDisbursed
+      maxParticipants
+      acceptedParticipantCount
     }
   }
 `;
+
+
 
 export const getTaskUpdated = `
   query GetTaskUpdateds($taskId: BigInt!) {
@@ -231,48 +216,30 @@ export const getTaskUpdated = `
 `;
 
 
-
 export const getTaskNoApproval = `
-  query GetTaskCreationNoApproval {
-    taskCreateds(
-      first: 100,
-      orderBy: blockTimestamp,
-      orderDirection: desc,
-      where: { taskDetail_: { requireApproval: false } }
-    ) {
-      id
-      internal_id
-      taskDetail {
-        acceptedParticipantCount
-        detailsUrl
-        id
-        expiryDate
-        isOpen
-        isTokenDisbursed
-        maxParticipants
-        name
-        owner
-        rewardToken
-        totalRewardAmount
-        requireApproval
-        isWhitelisted
-        verifiedParticipants
-      }
-      rewardManagement {
-        appId
-        id
-        name
-        rewardManagement
-      }
-      createdBy
-      blockNumber
-      blockTimestamp
-      transactionHash
-    }
+query GetTaskCreationWithApproval {
+  taskDetails(
+    first: 100,
+    orderBy: expiryDate,
+    orderDirection: desc,
+    where: { requireApproval: false }
+  ) {
+    id
+    name
+    detailsUrl
+    owner
+    expiryDate
+    rewardToken
+    totalRewardAmount
+    isOpen
+    requireApproval
+    isWhitelisted
+    isTokenDisbursed
+    maxParticipants
+    acceptedParticipantCount
   }
+}
 `;
-
-
 
 
 export const getOpenTasks = `
@@ -295,7 +262,6 @@ export const getOpenTasks = `
         totalRewardAmount
         requireApproval
         isWhitelisted
-        verifiedParticipants
         
         }
         rewardManagement{
@@ -312,8 +278,6 @@ export const getOpenTasks = `
   
     }
   `;
-
-
 
 export const getCloseTasks = `
     query GetCloseTasks {
@@ -334,7 +298,6 @@ export const getCloseTasks = `
         totalRewardAmount
         requireApproval
         isWhitelisted
-        verifiedParticipants
         
         }
         rewardManagement{
@@ -351,7 +314,24 @@ export const getCloseTasks = `
     }
   `;
 
-
+export const getApprovedTokensBySpender = `
+  query GetApprovedTokensBySpender($spender: Bytes!) {
+    approvals(
+      first: 100
+      orderBy: blockTimestamp
+      orderDirection: desc
+      where: { spender: $spender }
+    ) {
+      id
+      owner
+      spender
+      value
+      blockNumber
+      blockTimestamp
+      transactionHash
+    }
+  }
+`;
 
 export const getTaskCreatedById = `
   query GetTaskCreatedById($internal_id: Bytes!) {
@@ -372,7 +352,6 @@ export const getTaskCreatedById = `
         totalRewardAmount
         requireApproval
         isWhitelisted
-        verifiedParticipants
         
         }
         rewardManagement{
@@ -413,7 +392,6 @@ export const GetCombineParticipantsByTask = `
         totalRewardAmount
         requireApproval
         isWhitelisted
-        verifiedParticipants
       }
       rewardManagement {
         appId
@@ -443,7 +421,7 @@ export const GetCombineParticipantsByTask = `
         totalRewardAmount
         requireApproval
         isWhitelisted
-        verifiedParticipants
+        
       }
       rewardManagement {
         appId
@@ -474,7 +452,6 @@ export const GetCombineParticipantsByTask = `
         totalRewardAmount
         requireApproval
         isWhitelisted
-        verifiedParticipants
       }
       rewardManagement {
         appId
@@ -505,7 +482,7 @@ export const GetCombineParticipantsByTask = `
         totalRewardAmount
         requireApproval
         isWhitelisted
-        verifiedParticipants
+       
       }
       rewardManagement {
         appId
@@ -536,7 +513,7 @@ export const GetCombineParticipantsByTask = `
         totalRewardAmount
         requireApproval
         isWhitelisted
-        verifiedParticipants
+
       }
       rewardManagement {
         appId
@@ -549,7 +526,6 @@ export const GetCombineParticipantsByTask = `
 
   
 `;
-
 
 // Factory Queries
 export const GetRewardManagement = `
@@ -600,13 +576,12 @@ export const GetRewardManagementCreatedByAddress = `
   }
 `;
 
-
 //query to get the participant task statistic
 
 export const getParticipantTaskStatistics = `
   query GetParticipantTaskStatistics($participant: Bytes!) {
     
-    applied: participantApplieds(
+    applied:  taskAssignmentApplieds (
       where: { participant: $participant}
     ) {
       id
@@ -619,7 +594,7 @@ export const getParticipantTaskStatistics = `
       }
     }
     
-    accepted:taskAccepteds (
+    accepted:taskAssignmentAccepteds (
       where: { participant: $participant }
     ) {
       id
@@ -632,7 +607,7 @@ export const getParticipantTaskStatistics = `
       }
     }
     
-    completed: taskCompleteds(
+    completed: taskAssignmentCompleteds(
       where: { participant: $participant}
     ) {
       id
@@ -645,7 +620,7 @@ export const getParticipantTaskStatistics = `
       }
     }
     
-    verified: taskVerifieds(
+    verified: taskAssignmentVerifieds(
       where: { participant: $participant }
     ) {
       id
@@ -660,8 +635,6 @@ export const getParticipantTaskStatistics = `
     
   }
 `;
-
-
 
 export const getParticipantTasks = `
    query GetParticipantTasks($participant: Bytes!) {
@@ -697,8 +670,7 @@ export const getParticipantTasks = `
         }
     }
 }
-  `
-
+  `;
 
 export const GetTaskOwnedByIndividual = `
 query GetParticipantTasks($createdBy: Bytes!) {
@@ -729,41 +701,29 @@ query GetParticipantTasks($createdBy: Bytes!) {
         }
     }
 }
-`
+`;
 
 export const GetTaskByName = `
   query GetTaskByName($taskName: String!) {
-     taskCreateds(where: { taskDetail_: { name_contains_nocase: $taskName } }) {
+    taskDetails(
+      where: { name_contains_nocase: $taskName }
+    ) {
       id
-      internal_id
-      taskDetail {
-        id
-        name
-        detailsUrl
-        expiryDate
-        isOpen
-        isTokenDisbursed
-        maxParticipants
-        owner
-        rewardToken
-        totalRewardAmount
-        requireApproval
-        isWhitelisted
-        verifiedParticipants
-      }
-      rewardManagement {
-        appId
-        id
-        name
-        rewardManagement
-      }
-      createdBy
-      blockNumber
-      blockTimestamp
-      transactionHash
+      name
+      detailsUrl
+      expiryDate
+      isOpen
+      isTokenDisbursed
+      maxParticipants
+      owner
+      rewardToken
+      totalRewardAmount
+      requireApproval
+      isWhitelisted
     }
   }
 `;
+
 
 
 export const GetRewardManagementTokenTransfers = `
@@ -806,8 +766,6 @@ export const GetRewardManagementDisbursements = `
   }
 `;
 
-
-
 //for the reward Redemption
 export const GetRewards = `
     query GetRewards {
@@ -825,7 +783,6 @@ export const GetRewards = `
     }
   `;
 
-
 export const getRewardById = `
   query GetRewardById($rewardRedemption: Bytes!) {
     rewardRedemptionCreateds(where: { rewardRedemption: $rewardRedemption }) {
@@ -841,7 +798,6 @@ export const getRewardById = `
     }
   }
 `;
-
 
 export const GetRedeemedReward = `
 query GetRedemptionStatuses($rewardRedemption: Bytes!) {
@@ -898,14 +854,16 @@ query GetRedeemedRewardsByParticipant($participant: Bytes!) {
     }
   }
 }
-`
+`;
 export const GetWhiteListedParticipantByTask = `
 query GetWhiteListedParticipantByTask($taskId: Bytes!) {
-  participantWhitelisteds(where: { taskId: $taskId }) {
+  participantWhitelisteds(where: { taskId: $taskId, isActive: true }) {
     id
     taskId
     participant
     by
+    isActive
+    removedAt
     blockNumber
     blockTimestamp
   }
@@ -925,7 +883,6 @@ query GetRemovedWhiteListedParticipantByTask($taskId: Bytes!) {
 }
 `;
 
-
 export const GetEntityOwner = `
 query GetEntityOwner($userAddress: Bytes!) {
   ownerAddeds(where: { entityOwner: $userAddress }) {
@@ -935,9 +892,7 @@ query GetEntityOwner($userAddress: Bytes!) {
     entityOwner
   }
 }
-`
-
-
+`;
 
 export const GetRejectedParticipant = `
 query GetRejected($taskId: Bytes!) {
@@ -962,5 +917,17 @@ query GetTaskOwner($userAddress: Bytes!) {
   }
 }
 
-`
+`;
+
+
+
+export const GetTreasurerOrMinterWalletsUnique = `
+  query GetTreasurerOrMinterWalletsUnique($roles: [Bytes!]!) {
+    roleAdminGranteds(
+      where: { role_in: $roles }
+    ) {
+      account
+    }
+  }
+`;
 

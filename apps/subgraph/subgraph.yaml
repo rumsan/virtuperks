@@ -8,9 +8,9 @@ dataSources:
     name: AppRegistry
     network: base-sepolia
     source:
-      address: "0x4304DAcb27Ab56b436211A5816b36B83deE16faB"
+      address: '0x9dd3c3Be1487bF3F4f84C14584E8A12e74082F59'
       abi: AppRegistry
-      startBlock: 33322998
+      startBlock: 34875193
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -46,9 +46,9 @@ dataSources:
     name: RewardToken
     network: base-sepolia
     source:
-      address: "0xBEa4dF1Fb0C3c1b4F51406ea5C9263A75C633ca1"
+      address: '0x5619bA7707c811f209684478F7d981d835028aCb'
       abi: RewardToken
-      startBlock: 33323018
+      startBlock: 34875215
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -69,9 +69,9 @@ dataSources:
     name: RewardManagementFactory
     network: base-sepolia
     source:
-      address: "0x1fE52774D5188176999A4010EdAaC9697B155596"
+      address: '0x046D72Ce74a8E6DEe8551e123C9D461EF3D0aD0C'
       abi: RewardManagementFactory
-      startBlock: 33323023
+      startBlock: 34875221
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -102,21 +102,22 @@ templates:
         - AdditionalDisbursementToTask
         - ContractPaused
         - ContractUnpaused
+        - DisbursementToParticipant
         - DisbursementToTask
         - EtherWithdrawn
-        - ParticipantApplied
         - ParticipantRemovedFromWhitelist
-        - ParticipantResubmitted
         - ParticipantWhitelisted
-        - TaskAccepted
-        - TaskApproved
+        - TaskAssignmentAccepted
+        - TaskAssignmentApplied
+        - TaskAssignmentApproved
+        - TaskAssignmentCompleted
+        - TaskAssignmentRejected
+        - TaskAssignmentVerified
         - TaskClosed
-        - TaskCompleted
         - TaskCreated
         - TaskDetailsUpdated
-        - TaskRejected
-        - TaskVerified
         - TokenTransferred
+        - TokensAllocatedToTask
       abis:
         - name: RewardManagement
           file: ./abis/RewardManagement.json
@@ -127,34 +128,36 @@ templates:
           handler: handleContractPaused
         - event: ContractUnpaused(indexed address)
           handler: handleContractUnpaused
+        - event: DisbursementToParticipant(indexed bytes32,uint256,indexed address,indexed address)
+          handler: handleDisbursementToParticipant
         - event: DisbursementToTask(indexed bytes32,uint256,indexed address)
           handler: handleDisbursementToTask
         - event: EtherWithdrawn(indexed address,uint256,indexed address)
           handler: handleEtherWithdrawn
-        - event: ParticipantApplied(indexed bytes32,indexed address)
-          handler: handleParticipantApplied
         - event: ParticipantRemovedFromWhitelist(indexed bytes32,indexed address,indexed address)
           handler: handleParticipantRemovedFromWhitelist
-        - event: ParticipantResubmitted(indexed bytes32,indexed address)
-          handler: handleParticipantResubmitted
         - event: ParticipantWhitelisted(indexed bytes32,indexed address,indexed address)
           handler: handleParticipantWhitelisted
-        - event: TaskAccepted(indexed bytes32,indexed address)
-          handler: handleTaskAccepted
-        - event: TaskApproved(indexed bytes32,indexed address)
-          handler: handleTaskApproved
+        - event: TaskAssignmentAccepted(indexed bytes32,indexed address)
+          handler: handleTaskAssignmentAccepted
+        - event: TaskAssignmentApplied(indexed bytes32,indexed address)
+          handler: handleTaskAssignmentApplied
+        - event: TaskAssignmentApproved(indexed bytes32,indexed address)
+          handler: handleTaskAssignmentApproved
+        - event: TaskAssignmentCompleted(indexed bytes32,indexed address)
+          handler: handleTaskAssignmentCompleted
+        - event: TaskAssignmentRejected(indexed bytes32,indexed address,indexed address,string)
+          handler: handleTaskAssignmentRejected
+        - event: TaskAssignmentVerified(indexed bytes32,indexed address,indexed address)
+          handler: handleTaskAssignmentVerified
         - event: TaskClosed(indexed bytes32,indexed address)
           handler: handleTaskClosed
-        - event: TaskCompleted(indexed bytes32,indexed address)
-          handler: handleTaskCompleted
         - event: TaskCreated(indexed bytes32,indexed address)
           handler: handleTaskCreated
         - event: TaskDetailsUpdated(indexed bytes32,indexed address)
           handler: handleTaskDetailsUpdated
-        - event: TaskRejected(indexed bytes32,indexed address,indexed address,string)
-          handler: handleTaskRejected
-        - event: TaskVerified(indexed bytes32,indexed address,indexed address)
-          handler: handleTaskVerified
         - event: TokenTransferred(indexed address,indexed address,uint256,string,indexed address)
           handler: handleTokenTransferred
+        - event: TokensAllocatedToTask(indexed bytes32,indexed address,uint256,indexed address)
+          handler: handleTokensAllocatedToTask
       file: ./src/reward-management.ts

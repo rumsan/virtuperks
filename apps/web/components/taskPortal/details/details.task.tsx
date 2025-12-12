@@ -1,7 +1,9 @@
+import { useSelectParticipantLookUp } from "@/hooks/client/participant.lookup";
 import { formatDate } from "@/utils/formatDate";
 import { TaskCreated } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import {
+  Building2,
   Coins,
   ExternalLink,
   Timer,
@@ -19,7 +21,8 @@ const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
     e.stopPropagation();
     window.open(url, "_blank", "noopener,noreferrer");
   };
-
+  const { lookupByCuid } = useSelectParticipantLookUp();
+  const ownerData = lookupByCuid(taskData?.taskDetail?.owner);
   return (
     <>
       <Card className="w-[80%] h-full p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
@@ -65,8 +68,8 @@ const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
             <span>
               Task Owner:{" "}
               <span className="font-semibold">
-                {taskData?.taskDetail?.owner}
-              </span>
+  {ownerData?.name || taskData?.taskDetail?.owner}
+</span>
             </span>
           </span>
           <span className="flex items-center gap-3">
@@ -87,6 +90,11 @@ const TaskPortalDetails = ({ taskData }: TaskPortalDetailsProps) => {
               </span>
             </span>
           </span>
+
+          <span className="flex items-center gap-3">
+                      <Building2 color="#64748B" size={22} strokeWidth={2.5} />
+                      Department: <span className="font-semibold">{taskData?.rewardManagement?.name || "N/A"}</span>
+                    </span>
 
           {/* Eligibility Description */}
           <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">

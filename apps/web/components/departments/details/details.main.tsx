@@ -1,14 +1,13 @@
 "use client";
 
 import LoaderSkeleton from "@/components/common/list/loder.skeleton";
-import {
-  useCheckTotalAllocatedTokens,
-  useCheckTotalUnallocatedTokens,
-  useGetEntityById,
-  useGetEntityOwners,
-} from "@/hooks/subgraph/entity";
+import { useSelectParticipantLookUp } from "@/hooks/client/participant.lookup";
+import { useGetEntityById } from "@/hooks/subgraph/entity";
 import { useCloseExpiredTask } from "@/hooks/subgraph/task";
 import {
+  useCheckTotalAllocatedTokens,
+  useCheckTotalUnAllocatedTokens,
+  useGetApprovedTokens,
   useGetDisbursements,
   useGetTokenTransfers,
 } from "@/hooks/subgraph/token";
@@ -39,13 +38,24 @@ export default function DepartmentDetails({
     error,
   } = useGetEntityById(cuid.id);
 
+  const { totalUnallocatedTokens, statusLoading: unallocatedLoading } =
+    useCheckTotalUnAllocatedTokens(entity?.rewardManagement);
+
   const { totalAllocatedTokens, statusLoading: allocatedLoading } =
     useCheckTotalAllocatedTokens(entity?.rewardManagement);
-  const { unallocatedTokens, statusLoading: unallocatedLoading } =
-    useCheckTotalUnallocatedTokens(entity?.rewardManagement);
-  const { getEntityOwners, statusLoading: ownersLoading } = useGetEntityOwners(
-    entity?.entityId,
+
+  const { mappedTreasurers } = useSelectParticipantLookUp();
+  const getTreasurer = mappedTreasurers[0];
+
+  const { totalApproved, isLoading: approvedLoading } = useGetApprovedTokens(
+    entity?.rewardManagement,
   );
+  const approvedTokens = Number(totalApproved);
+
+  // use the mappedEntityOwners from the hook
+  const { mappedEntityOwners: getEntityOwners, isLoading: ownersLoading } =
+    useSelectParticipantLookUp(entity?.entityId);
+
   const { data: disbursementData } = useGetDisbursements(
     entity?.rewardManagement,
   );
@@ -59,7 +69,7 @@ export default function DepartmentDetails({
   const disbursementList = disbursementData?.rewardManagementCreateds?.[0];
 
   const Loading =
-    entityLoading || allocatedLoading || unallocatedLoading || ownersLoading;
+    entityLoading || unallocatedLoading || ownersLoading || allocatedLoading;
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
@@ -122,8 +132,10 @@ export default function DepartmentDetails({
       {/* Pass entity data to child */}
       <DepartmentDetailsCard
         entity={entity}
+        treasurerAddress={getTreasurer?.wallet as `0x${string}`}
+        totalUnAllocatedTokens={totalUnallocatedTokens}
         totalAllocatedTokens={totalAllocatedTokens}
-        unallocatedTokens={unallocatedTokens}
+        approvedTokens={approvedTokens}
         getEntityOwners={getEntityOwners}
         router={router}
         handleCloseExpiredTasks={handleCloseExpiredTasks}

@@ -1,9 +1,5 @@
-import {
-  useCheckTotalAllocatedTokens,
-  useCheckTotalUnallocatedTokens,
-  useGetEntityById,
-  useGetEntityOwners,
-} from "@/hooks/subgraph/entity";
+import { useGetEntityById, useGetEntityOwners } from "@/hooks/subgraph/entity";
+import { useCheckTotalAllocatedTokens } from "@/hooks/subgraph/token";
 import {
   Card,
   CardDescription,
@@ -13,7 +9,6 @@ import {
 } from "@workspace/ui/components/card";
 import { toast } from "@workspace/ui/hooks/use-toast";
 import { ArrowLeft, Coins, Copy, User } from "lucide-react";
-import TokenAllocateForm from "../form/token.allocate";
 
 interface TokenCreateMainProps {
   id: { id: string };
@@ -21,9 +16,9 @@ interface TokenCreateMainProps {
 
 const TokenCreateMain = ({ id }: TokenCreateMainProps) => {
   const { data: entity, isLoading, isError, error } = useGetEntityById(id.id);
-  const { unallocatedTokens } = useCheckTotalUnallocatedTokens(
-    entity?.rewardManagement,
-  );
+  // const { unallocatedTokens } = useCheckTotalUnAllocatedTokens(
+  //   entity?.rewardManagement,
+  // );
 
   const { totalAllocatedTokens } = useCheckTotalAllocatedTokens(
     entity?.rewardManagement,
@@ -135,16 +130,16 @@ const TokenCreateMain = ({ id }: TokenCreateMainProps) => {
           </CardHeader>
 
           <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {unallocatedTokens ?? "0"}
+            {/* {unallocatedTokens ?? "0"} */}
           </CardFooter>
         </Card>
       </div>
 
-      <TokenAllocateForm
+      {/* <TokenAllocateForm
         id={entity?.entityId}
         availableTokens={unallocatedTokens}
         entityData={entity}
-      />
+      /> */}
     </main>
   );
 };

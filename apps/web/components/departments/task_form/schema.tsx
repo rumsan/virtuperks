@@ -4,10 +4,10 @@ export const taskSchema = () => {
   return z
     .object({
       name: z.string().min(1, "Task name is required"),
-      detailsUrl: z.string().min(1, "Task details URL is required"),
+      detailsUrl: z.string()
+    .url("URL must be a valid URL starting with http:// or https://"),
       owner: z.string().min(1, "Task owner is required"),
       entityAddress: z.string().min(1, "Entity address is required"),
-
       // Expiry date
       expiryDate: z.coerce
         .date({
@@ -74,12 +74,15 @@ export const taskSchema = () => {
 
       whitelistedParticipants: z
         .array(
-          z
-            .string()
-            .regex(/^0x[a-fA-F0-9]{40}$/, "Must be a valid Ethereum address"),
+          z.string().regex(/^0x[a-fA-F0-9]{40}$/, "Must be a valid Ethereum address")
+        )
+        .refine(
+          (arr) =>
+            new Set(arr.map((a) => a.toLowerCase())).size === arr.length,
+          "Duplicate address is not allowed"
         )
         .optional()
-        .default([]),
+        .default([]),          
     })
 };
 
