@@ -1,14 +1,15 @@
 "use client";
 import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { Approval } from '../../../../packages/sdk/src/types/token.type';
+import type { Approval } from "../../../../packages/sdk/src/types/token.type";
 import {
   useReadRewardTokenBalanceOf,
+  useWriteRewardManagementAcceptTokenTransfer,
   useWriteRewardManagementDisburseTokensToTaskParticipants,
   useWriteRewardManagementDisburseToSingleParticipant,
   useWriteRewardManagementTransferToken,
   useWriteRewardTokenApprove,
-  useWriteRewardTokenTransfer
+  useWriteRewardTokenTransfer,
 } from "../wagmi/contracts";
 
 export const useDisburseTokenToTask = () => {
@@ -173,8 +174,7 @@ export const useTokenTranfer = () => {
 export const useRewardTokenApprove = () => {
   const { writeContractAsync } = useWriteRewardTokenApprove();
 
-  const tokenAddress = process.env
-    .NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
+  const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
 
   const mutation = useMutation({
     mutationFn: async ({
@@ -186,10 +186,7 @@ export const useRewardTokenApprove = () => {
     }) => {
       const result = await writeContractAsync({
         address: tokenAddress,
-        args: [
-          address as `0x${string}`, 
-          BigInt(amount),           
-        ],
+        args: [address as `0x${string}`, BigInt(amount)],
       });
 
       return result;
@@ -204,7 +201,6 @@ export const useRewardTokenApprove = () => {
   };
 };
 
-
 export const useCheckParticipantBalance = (participantAddress: string) => {
   const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN;
 
@@ -218,7 +214,6 @@ export const useCheckParticipantBalance = (participantAddress: string) => {
     isLoading,
   };
 };
-
 
 export const useGetApprovedTokens = (spender: string) => {
   const { queryService } = useGraphService();
@@ -251,12 +246,10 @@ export const useGetApprovedTokens = (spender: string) => {
   };
 };
 
-
-
 export const useDisburseToSingleParticipant = () => {
   const queryClient = useQueryClient();
 
-  const { writeContractAsync, isPending, isSuccess } =
+  const { writeContractAsync } =
     useWriteRewardManagementDisburseToSingleParticipant();
 
   return useMutation({
@@ -299,5 +292,47 @@ export const useDisburseToSingleParticipant = () => {
   });
 };
 
+// Hook to accept token transfer from treasury
+export const useAcceptTokenTransfer = () => {
+  const queryClient = useQueryClient();
+  const { writeContractAsync } = useWriteRewardManagementAcceptTokenTransfer();
 
+  return useMutation({
+    mutationFn: async ({
+      treasuryAddress,
+      tokenAddress,
+      amount,
+      rewardManagementAddress,
+    }: {
+      treasuryAddress: string;
+      tokenAddress: string;
+      amount: string;
+      rewardManagementAddress: string;
+    }) => {
+      console.log(
+        treasuryAddress,
+        tokenAddress,
+        amount,
+        rewardManagementAddress,
+        "Accepting token transfer",
+      );
+      return await writeContractAsync({
+        address: rewardManagementAddress as `0x${string}`,
+        args: [
+          treasuryAddress as `0x${string}`,
+          tokenAddress as `0x${string}`,
+          BigInt(amount),
+        ],
+      });
+    },
+    onSuccess: async (result, variables) => {
+      // Wait for transaction to be mined
+      await new Promise((resolve) => setTimeout(resolve, 5000));
 
+      // Invalidate queries to refresh the data
+      await queryClient.invalidateQueries({
+        queryKey: ["approvedTokens", variables.rewardManagementAddress],
+      });
+    },
+  });
+};
