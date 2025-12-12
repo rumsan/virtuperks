@@ -2,6 +2,7 @@
 
 import { DataTablePagination } from "@/components/common/list/list.pagination";
 import { ListTable } from "@/components/common/list/list.table";
+import LoaderSkeleton from "@/components/common/list/loder.skeleton";
 import { useParticipantLookup } from "@/hooks/client/participant.lookup";
 import { PATHS } from "@/routes/paths";
 import {
@@ -50,7 +51,6 @@ const ParticipantList = ({ router }: ParticipantListProps) => {
   } = useParticipantLookup();
   
 
-
   const participantDataDestructure = participantData?.data ?? [];
 
   
@@ -74,6 +74,23 @@ const ParticipantList = ({ router }: ParticipantListProps) => {
     },
     onPaginationChange: setPagination,
   });
+
+  if (participantDataLoading) {
+    return (
+      <LoaderSkeleton
+        title
+        subtitle
+        titleWidth="w-40"
+        subtitleWidth="w-64"
+        showTabs={false}
+        showCreateButton={true} // Matches the Assign / Revoke button area
+        cardCount={0} // No cards in this page
+        tableSkeleton={true} // Show table rectangle loader
+        tableHeight="h-80"
+        showPagination={true}
+      />
+    );
+  }
   
 
   return (
