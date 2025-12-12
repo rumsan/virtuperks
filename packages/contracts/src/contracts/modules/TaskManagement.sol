@@ -25,7 +25,6 @@ abstract contract TaskManagement is RewardManagementBase, ITaskManagement {
     function createTask(
         bytes32 taskId,
         Task memory task,
-        address treasuryAddress,
         address[] memory _whitelistParticipants
     ) public virtual onlyRole(OWNER) whenNotPaused {
         require(tasks[taskId].owner == address(0), "Task ID already exists");
@@ -43,7 +42,7 @@ abstract contract TaskManagement is RewardManagementBase, ITaskManagement {
         // Store task only once
         tasks[taskId] = task;
 
-        _allocateTokensToTask(taskId, task.rewardToken, treasuryAddress, task.totalRewardAmount);
+        _allocateTokensToTask(taskId, task.rewardToken, task.totalRewardAmount);
 
         if (task.isWhitelisted) {
             for (uint256 i = 0; i < _whitelistParticipants.length; i++) {
@@ -145,7 +144,6 @@ abstract contract TaskManagement is RewardManagementBase, ITaskManagement {
     function _allocateTokensToTask(
         bytes32 taskId,
         address tokenAddress,
-        address treasuryAddress,
         uint256 amount
     ) internal virtual;
 }

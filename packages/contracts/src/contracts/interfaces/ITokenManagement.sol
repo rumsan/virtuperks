@@ -28,10 +28,10 @@ interface ITokenManagement {
 
     function withdrawEther(address payable to) external;
 
-    function allocateTokensToTask(
-        bytes32 taskId,
-        address tokenAddress,
+    function allocateTokensToTask(bytes32 taskId, address tokenAddress, uint256 amount) external;
+    function acceptTokenTransfer(
         address treasuryAddress,
+        address tokenAddress,
         uint256 amount
     ) external;
 }
