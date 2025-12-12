@@ -43,7 +43,6 @@ interface ITaskManagement {
     function createTask(
         bytes32 taskId,
         Task memory task,
-        address treasuryAddress,
         address[] memory _whitelistParticipants
     ) external;
     function closeTask(bytes32 taskId) external;

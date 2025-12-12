@@ -34,6 +34,29 @@ describe('RewardManagement Contract', function () {
   });
 
   describe('Task Creation and Management', function () {
+    beforeEach(async function () {
+      const {
+        user2,
+        rewardManagement,
+
+        rewardToken,
+      } = await fixture();
+      //set up treasury
+      const [treasuryOwner] = await ethers.getSigners();
+      const minAmount = BigInt(1000);
+      await rewardToken.connect(user2).mint(treasuryOwner.address, minAmount);
+      //Approve contract to spend treasury's tokens
+      await rewardToken
+        .connect(treasuryOwner)
+        .approve(rewardManagement.target, minAmount);
+      await rewardManagement
+        .connect(user2)
+        .acceptTokenTransfer(
+          treasuryOwner.address,
+          await rewardToken.getAddress(),
+          minAmount,
+        );
+    });
     it('should create task and allocate tokens from treasury', async function () {
       const {
         user2,
@@ -44,16 +67,6 @@ describe('RewardManagement Contract', function () {
         APP_ID,
       } = await fixture();
 
-      //set up treasury
-      const [treasuryOwner] = await ethers.getSigners();
-      const minAmount = BigInt(1000);
-      await rewardToken.connect(user2).mint(treasuryOwner.address, minAmount);
-      //Approve contract to spend treasury's tokens
-      await rewardToken
-        .connect(treasuryOwner)
-        .approve(rewardManagement.target, minAmount);
-
-      // Now create the task
       const taskId = ethers.id('TEST_TASK');
       const future = Math.floor(Date.now() / 1000) + 86400; // 24 hours from now
 
@@ -73,11 +86,7 @@ describe('RewardManagement Contract', function () {
         approvedParticipants: [],
       };
 
-      await expect(
-        rewardManagement
-          .connect(user2)
-          .createTask(taskId, task, treasuryOwner.address, []),
-      )
+      await expect(rewardManagement.connect(user2).createTask(taskId, task, []))
         .to.emit(rewardManagement, 'TaskCreated')
         .withArgs(taskId, user2.address);
 
@@ -87,13 +96,6 @@ describe('RewardManagement Contract', function () {
 
     it('should update task details correctly', async function () {
       const { rewardManagement, user2, rewardToken } = await fixture();
-      const [treasuryOwner] = await ethers.getSigners();
-      const minAmount = BigInt(1000);
-      await rewardToken.connect(user2).mint(treasuryOwner.address, minAmount);
-      //Approve contract to spend treasury's tokens
-      await rewardToken
-        .connect(treasuryOwner)
-        .approve(rewardManagement.target, minAmount);
 
       const taskId = ethers.id('UPDATE_TASK');
 
@@ -114,9 +116,7 @@ describe('RewardManagement Contract', function () {
         approvedParticipants: [],
       };
 
-      await rewardManagement
-        .connect(user2)
-        .createTask(taskId, task, treasuryOwner.address, []);
+      await rewardManagement.connect(user2).createTask(taskId, task, []);
 
       // New details
       const newDetailsUrl = 'https://new-details.com';
@@ -140,14 +140,6 @@ describe('RewardManagement Contract', function () {
     it('should add participants to whitelist correctly', async function () {
       const { rewardManagement, user2, participant1, rewardToken } =
         await fixture();
-      const [treasury] = await ethers.getSigners();
-      const mintAmount = BigInt(1000);
-      await rewardToken.connect(user2).mint(treasury.address, mintAmount);
-
-      // Approve contract to spend treasury's tokens
-      await rewardToken
-        .connect(treasury)
-        .approve(rewardManagement.target, mintAmount);
       const taskId = ethers.id('WHITELIST_TASK');
 
       const task = {
@@ -167,9 +159,7 @@ describe('RewardManagement Contract', function () {
       };
 
       // Create whitelisted task
-      await rewardManagement
-        .connect(user2)
-        .createTask(taskId, task, treasury.address, []);
+      await rewardManagement.connect(user2).createTask(taskId, task, []);
 
       // Add participant to whitelist
       await expect(
@@ -199,14 +189,6 @@ describe('RewardManagement Contract', function () {
     it('should remove participant from whitelist correctly', async function () {
       const { rewardManagement, user2, participant1, rewardToken } =
         await fixture();
-      const [treasury] = await ethers.getSigners();
-      const mintAmount = BigInt(1000);
-      await rewardToken.connect(user2).mint(treasury.address, mintAmount);
-
-      // Approve contract to spend treasury's tokens
-      await rewardToken
-        .connect(treasury)
-        .approve(rewardManagement.target, mintAmount);
       const taskId = ethers.id('REMOVE_WHITELIST_TASK');
 
       const task = {
@@ -226,9 +208,7 @@ describe('RewardManagement Contract', function () {
       };
 
       // Create task and add to whitelist
-      await rewardManagement
-        .connect(user2)
-        .createTask(taskId, task, treasury.address, []);
+      await rewardManagement.connect(user2).createTask(taskId, task, []);
       await rewardManagement
         .connect(user2)
         .addToWhitelist(taskId, participant1.address, true);
@@ -258,13 +238,6 @@ describe('RewardManagement Contract', function () {
 
     it('should retrieve task details correctly', async function () {
       const { rewardManagement, user2, rewardToken } = await fixture();
-      const [treasury] = await ethers.getSigners();
-      const mintAmount = BigInt(1000);
-      await rewardToken.connect(user2).mint(treasury.address, mintAmount);
-      // Approve contract to spend treasury's tokens
-      await rewardToken
-        .connect(treasury)
-        .approve(rewardManagement.target, mintAmount);
       const taskId = ethers.id('GET_TASK_TEST');
 
       const task = {
@@ -284,9 +257,7 @@ describe('RewardManagement Contract', function () {
       };
 
       // Create task
-      await rewardManagement
-        .connect(user2)
-        .createTask(taskId, task, treasury.address, []);
+      await rewardManagement.connect(user2).createTask(taskId, task, []);
 
       // Get task details
       const retrievedTask = await rewardManagement.tasks(taskId);
@@ -304,13 +275,7 @@ describe('RewardManagement Contract', function () {
 
     it('should close task correctly', async function () {
       const { rewardManagement, user2, rewardToken } = await fixture();
-      const [treasury] = await ethers.getSigners();
-      const mintAmount = BigInt(1000);
-      await rewardToken.connect(user2).mint(treasury.address, mintAmount);
-      // Approve contract to spend treasury's tokens
-      await rewardToken
-        .connect(treasury)
-        .approve(rewardManagement.target, mintAmount);
+
       const taskId = ethers.id('CLOSE_TASK');
 
       const task = {
@@ -330,9 +295,7 @@ describe('RewardManagement Contract', function () {
       };
 
       // Create task
-      await rewardManagement
-        .connect(user2)
-        .createTask(taskId, task, treasury.address, []);
+      await rewardManagement.connect(user2).createTask(taskId, task, []);
 
       // Close task
       await expect(rewardManagement.connect(user2).closeTask(taskId))
@@ -347,16 +310,10 @@ describe('RewardManagement Contract', function () {
       // const openTasks = await rewardManagement.getOpenTasks();
       // expect(openTasks).to.not.include(taskId);
     });
-
+    //second part of the task
     // it('should close expired tasks automatically', async function () {
     //   const { rewardManagement, user2, rewardToken } = await fixture();
-    //   const [treasury] = await ethers.getSigners();
-    //   const mintAmount = BigInt(1000);
-    //   await rewardToken.connect(user2).mint(treasury.address, mintAmount);
-    //   // Approve contract to spend treasury's tokens
-    //   await rewardToken
-    //     .connect(treasury)
-    //     .approve(rewardManagement.target, mintAmount);
+
     //   const taskId1 = ethers.id('EXPIRED_TASK_1');
     //   const taskId2 = ethers.id('EXPIRED_TASK_2');
 
@@ -391,19 +348,15 @@ describe('RewardManagement Contract', function () {
     //   };
 
     //   // Create both tasks
-    //   await rewardManagement
-    //     .connect(user2)
-    //     .createTask(taskId1, task1, treasury.address, []);
-    //   await rewardManagement
-    //     .connect(user2)
-    //     .createTask(taskId2, task2, treasury.address, []);
+    //   await rewardManagement.connect(user2).createTask(taskId1, task1, []);
+    //   await rewardManagement.connect(user2).createTask(taskId2, task2, []);
 
     //   // Verify both tasks are created and open
     //   expect((await rewardManagement.tasks(taskId1)).isOpen).to.be.true;
-    //   expect((await rewardManagement.tasks
+    //   expect((await rewardManagement.tasks(taskId2)).isOpen).to.be.true;
     //   // Increase time past the first task's expiry
     //   await ethers.provider.send('evm_setNextBlockTimestamp', [nearFuture + 1]);
-    //   await ethers.provider.send('evm_mine');
+    //   await ethers.provider.send('evm_mine', []);
 
     //   // // Close expired tasks
     //   await rewardManagement.closeExpiredTasks();
@@ -445,6 +398,13 @@ describe('RewardManagement Contract', function () {
       await rewardToken
         .connect(treasury)
         .approve(rewardManagement.target, mintAmount);
+      await rewardManagement
+        .connect(user2)
+        .acceptTokenTransfer(
+          treasury.address,
+          await rewardToken.getAddress(),
+          mintAmount,
+        );
 
       // Task details with requireApproval: false
       taskId = ethers.id('NO_APPROVAL_TASK');
@@ -465,9 +425,7 @@ describe('RewardManagement Contract', function () {
         approvedParticipants: [],
       };
 
-      await rewardManagement
-        .connect(user2)
-        .createTask(taskId, task, treasury.address, []);
+      await rewardManagement.connect(user2).createTask(taskId, task, []);
     });
 
     it('should allow participant to complete task directly ', async function () {
@@ -552,6 +510,13 @@ describe('RewardManagement Contract', function () {
       await rewardToken
         .connect(treasury)
         .approve(rewardManagement.target, mintAmount);
+      await rewardManagement
+        .connect(user2)
+        .acceptTokenTransfer(
+          treasury.address,
+          await rewardToken.getAddress(),
+          mintAmount,
+        );
 
       // Task details with requireApproval: false
       taskId = ethers.id('NO_APPROVAL_TASK');
@@ -572,9 +537,7 @@ describe('RewardManagement Contract', function () {
         approvedParticipants: [],
       };
 
-      await rewardManagement
-        .connect(user2)
-        .createTask(taskId, task, treasury.address, []);
+      await rewardManagement.connect(user2).createTask(taskId, task, []);
     });
 
     it('should allow participant to  participate the task ', async function () {
@@ -723,6 +686,13 @@ describe('RewardManagement Contract', function () {
       await rewardToken
         .connect(treasury)
         .approve(rewardManagement.target, mintAmount);
+      await rewardManagement
+        .connect(user2)
+        .acceptTokenTransfer(
+          treasury.address,
+          await rewardToken.getAddress(),
+          mintAmount,
+        );
 
       // Task details with requireApproval: false
       taskId = ethers.id('NO_APPROVAL_TASK');
@@ -743,9 +713,7 @@ describe('RewardManagement Contract', function () {
         approvedParticipants: [],
       };
 
-      await rewardManagement
-        .connect(user2)
-        .createTask(taskId, task, treasury.address, []);
+      await rewardManagement.connect(user2).createTask(taskId, task, []);
     });
 
     it('should allow owner to disburse token to single participant ', async function () {
@@ -804,35 +772,10 @@ describe('RewardManagement Contract', function () {
       await expect(
         rewardManagement
           .connect(user2)
-          .allocateTokensToTask(
-            taskId,
-            getTokenAddress,
-            treasury.address,
-            initialAmount,
-          ),
+          .allocateTokensToTask(taskId, getTokenAddress, initialAmount),
       )
         .to.emit(rewardManagement, 'TokensAllocatedToTask')
         .withArgs(taskId, getTokenAddress, initialAmount, user2.address);
     });
-    //  it('should allocate token to task', async function () {
-    //    const initialAmount = BigInt(100);
-    //    const totalRewardAmount = BigInt(100);
-    //    const remarks = 'Additional reward for extra effort';
-    //    const getTokenAddress = await rewardToken.getAddress();
-
-    //    // call allocae tokens to  task
-    //    await expect(
-    //      rewardManagement
-    //        .connect(user2)
-    //        .allocateTokensToTask(
-    //          taskId,
-    //          getTokenAddress,
-    //          treasury.address,
-    //          initialAmount,
-    //        ),
-    //    )
-    //      .to.emit(rewardManagement, 'TokensAllocatedToTask')
-    //      .withArgs(taskId, getTokenAddress, initialAmount, user2.address);
-    //  });
   });
 });
