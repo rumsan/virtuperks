@@ -29,7 +29,7 @@ abstract contract TokenManagement is DisbursementManagement, ITokenManagement {
     ) public onlyOwner nonReentrant whenNotPaused {
         require(to != address(0), "Cannot transfer to zero address");
         require(tokenAddress != address(0), "Token address cannot be zero");
-        require(amount > 0, "Amount must be greater than 0");
+        require(amount > 0, "Amount must  be greater than 0");
 
         IERC20 token = IERC20(tokenAddress);
         require(
@@ -58,16 +58,15 @@ abstract contract TokenManagement is DisbursementManagement, ITokenManagement {
     function allocateTokensToTask(
         bytes32 taskId,
         address tokenAddress,
-        address treasuryAddress,
         uint256 amount
     ) public nonReentrant whenNotPaused {
-        _allocateTokensToTask(taskId, tokenAddress, treasuryAddress, amount);
+        _allocateTokensToTask(taskId, tokenAddress, amount);
     }
 
     function _allocateTokensToTask(
         bytes32 taskId,
         address tokenAddress,
-        address treasuryAddress,
+        //address treasuryAddress, //???
         uint256 amount
     ) internal override {
         require(amount > 0, "Amount must be greater than 0");
@@ -79,13 +78,22 @@ abstract contract TokenManagement is DisbursementManagement, ITokenManagement {
         require(task.rewardToken == tokenAddress, "Token address does not match task reward token");
 
         // Transfer tokens from user to this contract
-        IERC20 token = IERC20(tokenAddress);
-        token.safeTransferFrom(treasuryAddress, address(this), amount);
+        //IERC20 token = IERC20(tokenAddress); //???
+        //token.safeTransferFrom(treasuryAddress, address(this), amount); //???
 
         // Update task's total reward amount and allocated tokens
         task.totalRewardAmount += amount;
         totalAllocatedTokens[tokenAddress] += amount;
 
         emit TokensAllocatedToTask(taskId, tokenAddress, amount, msg.sender);
+    }
+
+    function acceptTokenTransfer(
+        address treasuryAddress,
+        address tokenAddress,
+        uint256 amount
+    ) public override onlyOwner {
+        IERC20 token = IERC20(tokenAddress);
+        token.safeTransferFrom(treasuryAddress, address(this), amount);
     }
 }

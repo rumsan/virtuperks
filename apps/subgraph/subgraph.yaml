@@ -8,9 +8,9 @@ dataSources:
     name: AppRegistry
     network: base-sepolia
     source:
-      address: '0x2422d2c1B8BBB8Fa0F69F858ABC583c43B7d8f03'
+      address: '0x9dd3c3Be1487bF3F4f84C14584E8A12e74082F59'
       abi: AppRegistry
-      startBlock: 34750134
+      startBlock: 34875193
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -46,9 +46,9 @@ dataSources:
     name: RewardToken
     network: base-sepolia
     source:
-      address: '0x2d8F891f3EAe9C9B3B2946F4f6489632F4fb5e14'
+      address: '0x5619bA7707c811f209684478F7d981d835028aCb'
       abi: RewardToken
-      startBlock: 34750168
+      startBlock: 34875215
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -69,9 +69,9 @@ dataSources:
     name: RewardManagementFactory
     network: base-sepolia
     source:
-      address: '0x12d3eFc5F4d35fEF9F831d1eb8C91c80bE49f02e'
+      address: '0x046D72Ce74a8E6DEe8551e123C9D461EF3D0aD0C'
       abi: RewardManagementFactory
-      startBlock: 34750174
+      startBlock: 34875221
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
