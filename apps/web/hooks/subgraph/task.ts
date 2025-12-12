@@ -37,7 +37,6 @@ export const useTaskAdd = () => {
             approvedParticipants:
               verifiedParticipants as readonly `0x${string}`[],
           },
-          data.treasurerAddress as `0x${string}`,
           data.whitelistedParticipants,
         ],
       });

@@ -1,4 +1,4 @@
-import { useSelectParticipantLookUp } from "@/hooks/client/participant.lookup";
+import { useParticipantLookup, useSelectParticipantLookUp } from "@/hooks/client/participant.lookup";
 import { useGetEntityRole } from "@/hooks/subgraph/entity";
 import { useGetWhiteListedParticipantByTask } from "@/hooks/subgraph/participant";
 import { useAddToWhitelist, useRemoveFromWhitelist, useUpdateTaskDetails } from "@/hooks/subgraph/task";
@@ -7,7 +7,7 @@ import hasRole from "@/utils/role";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { toast } from "@workspace/ui/hooks/use-toast";
 import { Building2, Pencil, Timer, Trophy, UserRoundCog, Users, XCircle } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import { updateSchema } from "./schema";
 
@@ -21,8 +21,12 @@ const TaskDetails = ({ taskData }: TaskDetailsProps) => {
   const [expiryDate, setExpiryDate] = useState(taskData?.taskDetail?.expiryDate || "");
   const [newParticipant, setNewParticipant] = useState("");
   const [detailsUrlError, setDetailsUrlError] = useState("");
-const [expiryDateError, setExpiryDateError] = useState("");
-
+  const [expiryDateError, setExpiryDateError] = useState("");
+  
+  const [inputValue, setInputValue] = useState("");
+const [showSuggestions, setShowSuggestions] = useState(false);
+const [highlightedIndex, setHighlightedIndex] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [removing, setRemoving] = useState<string | null>(null);
   const { address } = useAccount();
   const { addToWhitelist, addPending } = useAddToWhitelist();
@@ -98,6 +102,48 @@ const { lookupByCuid } = useSelectParticipantLookUp();
   const formattedDate = formatDate(taskData?.taskDetail?.expiryDate);
   const isWhiteListed = taskData?.taskDetail?.isWhitelisted;
 
+
+  const { data: participantData = {}, isLoading: participantLoading } = useParticipantLookup();
+  const participants = participantData?.data || [];
+  
+  
+  const filteredParticipants = useMemo(() => {
+    const lower = inputValue.toLowerCase();
+    return participants.filter(
+      (p: any) =>
+        (p.name?.toLowerCase().includes(lower) ||
+          p.address?.toLowerCase().includes(lower)) &&
+        !whiteListedParticipants.find((w: any) => w.participant === p.address)
+    );
+  }, [inputValue, participants, whiteListedParticipants]);
+  
+    
+   
+  const handleSelectParticipant = (p: any) => {
+    setNewParticipant(p.address); 
+    setInputValue(p.name);        
+    setShowSuggestions(false);
+    setHighlightedIndex(0);
+  };
+  
+ 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showSuggestions) return;
+  
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightedIndex((prev) => Math.min(prev + 1, filteredParticipants.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightedIndex((prev) => Math.max(prev - 1, 0));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (filteredParticipants[highlightedIndex]) {
+        handleSelectParticipant(filteredParticipants[highlightedIndex]);
+      }
+    }
+  };
+
   const openEditModal = () => {
     setDetailsUrl(taskData?.taskDetail?.detailsUrl || "");
   
@@ -114,14 +160,14 @@ const { lookupByCuid } = useSelectParticipantLookUp();
 
   const handleSave = async () => {
     try {
-      // Validate raw inputs (both optional)
+      
       const parsed = updateSchema.safeParse({
         detailsUrl,
         expiryDate,
       });
       
       if (!parsed.success) {
-        // Clear old errors
+        
         setDetailsUrlError("");
         setExpiryDateError("");
       
@@ -134,7 +180,7 @@ const { lookupByCuid } = useSelectParticipantLookUp();
           }
         });
       
-        return; // Stop submit
+        return; 
       }
       
   
@@ -281,23 +327,52 @@ const { lookupByCuid } = useSelectParticipantLookUp();
 
   {/* Input Field */}
   {taskData?.taskDetail?.isWhitelisted && hasEntityOwnerRole && (
-    <div className="flex gap-2">
-      <input
-        type="text"
-        value={newParticipant}
-        onChange={(e) => setNewParticipant(e.target.value)}
-        placeholder="Enter wallet address (0x...)"
-        className="border border-gray-300 rounded-xl px-3 py-2 w-full text-sm 
-                   focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-      <button
-        className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 text-sm"
-        onClick={handleAddParticipant}
-        disabled={addPending}
-      >
-        {addPending ? "Adding..." : "Add"}
-      </button>
-    </div>
+    <div className="flex gap-2 relative w-full">
+    <input
+      ref={inputRef}
+      type="text"
+      value={inputValue}
+      onChange={(e) => {
+        setInputValue(e.target.value);
+        setShowSuggestions(true);
+      }}
+      onKeyDown={handleKeyDown}
+      onFocus={() => setShowSuggestions(true)}
+      onBlur={() => setTimeout(() => setShowSuggestions(false), 120)}
+      placeholder="Search participant by name or address"
+      className="border border-gray-300 rounded-xl px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  
+    {showSuggestions && filteredParticipants.length > 0 && (
+      <ul className="absolute top-11 left-0 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto z-20">
+        {filteredParticipants.map((p: any, index: number) => (
+          <li
+            key={p.address}
+            onMouseDown={() => handleSelectParticipant(p)}
+            onMouseEnter={() => setHighlightedIndex(index)}
+            className={`px-3 py-2 cursor-pointer text-sm ${
+              highlightedIndex === index
+                ? "bg-blue-100"
+                : "hover:bg-blue-50"
+            }`}
+          >
+            <div className="font-medium">{p.name}</div>
+            <div className="text-gray-500 text-xs">
+              {p.address.slice(0, 10)}...{p.address.slice(-6)}
+            </div>
+          </li>
+        ))}
+      </ul>
+    )}
+  
+    <button
+      className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 text-sm"
+      onClick={handleAddParticipant}
+      disabled={addPending || !newParticipant}
+    >
+      {addPending ? "Adding..." : "Add"}
+    </button>
+  </div>  
   )}
 
   {/* Scrollable Whitelist Container */}
