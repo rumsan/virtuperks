@@ -5,9 +5,7 @@ import { toUtf8Bytes } from "ethers";
 import { keccak256 } from "viem";
 import {
   useReadRewardManagementFactoryGetEntityOwners,
-  useReadRewardManagementGetTotalUnallocatedTokens,
   useReadRewardManagementOwner,
-  useReadRewardManagementTotalAllocatedTokens,
   useWriteRewardManagementFactoryCreateRewardManagement,
 } from "../wagmi/contracts";
 
@@ -90,38 +88,6 @@ export const useGetEntityById = (rewardManagement: string) => {
       return entity;
     },
   });
-};
-
-export const useCheckTotalUnallocatedTokens = (entityId: string) => {
-  const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
-
-  const { data, isError, isLoading } =
-    useReadRewardManagementGetTotalUnallocatedTokens({
-      address: entityId as `0x${string}`,
-      args: [tokenAddress],
-    });
-
-  return {
-    unallocatedTokens: data,
-    isError,
-    statusLoading: isLoading,
-  };
-};
-
-export const useCheckTotalAllocatedTokens = (entityId: string) => {
-  const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
-
-  const { data, isError, isLoading } =
-    useReadRewardManagementTotalAllocatedTokens({
-      address: entityId as `0x${string}`,
-      args: [tokenAddress],
-    });
-
-  return {
-    totalAllocatedTokens: data,
-    isError,
-    statusLoading: isLoading,
-  };
 };
 
 export const useGetEntityOwners = (entityId: string) => {

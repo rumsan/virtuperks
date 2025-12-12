@@ -3,6 +3,8 @@ import { useGraphService } from "@/providers/subgraph-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Approval } from "../../../../packages/sdk/src/types/token.type";
 import {
+  useReadRewardManagementGetTotalUnallocatedTokens,
+  useReadRewardManagementTotalAllocatedTokens,
   useReadRewardTokenBalanceOf,
   useWriteRewardManagementAcceptTokenTransfer,
   useWriteRewardManagementDisburseTokensToTaskParticipants,
@@ -335,4 +337,37 @@ export const useAcceptTokenTransfer = () => {
       });
     },
   });
+};
+
+export const useCheckTotalUnAllocatedTokens = (entityId: string) => {
+  const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
+  console.log("Entity ID in useCheckTotalUnallocatedTokens:", entityId);
+
+  const { data, isError, isLoading } =
+    useReadRewardManagementGetTotalUnallocatedTokens({
+      address: entityId as `0x${string}`,
+      args: [tokenAddress],
+    });
+
+  return {
+    totalUnallocatedTokens: data,
+    isError,
+    statusLoading: isLoading,
+  };
+};
+
+export const useCheckTotalAllocatedTokens = (entityId: string) => {
+  const tokenAddress = process.env.NEXT_PUBLIC_RAHAT_TOKEN as `0x${string}`;
+
+  const { data, isError, isLoading } =
+    useReadRewardManagementTotalAllocatedTokens({
+      address: entityId as `0x${string}`,
+      args: [tokenAddress],
+    });
+
+  return {
+    totalAllocatedTokens: data,
+    isError,
+    statusLoading: isLoading,
+  };
 };

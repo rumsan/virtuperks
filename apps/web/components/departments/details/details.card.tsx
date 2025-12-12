@@ -18,7 +18,6 @@ import {
 } from "@workspace/ui/components/card";
 import { toast } from "@workspace/ui/hooks/use-toast";
 import {
-  AlertTriangle,
   Building,
   CheckCircle2,
   Clock,
@@ -34,8 +33,9 @@ import { useAccount } from "wagmi";
 
 type DepartmentDetailsCardProps = {
   entity: any;
+  totalUnAllocatedTokens?: bigint;
+  approvedTokens?: number;
   totalAllocatedTokens?: bigint;
-  unallocatedTokens?: number;
   treasurerAddress?: string;
   getEntityOwners?: { wallet: `0x${string}`; label: string }[];
   router: AppRouterInstance;
@@ -45,10 +45,11 @@ type DepartmentDetailsCardProps = {
 
 export default function DepartmentDetailsCard({
   entity,
-  totalAllocatedTokens,
-  unallocatedTokens,
+  totalUnAllocatedTokens,
+  approvedTokens,
   treasurerAddress,
   getEntityOwners,
+  totalAllocatedTokens,
   router,
   closePending,
   handleCloseExpiredTasks,
@@ -83,7 +84,7 @@ export default function DepartmentDetailsCard({
   const cuid = params?.id as string;
 
   const handleAcceptTokens = async () => {
-    if (!unallocatedTokens || unallocatedTokens <= 0) {
+    if (!approvedTokens || approvedTokens <= 0) {
       toast({
         title: "No approved tokens to accept",
         variant: "destructive",
@@ -95,13 +96,13 @@ export default function DepartmentDetailsCard({
       await acceptTokenMutation.mutateAsync({
         treasuryAddress: treasurerAddress || "",
         tokenAddress: process.env.NEXT_PUBLIC_RAHAT_TOKEN || "",
-        amount: unallocatedTokens.toString(),
+        amount: approvedTokens?.toString() || "0",
         rewardManagementAddress: entity.rewardManagement,
       });
 
       toast({
         title: "Tokens accepted successfully!",
-        description: `${unallocatedTokens} tokens have been transferred to your department.`,
+        description: `${approvedTokens} tokens have been transferred to your department.`,
         variant: "success",
       });
     } catch (error) {
@@ -123,7 +124,7 @@ export default function DepartmentDetailsCard({
   }
 
   const handleDialogAction = async (data: any) => {
-    if (!unallocatedTokens) {
+    if (!approvedTokens) {
       toast({
         title: "Unable to fetch available tokens.",
         variant: "destructive",
@@ -131,10 +132,10 @@ export default function DepartmentDetailsCard({
       return;
     }
 
-    if (data.amount > unallocatedTokens) {
+    if (data.amount > approvedTokens) {
       toast({
         title: `Transfer amount exceeds available tokens!`,
-        description: `Available: ${unallocatedTokens}, Requested: ${data.amount}`,
+        description: `Available: ${approvedTokens}, Requested: ${data.amount}`,
         variant: "destructive",
       });
       return;
@@ -268,9 +269,7 @@ export default function DepartmentDetailsCard({
                 }
                 submitType="directdisburse"
                 handleApplyTaskLogic={handleDialogAction}
-                availableTokens={
-                  unallocatedTokens ? Number(unallocatedTokens) : 0
-                }
+                availableTokens={approvedTokens ? Number(approvedTokens) : 0}
               />
             )}
 
@@ -293,8 +292,50 @@ export default function DepartmentDetailsCard({
         </div>
       </div>
 
+      {/* No Tokens - Info Banner */}
+      {canTransferToken &&
+        totalUnAllocatedTokens !== undefined &&
+        totalUnAllocatedTokens === BigInt(0) &&
+        (!approvedTokens || approvedTokens === 0) && (
+          <div className="mt-4 mb-2">
+            <div className="flex items-center gap-4 rounded-lg border-2 border-blue-400 bg-blue-50 p-4 shadow-sm">
+              <div className="flex items-center gap-3 flex-1">
+                <div className="flex items-center justify-center rounded-full bg-blue-100 p-2">
+                  <Gift className="h-6 w-6 text-blue-600" strokeWidth={2.5} />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold text-blue-800 text-base">
+                    No Tokens Available - Getting Started
+                  </span>
+                  <span className="text-sm text-blue-700">
+                    To create tasks and distribute rewards, follow these steps:
+                  </span>
+                  <ol className="text-sm text-blue-700 mt-2 ml-4 list-decimal space-y-1">
+                    <li>
+                      <span className="font-medium">Treasury/Minter</span> must
+                      approve tokens to your department
+                    </li>
+                    <li>
+                      Once approved,{" "}
+                      <span className="font-medium">
+                        you&apos;ll see a green banner
+                      </span>{" "}
+                      to accept the tokens
+                    </li>
+                    <li>
+                      After accepting, tokens will be available for{" "}
+                      <span className="font-medium">creating tasks</span> and
+                      distributing rewards
+                    </li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
       {/* Token Acceptance Notification Banner */}
-      {canTransferToken && unallocatedTokens && unallocatedTokens > 0 && (
+      {canTransferToken && approvedTokens && approvedTokens > 0 && (
         <div className="mt-4 mb-2">
           <div className="flex items-center justify-between gap-4 rounded-lg border-2 border-green-500 bg-green-50 p-4 shadow-sm">
             <div className="flex items-center gap-3">
@@ -306,7 +347,7 @@ export default function DepartmentDetailsCard({
               </div>
               <div className="flex flex-col">
                 <span className="font-semibold text-green-800 text-base">
-                  Treasury has Approved {unallocatedTokens} Tokens
+                  Treasury has Approved {approvedTokens} Tokens
                 </span>
                 <span className="text-sm text-green-700">
                   Click the button to accept and transfer these tokens to your
@@ -338,9 +379,9 @@ export default function DepartmentDetailsCard({
       )}
 
       <div className="grid grid-cols-4 mt-4 gap-4 w-full">
-        <Card className="font-normal text-base h-50 flex flex-col p-4">
+        <Card className="font-normal text-base h-48 flex flex-col p-4">
           <CardTitle className="flex items-center gap-3">
-            <div className="rounded-full flex p-3 bg-[#475263] mb-auto">
+            <div className="rounded-full flex p-2 bg-[#475263] mb-auto">
               <Building color="#fff" size={20} />
             </div>
             <CardDescription className="flex flex-col gap-2">
@@ -367,8 +408,9 @@ export default function DepartmentDetailsCard({
                             setTimeout(() => setCopiedOwner(null), 2000);
                           }}
                         >
-                          <span className="truncate max-w-[200px] text-[#475569]">
-                            {owner.label} ({owner.wallet})
+                          <span className="truncate max-w-[180px] text-[#475569]">
+                            {owner.label} ({owner.wallet.slice(0, 6)}...
+                            {owner.wallet.slice(-4)})
                           </span>
 
                           {copiedOwner === owner.wallet ? (
@@ -389,59 +431,35 @@ export default function DepartmentDetailsCard({
           </CardTitle>
         </Card>
 
-        <Card className="font-normal text-base h-50 flex flex-col">
-          <CardHeader className="flex-grow">
-            <CardTitle className="flex p-0 mb-4 text-[#0F172A]">
-              Total Approved Tokens Allocated
+        <Card className="font-normal text-base h-48 flex flex-col">
+          <CardHeader className="flex-grow p-5">
+            <CardTitle className="flex p-0 mb-4 text-[#0F172A] text-lg">
+              Total Allocated Tokens
             </CardTitle>
           </CardHeader>
-          <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
-            {totalAllocatedTokens ?? "-"}
+          <CardFooter className="flex items-center text-blue-500 text-2xl font-bold pb-5">
+            {totalAllocatedTokens?.toString() ?? "-"}
           </CardFooter>
         </Card>
 
-        <Card className="font-normal text-base flex flex-col justify-between p-5 space-y-4 h-50 shadow-sm border border-slate-200 relative overflow-hidden">
-          <CardHeader className="p-0">
-            <CardTitle className="text-[#0F172A] text-lg font-semibold">
-              Total Approved Tokens Available
+        <Card className="font-normal text-base h-48 flex flex-col">
+          <CardHeader className="flex-grow p-5">
+            <CardTitle className="flex p-0 mb-4 text-[#0F172A] text-lg">
+              Total Unallocated Tokens
             </CardTitle>
           </CardHeader>
-
-          <CardFooter className="p-0">
-            <div className="text-blue-600 text-3xl font-bold">
-              {unallocatedTokens ?? "-"}
-            </div>
+          <CardFooter className="flex items-center text-blue-500 text-2xl font-bold pb-5">
+            {totalUnAllocatedTokens?.toString() ?? "-"}
           </CardFooter>
-
-          {unallocatedTokens !== undefined && unallocatedTokens <= 0 && (
-            <div className="absolute inset-x-3 bottom-3 flex items-center gap-2 rounded-md border border-red-300 bg-red-50 p-2 shadow-sm">
-              <div className="flex items-center justify-center rounded-full bg-red-100 p-1">
-                <AlertTriangle
-                  className="h-4 w-4 text-red-600"
-                  strokeWidth={2.5}
-                />
-              </div>
-              <div className="flex flex-col leading-tight">
-                <span className="font-semibold text-red-600 text-xs">
-                  Tokens Not Approved
-                </span>
-                <span className="text-[10px] text-red-500">
-                  Please contact a{" "}
-                  <span className="font-medium text-red-600">Minter</span> to
-                  approve tokens.
-                </span>
-              </div>
-            </div>
-          )}
         </Card>
 
-        <Card className="font-normal text-base h-50 flex flex-col">
-          <CardHeader className="flex-grow">
-            <CardTitle className="flex p-0 mb-4 text-[#0F172A]">
+        <Card className="font-normal text-base h-48 flex flex-col">
+          <CardHeader className="flex-grow p-5">
+            <CardTitle className="flex p-0 mb-4 text-[#0F172A] text-lg">
               Total Tokens Redeemed
             </CardTitle>
           </CardHeader>
-          <CardFooter className="flex items-center text-blue-500 text-2xl font-bold">
+          <CardFooter className="flex items-center text-blue-500 text-2xl font-bold pb-5">
             -
           </CardFooter>
         </Card>
