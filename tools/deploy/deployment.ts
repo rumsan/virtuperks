@@ -29,6 +29,7 @@ class SeedProject extends commonLib {
 
   public async deployCommonContracts(appId: string) {
     // Deploy Forwarder
+    // Deploy Forwarder (used by ERC2771Context)
     const rumsanForwarder = await this.deployContract('ERC2771Forwarder', [
       'rumsanForwarder',
     ]);
@@ -91,26 +92,27 @@ class SeedProject extends commonLib {
     };
     console.log('RewardToken deployed:', rewardToken.contract.target);
 
-    return { rumsanForwarder, accessManagerV2, rewardToken };
+    return { accessManagerV2, rewardToken };
   }
 
-  // public async deployEntityContract(
-  //   appId: string,
-  //   name: string,
-  //   accessManagerContract: Addressable | string,
-  // ) {
-  //   const entity = await this.deployContract('RewardManagement', [
-  //     appId,
-  //     name,
-  //     accessManagerContract,
-  //   ]);
-  //   this.contracts['entity'] = {
-  //     address: entity.contract.target as string,
-  //     startBlock: entity.blockNumber,
-  //   };
-  //   console.log('RewardManagement deployed:', entity.contract.target);
-  //   return { entity };
-  // }
+  public async deployEntityContract(
+    appId: string,
+    name: string,
+    accessManagerContract: Addressable | string,
+  ) {
+    const entity = await this.deployContract('RewardManagement', [
+      appId,
+      name,
+      'https://rumsan.com',
+      accessManagerContract,
+    ]);
+    this.contracts['entity'] = {
+      address: entity.contract.target as string,
+      startBlock: entity.blockNumber,
+    };
+    console.log('RewardManagement deployed:', entity.contract.target);
+    return { entity };
+  }
 
   public async deployEntityContractFactory(
     accessManager: string,
@@ -152,11 +154,11 @@ async function main() {
     await seedProject.deployCommonContracts(RUMSAN_APP_ID);
   console.log('✅ Common contracts deployed');
 
-  // await seedProject.deployEntityContract(
-  //   RUMSAN_APP_ID,
-  //   name,
-  //   accessManagerV2.contract.target as string,
-  // );
+  await seedProject.deployEntityContract(
+    RUMSAN_APP_ID,
+    name,
+    accessManagerV2.contract.target as string,
+  );
 
   const { entityFactory } = await seedProject.deployEntityContractFactory(
     accessManagerV2.contract.target as string,
