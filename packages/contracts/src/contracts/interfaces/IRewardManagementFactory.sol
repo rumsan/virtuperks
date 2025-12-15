@@ -4,6 +4,7 @@ pragma solidity 0.8.20;
 interface IRewardManagementFactory {
     struct Entity {
         string name;
+        string url;
         address[] entityOwners;
     }
 
@@ -15,10 +16,5 @@ interface IRewardManagementFactory {
         bytes32 entityId
     );
 
-    event OwnerAdded (
-        bytes32 indexed entityId,
-        string name,
-        address indexed entityOwner
-    );
+    event OwnerAdded(bytes32 indexed entityId, string name, address indexed entityOwner);
 }
- 

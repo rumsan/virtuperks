@@ -6,10 +6,7 @@ import "./interfaces/IRewardManagementFactory.sol";
 import "./interfaces/IAppRegistry.sol";
 
 contract RewardManagementFactory is IRewardManagementFactory {
- 
     mapping(bytes32 => Entity) public entities;
-
- 
 
     function createRewardManagement(
         bytes32 entityId,
@@ -20,7 +17,12 @@ contract RewardManagementFactory is IRewardManagementFactory {
         // Ensure we don't exceed the maximum number of owners
         require(entity.entityOwners.length <= 5, "Maximum 5 entity owners allowed");
         // Deploy a new instance of RewardManagement
-        RewardManagement newRewardManagement = new RewardManagement(appId, entity.name, registry);
+        RewardManagement newRewardManagement = new RewardManagement(
+            appId,
+            entity.name,
+            entity.url,
+            registry
+        );
 
         // Get the OWNER role from the new contract
         bytes32 ownerRole = newRewardManagement.OWNER();
@@ -30,14 +32,19 @@ contract RewardManagementFactory is IRewardManagementFactory {
         for (uint i = 0; i < entity.entityOwners.length; i++) {
             appRegistry.grantRole(appId, ownerRole, entity.entityOwners[i]);
             emit OwnerAdded(entityId, entity.name, entity.entityOwners[i]);
-            
         }
-       
+
         //store entity with entity owners
         entities[entityId] = entity;
 
         //Emit an event when a new contract is deployed
-        emit RewardManagementCreated(address(newRewardManagement), registry, appId, entity.name, entityId);
+        emit RewardManagementCreated(
+            address(newRewardManagement),
+            registry,
+            appId,
+            entity.name,
+            entityId
+        );
     }
 
     // Public function to get entityOwners for a RewardManagement contract

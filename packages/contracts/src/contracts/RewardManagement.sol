@@ -7,13 +7,16 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
 
 contract RewardManagement is IRewardManagement, TokenManagement, Multicall {
     string public name;
+    string public url;
 
     constructor(
         bytes32 _appId,
         string memory _name,
+        string memory _url,
         address _registry
     ) RewardManagementBase(_appId, _registry) {
         name = _name;
+        url = _url;
     }
 
     //prevent contract from receiving ether

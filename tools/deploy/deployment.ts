@@ -94,23 +94,23 @@ class SeedProject extends commonLib {
     return { rumsanForwarder, accessManagerV2, rewardToken };
   }
 
-  public async deployEntityContract(
-    appId: string,
-    name: string,
-    accessManagerContract: Addressable | string,
-  ) {
-    const entity = await this.deployContract('RewardManagement', [
-      appId,
-      name,
-      accessManagerContract,
-    ]);
-    this.contracts['entity'] = {
-      address: entity.contract.target as string,
-      startBlock: entity.blockNumber,
-    };
-    console.log('RewardManagement deployed:', entity.contract.target);
-    return { entity };
-  }
+  // public async deployEntityContract(
+  //   appId: string,
+  //   name: string,
+  //   accessManagerContract: Addressable | string,
+  // ) {
+  //   const entity = await this.deployContract('RewardManagement', [
+  //     appId,
+  //     name,
+  //     accessManagerContract,
+  //   ]);
+  //   this.contracts['entity'] = {
+  //     address: entity.contract.target as string,
+  //     startBlock: entity.blockNumber,
+  //   };
+  //   console.log('RewardManagement deployed:', entity.contract.target);
+  //   return { entity };
+  // }
 
   public async deployEntityContractFactory(
     accessManager: string,
@@ -152,11 +152,11 @@ async function main() {
     await seedProject.deployCommonContracts(RUMSAN_APP_ID);
   console.log('✅ Common contracts deployed');
 
-  await seedProject.deployEntityContract(
-    RUMSAN_APP_ID,
-    name,
-    accessManagerV2.contract.target as string,
-  );
+  // await seedProject.deployEntityContract(
+  //   RUMSAN_APP_ID,
+  //   name,
+  //   accessManagerV2.contract.target as string,
+  // );
 
   const { entityFactory } = await seedProject.deployEntityContractFactory(
     accessManagerV2.contract.target as string,
