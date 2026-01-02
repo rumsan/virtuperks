@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity 0.8.22;
 
 import "./ITaskManagement.sol";
 
@@ -13,11 +13,6 @@ interface IParticipantManagement {
         address indexed participant,
         address indexed rejectedBy,
         string reason
-    );
-    event TaskAssignmentVerified(
-        bytes32 indexed id,
-        address indexed participant,
-        address indexed verifier
     );
     event ParticipantWhitelisted(
         bytes32 indexed taskId,
@@ -41,8 +36,4 @@ interface IParticipantManagement {
         string memory reason
     ) external;
     function approveTaskSubmission(bytes32 taskId, address participant) external;
-    function getParticipantTaskAssignment(
-        bytes32 taskId,
-        address participant
-    ) external view returns (ITaskManagement.TaskAssignment memory);
 }

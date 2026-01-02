@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity 0.8.22;
 
 interface ITaskManagement {
     enum AssignmentStatus {
@@ -27,11 +27,9 @@ interface ITaskManagement {
         //----
         uint256 maxParticipants;
         uint256 acceptedParticipantCount;
-        address[] approvedParticipants;
     }
 
     struct TaskAssignment {
-        address participant;
         AssignmentStatus status;
         string completionUrl;
     }
@@ -54,4 +52,6 @@ interface ITaskManagement {
         string memory newDetailsUrl,
         uint256 newExpiryDate
     ) external;
+    function getTask(bytes32 taskId) external view returns (Task memory);
+    function getAllTasks() external view returns (bytes32[] memory);
 }
