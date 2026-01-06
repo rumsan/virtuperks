@@ -5,40 +5,85 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: AppRegistry
+    name: Entity
     network: base-sepolia
     source:
-      address: "0xb4574d2d7e92928CA2c1C01F199faD6992521932"
-      abi: AppRegistry
-      startBlock: 35011865
+      address: "0xf00E856a7E602468bAE51AEff431Aa22Ce2d3bbD"
+      abi: Entity
+      startBlock: 35957078
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
-        - AppCreated
-        - AppNameUpdated
-        - AppPrivacyChanged
-        - RoleAdminGranted
-        - RoleAdminRevoked
-        - RoleGranted
-        - RoleRevoked
+        - AllocationsFrozen
+        - AppContractUpdated
+        - EmergencyWithdrawal
+        - EntityDeactivated
+        - EntityInitialized
+        - EntityUpgraded
+        - Initialized
+        - OwnershipTransferred
+        - ParticipantRemovedFromWhitelist
+        - ParticipantWhitelisted
+        - RewardsDistributed
+        - TaskAssignmentAccepted
+        - TaskAssignmentApplied
+        - TaskAssignmentApproved
+        - TaskAssignmentCompleted
+        - TaskAssignmentRejected
+        - TaskClosed
+        - TaskCreated
+        - TaskDetailsUpdated
+        - TokensDeposited
+        - TokensWithdrawn
+        - Upgraded
       abis:
-        - name: AppRegistry
-          file: ./abis/AppRegistry.json
+        - name: Entity
+          file: ./abis/Entity.json
       eventHandlers:
-        - event: AppCreated(indexed bytes32,indexed address,indexed address)
-          handler: handleAppCreated
-        - event: AppNameUpdated(indexed bytes32,string,indexed address)
-          handler: handleAppNameUpdated
-        - event: AppPrivacyChanged(indexed bytes32,indexed bool,indexed address)
-          handler: handleAppPrivacyChanged
-        - event: RoleAdminGranted(indexed bytes32,indexed bytes32,indexed address,address)
-          handler: handleRoleAdminGranted
-        - event: RoleAdminRevoked(indexed bytes32,indexed bytes32,indexed address,address)
-          handler: handleRoleAdminRevoked
-        - event: RoleGranted(indexed bytes32,indexed bytes32,indexed address,address)
-          handler: handleRoleGranted
-        - event: RoleRevoked(indexed bytes32,indexed bytes32,indexed address,address)
-          handler: handleRoleRevoked
-      file: ./src/app-registry.ts
+        - event: AllocationsFrozen(indexed address)
+          handler: handleAllocationsFrozen
+        - event: AppContractUpdated(indexed address,indexed address)
+          handler: handleAppContractUpdated
+        - event: EmergencyWithdrawal(indexed address,indexed address,uint256,indexed address)
+          handler: handleEmergencyWithdrawal
+        - event: EntityDeactivated(indexed address)
+          handler: handleEntityDeactivated
+        - event: EntityInitialized(indexed address,string)
+          handler: handleEntityInitialized
+        - event: EntityUpgraded(indexed address)
+          handler: handleEntityUpgraded
+        - event: Initialized(uint64)
+          handler: handleInitialized
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: ParticipantRemovedFromWhitelist(indexed bytes32,indexed address,indexed address)
+          handler: handleParticipantRemovedFromWhitelist
+        - event: ParticipantWhitelisted(indexed bytes32,indexed address,indexed address)
+          handler: handleParticipantWhitelisted
+        - event: RewardsDistributed(indexed bytes32,uint256,uint256)
+          handler: handleRewardsDistributed
+        - event: TaskAssignmentAccepted(indexed bytes32,indexed address)
+          handler: handleTaskAssignmentAccepted
+        - event: TaskAssignmentApplied(indexed bytes32,indexed address)
+          handler: handleTaskAssignmentApplied
+        - event: TaskAssignmentApproved(indexed bytes32,indexed address)
+          handler: handleTaskAssignmentApproved
+        - event: TaskAssignmentCompleted(indexed bytes32,indexed address)
+          handler: handleTaskAssignmentCompleted
+        - event: TaskAssignmentRejected(indexed bytes32,indexed address,indexed address,string)
+          handler: handleTaskAssignmentRejected
+        - event: TaskClosed(indexed bytes32,indexed address)
+          handler: handleTaskClosed
+        - event: TaskCreated(indexed bytes32,indexed address)
+          handler: handleTaskCreated
+        - event: TaskDetailsUpdated(indexed bytes32,indexed address)
+          handler: handleTaskDetailsUpdated
+        - event: TokensDeposited(indexed address,uint256,indexed address)
+          handler: handleTokensDeposited
+        - event: TokensWithdrawn(indexed address,indexed address,uint256,indexed address)
+          handler: handleTokensWithdrawn
+        - event: Upgraded(indexed address)
+          handler: handleUpgraded
+      file: ./src/entity.ts

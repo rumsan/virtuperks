@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contract Testing Hub</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #222;
+        }
+        
+        .header p {
+            font-size: 1em;
+            color: #666;
+        }
+        
+        .section {
+            background: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+        }
+        
+        .section h2 {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #222;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 500;
+            font-size: 0.9em;
+            color: #555;
+        }
+        
+        input {
+            padding: 8px 10px;
+            border: 1px solid #d0d0d0;
+            border-radius: 4px;
+            font-size: 0.9em;
+            transition: border-color 0.2s;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #999;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+        
+        button {
+            padding: 8px 16px;
+            background: #333;
+            color: white;
+            border: 1px solid #333;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background: #222;
+            border-color: #222;
+        }
+        
+        button:active {
+            opacity: 0.8;
+        }
+        
+        .result {
+            margin-top: 12px;
+            padding: 12px;
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-left: 3px solid #999;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85em;
+            word-break: break-all;
+            line-height: 1.5;
+        }
+        
+        .error {
+            color: #d32f2f;
+            border-left-color: #d32f2f;
+            background: #ffebee;
+        }
+        
+        .success {
+            color: #388e3c;
+            border-left-color: #388e3c;
+            background: #e8f5e9;
+        }
+        
+        .contract-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .contract-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .contract-card:hover {
+            border-color: #999;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .contract-card h3 {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #222;
+        }
+        
+        .contract-card p {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .contract-card a {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .contract-card a:hover {
+            background: #222;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .section {
+                padding: 15px;
+            }
+            
+            .contract-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Contract Testing Hub</h1>
+            <p>Connect your wallet and test your smart contracts</p>
+        </div>
+
+        <div class="section">
+            <h2>Wallet Connection</h2>
+            <div class="button-group">
+                <button id="connectButton">Connect MetaMask</button>
+                <button id="disconnectButton" style="display: none; background: #d32f2f; border-color: #d32f2f;">Disconnect</button>
+            </div>
+            <div id="accountInfo" class="result"></div>
+        </div>
+
+        <div class="section">
+            <h2>Select Contract Type</h2>
+            <div class="contract-grid">
+                <div class="contract-card">
+                    <h3>App Contract</h3>
+                    <p>Test and manage your App contract, create entities, and manage ownership.</p>
+                    <a href="app-demo.html">Go to App Tester</a>
+                </div>
+                <div class="contract-card">
+                    <h3>Entity Contract</h3>
+                    <p>Test entity contracts and manage basic entity operations.</p>
+                    <a href="entity-demo.html">Go to Entity Tester</a>
+                </div>
+                <div class="contract-card">
+                    <h3>Task Management</h3>
+                    <p>Create and manage tasks within entities, handle participation and approvals.</p>
+                    <a href="task-demo.html">Go to Task Tester</a>
+                </div>
+                <div class="contract-card">
+                    <h3>Token Contract</h3>
+                    <p>Test ERC20 tokens, transfer, approve, and check balances.</p>
+                    <a href="token-demo.html">Go to Token Tester</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let provider;
+        let signer;
+
+        document.getElementById('connectButton').addEventListener('click', async () => {
+            try {
+                if (typeof window.ethereum !== 'undefined') {
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    provider = new ethers.BrowserProvider(window.ethereum);
+                    signer = await provider.getSigner();
+                    const address = await signer.getAddress();
+                    const balance = await provider.getBalance(address);
+                    const balanceEth = ethers.formatEther(balance);
+                    
+                    document.getElementById('accountInfo').innerHTML = `
+                        <div class="success">
+                            <div><strong>Connected:</strong> ${address}</div>
+                            <div><strong>Balance:</strong> ${balanceEth} ETH</div>
+                        </div>
+                    `;
+                    
+                    document.getElementById('connectButton').style.display = 'none';
+                    document.getElementById('disconnectButton').style.display = 'inline-block';
+                    
+                    // Store connection state in session
+                    sessionStorage.setItem('connected', 'true');
+                    sessionStorage.setItem('address', address);
+                } else {
+                    throw new Error('MetaMask not detected');
+                }
+            } catch (error) {
+                document.getElementById('accountInfo').innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        });
+
+        document.getElementById('disconnectButton').addEventListener('click', () => {
+            provider = null;
+            signer = null;
+            document.getElementById('accountInfo').innerHTML = '';
+            document.getElementById('connectButton').style.display = 'inline-block';
+            document.getElementById('disconnectButton').style.display = 'none';
+            sessionStorage.removeItem('connected');
+            sessionStorage.removeItem('address');
+        });
+
+        // Load deployment configuration
+        async function loadDeploymentConfig() {
+            try {
+                const response = await fetch('deployment.json?' + new Date().getTime());
+                const config = await response.json();
+                sessionStorage.setItem('deploymentConfig', JSON.stringify(config));
+            } catch (error) {
+                console.warn('Could not load deployment.json:', error);
+            }
+        }
+
+        // Check if already connected on page load
+        window.addEventListener('load', async () => {
+            await loadDeploymentConfig();
+            if (sessionStorage.getItem('connected') === 'true') {
+                document.getElementById('connectButton').click();
+            }
+        });
+    </script>
+</body>
+</html>

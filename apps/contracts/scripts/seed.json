@@ -1,0 +1,12 @@
+{
+  "network": "hardhat",
+  "initialOwner": "0xE1e3cA4D4C67E815c0927d0510F316A58bBd52E5",
+  "appName": "Test App",
+  "tokenName": "Test Token",
+  "tokenSymbol": "TST",
+  "createEntity": true,
+  "entityName": "Test Entity 1",
+  "entityUrl": "test.com",
+  "entityOwner": "0xE1e3cA4D4C67E815c0927d0510F316A58bBd52E5",
+  "tokenOwner": "0xE1e3cA4D4C67E815c0927d0510F316A58bBd52E5"
+}

@@ -1,72 +1,201 @@
-type AppCreated @entity(immutable: true) {
+type AllocationsFrozen @entity(immutable: true) {
   id: Bytes!
-  appId: Bytes! # bytes32
-  admin: Bytes! # address
-  sender: Bytes! # address
+  by: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type AppNameUpdated @entity(immutable: true) {
+type AppContractUpdated @entity(immutable: true) {
   id: Bytes!
-  appId: Bytes! # bytes32
-  newName: String! # string
-  sender: Bytes! # address
+  oldApp: Bytes! # address
+  newApp: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type AppPrivacyChanged @entity(immutable: true) {
+type EmergencyWithdrawal @entity(immutable: true) {
   id: Bytes!
-  appId: Bytes! # bytes32
-  isPrivate: Boolean! # bool
-  sender: Bytes! # address
+  token: Bytes! # address
+  to: Bytes! # address
+  amount: BigInt! # uint256
+  by: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type RoleAdminGranted @entity(immutable: true) {
+type EntityDeactivated @entity(immutable: true) {
   id: Bytes!
-  appId: Bytes! # bytes32
-  role: Bytes! # bytes32
-  account: Bytes! # address
-  sender: Bytes! # address
+  by: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type RoleAdminRevoked @entity(immutable: true) {
+type EntityInitialized @entity(immutable: true) {
   id: Bytes!
-  appId: Bytes! # bytes32
-  role: Bytes! # bytes32
-  account: Bytes! # address
-  sender: Bytes! # address
+  owner: Bytes! # address
+  name: String! # string
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type RoleGranted @entity(immutable: true) {
+type EntityUpgraded @entity(immutable: true) {
   id: Bytes!
-  appId: Bytes! # bytes32
-  role: Bytes! # bytes32
-  account: Bytes! # address
-  sender: Bytes! # address
+  newImplementation: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type RoleRevoked @entity(immutable: true) {
+type Initialized @entity(immutable: true) {
   id: Bytes!
-  appId: Bytes! # bytes32
-  role: Bytes! # bytes32
-  account: Bytes! # address
-  sender: Bytes! # address
+  version: BigInt! # uint64
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type OwnershipTransferred @entity(immutable: true) {
+  id: Bytes!
+  previousOwner: Bytes! # address
+  newOwner: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ParticipantRemovedFromWhitelist @entity(immutable: true) {
+  id: Bytes!
+  taskId: Bytes! # bytes32
+  participant: Bytes! # address
+  by: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ParticipantWhitelisted @entity(immutable: true) {
+  id: Bytes!
+  taskId: Bytes! # bytes32
+  participant: Bytes! # address
+  by: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RewardsDistributed @entity(immutable: true) {
+  id: Bytes!
+  taskId: Bytes! # bytes32
+  totalAmount: BigInt! # uint256
+  participantCount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskAssignmentAccepted @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  participant: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskAssignmentApplied @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  participant: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskAssignmentApproved @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  approver: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskAssignmentCompleted @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  participant: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskAssignmentRejected @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  participant: Bytes! # address
+  rejectedBy: Bytes! # address
+  reason: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskClosed @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  closedBy: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskCreated @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  createdBy: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TaskDetailsUpdated @entity(immutable: true) {
+  id: Bytes!
+  internal_id: Bytes! # bytes32
+  updatedBy: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TokensDeposited @entity(immutable: true) {
+  id: Bytes!
+  token: Bytes! # address
+  amount: BigInt! # uint256
+  by: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TokensWithdrawn @entity(immutable: true) {
+  id: Bytes!
+  token: Bytes! # address
+  to: Bytes! # address
+  amount: BigInt! # uint256
+  by: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Upgraded @entity(immutable: true) {
+  id: Bytes!
+  implementation: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

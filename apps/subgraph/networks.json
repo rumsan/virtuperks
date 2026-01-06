@@ -1,8 +1,8 @@
 {
   "base-sepolia": {
-    "AppRegistry": {
-      "address": "0xb4574d2d7e92928CA2c1C01F199faD6992521932",
-      "startBlock": 35011865
+    "Entity": {
+      "address": "0xf00E856a7E602468bAE51AEff431Aa22Ce2d3bbD",
+      "startBlock": 35957078
     }
   }
 }

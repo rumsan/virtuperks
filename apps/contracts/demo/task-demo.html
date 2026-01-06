@@ -1,0 +1,1941 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task Management Tester</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial, sans-serif;
+        background: #f5f5f5;
+        color: #333;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        gap: 20px;
+      }
+
+      .left-panel {
+        flex: 1;
+        min-width: 400px;
+      }
+
+      .right-panel {
+        flex: 1;
+        min-width: 400px;
+        display: none; /* Hidden until task is selected */
+      }
+
+      .header {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .header h1 {
+        font-size: 2em;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #222;
+      }
+
+      .header p {
+        font-size: 0.95em;
+        color: #666;
+      }
+
+      .breadcrumb {
+        background: white;
+        padding: 10px 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .breadcrumb a {
+        color: #333;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+
+      .breadcrumb a:hover {
+        color: #666;
+      }
+
+      .section {
+        background: white;
+        margin-bottom: 20px;
+        padding: 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+      }
+
+      .section h2 {
+        font-size: 1.2em;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #222;
+        border-bottom: 1px solid #f0f0f0;
+        padding-bottom: 10px;
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #f0f0f0;
+        padding-bottom: 10px;
+      }
+
+      .section-header h2 {
+        margin: 0;
+        font-size: 1.2em;
+        font-weight: 600;
+        color: #222;
+        border: none;
+        padding: 0;
+      }
+
+      .section-header .button-group {
+        margin-top: 0;
+      }
+
+      .section h3 {
+        font-size: 0.95em;
+        font-weight: 600;
+        margin-top: 15px;
+        margin-bottom: 12px;
+        color: #333;
+      }
+
+      .form-group {
+        margin-bottom: 12px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 4px;
+        font-weight: 500;
+        font-size: 0.9em;
+        color: #555;
+      }
+
+      input,
+      textarea {
+        padding: 8px 10px;
+        border: 1px solid #d0d0d0;
+        border-radius: 4px;
+        font-size: 0.9em;
+        transition: border-color 0.2s;
+        font-family: 'Monaco', 'Menlo', monospace;
+      }
+
+      input:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #999;
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 70px;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+
+      button {
+        padding: 8px 16px;
+        background: #333;
+        color: white;
+        border: 1px solid #333;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.9em;
+        transition: all 0.2s;
+      }
+
+      button:hover {
+        background: #222;
+        border-color: #222;
+      }
+
+      button:active {
+        opacity: 0.8;
+      }
+
+      button.secondary {
+        background: #666;
+        border-color: #666;
+      }
+
+      button.secondary:hover {
+        background: #555;
+        border-color: #555;
+      }
+
+      button.warning {
+        background: #d32f2f;
+        border-color: #d32f2f;
+      }
+
+      button.warning:hover {
+        background: #b71c1c;
+        border-color: #b71c1c;
+      }
+
+      .result {
+        margin-top: 12px;
+        padding: 12px;
+        background: #fafafa;
+        border: 1px solid #e0e0e0;
+        border-left: 3px solid #999;
+        border-radius: 4px;
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-size: 0.85em;
+        word-break: break-all;
+        line-height: 1.5;
+      }
+
+      .error {
+        color: #d32f2f;
+        border-left-color: #d32f2f;
+        background: #ffebee;
+      }
+
+      .success {
+        color: #388e3c;
+        border-left-color: #388e3c;
+        background: #e8f5e9;
+      }
+
+      .info {
+        color: #1976d2;
+        border-left-color: #1976d2;
+        background: #e3f2fd;
+      }
+
+      .task-card {
+        background: #fafafa;
+        padding: 12px;
+        border: 1px solid #e0e0e0;
+        border-left: 3px solid #999;
+        border-radius: 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-size: 0.85em;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .task-card:hover {
+        background: #f0f0f0;
+        border-color: #ccc;
+      }
+
+      .task-card.selected {
+        background: #e3f2fd;
+        border-left-color: #1976d2;
+      }
+
+      .task-id {
+        flex: 1;
+        word-break: break-all;
+        color: #555;
+        font-weight: 500;
+      }
+
+      .task-name {
+        flex: 1;
+        margin: 0 10px;
+        color: #333;
+        font-weight: 600;
+      }
+
+      .select-button {
+        padding: 6px 12px;
+        background: #666;
+        color: white;
+        border: 1px solid #666;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.8em;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+
+      .select-button:hover {
+        background: #555;
+        border-color: #555;
+      }
+
+      .select-button.selected {
+        background: #1976d2;
+        border-color: #1976d2;
+      }
+
+      .whitelist-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 0.9em;
+      }
+
+      .whitelist-table th {
+        background: #f0f0f0;
+        padding: 8px;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .whitelist-table td {
+        padding: 8px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .whitelist-table tr:hover {
+        background: #fafafa;
+      }
+
+      @media (max-width: 768px) {
+        .header h1 {
+          font-size: 1.5em;
+        }
+
+        .section {
+          padding: 15px;
+        }
+
+        .container {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .left-panel,
+        .right-panel {
+          min-width: unset;
+        }
+
+        .task-card {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+
+        .task-name {
+          margin: 0;
+        }
+
+        .select-button {
+          align-self: flex-end;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="left-panel">
+        <div class="header">
+          <h1>Task Management Tester</h1>
+          <p>Manage and test task functionality within entities</p>
+        </div>
+
+        <div class="breadcrumb">
+          <a href="index.html">🏠 Home</a> |
+          <a href="entity-demo.html">← Back to Entity Contract</a>
+        </div>
+
+        <div class="section">
+          <div class="section-header">
+            <h2>Wallet Connection</h2>
+            <div class="button-group">
+              <button id="connectButton">Connect MetaMask Wallet</button>
+              <button
+                id="switchWalletButton"
+                style="
+                  display: none;
+                  background: #1976d2;
+                  border-color: #1976d2;
+                "
+              >
+                Switch Wallet
+              </button>
+              <button
+                id="disconnectButton"
+                style="
+                  display: none;
+                  background: #d32f2f;
+                  border-color: #d32f2f;
+                "
+              >
+                Disconnect
+              </button>
+            </div>
+          </div>
+          <div id="accountInfo" class="result"></div>
+        </div>
+
+        <div class="section">
+          <div class="section-header">
+            <h2>Load Entity Contract</h2>
+            <div class="button-group">
+              <button id="loadContract">Load Contract</button>
+              <button
+                id="autoLoadButton"
+                class="secondary"
+                style="display: none"
+              >
+                Auto-loaded from Entity ✓
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="entityAddress">Entity Contract Address:</label>
+            <input
+              type="text"
+              id="entityAddress"
+              placeholder="0x..."
+              size="50"
+            />
+          </div>
+          <div id="contractStatus" class="result"></div>
+        </div>
+
+        <div class="section">
+          <h2>All Tasks</h2>
+          <div id="tasksListContainer">
+            <div class="result" id="tasksListResults">
+              Load contract to view tasks
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Create New Task</h2>
+          <div class="form-group">
+            <label for="taskId">Task ID (bytes32):</label>
+            <input type="text" id="taskId" placeholder="0x..." />
+          </div>
+          <div class="form-group">
+            <label for="taskName">Task Name:</label>
+            <input type="text" id="taskName" />
+          </div>
+          <div class="form-group">
+            <label for="taskOwner">Task Owner Address:</label>
+            <div style="display: flex; gap: 8px; align-items: center">
+              <input
+                type="text"
+                id="taskOwner"
+                placeholder="0x..."
+                style="flex: 1"
+              />
+              <button
+                id="fillTaskOwner"
+                class="secondary"
+                style="padding: 6px 8px; font-size: 1em; height: auto"
+              >
+                �
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="taskDetailsUrl">Details URL:</label>
+            <input type="text" id="taskDetailsUrl" />
+          </div>
+          <div class="form-group">
+            <label for="taskExpiryDate">Expiry Date (timestamp):</label>
+            <input type="text" id="taskExpiryDate" placeholder="1234567890" />
+          </div>
+          <div class="form-group">
+            <label for="rewardToken">Reward Token Address:</label>
+            <input type="text" id="rewardToken" placeholder="0x..." />
+          </div>
+          <div class="form-group">
+            <label for="totalRewardAmount"
+              >Total Reward Amount (whole tokens):</label
+            >
+            <input type="text" id="totalRewardAmount" />
+          </div>
+          <div class="form-group">
+            <label for="maxParticipants">Max Participants:</label>
+            <input type="text" id="maxParticipants" />
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="requireApproval" /> Require Approval
+            </label>
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="isWhitelisted" /> Is Whitelisted
+            </label>
+          </div>
+          <div class="button-group">
+            <button id="createTask">Create Task</button>
+          </div>
+          <div id="createTaskResults" class="result"></div>
+        </div>
+      </div>
+
+      <div class="right-panel" id="taskDetailsPanel">
+        <div class="header">
+          <h1>Task Details & Actions</h1>
+          <p id="selectedTaskTitle">Select a task from the left panel</p>
+        </div>
+
+        <div class="section">
+          <h2>Wallet Info & Whitelist Status</h2>
+          <div id="currentWalletInfo" class="result">No wallet connected</div>
+          <div id="whitelistStatusSection" style="margin-top: 15px">
+            No task selected
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Task Information</h2>
+          <div id="selectedTaskInfo" class="result">No task selected</div>
+        </div>
+
+        <div class="section">
+          <h2>Approved & Accepted Participants</h2>
+          <div id="participantListsSection" class="result">
+            No task selected
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Task Information & Status</h2>
+
+          <h3>View Task Details</h3>
+          <div class="button-group">
+            <button id="getTaskInfo">Get Task Info</button>
+            <button id="checkTaskOpen">Is Task Open?</button>
+            <button id="checkTaskExpired">Is Task Expired?</button>
+            <button id="checkMaxParticipants">Max Participants Reached?</button>
+          </div>
+          <div id="taskInfoResults" class="result"></div>
+        </div>
+
+        <div class="section">
+          <h2>Manage Task</h2>
+
+          <h3>Update Task Details & Close Task</h3>
+          <div class="form-group">
+            <label for="newDetailsUrl">New Details URL:</label>
+            <input type="text" id="newDetailsUrl" placeholder="https://..." />
+          </div>
+          <div class="form-group">
+            <label for="newExpiryDate">New Expiry Date (timestamp):</label>
+            <input type="text" id="newExpiryDate" placeholder="1234567890" />
+          </div>
+          <div class="button-group">
+            <button id="updateTaskDetails" disabled>Update Task Details</button>
+            <button id="closeTask" class="warning" disabled>Close Task</button>
+          </div>
+          <div id="taskManagementResults" class="result"></div>
+
+          <hr
+            style="margin: 20px 0; border: none; border-top: 1px solid #f0f0f0"
+          />
+          <h3>Distribute Rewards to Approved Participants</h3>
+          <p style="color: #666; font-size: 0.9em; margin-bottom: 12px">
+            Once task is completed and approved participants are finalized,
+            distribute tokens to all approved participants.
+          </p>
+          <div class="button-group">
+            <button id="distributeRewards" class="secondary" disabled>
+              Distribute Tokens
+            </button>
+          </div>
+          <div id="distributeRewardsResults" class="result"></div>
+        </div>
+
+        <div class="section">
+          <h2>Whitelist Management</h2>
+          <div class="form-group">
+            <label for="whitelistAddress">Participant Address:</label>
+            <input type="text" id="whitelistAddress" placeholder="0x..." />
+          </div>
+          <div class="button-group">
+            <button id="addWhitelist" disabled>Add to Whitelist</button>
+            <button id="removeWhitelist" disabled>Remove from Whitelist</button>
+          </div>
+          <div id="whitelistResults" class="result"></div>
+        </div>
+
+        <div class="section">
+          <h2>Review & Accept Submissions</h2>
+          <div class="form-group">
+            <label for="reviewParticipant">Participant Address:</label>
+            <input type="text" id="reviewParticipant" placeholder="0x..." />
+          </div>
+          <div class="form-group">
+            <label for="rejectionReason"
+              >Rejection Reason (if rejecting):</label
+            >
+            <textarea
+              id="rejectionReason"
+              placeholder="Reason for rejection..."
+            ></textarea>
+          </div>
+          <div class="button-group">
+            <button id="approveSubmission" disabled>Approve Submission</button>
+            <button id="rejectSubmission" class="warning" disabled>
+              Reject Submission
+            </button>
+          </div>
+          <br />
+          <hr />
+          <h3>Accept Pending Participants</h3>
+          <div class="form-group">
+            <label for="acceptParticipantAddr">Participant Address:</label>
+            <input type="text" id="acceptParticipantAddr" placeholder="0x..." />
+          </div>
+          <div class="button-group">
+            <button id="acceptParticipant" disabled>Accept Participant</button>
+          </div>
+
+          <div id="reviewResults" class="result"></div>
+        </div>
+
+        <div class="section">
+          <h2>Check Assignment Status</h2>
+
+          <h3>View Assignment Status for Wallet Address</h3>
+          <div class="form-group">
+            <label for="checkStatusAddress">Wallet Address:</label>
+            <input type="text" id="checkStatusAddress" placeholder="0x..." />
+          </div>
+          <div class="button-group">
+            <button id="checkAssignmentStatus">Check Assignment Status</button>
+          </div>
+
+          <div id="assignmentStatusResults" class="result"></div>
+        </div>
+
+        <div class="section">
+          <h2>Participant Functions</h2>
+
+          <h3>Participate in Task</h3>
+          <div class="button-group">
+            <button id="participateTask">Join Task</button>
+          </div>
+
+          <h3>Submit Task Completion</h3>
+          <div class="form-group">
+            <label for="completionUrl">Completion URL:</label>
+            <input type="text" id="completionUrl" placeholder="https://..." />
+          </div>
+          <div class="button-group">
+            <button id="completeTask">Submit Completion</button>
+          </div>
+
+          <div id="participantResults" class="result"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let provider;
+      let signer;
+      let contract;
+      let contractAddress;
+      let autoLoaded = false;
+      let selectedTaskId = null;
+
+      // Entity ABI (only task-related functions)
+      const abi = [
+        'function createTask(bytes32 taskId, tuple(string name, string detailsUrl, address owner, uint256 expiryDate, address rewardToken, uint256 totalRewardAmount, bool isOpen, bool requireApproval, bool isWhitelisted, bool isTokenDisbursed, uint256 maxParticipants, uint256 acceptedParticipantCount) task, address[] whitelistParticipants) external',
+        'function closeTask(bytes32 taskId) external',
+        'function distributeRewards(bytes32 taskId) external',
+        'function updateTaskDetails(bytes32 taskId, string memory newDetailsUrl, uint256 newExpiryDate) external',
+        'function isTaskExpired(bytes32 taskId) external view returns (bool)',
+        'function isTaskOpen(bytes32 taskId) external view returns (bool)',
+        'function isMaxParticipantsReached(bytes32 taskId) external view returns (bool)',
+        'function getTask(bytes32 taskId) external view returns (tuple(string name, string detailsUrl, address owner, uint256 expiryDate, address rewardToken, uint256 totalRewardAmount, bool isOpen, bool requireApproval, bool isWhitelisted, bool isTokenDisbursed, uint256 maxParticipants, uint256 acceptedParticipantCount))',
+        'function getAllTasks() external view returns (bytes32[])',
+        'function participate(bytes32 taskId) external',
+        'function acceptParticipant(bytes32 taskId, address participant) external',
+        'function completeTask(bytes32 taskId, string memory completionUrl) external',
+        'function approveTaskSubmission(bytes32 taskId, address participant) external',
+        'function rejectTaskSubmission(bytes32 taskId, address participant, string memory reason) external',
+        'function taskAssignments(bytes32 taskId, address participant) external view returns (uint8 status, string completionUrl)',
+        'function addToWhitelist(bytes32 taskId, address participant, bool throwError) external',
+        'function removeFromWhitelist(bytes32 taskId, address participant) external',
+        'function whitelistedParticipants(bytes32 taskId, address participant) external view returns (bool)',
+        'function approvedParticipants(bytes32 taskId, uint256 index) external view returns (address)',
+        'function acceptedParticipants(bytes32 taskId, uint256 index) external view returns (address)',
+        'function isParticipant(bytes32 taskId, address participant) external view returns (bool)',
+        'event ParticipantWhitelisted(bytes32 indexed taskId, address indexed participant, address indexed by)',
+        'event ParticipantRemovedFromWhitelist(bytes32 indexed taskId, address indexed participant, address indexed by)',
+      ];
+
+      // Load deployment configuration
+      async function loadDeploymentConfig() {
+        try {
+          const response = await fetch(
+            'deployment.json?' + new Date().getTime(),
+          );
+          const config = await response.json();
+          sessionStorage.setItem('deploymentConfig', JSON.stringify(config));
+
+          // Prefill token address if available
+          if (config.contracts && config.contracts.rewardToken) {
+            document.getElementById('rewardToken').value =
+              config.contracts.rewardToken.address;
+          }
+        } catch (error) {
+          console.warn('Could not load deployment.json:', error);
+        }
+      }
+
+      // Generate random bytes32-like string for task ID
+      function generateRandomTaskId() {
+        try {
+          const randomBytes = new Uint8Array(32);
+          if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+            crypto.getRandomValues(randomBytes);
+          } else {
+            // Fallback for environments without crypto.getRandomValues
+            for (let i = 0; i < 32; i++) {
+              randomBytes[i] = Math.floor(Math.random() * 256);
+            }
+          }
+          return (
+            '0x' +
+            Array.from(randomBytes, (byte) =>
+              byte.toString(16).padStart(2, '0'),
+            ).join('')
+          );
+        } catch (error) {
+          // Ultimate fallback - use timestamp and random
+          const timestamp = Date.now().toString(16);
+          const random = Math.random().toString(16).substring(2);
+          return '0x' + (timestamp + random).padEnd(64, '0').substring(0, 64);
+        }
+      }
+
+      // Set default values for task creation
+      function setTaskDefaults() {
+        // Generate random task ID
+        document.getElementById('taskId').value = generateRandomTaskId();
+
+        // Set expiry date to 1 week from now
+        const oneWeekFromNow = new Date();
+        oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
+        const timestamp = Math.floor(oneWeekFromNow.getTime() / 1000);
+        document.getElementById('taskExpiryDate').value = timestamp.toString();
+      }
+
+      // Auto-load from URL parameters
+      async function loadParametersFromURL() {
+        await loadDeploymentConfig();
+        await setTaskDefaults();
+
+        const params = new URLSearchParams(window.location.search);
+        const entityAddress = params.get('entity');
+        const taskId = params.get('task');
+
+        if (entityAddress) {
+          document.getElementById('entityAddress').value = entityAddress;
+          autoLoaded = true;
+        }
+
+        // Store taskId to load after contract is loaded
+        if (taskId) {
+          sessionStorage.setItem('pendingTaskId', taskId);
+        }
+      }
+
+      // Connect to MetaMask
+      async function connectWallet() {
+        try {
+          if (typeof window.ethereum !== 'undefined') {
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            provider = new ethers.BrowserProvider(window.ethereum);
+            signer = await provider.getSigner();
+            const address = await signer.getAddress();
+            const balance = await provider.getBalance(address);
+            const balanceEth = ethers.formatEther(balance);
+
+            document.getElementById('accountInfo').innerHTML = `
+                        <div class="success">
+                            <div><strong>Connected:</strong> ${address}</div>
+                            <div><strong>Balance:</strong> ${balanceEth} ETH</div>
+                        </div>
+                    `;
+            document.getElementById('connectButton').style.display = 'none';
+            document.getElementById('switchWalletButton').style.display =
+              'inline-block';
+            document.getElementById('disconnectButton').style.display =
+              'inline-block';
+            sessionStorage.setItem('connected', 'true');
+            sessionStorage.setItem('address', address);
+
+            // Prefill owner address in task form
+            document.getElementById('taskOwner').value = address;
+
+            // Auto-load contract if entity address was provided in URL
+            if (autoLoaded) {
+              setTimeout(async () => {
+                const loadButton = document.getElementById('loadContract');
+                loadButton.click();
+              }, 500);
+            }
+          } else {
+            throw new Error('MetaMask not detected');
+          }
+        } catch (error) {
+          document.getElementById('accountInfo').innerHTML =
+            `<span class="error">Error: ${error.message}</span>`;
+        }
+      }
+
+      // Switch Wallet
+      async function switchWallet() {
+        try {
+          if (typeof window.ethereum !== 'undefined') {
+            // Request wallet_requestPermissions to show account picker
+            try {
+              await window.ethereum.request({
+                method: 'wallet_requestPermissions',
+                params: [{ eth_accounts: {} }],
+              });
+            } catch (e) {
+              // If wallet_requestPermissions is not supported, use eth_requestAccounts
+              await window.ethereum.request({ method: 'eth_requestAccounts' });
+            }
+
+            provider = new ethers.BrowserProvider(window.ethereum);
+            signer = await provider.getSigner();
+            const address = await signer.getAddress();
+            const balance = await provider.getBalance(address);
+            const balanceEth = ethers.formatEther(balance);
+
+            document.getElementById('accountInfo').innerHTML = `
+                        <div class="success">
+                            <div><strong>Connected:</strong> ${address}</div>
+                            <div><strong>Balance:</strong> ${balanceEth} ETH</div>
+                        </div>
+                    `;
+
+            sessionStorage.setItem('address', address);
+
+            // Prefill owner address in task form
+            document.getElementById('taskOwner').value = address;
+
+            // Re-select current task if one is already selected to update button states
+            if (selectedTaskId) {
+              await selectTask(selectedTaskId);
+            }
+          } else {
+            throw new Error('MetaMask not detected');
+          }
+        } catch (error) {
+          document.getElementById('accountInfo').innerHTML =
+            `<span class="error">Error: ${error.message}</span>`;
+        }
+      }
+
+      // Wait for DOM to be ready before adding event listeners
+      document.addEventListener('DOMContentLoaded', function () {
+        document
+          .getElementById('connectButton')
+          .addEventListener('click', connectWallet);
+        document
+          .getElementById('switchWalletButton')
+          .addEventListener('click', switchWallet);
+
+        // Disconnect Wallet
+        document
+          .getElementById('disconnectButton')
+          .addEventListener('click', () => {
+            provider = null;
+            signer = null;
+            document.getElementById('accountInfo').innerHTML = '';
+            document.getElementById('connectButton').style.display =
+              'inline-block';
+            document.getElementById('switchWalletButton').style.display =
+              'none';
+            document.getElementById('disconnectButton').style.display = 'none';
+            sessionStorage.removeItem('connected');
+            sessionStorage.removeItem('address');
+          });
+
+        // Load Contract button listener
+        document
+          .getElementById('loadContract')
+          .addEventListener('click', async () => {
+            contractAddress = document.getElementById('entityAddress').value;
+            if (!contractAddress) {
+              document.getElementById('contractStatus').innerHTML =
+                '<span class="error">Please enter entity contract address</span>';
+              return;
+            }
+            if (!signer) {
+              document.getElementById('contractStatus').innerHTML =
+                '<span class="error">Please connect wallet first</span>';
+              return;
+            }
+            try {
+              contract = new ethers.Contract(contractAddress, abi, signer);
+              document.getElementById('contractStatus').innerHTML =
+                '<span class="success">Entity contract loaded successfully</span>';
+              if (autoLoaded) {
+                document.getElementById('autoLoadButton').style.display =
+                  'inline-block';
+              }
+              // Auto-load all tasks when contract is loaded
+              await loadAllTasks();
+
+              // Auto-select task from URL if available
+              const pendingTaskId = sessionStorage.getItem('pendingTaskId');
+              if (pendingTaskId) {
+                await selectTask(pendingTaskId);
+                sessionStorage.removeItem('pendingTaskId');
+              }
+            } catch (error) {
+              document.getElementById('contractStatus').innerHTML =
+                `<span class="error">Error loading contract: ${error.message}</span>`;
+            }
+          });
+
+        // Fill task owner with connected wallet address
+        document
+          .getElementById('fillTaskOwner')
+          .addEventListener('click', async () => {
+            if (!signer) {
+              alert('Please connect your wallet first');
+              return;
+            }
+            try {
+              const address = await signer.getAddress();
+              document.getElementById('taskOwner').value = address;
+            } catch (error) {
+              alert('Error getting address: ' + error.message);
+            }
+          });
+      });
+
+      // Check if already connected on page load
+      window.addEventListener('load', async () => {
+        await loadDeploymentConfig();
+        await setTaskDefaults();
+        if (sessionStorage.getItem('connected') === 'true') {
+          document.getElementById('connectButton').click();
+        }
+      });
+
+      // Also run loadParametersFromURL on load
+      window.addEventListener('load', async () => {
+        await loadParametersFromURL();
+      });
+
+      // Load all tasks and display them
+      async function loadAllTasks() {
+        if (!contract) return;
+        try {
+          const taskIds = await contract.getAllTasks();
+          displayTasks(taskIds);
+        } catch (error) {
+          document.getElementById('tasksListResults').innerHTML =
+            `<span class="error">Error loading tasks: ${error.message}</span>`;
+        }
+      }
+
+      // Display tasks in the left panel with select buttons
+      async function displayTasks(taskIds) {
+        if (taskIds.length === 0) {
+          document.getElementById('tasksListResults').innerHTML =
+            '<div>No tasks found</div>';
+          return;
+        }
+
+        let html = `<div><strong>Found ${taskIds.length} task(s):</strong></div><div class="entities-list">`;
+
+        for (const taskId of taskIds) {
+          try {
+            const task = await contract.getTask(taskId);
+            const shortId =
+              taskId.substring(0, 10) +
+              '...' +
+              taskId.substring(taskId.length - 8);
+            html += `
+                        <div class="task-card" data-task-id="${taskId}">
+                            <span class="task-id">${shortId}</span>
+                            <span class="task-name">${task.name}</span>
+                            <button class="select-button" onclick="selectTask('${taskId}')">Select</button>
+                        </div>
+                    `;
+          } catch (error) {
+            // If we can't get task details, show just the ID
+            const shortId =
+              taskId.substring(0, 10) +
+              '...' +
+              taskId.substring(taskId.length - 8);
+            html += `
+                        <div class="task-card" data-task-id="${taskId}">
+                            <span class="task-id">${shortId}</span>
+                            <span class="task-name">Error loading task</span>
+                            <button class="select-button" onclick="selectTask('${taskId}')">Select</button>
+                        </div>
+                    `;
+          }
+        }
+
+        html += '</div>';
+        document.getElementById('tasksListResults').innerHTML = html;
+      }
+
+      // Select a task and show details in right panel
+      async function selectTask(taskId) {
+        // Update UI to show selected task
+        document.querySelectorAll('.task-card').forEach((card) => {
+          card.classList.remove('selected');
+        });
+        document.querySelectorAll('.select-button').forEach((btn) => {
+          btn.classList.remove('selected');
+          btn.textContent = 'Select';
+        });
+
+        const selectedCard = document.querySelector(
+          `[data-task-id="${taskId}"]`,
+        );
+        if (selectedCard) {
+          selectedCard.classList.add('selected');
+          const selectBtn = selectedCard.querySelector('.select-button');
+          selectBtn.classList.add('selected');
+          selectBtn.textContent = 'Selected';
+        }
+
+        // Show right panel
+        document.getElementById('taskDetailsPanel').style.display = 'block';
+
+        // Store the selected task ID
+        selectedTaskId = taskId;
+
+        // Update URL with task ID
+        const params = new URLSearchParams(window.location.search);
+        params.set('task', taskId);
+        window.history.replaceState(
+          {},
+          '',
+          `${window.location.pathname}?${params.toString()}`,
+        );
+
+        // Load and display task details
+        try {
+          const task = await contract.getTask(taskId);
+          const shortId =
+            taskId.substring(0, 10) +
+            '...' +
+            taskId.substring(taskId.length - 8);
+          document.getElementById('selectedTaskTitle').textContent =
+            `Task: ${task.name} (${shortId})`;
+
+          let taskHtml = `
+                    <div><strong>Task Details:</strong></div>
+                    <div style="margin-top: 10px; font-size: 0.9em;">
+                        <div><strong>ID:</strong> <code style="word-break: break-all;">${taskId}</code></div>
+                        <div><strong>Name:</strong> ${task.name}</div>
+                        <div><strong>Owner:</strong> <code style="word-break: break-all;">${task.owner}</code></div>
+                        <div><strong>Details URL:</strong> <a href="${task.detailsUrl}" target="_blank">${task.detailsUrl}</a></div>
+                        <div><strong>Expiry Date:</strong> ${new Date(Number(task.expiryDate) * 1000).toLocaleString()}</div>
+                        <div><strong>Reward Token:</strong> <code>${task.rewardToken}</code></div>
+                        <div><strong>Total Reward:</strong> ${task.totalRewardAmount.toString()}</div>
+                        <div><strong>Max Participants:</strong> ${task.maxParticipants}</div>
+                        <div><strong>Accepted Participants:</strong> ${task.acceptedParticipantCount}</div>
+                        <div><strong>Open:</strong> ${task.isOpen ? 'Yes' : 'No'}</div>
+                        <div><strong>Requires Approval:</strong> ${task.requireApproval ? 'Yes' : 'No'}</div>
+                        <div><strong>Whitelisted:</strong> ${task.isWhitelisted ? 'Yes' : 'No'}</div>
+                        <div><strong>Token Disbursed:</strong> ${task.isTokenDisbursed ? '✓ Yes' : 'No'}</div>
+                    </div>
+                `;
+          document.getElementById('selectedTaskInfo').innerHTML = taskHtml;
+
+          // Display current wallet info and participation status
+          const currentAddress = await signer.getAddress();
+          let walletHtml = `<div><strong>Current Wallet:</strong> <code style="word-break: break-all;">${currentAddress}</code></div><div style="margin-top: 10px; font-size: 0.9em;">`;
+
+          try {
+            // Get assignment status
+            const result = await contract.taskAssignments(
+              taskId,
+              currentAddress,
+            );
+            // Result can be accessed as array [status, completionUrl] or as named properties
+            const status_code =
+              result[0] !== undefined
+                ? Number(result[0])
+                : Number(result.status);
+            const completionUrl =
+              result[1] !== undefined ? result[1] : result.completionUrl;
+
+            const statusMap = {
+              0: 'NONE',
+              1: 'PENDING',
+              2: 'ACCEPTED',
+              3: 'COMPLETED',
+              4: 'APPROVED',
+              5: 'REJECTED',
+              6: 'DISBURSED',
+            };
+
+            const status = statusMap[status_code] || 'UNKNOWN';
+            walletHtml += `<div><strong>Assignment Status:</strong> ${status}</div>`;
+            if (completionUrl && completionUrl.trim()) {
+              walletHtml += `<div><strong>Completion URL:</strong> <a href="${completionUrl}" target="_blank">${completionUrl}</a></div>`;
+            }
+          } catch (e) {
+            walletHtml += `<div><strong>Assignment Status:</strong> NONE (not a participant)</div>`;
+          }
+
+          // Check whitelist status
+          try {
+            const isWhitelisted = await contract.whitelistedParticipants(
+              taskId,
+              currentAddress,
+            );
+            walletHtml += `<div><strong>Whitelisted:</strong> ${isWhitelisted ? 'Yes ✓' : 'No'}</div>`;
+          } catch (e) {
+            walletHtml += `<div><strong>Whitelisted:</strong> Error checking</div>`;
+          }
+
+          // Check if participant
+          try {
+            const isParticipantFlag = await contract.isParticipant(
+              taskId,
+              currentAddress,
+            );
+            walletHtml += `<div><strong>Is Participant:</strong> ${isParticipantFlag ? 'Yes' : 'No'}</div>`;
+          } catch (e) {
+            walletHtml += `<div><strong>Is Participant:</strong> Error checking</div>`;
+          }
+
+          walletHtml += '</div>';
+          document.getElementById('currentWalletInfo').innerHTML = walletHtml;
+
+          // Enable/Disable owner-only buttons based on whether current address is task owner
+          const isOwner =
+            currentAddress.toLowerCase() === task.owner.toLowerCase();
+          document.getElementById('updateTaskDetails').disabled = !isOwner;
+          document.getElementById('closeTask').disabled = !isOwner;
+          document.getElementById('distributeRewards').disabled =
+            !isOwner || task.isTokenDisbursed;
+          document.getElementById('addWhitelist').disabled = !isOwner;
+          document.getElementById('removeWhitelist').disabled = !isOwner;
+          document.getElementById('approveSubmission').disabled = !isOwner;
+          document.getElementById('rejectSubmission').disabled = !isOwner;
+          document.getElementById('acceptParticipant').disabled = !isOwner;
+
+          // Load and display participant lists
+          await loadParticipantLists(taskId);
+
+          // Load whitelist status section
+          await loadWhitelistStatus(taskId);
+        } catch (error) {
+          document.getElementById('selectedTaskInfo').innerHTML =
+            `<span class="error">Error loading task details: ${error.message}</span>`;
+        }
+      }
+
+      // Load and display approved and accepted participants
+      async function loadParticipantLists(taskId) {
+        try {
+          let html = '<div style="font-size: 0.9em;">';
+
+          // Try to load approved participants
+          html += '<div><strong>Approved Participants:</strong></div>';
+          try {
+            const approvedList = [];
+            let index = 0;
+            while (true) {
+              try {
+                const addr = await contract.approvedParticipants(taskId, index);
+                approvedList.push(addr);
+                index++;
+              } catch (e) {
+                break;
+              }
+            }
+
+            if (approvedList.length === 0) {
+              html +=
+                '<div style="margin-left: 10px; color: #666;">No approved participants yet</div>';
+            } else {
+              html += '<ul style="margin-left: 20px;">';
+              for (const addr of approvedList) {
+                const short =
+                  addr.substring(0, 6) +
+                  '...' +
+                  addr.substring(addr.length - 4);
+                html += `<li><code title="${addr}">${short}</code></li>`;
+              }
+              html += '</ul>';
+            }
+          } catch (e) {
+            html +=
+              '<div style="margin-left: 10px; color: #999;">Unable to load approved participants</div>';
+          }
+
+          html +=
+            '<div style="margin-top: 15px;"><strong>Accepted Participants:</strong></div>';
+
+          // Try to load accepted participants
+          try {
+            const acceptedList = [];
+            let index = 0;
+            while (true) {
+              try {
+                const addr = await contract.acceptedParticipants(taskId, index);
+                acceptedList.push(addr);
+                index++;
+              } catch (e) {
+                break;
+              }
+            }
+
+            if (acceptedList.length === 0) {
+              html +=
+                '<div style="margin-left: 10px; color: #666;">No accepted participants yet</div>';
+            } else {
+              html += '<ul style="margin-left: 20px;">';
+              for (const addr of acceptedList) {
+                const short =
+                  addr.substring(0, 6) +
+                  '...' +
+                  addr.substring(addr.length - 4);
+                html += `<li><code title="${addr}">${short}</code></li>`;
+              }
+              html += '</ul>';
+            }
+          } catch (e) {
+            html +=
+              '<div style="margin-left: 10px; color: #999;">Unable to load accepted participants</div>';
+          }
+
+          html += '</div>';
+          document.getElementById('participantListsSection').innerHTML = html;
+        } catch (error) {
+          document.getElementById('participantListsSection').innerHTML =
+            `<span class="error">Error loading participant lists: ${error.message}</span>`;
+        }
+      }
+
+      // Load and display whitelist status
+      async function loadWhitelistStatus(taskId) {
+        try {
+          const currentAddress = await signer.getAddress();
+          const task = await contract.getTask(taskId);
+
+          let html = '<div style="font-size: 0.9em;">';
+          html += `<div style="margin-bottom: 15px;"><strong>Task Whitelist Enabled:</strong> ${task.isWhitelisted ? 'Yes' : 'No'}</div>`;
+
+          if (task.isWhitelisted) {
+            const isWhitelisted = await contract.whitelistedParticipants(
+              taskId,
+              currentAddress,
+            );
+            html += `<div style="margin-bottom: 15px;"><strong>Current Wallet Whitelisted:</strong> ${isWhitelisted ? 'Yes ✓' : 'No ✗'}</div>`;
+
+            // Load whitelisted participants in table format
+            try {
+              const whitelistFilter =
+                contract.filters.ParticipantWhitelisted(taskId);
+              const removeFilter =
+                contract.filters.ParticipantRemovedFromWhitelist(taskId);
+
+              const whitelistEvents =
+                await contract.queryFilter(whitelistFilter);
+              const removeEvents = await contract.queryFilter(removeFilter);
+
+              const whitelistedSet = new Set();
+              const removedSet = new Set();
+
+              for (const event of whitelistEvents) {
+                whitelistedSet.add(event.args.participant.toLowerCase());
+              }
+
+              for (const event of removeEvents) {
+                const addr = event.args.participant.toLowerCase();
+                whitelistedSet.delete(addr);
+                removedSet.add(addr);
+              }
+
+              const whitelistedAddresses = Array.from(whitelistedSet).sort();
+
+              if (whitelistedAddresses.length === 0) {
+                html +=
+                  '<div style="color: #666;">No whitelisted participants yet</div>';
+              } else {
+                html += `<div style="margin-bottom: 10px; margin-top: 10px;"><strong>Whitelisted Participants (${whitelistedAddresses.length}):</strong></div>`;
+                html +=
+                  '<table class="whitelist-table"><thead><tr><th>Address</th><th>Short ID</th></tr></thead><tbody>';
+                for (const addr of whitelistedAddresses) {
+                  const shortAddr =
+                    '0x' +
+                    addr.substring(2, 8) +
+                    '...' +
+                    addr.substring(addr.length - 4);
+                  html += `<tr><td><code style="word-break: break-all; font-size: 0.85em;">${addr}</code></td><td><code title="${addr}" style="cursor: pointer;">${shortAddr}</code></td></tr>`;
+                }
+                html += '</tbody></table>';
+              }
+
+              if (removedSet.size > 0) {
+                html += `<div style="margin-top: 15px; color: #999;"><strong>Recently Removed (${removedSet.size}):</strong></div>`;
+                const removedAddresses = Array.from(removedSet).sort();
+                html +=
+                  '<table class="whitelist-table" style="opacity: 0.6;"><thead><tr><th>Address</th><th>Short ID</th></tr></thead><tbody>';
+                for (const addr of removedAddresses) {
+                  const shortAddr =
+                    '0x' +
+                    addr.substring(2, 8) +
+                    '...' +
+                    addr.substring(addr.length - 4);
+                  html += `<tr><td><code style="word-break: break-all; font-size: 0.85em; text-decoration: line-through;">${addr}</code></td><td><code style="text-decoration: line-through;">${shortAddr}</code></td></tr>`;
+                }
+                html += '</tbody></table>';
+              }
+            } catch (e) {
+              html += `<div style="color: #999; margin-top: 10px;">Unable to load whitelisted participants: ${e.message}</div>`;
+            }
+          } else {
+            html +=
+              '<div><strong>Current Wallet Whitelisted:</strong> N/A (Task not whitelisted)</div>';
+          }
+
+          html += '</div>';
+          document.getElementById('whitelistStatusSection').innerHTML = html;
+        } catch (error) {
+          document.getElementById('whitelistStatusSection').innerHTML =
+            `<span class="error">Error loading whitelist status: ${error.message}</span>`;
+        }
+      }
+
+      // Load whitelisted addresses from contract events
+      async function loadWhitelistedAddresses(taskId) {
+        if (!contract || !provider) {
+          document.getElementById('whitelistedAddressesSection').innerHTML =
+            '<span class="error">Contract not loaded</span>';
+          return;
+        }
+
+        try {
+          let html = '<div style="font-size: 0.9em;">';
+
+          // Create filter for ParticipantWhitelisted events for this task
+          const whitelistFilter =
+            contract.filters.ParticipantWhitelisted(taskId);
+          const removeFilter =
+            contract.filters.ParticipantRemovedFromWhitelist(taskId);
+
+          // Get all whitelisted events
+          const whitelistEvents = await contract.queryFilter(whitelistFilter);
+          const removeEvents = await contract.queryFilter(removeFilter);
+
+          // Track current whitelisted addresses (added - removed)
+          const whitelistedSet = new Set();
+          const removedSet = new Set();
+
+          // Add all whitelisted addresses
+          for (const event of whitelistEvents) {
+            whitelistedSet.add(event.args.participant.toLowerCase());
+          }
+
+          // Remove addresses that were removed from whitelist
+          for (const event of removeEvents) {
+            const addr = event.args.participant.toLowerCase();
+            whitelistedSet.delete(addr);
+            removedSet.add(addr);
+          }
+
+          // Display results
+          const whitelistedAddresses = Array.from(whitelistedSet);
+
+          if (whitelistedAddresses.length === 0) {
+            html +=
+              '<div style="color: #666;">No whitelisted participants yet</div>';
+          } else {
+            html += `<div style="margin-bottom: 10px;"><strong>Currently Whitelisted (${whitelistedAddresses.length}):</strong></div>`;
+            html += '<ul style="margin-left: 20px;">';
+            for (const addr of whitelistedAddresses.sort()) {
+              const shortAddr =
+                '0x' +
+                addr.substring(2, 8) +
+                '...' +
+                addr.substring(addr.length - 4);
+              html += `<li><code title="${addr}" style="cursor: pointer; word-break: break-all;">${shortAddr}</code></li>`;
+            }
+            html += '</ul>';
+          }
+
+          // Show removed addresses if any
+          if (removedSet.size > 0) {
+            html += `<div style="margin-top: 15px; color: #999;"><strong>Recently Removed (${removedSet.size}):</strong></div>`;
+            html += '<ul style="margin-left: 20px; color: #999;">';
+            const removedAddresses = Array.from(removedSet);
+            for (const addr of removedAddresses.sort()) {
+              const shortAddr =
+                '0x' +
+                addr.substring(2, 8) +
+                '...' +
+                addr.substring(addr.length - 4);
+              html += `<li><code title="${addr}" style="text-decoration: line-through;">${shortAddr}</code></li>`;
+            }
+            html += '</ul>';
+          }
+
+          // Show event details
+          html += `<div style="margin-top: 15px; font-size: 0.85em; color: #666;">`;
+          html += `<div>Total Added: ${whitelistEvents.length}</div>`;
+          html += `<div>Total Removed: ${removeEvents.length}</div>`;
+          html += `</div>`;
+
+          html += '</div>';
+          document.getElementById('whitelistedAddressesSection').innerHTML =
+            html;
+        } catch (error) {
+          document.getElementById('whitelistedAddressesSection').innerHTML =
+            `<span class="error">Error loading whitelisted addresses: ${error.message}</span>`;
+          console.error('Whitelist loading error:', error);
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        document
+          .getElementById('createTask')
+          .addEventListener('click', async () => {
+            if (!contract) return alert('Load contract first');
+
+            const taskId = document.getElementById('taskId').value.trim();
+            const taskName = document.getElementById('taskName').value.trim();
+            const taskOwner = document.getElementById('taskOwner').value.trim();
+            const detailsUrl = document
+              .getElementById('taskDetailsUrl')
+              .value.trim();
+            const expiryDate = document
+              .getElementById('taskExpiryDate')
+              .value.trim();
+            const rewardToken = document
+              .getElementById('rewardToken')
+              .value.trim();
+            const totalReward = document
+              .getElementById('totalRewardAmount')
+              .value.trim();
+            const maxParticipants = document
+              .getElementById('maxParticipants')
+              .value.trim();
+            const requireApproval =
+              document.getElementById('requireApproval').checked;
+            const isWhitelisted =
+              document.getElementById('isWhitelisted').checked;
+
+            if (
+              !taskId ||
+              !taskName ||
+              !taskOwner ||
+              !detailsUrl ||
+              !expiryDate ||
+              !rewardToken ||
+              !totalReward ||
+              !maxParticipants
+            ) {
+              return alert('Fill all required fields');
+            }
+
+            try {
+              // Convert whole token amount to wei (assuming 18 decimals)
+              const totalRewardWei = BigInt(totalReward) * BigInt(10 ** 18);
+
+              const task = {
+                name: taskName,
+                detailsUrl: detailsUrl,
+                owner: taskOwner,
+                expiryDate: BigInt(expiryDate),
+                rewardToken: rewardToken,
+                totalRewardAmount: totalRewardWei,
+                isOpen: true,
+                requireApproval: requireApproval,
+                isWhitelisted: isWhitelisted,
+                isTokenDisbursed: false,
+                maxParticipants: parseInt(maxParticipants),
+                acceptedParticipantCount: 0,
+              };
+
+              const tx = await contract.createTask(taskId, task, []);
+              document.getElementById('createTaskResults').innerHTML =
+                `<div class="info">Transaction sent: <code>${tx.hash}</code></div>`;
+              await tx.wait();
+              document.getElementById('createTaskResults').innerHTML +=
+                '<div class="success">Task created successfully!</div>';
+              // Refresh task list
+              await loadAllTasks();
+              // Reset form with new values
+              setTaskDefaults();
+              // Clear success message after 5 seconds
+              setTimeout(() => {
+                document.getElementById('createTaskResults').innerHTML = '';
+              }, 5000);
+            } catch (error) {
+              document.getElementById('createTaskResults').innerHTML =
+                `<span class="error">Error: ${error.message}</span>`;
+            }
+          });
+
+        document
+          .getElementById('getTaskInfo')
+          .addEventListener('click', async () => {
+            if (!contract) return alert('Load contract first');
+            if (!selectedTaskId) return alert('Select a task first');
+
+            try {
+              const task = await contract.getTask(taskId);
+              let html = `
+                    <div><strong>Task Details:</strong></div>
+                    <div style="margin-top: 10px; font-size: 0.9em;">
+                        <div><strong>Name:</strong> ${task.name}</div>
+                        <div><strong>Owner:</strong> <code style="word-break: break-all;">${task.owner}</code></div>
+                        <div><strong>Details URL:</strong> <a href="${task.detailsUrl}" target="_blank">${task.detailsUrl}</a></div>
+                        <div><strong>Expiry Date:</strong> ${new Date(Number(task.expiryDate) * 1000).toLocaleString()}</div>
+                        <div><strong>Reward Token:</strong> <code>${task.rewardToken}</code></div>
+                        <div><strong>Total Reward:</strong> ${task.totalRewardAmount.toString()}</div>
+                        <div><strong>Max Participants:</strong> ${task.maxParticipants}</div>
+                        <div><strong>Accepted Participants:</strong> ${task.acceptedParticipantCount}</div>
+                        <div><strong>Open:</strong> ${task.isOpen ? 'Yes' : 'No'}</div>
+                        <div><strong>Requires Approval:</strong> ${task.requireApproval ? 'Yes' : 'No'}</div>
+                        <div><strong>Whitelisted:</strong> ${task.isWhitelisted ? 'Yes' : 'No'}</div>
+                    </div>
+                `;
+              document.getElementById('taskInfoResults').innerHTML = html;
+            } catch (error) {
+              document.getElementById('taskInfoResults').innerHTML =
+                `<span class="error">Error: ${error.message}</span>`;
+            }
+          });
+
+        document
+          .getElementById('checkTaskOpen')
+          .addEventListener('click', async () => {
+            if (!contract) return alert('Load contract first');
+            if (!selectedTaskId) return alert('Select a task first');
+
+            try {
+              const isOpen = await contract.isTaskOpen(taskId);
+              document.getElementById('taskInfoResults').innerHTML =
+                `<div><strong>Task is ${isOpen ? 'Open' : 'Closed'}</strong></div>`;
+            } catch (error) {
+              document.getElementById('taskInfoResults').innerHTML =
+                `<span class="error">Error: ${error.message}</span>`;
+            }
+          });
+
+        document
+          .getElementById('checkTaskExpired')
+          .addEventListener('click', async () => {
+            if (!contract) return alert('Load contract first');
+            if (!selectedTaskId) return alert('Select a task first');
+
+            try {
+              const isExpired = await contract.isTaskExpired(taskId);
+              document.getElementById('taskInfoResults').innerHTML =
+                `<div><strong>Task is ${isExpired ? 'Expired' : 'Not Expired'}</strong></div>`;
+            } catch (error) {
+              document.getElementById('taskInfoResults').innerHTML =
+                `<span class="error">Error: ${error.message}</span>`;
+            }
+          });
+
+        document
+          .getElementById('checkMaxParticipants')
+          .addEventListener('click', async () => {
+            if (!contract) return alert('Load contract first');
+            if (!selectedTaskId) return alert('Select a task first');
+
+            try {
+              const maxReached =
+                await contract.isMaxParticipantsReached(taskId);
+              document.getElementById('taskInfoResults').innerHTML =
+                `<div><strong>Max Participants ${maxReached ? 'Reached' : 'Not Reached'}</strong></div>`;
+            } catch (error) {
+              document.getElementById('taskInfoResults').innerHTML =
+                `<span class="error">Error: ${error.message}</span>`;
+            }
+          });
+
+        document
+          .getElementById('updateTaskDetails')
+          .addEventListener('click', async () => {
+            if (!contract) return alert('Load contract first');
+            if (!selectedTaskId) return alert('Select a task first');
+            const newDetailsUrl = document
+              .getElementById('newDetailsUrl')
+              .value.trim();
+            const newExpiryDate = document
+              .getElementById('newExpiryDate')
+              .value.trim();
+
+            if (!newDetailsUrl || !newExpiryDate)
+              return alert('Fill all fields');
+
+            try {
+              const tx = await contract.updateTaskDetails(
+                selectedTaskId,
+                newDetailsUrl,
+                BigInt(newExpiryDate),
+              );
+              document.getElementById('taskManagementResults').innerHTML =
+                `<div class="info">Transaction sent: <code>${tx.hash}</code></div>`;
+              await tx.wait();
+              document.getElementById('taskManagementResults').innerHTML +=
+                '<div class="success">Task details updated!</div>';
+              // Refresh task details
+              await selectTask(selectedTaskId);
+            } catch (error) {
+              document.getElementById('taskManagementResults').innerHTML =
+                `<span class="error">Error: ${error.message}</span>`;
+            }
+          });
+
+        document
+          .getElementById('closeTask')
+          .addEventListener('click', async () => {
+            if (!contract) return alert('Load contract first');
+            if (!selectedTaskId) return alert('Select a task first');
+
+            try {
+              const tx = await contract.closeTask(selectedTaskId);
+              document.getElementById('taskManagementResults').innerHTML =
+                `<div class="info">Transaction sent: <code>${tx.hash}</code></div>`;
+              await tx.wait();
+              document.getElementById('taskManagementResults').innerHTML +=
+                '<div class="success">Task closed!</div>';
+              // Refresh task details
+              await selectTask(selectedTaskId);
+            } catch (error) {
+              document.getElementById('taskManagementResults').innerHTML =
+                `<span class="error">Error: ${error.message}</span>`;
+            }
+          });
+
+        document
+          .getElementById('distributeRewards')
+          .addEventListener('click', async () => {
+            if (!contract) return alert('Load contract first');
+            if (!selectedTaskId) return alert('Select a task first');
+
+            // Confirm action
+            if (
+              !confirm(
+                'Are you sure you want to distribute rewards to all approved participants? This action cannot be undone.',
+              )
+            ) {
+              return;
+            }
+
+            try {
+              const tx = await contract.distributeRewards(selectedTaskId);
+              document.getElementById('distributeRewardsResults').innerHTML =
+                `<div class="info">Transaction sent: <code>${tx.hash}</code></div>`;
+              await tx.wait();
+              document.getElementById('distributeRewardsResults').innerHTML +=
+                '<div class="success">✓ Rewards distributed successfully! All approved participants have received their tokens.</div>';
+              // Refresh task details
+              await selectTask(selectedTaskId);
+            } catch (error) {
+              document.getElementById('distributeRewardsResults').innerHTML =
+                `<span class="error">Error: ${error.message}</span>`;
+            }
+          });
+
+        document
+          .getElementById('checkAssignmentStatus')
+          .addEventListener('click', async () => {
+            if (!contract) return alert('Load contract first');
+            if (!selectedTaskId) return alert('Select a task first');
+            const addressToCheck = document
+              .getElementById('checkStatusAddress')
+              .value.trim();
+
+            if (!addressToCheck) return alert('Fill wallet address field');
+
+            try {
+              // Get assignment status
+              const result = await contract.taskAssignments(
+                selectedTaskId,
+                addressToCheck,
+              );
+              // Result can be accessed as array [status, completionUrl] or as named properties
+              const status_code =
+                result[0] !== undefined
+                  ? Number(result[0])
+                  : Number(result.status);
+              const completionUrl =
+                result[1] !== undefined ? result[1] : result.completionUrl;
+
+              const statusMap = {
+                0: 'NONE',
+                1: 'PENDING',
+                2: 'ACCEPTED',
+                3: 'COMPLETED',
+                4: 'APPROVED',
+                5: 'REJECTED',
+                6: 'DISBURSED',
+              };
+
+              const status = statusMap[status_code] || 'UNKNOWN';
+              const shortAddr =
+                addressToCheck.substring(0, 10) +
+                '...' +
+                addressToCheck.substring(addressToCheck.length - 8);
+
+              let html = `
+                    <div><strong>Assignment Status for ${shortAddr}:</strong></div>
+                    <div style="margin-top: 10px; font-size: 0.9em;">
+                        <div><strong>Address:</strong> <code style="word-break: break-all;">${addressToCheck}</code></div>
+                        <div><strong>Status:</strong> ${status}</div>
+                `;
+
+              if (completionUrl && completionUrl.trim()) {
+                html += `<div><strong>Completion URL:</strong> <a href="${completionUrl}" target="_blank">${completionUrl}</a></div>`;
+              }
+
+              html += '</div>';
+              document.getElementById('assignmentStatusResults').innerHTML =
+                html;
+            } catch (error) {
+              document.getElementById('assignmentStatusResults').innerHTML =
+                `<span class="error">Error: ${error.message}</span>`;
+            }
+          });
+
+        document
+          .getElementById('participateTask')
+          .addEventListener('click', async () => {
+            if (!contract) return alert('Load contract first');
+            if (!selectedTaskId) return alert('Select a task first');
+
+            try {
+              const tx = await contract.participate(selectedTaskId);
+              document.getElementById('participantResults').innerHTML =
+                `<div class="info">Transaction sent: <code>${tx.hash}</code></div>`;
+              await tx.wait();
+              document.getElementById('participantResults').innerHTML +=
+                '<div class="success">Participation applied! If task requires approval, you will be PENDING until task owner accepts. If not, you are ACCEPTED.</div>';
+              // Refresh participant lists
+              await loadParticipantLists(selectedTaskId);
+            } catch (error) {
+              document.getElementById('participantResults').innerHTML =
+                `<span class="error">Error: ${error.message}</span>`;
+            }
+          });
+
+        document
+          .getElementById('completeTask')
+          .addEventListener('click', async () => {
+            if (!contract) return alert('Load contract first');
+            if (!selectedTaskId) return alert('Select a task first');
+            const completionUrl = document
+              .getElementById('completionUrl')
+              .value.trim();
+
+            if (!completionUrl) return alert('Fill all fields');
+
+            try {
+              const tx = await contract.completeTask(
+                selectedTaskId,
+                completionUrl,
+              );
+              document.getElementById('participantResults').innerHTML =
+                `<div class="info">Transaction sent: <code>${tx.hash}</code></div>`;
+              await tx.wait();
+              document.getElementById('participantResults').innerHTML +=
+                '<div class="success">Task completed! For non-approval tasks, you are auto-accepted.</div>';
+              // Refresh participant lists and task details
+              await selectTask(selectedTaskId);
+            } catch (error) {
+              document.getElementById('participantResults').innerHTML =
+                `<span class="error">Error: ${error.message}</span>`;
+            }
+          });
+
+        document
+          .getElementById('addWhitelist')
+          .addEventListener('click', async () => {
+            if (!contract) return alert('Load contract first');
+            if (!selectedTaskId) return alert('Select a task first');
+            const participant = document
+              .getElementById('whitelistAddress')
+              .value.trim();
+
+            if (!participant) return alert('Fill all fields');
+
+            try {
+              const tx = await contract.addToWhitelist(
+                selectedTaskId,
+                participant,
+                true,
+              );
+              document.getElementById('whitelistResults').innerHTML =
+                `<div class="info">Transaction sent: <code>${tx.hash}</code></div>`;
+              await tx.wait();
+              document.getElementById('whitelistResults').innerHTML +=
+                '<div class="success">Participant added to whitelist!</div>';
+            } catch (error) {
+              document.getElementById('whitelistResults').innerHTML =
+                `<span class="error">Error: ${error.message}</span>`;
+            }
+          });
+
+        document
+          .getElementById('removeWhitelist')
+          .addEventListener('click', async () => {
+            if (!contract) return alert('Load contract first');
+            if (!selectedTaskId) return alert('Select a task first');
+            const participant = document
+              .getElementById('whitelistAddress')
+              .value.trim();
+
+            if (!participant) return alert('Fill all fields');
+
+            try {
+              const tx = await contract.removeFromWhitelist(
+                selectedTaskId,
+                participant,
+              );
+              document.getElementById('whitelistResults').innerHTML =
+                `<div class="info">Transaction sent: <code>${tx.hash}</code></div>`;
+              await tx.wait();
+              document.getElementById('whitelistResults').innerHTML +=
+                '<div class="success">Participant removed from whitelist!</div>';
+            } catch (error) {
+              document.getElementById('whitelistResults').innerHTML =
+                `<span class="error">Error: ${error.message}</span>`;
+            }
+          });
+
+        document
+          .getElementById('approveSubmission')
+          .addEventListener('click', async () => {
+            if (!contract) return alert('Load contract first');
+            if (!selectedTaskId) return alert('Select a task first');
+            const participant = document
+              .getElementById('reviewParticipant')
+              .value.trim();
+
+            if (!participant) return alert('Fill all fields');
+
+            try {
+              const tx = await contract.approveTaskSubmission(
+                selectedTaskId,
+                participant,
+              );
+              document.getElementById('reviewResults').innerHTML =
+                `<div class="info">Transaction sent: <code>${tx.hash}</code></div>`;
+              await tx.wait();
+              document.getElementById('reviewResults').innerHTML +=
+                '<div class="success">Submission approved! Participant is now APPROVED.</div>';
+              // Refresh participant lists
+              await loadParticipantLists(selectedTaskId);
+            } catch (error) {
+              document.getElementById('reviewResults').innerHTML =
+                `<span class="error">Error: ${error.message}</span>`;
+            }
+          });
+
+        document
+          .getElementById('rejectSubmission')
+          .addEventListener('click', async () => {
+            if (!contract) return alert('Load contract first');
+            if (!selectedTaskId) return alert('Select a task first');
+            const participant = document
+              .getElementById('reviewParticipant')
+              .value.trim();
+            const reason = document
+              .getElementById('rejectionReason')
+              .value.trim();
+
+            if (!participant || !reason) return alert('Fill all fields');
+
+            try {
+              const tx = await contract.rejectTaskSubmission(
+                selectedTaskId,
+                participant,
+                reason,
+              );
+              document.getElementById('reviewResults').innerHTML =
+                `<div class="info">Transaction sent: <code>${tx.hash}</code></div>`;
+              await tx.wait();
+              document.getElementById('reviewResults').innerHTML +=
+                '<div class="success">Submission rejected! Participant is now REJECTED.</div>';
+              // Refresh participant lists
+              await loadParticipantLists(selectedTaskId);
+            } catch (error) {
+              document.getElementById('reviewResults').innerHTML =
+                `<span class="error">Error: ${error.message}</span>`;
+            }
+          });
+
+        document
+          .getElementById('acceptParticipant')
+          .addEventListener('click', async () => {
+            if (!contract) return alert('Load contract first');
+            if (!selectedTaskId) return alert('Select a task first');
+            const participant = document
+              .getElementById('acceptParticipantAddr')
+              .value.trim();
+
+            if (!participant) return alert('Fill all fields');
+
+            try {
+              const tx = await contract.acceptParticipant(
+                selectedTaskId,
+                participant,
+              );
+              document.getElementById('reviewResults').innerHTML =
+                `<div class="info">Transaction sent: <code>${tx.hash}</code></div>`;
+              await tx.wait();
+              document.getElementById('reviewResults').innerHTML +=
+                '<div class="success">Participant accepted! They are now in ACCEPTED status.</div>';
+              // Refresh participant lists
+              await loadParticipantLists(selectedTaskId);
+            } catch (error) {
+              document.getElementById('reviewResults').innerHTML =
+                `<span class="error">Error: ${error.message}</span>`;
+            }
+          });
+      }); // Close DOMContentLoaded
+
+      // Make selectTask function globally available
+      window.selectTask = selectTask;
+    </script>
+  </body>
+</html>

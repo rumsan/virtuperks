@@ -28,6 +28,15 @@ output/
 build
 dist
 tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# Hardhat files
+cache
+artifacts
+
+# TypeScript
+typechain
+typechain-types
 
 # Misc
 .DS_Store
@@ -45,6 +54,7 @@ lerna-debug.log*
 # Tests
 /coverage
 /.nyc_output
+coverage.json
 
 # IDEs and editors
 /.idea

@@ -1,0 +1,24 @@
+{
+  "network": "base-sepolia",
+  "chainId": 84532,
+  "blockNumber": 35957084,
+  "timestamp": "2026-01-06T06:54:16.709Z",
+  "contracts": {
+    "entityImplementation": "0xf00E856a7E602468bAE51AEff431Aa22Ce2d3bbD",
+    "appProxy": "0xAf4d614FaE9382CbC2026408C026eB12A5DdEb4e",
+    "appImplementation": "0xA35a59c5eA0d36052C07d31FaaD074f3aceAe0e9",
+    "rewardToken": "0xf2544d5668c563B21483100C056B22f4c0308f86"
+  },
+  "app": {
+    "id": "0xd6841aad59f5d4e7175aa247c10751d3ca629a915db0f2e88379d1da62534b64",
+    "name": "Test App",
+    "owner": "0xE1e3cA4D4C67E815c0927d0510F316A58bBd52E5"
+  },
+  "configuration": {
+    "initialOwner": "0xE1e3cA4D4C67E815c0927d0510F316A58bBd52E5",
+    "appName": "Test App",
+    "tokenName": "Test Token",
+    "tokenSymbol": "TST",
+    "tokenOwner": "0xE1e3cA4D4C67E815c0927d0510F316A58bBd52E5"
+  }
+}

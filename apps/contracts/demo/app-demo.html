@@ -1,0 +1,1015 @@
+<!-- python3 -m http.server 8000 -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>App Contract Tester</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial, sans-serif;
+        background: #f5f5f5;
+        color: #333;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .header {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .header h1 {
+        font-size: 2em;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #222;
+      }
+
+      .header p {
+        font-size: 0.95em;
+        color: #666;
+      }
+
+      .breadcrumb {
+        background: white;
+        padding: 10px 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .breadcrumb a {
+        color: #333;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+
+      .breadcrumb a:hover {
+        color: #666;
+      }
+
+      .section {
+        background: white;
+        margin-bottom: 20px;
+        padding: 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+      }
+
+      .section h2 {
+        font-size: 1.2em;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #222;
+        border-bottom: 1px solid #f0f0f0;
+        padding-bottom: 10px;
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #f0f0f0;
+        padding-bottom: 10px;
+      }
+
+      .section-header h2 {
+        margin: 0;
+        font-size: 1.2em;
+        font-weight: 600;
+        color: #222;
+        border: none;
+        padding: 0;
+      }
+
+      .section-header .button-group {
+        margin-top: 0;
+      }
+
+      .section h3 {
+        font-size: 0.95em;
+        font-weight: 600;
+        margin-top: 15px;
+        margin-bottom: 12px;
+        color: #333;
+      }
+
+      .form-group {
+        margin-bottom: 12px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 4px;
+        font-weight: 500;
+        font-size: 0.9em;
+        color: #555;
+      }
+
+      input {
+        padding: 8px 10px;
+        border: 1px solid #d0d0d0;
+        border-radius: 4px;
+        font-size: 0.9em;
+        transition: border-color 0.2s;
+        font-family: 'Monaco', 'Menlo', monospace;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: #999;
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+      }
+
+      .button-group {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+
+      button {
+        padding: 8px 16px;
+        background: #333;
+        color: white;
+        border: 1px solid #333;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.9em;
+        transition: all 0.2s;
+      }
+
+      button:hover {
+        background: #222;
+        border-color: #222;
+      }
+
+      button:active {
+        opacity: 0.8;
+      }
+
+      button.secondary {
+        background: #666;
+        border-color: #666;
+      }
+
+      button.secondary:hover {
+        background: #555;
+        border-color: #555;
+      }
+
+      button.warning {
+        background: #d32f2f;
+        border-color: #d32f2f;
+      }
+
+      button.warning:hover {
+        background: #b71c1c;
+        border-color: #b71c1c;
+      }
+
+      .result {
+        margin-top: 12px;
+        padding: 12px;
+        background: #fafafa;
+        border: 1px solid #e0e0e0;
+        border-left: 3px solid #999;
+        border-radius: 4px;
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-size: 0.85em;
+        word-break: break-all;
+        line-height: 1.5;
+      }
+
+      .error {
+        color: #d32f2f;
+        border-left-color: #d32f2f;
+        background: #ffebee;
+      }
+
+      .success {
+        color: #388e3c;
+        border-left-color: #388e3c;
+        background: #e8f5e9;
+      }
+
+      .entities-list {
+        margin-top: 12px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .entity-card {
+        background: #fafafa;
+        padding: 10px;
+        border: 1px solid #e0e0e0;
+        border-left: 3px solid #999;
+        border-radius: 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-size: 0.85em;
+      }
+
+      .entity-address {
+        flex: 1;
+        word-break: break-all;
+        color: #555;
+      }
+
+      .entity-btn {
+        background: #666;
+        border-color: #666;
+        padding: 6px 12px;
+        margin: 0;
+        margin-left: 10px;
+        font-size: 0.8em;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      .entity-btn:hover {
+        background: #555;
+        border-color: #555;
+      }
+
+      @media (max-width: 768px) {
+        .header h1 {
+          font-size: 1.5em;
+        }
+
+        .section {
+          padding: 15px;
+        }
+
+        .entity-card {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .entity-btn {
+          margin: 8px 0 0 0;
+          width: 100%;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>App Contract Tester</h1>
+        <p>Manage and test your App contract</p>
+      </div>
+
+      <div class="breadcrumb">
+        <a href="index.html">🏠 Home</a>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h2>Wallet Connection</h2>
+          <div class="button-group">
+            <button id="connectButton">Connect MetaMask</button>
+            <button
+              id="switchWalletButton"
+              style="display: none; background: #1976d2; border-color: #1976d2"
+            >
+              Switch Wallet
+            </button>
+            <button
+              id="disconnectButton"
+              style="display: none; background: #d32f2f; border-color: #d32f2f"
+            >
+              Disconnect
+            </button>
+          </div>
+        </div>
+        <div id="accountInfo" class="result"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <h2>Load Contract</h2>
+          <div class="button-group">
+            <button id="loadContract">Load Contract</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="contractAddress">App Contract Address:</label>
+          <input
+            type="text"
+            id="contractAddress"
+            placeholder="0x..."
+            size="50"
+          />
+        </div>
+        <div id="contractStatus" class="result"></div>
+      </div>
+
+      <div class="section">
+        <h2>Entities</h2>
+        <div id="entitySelectionResults" class="result"></div>
+      </div>
+
+      <div class="section">
+        <h2>Read Contract Data</h2>
+        <div class="button-group">
+          <button id="getAppName">Get App Name</button>
+          <button id="isAppActive">Is App Active</button>
+          <button id="getOwner">Get Owner</button>
+          <button id="getAppEntities" class="secondary">Load Entities</button>
+        </div>
+        <div id="readResults" class="result"></div>
+      </div>
+
+      <div class="section">
+        <h2>Manage Contract</h2>
+
+        <h3>Update App Name</h3>
+        <div class="form-group">
+          <label for="newAppName">New Name:</label>
+          <input type="text" id="newAppName" placeholder="Enter new app name" />
+        </div>
+        <div class="button-group">
+          <button id="updateAppName">Update App Name</button>
+        </div>
+
+        <h3>Deactivate App</h3>
+        <div class="button-group">
+          <button id="deactivateApp" class="warning">Deactivate App</button>
+        </div>
+
+        <h3>Create Entity</h3>
+        <div class="form-group">
+          <label for="entityOwner">Entity Owner Address:</label>
+          <div style="display: flex; gap: 8px; align-items: center">
+            <input
+              type="text"
+              id="entityOwner"
+              placeholder="0x..."
+              style="flex: 1"
+            />
+            <button
+              id="fillEntityOwner"
+              class="secondary"
+              style="padding: 6px 8px; font-size: 1em; height: auto"
+            >
+              🔡
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="entityName">Entity Name:</label>
+          <input type="text" id="entityName" placeholder="Entity name" />
+        </div>
+        <div class="form-group">
+          <label for="entityUrl">URL:</label>
+          <input type="text" id="entityUrl" placeholder="https://..." />
+        </div>
+        <div class="button-group">
+          <button id="createEntity">Create Entity</button>
+        </div>
+
+        <h3>Transfer Ownership</h3>
+        <div class="form-group">
+          <label for="newOwner">New Owner Address:</label>
+          <div style="display: flex; gap: 8px; align-items: center">
+            <input
+              type="text"
+              id="newOwner"
+              placeholder="0x..."
+              style="flex: 1"
+            />
+            <button
+              id="fillNewOwner"
+              class="secondary"
+              style="padding: 6px 8px; font-size: 1em; height: auto"
+            >
+              🔡
+            </button>
+          </div>
+        </div>
+        <div class="button-group">
+          <button id="transferOwnership">Transfer Ownership</button>
+        </div>
+
+        <h3>Recover ERC20 Tokens</h3>
+        <div class="form-group">
+          <label for="tokenAddress">Token Contract Address:</label>
+          <input type="text" id="tokenAddress" placeholder="0x..." size="50" />
+        </div>
+        <div class="form-group">
+          <label for="recipient">Recipient Address:</label>
+          <input type="text" id="recipient" placeholder="0x..." size="50" />
+        </div>
+        <div class="form-group">
+          <label for="amount">Amount (in wei):</label>
+          <input type="text" id="amount" placeholder="1000000000000000000" />
+        </div>
+        <div class="button-group">
+          <button id="recoverERC20">Recover ERC20</button>
+        </div>
+
+        <div id="writeResults" class="result"></div>
+      </div>
+    </div>
+
+    <script>
+      let provider;
+      let signer;
+      let contract;
+      let contractAddress;
+
+      // Contract ABI
+      const abi = [
+        'function updateAppName(string memory newName) external',
+        'function deactivateApp() external',
+        'function createEntity(address entityOwner, string memory entityName, string memory url) external returns (address)',
+        'function getAppName() external view returns (string memory)',
+        'function isAppActive() external view returns (bool)',
+        'function getAppEntities() external view returns (address[] memory)',
+        'function recoverERC20(address token, address to, uint256 amount) external',
+        'function stop() external',
+        'function setEntityImplementation(address newImplementation) external',
+        'function owner() external view returns (address)',
+        'function transferOwnership(address newOwner) external',
+      ];
+
+      // IEntity ABI for getting entity info
+      const iEntityAbi = [
+        'function getEntityInfo() external view returns (tuple(string name, string url, address owner, bool isActive))',
+      ];
+
+      // Connect to MetaMask
+      document
+        .getElementById('connectButton')
+        .addEventListener('click', async () => {
+          try {
+            if (typeof window.ethereum !== 'undefined') {
+              await window.ethereum.request({ method: 'eth_requestAccounts' });
+              provider = new ethers.BrowserProvider(window.ethereum);
+              signer = await provider.getSigner();
+              const address = await signer.getAddress();
+              const balance = await provider.getBalance(address);
+              const balanceEth = ethers.formatEther(balance);
+
+              document.getElementById('accountInfo').innerHTML = `
+                        <div class="success">
+                            <div><strong>Connected:</strong> ${address}</div>
+                            <div><strong>Balance:</strong> ${balanceEth} ETH</div>
+                        </div>
+                    `;
+
+              document.getElementById('connectButton').style.display = 'none';
+              document.getElementById('switchWalletButton').style.display =
+                'inline-block';
+              document.getElementById('disconnectButton').style.display =
+                'inline-block';
+              sessionStorage.setItem('connected', 'true');
+              sessionStorage.setItem('address', address);
+            } else {
+              throw new Error('MetaMask not detected');
+            }
+          } catch (error) {
+            document.getElementById('accountInfo').innerHTML =
+              `<span class="error">Error: ${error.message}</span>`;
+          }
+        });
+
+      document
+        .getElementById('disconnectButton')
+        .addEventListener('click', () => {
+          provider = null;
+          signer = null;
+          document.getElementById('accountInfo').innerHTML = '';
+          document.getElementById('connectButton').style.display =
+            'inline-block';
+          document.getElementById('disconnectButton').style.display = 'none';
+          document.getElementById('switchWalletButton').style.display = 'none';
+          sessionStorage.removeItem('connected');
+          sessionStorage.removeItem('address');
+        });
+
+      // Switch Wallet
+      document
+        .getElementById('switchWalletButton')
+        .addEventListener('click', async () => {
+          try {
+            if (typeof window.ethereum !== 'undefined') {
+              // Request wallet_requestPermissions to show account picker
+              try {
+                await window.ethereum.request({
+                  method: 'wallet_requestPermissions',
+                  params: [{ eth_accounts: {} }],
+                });
+              } catch (e) {
+                // If wallet_requestPermissions is not supported, use eth_requestAccounts
+                await window.ethereum.request({
+                  method: 'eth_requestAccounts',
+                });
+              }
+
+              provider = new ethers.BrowserProvider(window.ethereum);
+              signer = await provider.getSigner();
+              const address = await signer.getAddress();
+              const balance = await provider.getBalance(address);
+              const balanceEth = ethers.formatEther(balance);
+
+              document.getElementById('accountInfo').innerHTML = `
+                        <div class="success">
+                            <div><strong>Connected:</strong> ${address}</div>
+                            <div><strong>Balance:</strong> ${balanceEth} ETH</div>
+                        </div>
+                    `;
+
+              sessionStorage.setItem('address', address);
+            } else {
+              throw new Error('MetaMask not detected');
+            }
+          } catch (error) {
+            document.getElementById('accountInfo').innerHTML =
+              `<span class="error">Error: ${error.message}</span>`;
+          }
+        });
+
+      // Fill entity owner with connected wallet address
+      document
+        .getElementById('fillEntityOwner')
+        .addEventListener('click', async () => {
+          if (!signer) {
+            alert('Please connect your wallet first');
+            return;
+          }
+          try {
+            const address = await signer.getAddress();
+            document.getElementById('entityOwner').value = address;
+          } catch (error) {
+            alert('Error getting address: ' + error.message);
+          }
+        });
+
+      // Fill new owner with connected wallet address
+      document
+        .getElementById('fillNewOwner')
+        .addEventListener('click', async () => {
+          if (!signer) {
+            alert('Please connect your wallet first');
+            return;
+          }
+          try {
+            const address = await signer.getAddress();
+            document.getElementById('newOwner').value = address;
+          } catch (error) {
+            alert('Error getting address: ' + error.message);
+          }
+        });
+
+      // Initialize from session storage
+      window.addEventListener('load', () => {
+        const storedProvider = sessionStorage.getItem('provider');
+        const storedSigner = sessionStorage.getItem('signer');
+        if (storedProvider && storedSigner) {
+          document.body.style.opacity = '1';
+        }
+      });
+
+      // Load Contract
+      document
+        .getElementById('loadContract')
+        .addEventListener('click', async () => {
+          contractAddress = document.getElementById('contractAddress').value;
+          if (!contractAddress) {
+            document.getElementById('contractStatus').innerHTML =
+              '<span class="error">Please enter contract address</span>';
+            return;
+          }
+
+          // Get provider and signer from parent window or create new connection
+          if (!signer) {
+            try {
+              if (typeof window.ethereum !== 'undefined') {
+                const tempProvider = new ethers.BrowserProvider(
+                  window.ethereum,
+                );
+                signer = await tempProvider.getSigner();
+                provider = tempProvider;
+              } else {
+                throw new Error('MetaMask not detected');
+              }
+            } catch (error) {
+              document.getElementById('contractStatus').innerHTML =
+                `<span class="error">Error: ${error.message}</span>`;
+              return;
+            }
+          }
+
+          try {
+            contract = new ethers.Contract(contractAddress, abi, signer);
+            document.getElementById('contractStatus').innerHTML =
+              '<span class="success">Contract loaded successfully</span>';
+            loadEntities();
+          } catch (error) {
+            document.getElementById('contractStatus').innerHTML =
+              `<span class="error">Error loading contract: ${error.message}</span>`;
+          }
+        });
+
+      // Read Functions
+      document
+        .getElementById('getAppName')
+        .addEventListener('click', async () => {
+          if (!contract) return alert('Load contract first');
+          try {
+            const name = await contract.getAppName();
+            document.getElementById('readResults').innerHTML =
+              `<div>App Name: ${name}</div>`;
+          } catch (error) {
+            document.getElementById('readResults').innerHTML =
+              `<span class="error">Error: ${error.message}</span>`;
+          }
+        });
+
+      document
+        .getElementById('isAppActive')
+        .addEventListener('click', async () => {
+          if (!contract) return alert('Load contract first');
+          try {
+            const active = await contract.isAppActive();
+            document.getElementById('readResults').innerHTML =
+              `<div>App Active: ${active}</div>`;
+          } catch (error) {
+            document.getElementById('readResults').innerHTML =
+              `<span class="error">Error: ${error.message}</span>`;
+          }
+        });
+
+      document
+        .getElementById('getAppEntities')
+        .addEventListener('click', async () => {
+          if (!contract) return alert('Load contract first');
+          try {
+            const entities = await contract.getAppEntities();
+            if (entities.length === 0) {
+              document.getElementById('readResults').innerHTML =
+                '<div>No entities found</div>';
+            } else {
+              let html =
+                '<div style="margin-bottom: 10px;"><strong>Found ' +
+                entities.length +
+                ' entity(ies):</strong></div><div class="entities-list">';
+
+              entities.forEach((entity, index) => {
+                const entityId = `entity-${index}`;
+                html += `<div class="entity-card" id="${entityId}">
+                            <div style="flex: 1;">
+                                <span class="entity-address">${entity}</span>
+                                <div style="font-weight: bold; margin-top: 4px;" id="${entityId}-name">Loading name...</div>
+                            </div>
+                            <button class="entity-btn" onclick="loadEntityDemo('${entity}')">Test Entity</button>
+                        </div>`;
+              });
+
+              html += '</div>';
+              document.getElementById('readResults').innerHTML = html;
+
+              // Asynchronously fetch entity names
+              entities.forEach(async (entity, index) => {
+                const entityId = `entity-${index}`;
+                try {
+                  const entityContract = new ethers.Contract(
+                    entity,
+                    iEntityAbi,
+                    provider,
+                  );
+                  const entityInfo = await entityContract.getEntityInfo();
+                  const entityName = entityInfo[0];
+                  const nameElement = document.getElementById(
+                    `${entityId}-name`,
+                  );
+                  if (nameElement) {
+                    nameElement.textContent = entityName;
+                  }
+                } catch (error) {
+                  const nameElement = document.getElementById(
+                    `${entityId}-name`,
+                  );
+                  if (nameElement) {
+                    nameElement.textContent = 'Error loading name';
+                  }
+                }
+              });
+            }
+          } catch (error) {
+            document.getElementById('readResults').innerHTML =
+              `<span class="error">Error: ${error.message}</span>`;
+          }
+        });
+
+      function loadEntityDemo(entityAddress) {
+        const contractAddr = document.getElementById('contractAddress').value;
+        window.location.href = `entity-demo.html?app=${contractAddr}&entity=${entityAddress}`;
+      }
+
+      async function loadEntities() {
+        if (!contract) return;
+        try {
+          const entities = await contract.getAppEntities();
+          if (entities.length === 0) {
+            document.getElementById('entitySelectionResults').innerHTML =
+              '<div>No entities found</div>';
+          } else {
+            let html =
+              '<table style="width: 100%; border-collapse: collapse; margin-top: 12px;"><thead><tr><th style="border: 1px solid #e0e0e0; padding: 8px; background: #f5f5f5;">Entity Address</th><th style="border: 1px solid #e0e0e0; padding: 8px; background: #f5f5f5;">Entity Name</th><th style="border: 1px solid #e0e0e0; padding: 8px; background: #f5f5f5;">Action</th></tr></thead><tbody>';
+
+            entities.forEach((entity, index) => {
+              const entityId = `entity-table-${index}`;
+              html += `<tr id="${entityId}"><td style="border: 1px solid #e0e0e0; padding: 8px; font-family: 'Monaco', 'Menlo', monospace; word-break: break-all;">${entity}</td><td style="border: 1px solid #e0e0e0; padding: 8px; font-weight: bold;" id="${entityId}-name">Loading name...</td><td style="border: 1px solid #e0e0e0; padding: 8px; text-align: center;"><button class="entity-btn" onclick="loadEntityDemo('${entity}')">Select</button></td></tr>`;
+            });
+
+            html += '</tbody></table>';
+            document.getElementById('entitySelectionResults').innerHTML = html;
+
+            // Asynchronously fetch entity names
+            entities.forEach(async (entity, index) => {
+              const entityId = `entity-table-${index}`;
+              try {
+                const entityContract = new ethers.Contract(
+                  entity,
+                  iEntityAbi,
+                  provider,
+                );
+                const entityInfo = await entityContract.getEntityInfo();
+                const entityName = entityInfo[0];
+                const nameElement = document.getElementById(`${entityId}-name`);
+                if (nameElement) {
+                  nameElement.textContent = entityName;
+                }
+              } catch (error) {
+                const nameElement = document.getElementById(`${entityId}-name`);
+                if (nameElement) {
+                  nameElement.textContent = 'Error loading name';
+                }
+              }
+            });
+          }
+        } catch (error) {
+          document.getElementById('entitySelectionResults').innerHTML =
+            `<span class="error">Error loading entities: ${error.message}</span>`;
+        }
+      }
+
+      document
+        .getElementById('getOwner')
+        .addEventListener('click', async () => {
+          if (!contract) return alert('Load contract first');
+          try {
+            const owner = await contract.owner();
+            document.getElementById('readResults').innerHTML =
+              `<div>Owner: ${owner}</div>`;
+          } catch (error) {
+            document.getElementById('readResults').innerHTML =
+              `<span class="error">Error: ${error.message}</span>`;
+          }
+        });
+
+      // Write Functions
+      document
+        .getElementById('updateAppName')
+        .addEventListener('click', async () => {
+          if (!contract) return alert('Load contract first');
+          const newName = document.getElementById('newAppName').value.trim();
+          if (!newName) return alert('Enter a valid name (cannot be empty)');
+
+          try {
+            const owner = await contract.owner();
+            const currentAccount = await signer.getAddress();
+
+            if (owner.toLowerCase() !== currentAccount.toLowerCase()) {
+              document.getElementById('writeResults').innerHTML =
+                `<span class="error">Error: You are not the owner</span>`;
+              return;
+            }
+
+            const tx = await contract.updateAppName(newName);
+            document.getElementById('writeResults').innerHTML =
+              `<div>Transaction sent: ${tx.hash}</div>`;
+            await tx.wait();
+            document.getElementById('writeResults').innerHTML +=
+              '<div class="success">App name updated to: ' + newName + '</div>';
+          } catch (error) {
+            document.getElementById('writeResults').innerHTML =
+              `<span class="error">Error: ${error.message}</span>`;
+          }
+        });
+
+      document
+        .getElementById('deactivateApp')
+        .addEventListener('click', async () => {
+          if (!contract) return alert('Load contract first');
+          if (!confirm('Are you sure you want to deactivate the app?')) return;
+
+          try {
+            const owner = await contract.owner();
+            const currentAccount = await signer.getAddress();
+
+            if (owner.toLowerCase() !== currentAccount.toLowerCase()) {
+              document.getElementById('writeResults').innerHTML =
+                `<span class="error">Error: You are not the owner</span>`;
+              return;
+            }
+
+            const tx = await contract.deactivateApp();
+            document.getElementById('writeResults').innerHTML =
+              `<div>Transaction sent: ${tx.hash}</div>`;
+            await tx.wait();
+            document.getElementById('writeResults').innerHTML +=
+              '<div class="success">App deactivated!</div>';
+          } catch (error) {
+            document.getElementById('writeResults').innerHTML =
+              `<span class="error">Error: ${error.message}</span>`;
+          }
+        });
+
+      document
+        .getElementById('transferOwnership')
+        .addEventListener('click', async () => {
+          if (!contract) return alert('Load contract first');
+          const newOwner = document.getElementById('newOwner').value.trim();
+          if (!newOwner || !newOwner.startsWith('0x') || newOwner.length !== 42)
+            return alert('Enter a valid Ethereum address');
+
+          if (
+            !confirm(
+              `Are you sure you want to transfer ownership to ${newOwner}?`,
+            )
+          )
+            return;
+
+          try {
+            const owner = await contract.owner();
+            const currentAccount = await signer.getAddress();
+
+            if (owner.toLowerCase() !== currentAccount.toLowerCase()) {
+              document.getElementById('writeResults').innerHTML =
+                `<span class="error">Error: You are not the owner</span>`;
+              return;
+            }
+
+            const tx = await contract.transferOwnership(newOwner);
+            document.getElementById('writeResults').innerHTML =
+              `<div>Transaction sent: ${tx.hash}</div>`;
+            await tx.wait();
+            document.getElementById('writeResults').innerHTML +=
+              '<div class="success">Ownership transferred to: ' +
+              newOwner +
+              '</div>';
+          } catch (error) {
+            document.getElementById('writeResults').innerHTML =
+              `<span class="error">Error: ${error.message}</span>`;
+          }
+        });
+
+      document
+        .getElementById('createEntity')
+        .addEventListener('click', async () => {
+          if (!contract) return alert('Load contract first');
+          const owner = document.getElementById('entityOwner').value.trim();
+          const name = document.getElementById('entityName').value.trim();
+          const url = document.getElementById('entityUrl').value.trim();
+          if (!owner || !name || !url) return alert('Fill all fields');
+          if (!owner.startsWith('0x') || owner.length !== 42)
+            return alert('Invalid entity owner address');
+
+          try {
+            const contractOwner = await contract.owner();
+            const currentAccount = await signer.getAddress();
+
+            if (contractOwner.toLowerCase() !== currentAccount.toLowerCase()) {
+              document.getElementById('writeResults').innerHTML =
+                `<span class="error">Error: You are not the owner</span>`;
+              return;
+            }
+
+            const tx = await contract.createEntity(owner, name, url);
+            document.getElementById('writeResults').innerHTML =
+              `<div>Transaction sent: ${tx.hash}</div>`;
+            const receipt = await tx.wait();
+            document.getElementById('writeResults').innerHTML +=
+              '<div class="success">Entity created!</div>';
+            loadEntities();
+          } catch (error) {
+            document.getElementById('writeResults').innerHTML =
+              `<span class="error">Error: ${error.message}</span>`;
+          }
+        });
+
+      document
+        .getElementById('recoverERC20')
+        .addEventListener('click', async () => {
+          if (!contract) return alert('Load contract first');
+          const token = document.getElementById('tokenAddress').value.trim();
+          const to = document.getElementById('recipient').value.trim();
+          const amount = document.getElementById('amount').value.trim();
+          if (!token || !to || !amount) return alert('Fill all fields');
+          if (!token.startsWith('0x') || token.length !== 42)
+            return alert('Invalid token address');
+          if (!to.startsWith('0x') || to.length !== 42)
+            return alert('Invalid recipient address');
+
+          try {
+            const owner = await contract.owner();
+            const currentAccount = await signer.getAddress();
+
+            if (owner.toLowerCase() !== currentAccount.toLowerCase()) {
+              document.getElementById('writeResults').innerHTML =
+                `<span class="error">Error: You are not the owner</span>`;
+              return;
+            }
+
+            const tx = await contract.recoverERC20(token, to, amount);
+            document.getElementById('writeResults').innerHTML =
+              `<div>Transaction sent: ${tx.hash}</div>`;
+            await tx.wait();
+            document.getElementById('writeResults').innerHTML +=
+              '<div class="success">Tokens recovered!</div>';
+          } catch (error) {
+            document.getElementById('writeResults').innerHTML =
+              `<span class="error">Error: ${error.message}</span>`;
+          }
+        });
+
+      // Load deployment configuration
+      async function loadDeploymentConfig() {
+        try {
+          const response = await fetch(
+            'deployment.json?' + new Date().getTime(),
+          );
+          const config = await response.json();
+          sessionStorage.setItem('deploymentConfig', JSON.stringify(config));
+
+          // Auto-populate app contract address if available
+          if (config.contracts && config.contracts.appProxy) {
+            document.getElementById('contractAddress').value =
+              config.contracts.appProxy.address;
+            // Auto load contract
+            if (typeof window.ethereum !== 'undefined') {
+              try {
+                if (!signer) {
+                  const tempProvider = new ethers.BrowserProvider(
+                    window.ethereum,
+                  );
+                  signer = await tempProvider.getSigner();
+                  provider = tempProvider;
+                }
+                contractAddress = config.contracts.appProxy.address;
+                contract = new ethers.Contract(contractAddress, abi, signer);
+                document.getElementById('contractStatus').innerHTML =
+                  '<span class="success">Contract loaded successfully</span>';
+                loadEntities();
+              } catch (error) {
+                // If not connected, silently fail
+                console.log(
+                  'Auto load failed, probably not connected:',
+                  error.message,
+                );
+              }
+            }
+          }
+        } catch (error) {
+          console.warn('Could not load deployment.json:', error);
+        }
+      }
+
+      // Check if already connected on page load
+      window.addEventListener('load', async () => {
+        await loadDeploymentConfig();
+        if (sessionStorage.getItem('connected') === 'true') {
+          document.getElementById('connectButton').click();
+        }
+      });
+    </script>
+  </body>
+</html>
