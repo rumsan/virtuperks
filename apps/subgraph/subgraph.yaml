@@ -8,7 +8,7 @@ dataSources:
     name: Entity
     network: base-sepolia
     source:
-      address: "0xf00E856a7E602468bAE51AEff431Aa22Ce2d3bbD"
+      address: '0xf00E856a7E602468bAE51AEff431Aa22Ce2d3bbD'
       abi: Entity
       startBlock: 35957078
     mapping:
@@ -87,3 +87,96 @@ dataSources:
         - event: Upgraded(indexed address)
           handler: handleUpgraded
       file: ./src/entity.ts
+  - kind: ethereum
+    name: App
+    network: base-sepolia
+    source:
+      address: '0xA35a59c5eA0d36052C07d31FaaD074f3aceAe0e9'
+      abi: App
+      startBlock: 35957080
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - AppCreated
+        - AppDeactivated
+        - AppNameUpdated
+        - AppStopped
+        - EntityCreated
+        - EntityImplementationUpdated
+        - AppInitialized
+        - AppOwnershipTransferred
+        - TokensRecovered
+        - AppUpgraded
+      abis:
+        - name: App
+          file: ./abis/App.json
+      eventHandlers:
+        - event: AppCreated(indexed address,string)
+          handler: handleAppCreated
+        - event: AppDeactivated(indexed address)
+          handler: handleAppDeactivated
+        - event: AppNameUpdated(string,string,indexed address)
+          handler: handleAppNameUpdated
+        - event: AppStopped(indexed address)
+          handler: handleAppStopped
+        - event: EntityCreated(indexed address,indexed address)
+          handler: handleEntityCreated
+        - event: EntityImplementationUpdated(indexed address,indexed address)
+          handler: handleEntityImplementationUpdated
+        - event: Initialized(uint64)
+          handler: handleInitialized
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: TokensRecovered(indexed address,indexed address,uint256,indexed address)
+          handler: handleTokensRecovered
+        - event: Upgraded(indexed address)
+          handler: handleUpgraded
+      file: ./src/app.ts
+  - kind: ethereum
+    name: RewardToken
+    network: base-sepolia
+    source:
+      address: '0xf2544d5668c563B21483100C056B22f4c0308f86'
+      abi: RewardToken
+      startBlock: 35957084
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - RewardTokenOwnershipTransferred
+        - Transfer
+      abis:
+        - name: RewardToken
+          file: ./abis/RewardToken.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/reward-token.ts
+  - kind: ethereum
+    name: ERC1967Proxy
+    network: base-sepolia
+    source:
+      address: '0xAf4d614FaE9382CbC2026408C026eB12A5DdEb4e'
+      abi: ERC1967Proxy
+      startBlock: 35957083
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - ERC1967ProxyUpgraded
+      abis:
+        - name: ERC1967Proxy
+          file: ./abis/ERC1967Proxy.json
+      eventHandlers:
+        - event: Upgraded(indexed address)
+          handler: handleUpgraded
+      file: ./src/erc-1967-proxy.ts
