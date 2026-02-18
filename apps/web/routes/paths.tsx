@@ -49,6 +49,8 @@ export const PATHS = {
     HOME: `${ROOTS.TASKPORTAL}`,
     ADD: `${ROOTS.TASKPORTAL}/add`,
     DETAILS: (cuid: string) => `${ROOTS.TASKPORTAL}/${cuid}`,
+    MINE: `${ROOTS.TASKPORTAL}/mine`,
+    MINE_DETAILS: (cuid: string) => `${ROOTS.TASKPORTAL}/mine/${cuid}`,
   },
 
   TOKENMARKETPLACE: {

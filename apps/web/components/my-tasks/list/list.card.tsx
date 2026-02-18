@@ -1,9 +1,9 @@
+import { PATHS } from "@/routes/paths";
 import { formatDate } from "@/utils/formatDate";
 import { TaskCreated } from "@workspace/sdk/type";
 import { Card, CardTitle } from "@workspace/ui/components/card";
 import { Coins, Dot } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { useEffect } from "react";
 
 type ListCardDetailsProps = {
   taskList: TaskCreated[];
@@ -16,26 +16,19 @@ const ListCardDetails = ({
   router,
   tabStatus,
 }: ListCardDetailsProps) => {
-  
   const allTasks = Array.isArray(taskList) ? taskList : [];
 
-  
-  useEffect(() => {
-    if (allTasks.length > 0) {
-      console.log("📋 All Task Statuses:");
-      allTasks.forEach((task) => {
-        console.log({
-          id: task?.id,
-          name: task?.taskDetail?.name,
-          isOpen: task?.taskDetail?.isOpen,
-          isTokenDisbursed: task?.taskDetail?.isTokenDisbursed,
-          expiryDate: task?.taskDetail?.expiryDate,
-        });
-      });
+  const handleTaskClick = (task: any) => {
+    // Use internal_id field from the participant data
+    const taskId = task?.internal_id;
+
+    if (taskId) {
+      console.log("🚀 Navigating with internal_id:", taskId);
+      router.push(PATHS.TASKPORTAL.MINE_DETAILS(taskId));
     } else {
-      console.log("⚠️ No tasks available to display.");
+      console.error("❌ No internal_id found in task:", task);
     }
-  }, [allTasks]);
+  };
 
   const handleUrlClick = (e: React.MouseEvent, url: string) => {
     e.stopPropagation();
@@ -48,7 +41,7 @@ const ListCardDetails = ({
         <Card
           key={task?.id}
           className="cursor-pointer"
-          // onClick={() => task?.id && router.push(PATHS.TASKS.DETAILS(task?.id))}
+          onClick={() => handleTaskClick(task)}
         >
           <CardTitle className="flex flex-col p-4 gap-2">
             <div className="flex items-center gap-2 text-[#334155]">
@@ -63,9 +56,9 @@ const ListCardDetails = ({
             </div>
 
             <div className="flex flex-col gap-1 text-sm">
-              <div className="flex items-center font-normal gap-2 cursor-pointer hover:text-blue-400">
+              <div className="flex items-center font-normal gap-2 cursor-pointer group">
                 <span
-                  className="text-[#297AD6] truncate max-w-[200px]"
+                  className="text-[#297AD6] truncate max-w-[200px] border-b-2 border-transparent group-hover:border-[#297AD6] transition-all"
                   title={task?.taskDetail?.detailsUrl}
                   onClick={(e) =>
                     handleUrlClick(e, task?.taskDetail?.detailsUrl ?? "")
